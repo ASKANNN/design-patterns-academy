@@ -1,0 +1,307 @@
+{
+  "slug": "strategy",
+  "name": "Strategy",
+  "category": "behavioral",
+  "complexity": 1,
+  "popularity": 3,
+  "also_known_as": [
+    "Policy"
+  ],
+  "tags": [
+    "behavioral",
+    "algorithm",
+    "interchangeable"
+  ],
+  "intent": {
+    "en": "Strategy packages a group of interchangeable algorithms into their own classes and lets the object using them switch between algorithms at runtime through a shared interface.",
+    "ru": "Стратегия оформляет набор взаимозаменяемых алгоритмов в виде отдельных классов и позволяет объекту, который их использует, переключаться между алгоритмами во время выполнения через общий интерфейс."
+  },
+  "problem": {
+    "en": "Imagine you're building an e-commerce application. At checkout, customers choose how their order is shipped: standard delivery, express shipping, or overnight courier.\n\nYou could implement all these options with a giant `if/else` block inside an `Order` class. But every time shipping rates change, or a new carrier is added, you have to modify that class — violating the Open/Closed Principle and making it harder to maintain.\n\nAs business rules grow, the class becomes bloated with unrelated logic that is difficult to test in isolation.",
+    "ru": "Представьте, что вы создаёте интернет-магазин. На этапе оформления заказа покупатель выбирает способ доставки: обычная, экспресс или курьер на следующий день.\n\nМожно реализовать все варианты с помощью большого блока `if/else` внутри класса `Order`. Но каждый раз, когда изменяются тарифы или добавляется новый перевозчик, придётся менять этот класс — нарушая принцип открытости/закрытости.\n\nПо мере роста бизнес-логики класс разбухает несвязанной логикой, которую сложно тестировать."
+  },
+  "solution": {
+    "en": "The Strategy pattern suggests extracting all these algorithms (shipping methods) into separate classes called **strategies**. The original class, called the **context**, stores a reference to one of the strategy objects and delegates the work to it.\n\nThe context is not responsible for selecting the appropriate algorithm — the client does that. The context works with all strategies through a generic interface exposing a single method that triggers the algorithm.\n\nThis makes the context independent of concrete strategies, so you can add new shipping carriers without ever touching the `Order` class.",
+    "ru": "Паттерн Стратегия предлагает вынести все алгоритмы (способы доставки) в отдельные классы — **стратегии**. Исходный класс, называемый **контекстом**, хранит ссылку на одну из стратегий и делегирует ей выполнение работы.\n\nКонтекст не выбирает подходящий алгоритм — это делает клиент. Контекст взаимодействует со всеми стратегиями через единый интерфейс.\n\nЭто делает контекст независимым от конкретных стратегий: можно добавлять новых перевозчиков, не изменяя класс `Order`."
+  },
+  "structure": {
+    "description": {
+      "en": "The Context holds a reference to a Strategy and delegates work to it. The Strategy interface is common to all supported algorithms. ConcreteStrategy classes implement each variation of the algorithm.",
+      "ru": "Контекст хранит ссылку на стратегию и делегирует ей выполнение работы. Интерфейс стратегии общий для всех поддерживаемых алгоритмов. Конкретные стратегии реализуют различные варианты алгоритма."
+    },
+    "participants": [
+      {
+        "name": "Context",
+        "role": {
+          "en": "Holds a reference to a strategy object and delegates all algorithm-specific work to it. Communicates with the strategy only through the Strategy interface.",
+          "ru": "Хранит ссылку на объект-стратегию и делегирует ей выполнение алгоритма. Взаимодействует со стратегией только через интерфейс."
+        }
+      },
+      {
+        "name": "Strategy",
+        "role": {
+          "en": "Declares an interface common to all supported versions of the algorithm. The context uses this interface to call the algorithm defined by a concrete strategy.",
+          "ru": "Объявляет интерфейс, общий для всех вариантов алгоритма. Контекст использует этот интерфейс для вызова алгоритма, определённого конкретной стратегией."
+        }
+      },
+      {
+        "name": "ConcreteStrategy",
+        "role": {
+          "en": "Implements a specific version of the algorithm using the Strategy interface.",
+          "ru": "Реализует конкретный вариант алгоритма, используя интерфейс стратегии."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Creates a specific strategy object and passes it to the context. The context exposes a setter that lets clients replace the strategy at runtime.",
+          "ru": "Создаёт объект-стратегию и передаёт его контексту. Контекст предоставляет сеттер, позволяющий клиентам заменять стратегию во время выполнения."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Strategy base class (duck-typed in JS)\nclass ShippingStrategy {\n  calculate(order) {\n    throw new Error('calculate() must be implemented');\n  }\n}\n\nclass StandardShipping extends ShippingStrategy {\n  calculate({ weight }) {\n    return weight * 1.5;\n  }\n}\n\nclass ExpressShipping extends ShippingStrategy {\n  calculate({ weight }) {\n    return weight * 3.0 + 10;\n  }\n}\n\nclass OvernightShipping extends ShippingStrategy {\n  calculate({ weight }) {\n    return weight * 5.0 + 25;\n  }\n}\n\n// Context\nclass ShoppingCart {\n  #strategy;\n\n  constructor(strategy) {\n    this.#strategy = strategy;\n  }\n\n  setStrategy(strategy) {\n    this.#strategy = strategy;\n  }\n\n  getShippingCost(order) {\n    return this.#strategy.calculate(order);\n  }\n}\n\n// Usage\nconst cart = new ShoppingCart(new StandardShipping());\nconst order = { weight: 10, destination: 'NYC' };\n\nconsole.log(cart.getShippingCost(order)); // 15\n\ncart.setStrategy(new ExpressShipping());\nconsole.log(cart.getShippingCost(order)); // 40\n\ncart.setStrategy(new OvernightShipping());\nconsole.log(cart.getShippingCost(order)); // 75",
+    "typescript": "interface ShippingStrategy {\n  calculate(order: OrderData): number;\n}\n\ninterface OrderData {\n  weight: number;\n  destination: string;\n}\n\nclass StandardShipping implements ShippingStrategy {\n  calculate({ weight }: OrderData): number {\n    return weight * 1.5;\n  }\n}\n\nclass ExpressShipping implements ShippingStrategy {\n  calculate({ weight }: OrderData): number {\n    return weight * 3.0 + 10;\n  }\n}\n\nclass OvernightShipping implements ShippingStrategy {\n  calculate({ weight }: OrderData): number {\n    return weight * 5.0 + 25;\n  }\n}\n\n// Context\nclass ShoppingCart {\n  private strategy: ShippingStrategy;\n\n  constructor(strategy: ShippingStrategy) {\n    this.strategy = strategy;\n  }\n\n  setStrategy(strategy: ShippingStrategy): void {\n    this.strategy = strategy;\n  }\n\n  getShippingCost(order: OrderData): number {\n    return this.strategy.calculate(order);\n  }\n}\n\n// Usage\nconst cart = new ShoppingCart(new StandardShipping());\nconst order: OrderData = { weight: 10, destination: 'NYC' };\n\nconsole.log(cart.getShippingCost(order)); // 15\n\ncart.setStrategy(new OvernightShipping());\nconsole.log(cart.getShippingCost(order)); // 75",
+    "java": "// Strategy interface\ninterface ShippingStrategy {\n    double calculate(Order order);\n}\n\nrecord Order(double weight, String destination) {}\n\nclass StandardShipping implements ShippingStrategy {\n    public double calculate(Order o) { return o.weight() * 1.5; }\n}\n\nclass ExpressShipping implements ShippingStrategy {\n    public double calculate(Order o) { return o.weight() * 3.0 + 10; }\n}\n\nclass OvernightShipping implements ShippingStrategy {\n    public double calculate(Order o) { return o.weight() * 5.0 + 25; }\n}\n\n// Context\nclass ShoppingCart {\n    private ShippingStrategy strategy;\n\n    ShoppingCart(ShippingStrategy strategy) { this.strategy = strategy; }\n\n    public void setStrategy(ShippingStrategy s) { this.strategy = s; }\n    public double getShippingCost(Order o)      { return strategy.calculate(o); }\n}\n\n// Usage\nShoppingCart cart = new ShoppingCart(new StandardShipping());\nOrder order = new Order(10, \"NYC\");\n\nSystem.out.println(cart.getShippingCost(order)); // 15.0\n\ncart.setStrategy(new ExpressShipping());\nSystem.out.println(cart.getShippingCost(order)); // 40.0\n\ncart.setStrategy(new OvernightShipping());\nSystem.out.println(cart.getShippingCost(order)); // 75.0",
+    "csharp": "// Strategy interface\ninterface IShippingStrategy { double Calculate(Order order); }\n\nrecord Order(double Weight, string Destination);\n\nclass StandardShipping  : IShippingStrategy { public double Calculate(Order o) => o.Weight * 1.5; }\nclass ExpressShipping   : IShippingStrategy { public double Calculate(Order o) => o.Weight * 3.0 + 10; }\nclass OvernightShipping : IShippingStrategy { public double Calculate(Order o) => o.Weight * 5.0 + 25; }\n\n// Context\nclass ShoppingCart\n{\n    private IShippingStrategy _strategy;\n\n    public ShoppingCart(IShippingStrategy strategy) => _strategy = strategy;\n\n    public void SetStrategy(IShippingStrategy s) => _strategy = s;\n    public double GetShippingCost(Order o)        => _strategy.Calculate(o);\n}\n\n// Usage\nvar cart  = new ShoppingCart(new StandardShipping());\nvar order = new Order(10, \"NYC\");\n\nConsole.WriteLine(cart.GetShippingCost(order)); // 15\n\ncart.SetStrategy(new ExpressShipping());\nConsole.WriteLine(cart.GetShippingCost(order)); // 40\n\ncart.SetStrategy(new OvernightShipping());\nConsole.WriteLine(cart.GetShippingCost(order)); // 75",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\nfrom dataclasses import dataclass\n\n\n@dataclass\nclass OrderData:\n    weight: float\n    destination: str\n\n\nclass ShippingStrategy(ABC):\n    @abstractmethod\n    def calculate(self, order: OrderData) -> float:\n        ...\n\n\nclass StandardShipping(ShippingStrategy):\n    def calculate(self, order: OrderData) -> float:\n        return order.weight * 1.5\n\n\nclass ExpressShipping(ShippingStrategy):\n    def calculate(self, order: OrderData) -> float:\n        return order.weight * 3.0 + 10\n\n\nclass OvernightShipping(ShippingStrategy):\n    def calculate(self, order: OrderData) -> float:\n        return order.weight * 5.0 + 25\n\n\n# Context\nclass ShoppingCart:\n    def __init__(self, strategy: ShippingStrategy) -> None:\n        self._strategy = strategy\n\n    def set_strategy(self, strategy: ShippingStrategy) -> None:\n        self._strategy = strategy\n\n    def get_shipping_cost(self, order: OrderData) -> float:\n        return self._strategy.calculate(order)\n\n\n# Usage\ncart = ShoppingCart(StandardShipping())\norder = OrderData(weight=10, destination='NYC')\n\nprint(cart.get_shipping_cost(order))  # 15.0\n\ncart.set_strategy(ExpressShipping())\nprint(cart.get_shipping_cost(order))  # 40.0\n\ncart.set_strategy(OvernightShipping())\nprint(cart.get_shipping_cost(order))  # 75.0"
+  },
+  "pros": [
+    {
+      "en": "New algorithms can be added as new strategy classes, without editing the context or any existing strategy.",
+      "ru": "Новые алгоритмы добавляются как новые классы стратегий — без правок контекста и уже существующих стратегий."
+    },
+    {
+      "en": "The active algorithm can be swapped while the program is running, simply by handing the context a different strategy object.",
+      "ru": "Активный алгоритм можно заменить прямо во время работы программы, просто передав контексту другой объект-стратегию."
+    },
+    {
+      "en": "Each algorithm becomes independently testable, since it lives in its own class with no dependency on the context's internals.",
+      "ru": "Каждый алгоритм можно тестировать отдельно, поскольку он находится в своём классе и не зависит от внутреннего устройства контекста."
+    },
+    {
+      "en": "A tangled chain of conditionals gets replaced by composition: the context simply holds and delegates to an object.",
+      "ru": "Запутанная цепочка условных операторов заменяется композицией: контекст просто хранит объект и делегирует ему работу."
+    }
+  ],
+  "cons": [
+    {
+      "en": "For a handful of algorithms that almost never change, a strategy hierarchy adds more ceremony than a simple conditional would.",
+      "ru": "Если алгоритмов немного и они почти не меняются, иерархия стратегий добавляет больше формальностей, чем простое условие."
+    },
+    {
+      "en": "The calling code has to know which strategies exist and what each one is for, so the decision logic doesn't disappear — it just moves to the client.",
+      "ru": "Вызывающий код должен знать, какие стратегии существуют и для чего каждая из них нужна, — логика выбора никуда не исчезает, а просто переносится к клиенту."
+    },
+    {
+      "en": "In languages with first-class functions, a single-method strategy interface can often be replaced by passing a plain function or closure instead.",
+      "ru": "В языках с функциями первого класса интерфейс стратегии с одним методом часто можно заменить обычной функцией или замыканием."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Strategy when an object needs to pick between several variants of a behavior and that choice may change while the program runs.",
+      "ru": "Применяйте Стратегию, когда объекту нужно выбирать между несколькими вариантами поведения и этот выбор может меняться во время работы программы."
+    },
+    {
+      "en": "It also helps when several classes are nearly identical except for one piece of behavior — that piece becomes the strategy, and the classes collapse into one.",
+      "ru": "Паттерн полезен и тогда, когда несколько классов почти идентичны и отличаются лишь одним фрагментом поведения — этот фрагмент выносится в стратегию, а классы объединяются в один."
+    },
+    {
+      "en": "Use it to keep an algorithm's implementation details out of a class whose main job is unrelated business logic.",
+      "ru": "Используйте паттерн, чтобы детали реализации алгоритма не засоряли класс, чья основная задача — не связанная с ними бизнес-логика."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Payment gateways** — checkout can switch between Stripe, PayPal, or Apple Pay without changing the cart logic.",
+      "ru": "**Платёжные шлюзы** — на странице оплаты можно переключаться между Stripe, PayPal или Apple Pay, не меняя логику корзины."
+    },
+    {
+      "en": "**`Array.prototype.sort()`** — the comparator function you pass is a strategy that defines how elements are ordered.",
+      "ru": "**`Array.prototype.sort()`** — функция-компаратор, переданная в `sort()`, является стратегией, определяющей порядок элементов."
+    },
+    {
+      "en": "**File compression** — archiving tools let users choose between ZIP, GZIP, or BZIP2 without changing the archiving UI.",
+      "ru": "**Сжатие файлов** — архиватор позволяет выбрать формат (ZIP, GZIP, BZIP2), не меняя интерфейс программы."
+    }
+  ],
+  "related_patterns": [
+    "state",
+    "template-method",
+    "command",
+    "decorator"
+  ],
+  "visuals": [
+    {
+      "id": "strategy-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "behavioral",
+      "width": 960,
+      "height": 420,
+      "title": {
+        "en": "How Strategy works",
+        "ru": "Как работает Стратегия"
+      },
+      "description": {
+        "en": "The Context holds a reference to a Strategy interface. The Client swaps the concrete strategy at runtime without touching the Context. The same calculate() call produces different results depending on which concrete strategy — Ground or Air — is currently set.",
+        "ru": "Контекст хранит ссылку на интерфейс Стратегии. Клиент меняет конкретную стратегию во время выполнения, не затрагивая Контекст. Один и тот же вызов calculate() даёт разные результаты в зависимости от того, какая конкретная стратегия — Ground или Air — установлена в данный момент."
+      },
+      "caption": {
+        "en": "Same context. Different strategy. Different result. Swapped at runtime.",
+        "ru": "Тот же контекст. Другая стратегия. Другой результат. Изменено во время выполнения."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "chooses route",
+            "ru": "выбирает маршрут"
+          },
+          "position": {
+            "x": 60,
+            "y": 165,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "context",
+          "kind": "class",
+          "icon": "layers",
+          "label": {
+            "en": "Navigator",
+            "ru": "Навигатор"
+          },
+          "subtitle": {
+            "en": "context",
+            "ru": "контекст"
+          },
+          "position": {
+            "x": 340,
+            "y": 165,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "strategy",
+          "kind": "interface",
+          "icon": "spark",
+          "emphasis": true,
+          "label": {
+            "en": "RouteStrategy",
+            "ru": "СтратегияПути"
+          },
+          "subtitle": {
+            "en": "changeable gear",
+            "ru": "сменная шестеренка"
+          },
+          "position": {
+            "x": 340,
+            "y": 290,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "ground",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "WalkingRoute",
+            "ru": "Пеший Маршрут"
+          },
+          "subtitle": {
+            "en": "strategy A",
+            "ru": "стратегия A"
+          },
+          "position": {
+            "x": 680,
+            "y": 60,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "air",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "RoadRoute",
+            "ru": "Авто Маршрут"
+          },
+          "subtitle": {
+            "en": "strategy B",
+            "ru": "стратегия B"
+          },
+          "position": {
+            "x": 680,
+            "y": 240,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "context",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "side",
+          "label": {
+            "en": "① setStrategy()",
+            "ru": "① выбратьСтратегию()"
+          }
+        },
+        {
+          "source": "context",
+          "target": "strategy",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "vertical",
+          "label": {
+            "en": "② calculate()",
+            "ru": "② рассчитать()"
+          }
+        },
+        {
+          "source": "strategy",
+          "target": "ground",
+          "relationship": "flow",
+          "variant": "reuse",
+          "routing": "border",
+          "label": {
+            "en": "③ run",
+            "ru": "③ запуск"
+          }
+        },
+        {
+          "source": "strategy",
+          "target": "air",
+          "relationship": "flow",
+          "variant": "reuse",
+          "routing": "border",
+          "label": {
+            "en": "④ run",
+            "ru": "④ запуск"
+          }
+        }
+      ]
+    }
+  ]
+}

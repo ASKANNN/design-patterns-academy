@@ -1,0 +1,1238 @@
+
+
+.diagram {
+  --diagram-accent: var(--color-accent);
+  margin: 0;
+}
+
+.diagram--creational { --diagram-accent: var(--palette-category-creational); }
+.diagram--structural { --diagram-accent: var(--palette-category-structural); }
+.diagram--behavioral { --diagram-accent: var(--palette-category-behavioral); }
+
+.diagram__viewport {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+[data-theme="light"] .diagram__viewport {
+  background: var(--color-bg-subtle);
+}
+
+.diagram__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  font-family: var(--font-sans);
+}
+
+.diagram__node {
+  outline: none;
+  cursor: default;
+}
+
+.diagram__node-box {
+  fill: var(--color-bg-elevated);
+  stroke: var(--color-border);
+  stroke-width: 1;
+  transition: var(--transition-colors);
+}
+
+.diagram__node--abstract .diagram__node-box {
+  stroke-dasharray: 5 4;
+}
+
+.diagram__node--client .diagram__node-box {
+  fill: var(--color-bg-subtle);
+}
+
+[data-theme="light"] .diagram__node--client .diagram__node-box {
+  fill: var(--color-bg-base);
+}
+
+.diagram__node-accent {
+  fill: var(--diagram-accent);
+}
+
+.diagram__node-title {
+  fill: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 14px;
+}
+
+.diagram__node-member {
+  fill: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.diagram__node-sep {
+  stroke: var(--color-border-subtle);
+  stroke-width: 1;
+}
+
+.diagram__node:hover .diagram__node-box {
+  stroke: var(--color-border-strong);
+}
+
+.diagram__node:focus-visible .diagram__node-box {
+  stroke: var(--diagram-accent);
+  stroke-width: 2;
+}
+
+.diagram__edge {
+  fill: none;
+  stroke: var(--color-border-strong);
+  stroke-width: 1.5;
+}
+
+.diagram__edge--dashed {
+  stroke-dasharray: 6 4;
+}
+
+.diagram__edge-label {
+  fill: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+
+.diagram__marker path {
+  stroke: var(--color-border-strong);
+  stroke-width: 1.5;
+}
+
+.diagram__marker--association path { fill: none; }
+.diagram__marker--inheritance path { fill: var(--color-bg-surface); }
+.diagram__marker--aggregation path { fill: var(--color-bg-surface); }
+.diagram__marker--composition path { fill: var(--color-border-strong); }
+
+.diagram__caption {
+  margin-top: var(--space-3);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
+.diagram--concept .diagram__viewport {
+  background:
+    radial-gradient(62% 78% at 80% 50%, color-mix(in srgb, var(--diagram-accent) 16%, transparent), transparent 74%),
+    var(--color-bg-subtle);
+  border-color: var(--color-border-strong);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-10) var(--space-8);
+}
+
+[data-theme="light"] .diagram--concept .diagram__viewport {
+  background:
+    radial-gradient(62% 78% at 80% 50%, color-mix(in srgb, var(--diagram-accent) 10%, transparent), transparent 74%),
+    var(--palette-gray-200);
+}
+
+[data-theme="dark"] .diagram--concept .diagram__viewport {
+  border-color: var(--color-border);
+}
+
+.diagram__card {
+  outline: none;
+  filter:
+    drop-shadow(0 2px 4px rgba(17, 24, 39, 0.06))
+    drop-shadow(0 12px 22px rgba(17, 24, 39, 0.12));
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__card {
+  filter:
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 14px 26px rgba(0, 0, 0, 0.55));
+}
+.diagram__card:hover { transform: translateY(-2px); }
+
+.diagram__card-bg {
+  fill: var(--color-bg-elevated);
+  stroke: var(--color-border);
+  stroke-width: 1;
+  transition: var(--transition-colors);
+}
+.diagram__card:hover .diagram__card-bg {
+  stroke: var(--color-border-strong);
+}
+.diagram__card:focus-visible .diagram__card-bg {
+  stroke: var(--diagram-accent);
+  stroke-width: 2;
+}
+
+.diagram__card--emphasis {
+  filter:
+    drop-shadow(0 6px 14px rgba(17, 24, 39, 0.16))
+    drop-shadow(0 20px 42px color-mix(in srgb, var(--diagram-accent) 40%, transparent));
+}
+[data-theme="dark"] .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 20px 46px color-mix(in srgb, var(--diagram-accent) 55%, transparent));
+}
+.diagram__card--emphasis .diagram__card-bg {
+  stroke: transparent;
+}
+
+.diagram__card-chip {
+  fill: var(--color-accent-subtle);
+  stroke: none;
+}
+.diagram__card-chip--on-accent {
+  fill: rgba(255, 255, 255, 0.18);
+}
+
+.diagram__card-title {
+  fill: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+.diagram__card-sub {
+  fill: var(--color-text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.diagram__card--emphasis .diagram__card-title--on-accent {
+  font-size: 17px;
+}
+.diagram__card-title--on-accent { fill: #FFFFFF; }
+.diagram__card-sub--on-accent   { fill: rgba(255, 255, 255, 0.90); font-family: var(--font-sans); }
+
+.diagram__card-icon { color: var(--diagram-accent); }
+.diagram__card-icon--on-accent { color: #FFFFFF; }
+.diagram__card-icon path,
+.diagram__card-icon circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.diagram__badge circle {
+  fill: #FFFFFF;
+  stroke: none;
+}
+.diagram__badge text {
+  fill: var(--diagram-accent);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-bold);
+  font-size: 16px;
+}
+
+.diagram__grad-start { stop-color: var(--diagram-accent); stop-opacity: 1; }
+.diagram__grad-end   { stop-color: var(--diagram-accent); stop-opacity: 0.78; }
+
+.diagram__result-badge {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+.diagram__result-badge rect {
+  fill: var(--diagram-accent);
+  stroke: none;
+}
+.diagram__result-badge text {
+  fill: #FFFFFF;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-bold);
+  font-size: 13px;
+}
+
+.diagram__flow {
+  fill: none;
+  stroke: var(--diagram-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.diagram__flow--create { opacity: 0.95; }
+
+.diagram__flow--reuse {
+  opacity: 0.55;
+  stroke-dasharray: 7 6;
+}
+.diagram__marker--flow path {
+  fill: var(--diagram-accent);
+  stroke: none;
+}
+.diagram__flow-label {
+  fill: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12px;
+  paint-order: stroke;
+  stroke: var(--color-bg-subtle);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+
+.diagram__flow-dash {
+  fill: none;
+  stroke: var(--diagram-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 16;
+  animation: diagram-flow-pulse 2.6s var(--ease-in-out) infinite;
+}
+.diagram__flow-dash--create { animation-delay: 0ms; }
+.diagram__flow-dash--reuse  { animation-delay: 900ms; }
+
+@keyframes diagram-flow-pulse {
+  0%   { stroke-dashoffset: 16; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { stroke-dashoffset: 0;  opacity: 0; }
+}
+
+.diagram--concept .diagram__nodes > .diagram__card {
+  animation: fade-in-up 460ms var(--ease-out) both;
+}
+.diagram--concept .diagram__nodes > .diagram__card:nth-child(1) { animation-delay:  60ms; }
+.diagram--concept .diagram__nodes > .diagram__card:nth-child(2) { animation-delay: 130ms; }
+.diagram--concept .diagram__nodes > .diagram__card:nth-child(3) { animation-delay: 200ms; }
+.diagram--concept .diagram__nodes > .diagram__card:nth-child(4) { animation-delay: 300ms; }
+.diagram--concept .diagram__edges {
+  animation: fade-in 700ms var(--ease-out) both;
+  animation-delay: 360ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram__flow-dash { display: none; }
+}
+
+@media (max-width: 768px) {
+  .diagram__viewport {
+    padding: var(--space-4);
+  }
+  .diagram--concept .diagram__viewport {
+    padding: var(--space-5);
+  }
+}
+
+.diagram__shell-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 7%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 34%, transparent);
+  stroke-width: 1.5;
+  transition: fill var(--duration-normal) var(--ease-out),
+              stroke var(--duration-normal) var(--ease-out);
+}
+
+.diagram__shell[data-shell-index='1'] .diagram__shell-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 10%, transparent);
+}
+[data-theme="dark"] .diagram__shell-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 12%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 42%, transparent);
+}
+[data-theme="dark"] .diagram__shell[data-shell-index='1'] .diagram__shell-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 17%, transparent);
+}
+
+.diagram__shell[data-viz-state='active'] .diagram__shell-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 16%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 62%, transparent);
+}
+
+.diagram__shell-chip {
+  fill: color-mix(in srgb, var(--diagram-accent) 16%, transparent);
+  stroke: none;
+}
+.diagram__shell-icon { color: var(--diagram-accent); }
+.diagram__shell-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.diagram__shell-title {
+  fill: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+.diagram__shell-badge rect {
+  fill: color-mix(in srgb, var(--diagram-accent) 14%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 45%, transparent);
+  stroke-width: 1.25;
+  transition: fill var(--duration-normal) var(--ease-out);
+}
+.diagram__shell-badge text {
+  fill: var(--diagram-accent);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-bold);
+  font-size: 13px;
+}
+.diagram__shell[data-viz-state='active'] .diagram__shell-badge rect,
+.diagram__shell[data-viz-highlight='true'] .diagram__shell-badge rect {
+  fill: color-mix(in srgb, var(--diagram-accent) 24%, transparent);
+}
+
+.diagram__flow--guide {
+  fill: none;
+  stroke: color-mix(in srgb, var(--diagram-accent) 26%, transparent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 1 9;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+.diagram__flow--guide[data-viz-active='true'] {
+  stroke: color-mix(in srgb, var(--diagram-accent) 62%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--diagram-accent) 55%, transparent));
+}
+[data-theme="dark"] .diagram__flow--guide {
+  stroke: color-mix(in srgb, var(--diagram-accent) 34%, transparent);
+}
+
+.diagram--nested .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram--nested .diagram__flow-dash {
+  display: none;
+}
+
+.diagram--nested .diagram__shell {
+  animation: fade-in 600ms var(--ease-out) both;
+}
+.diagram--nested .diagram__shell[data-shell-index='0'] { animation-delay: 120ms; }
+.diagram--nested .diagram__shell[data-shell-index='1'] { animation-delay: 200ms; }
+
+@media (max-width: 768px) {
+  .diagram__shell-title { font-size: 14px; }
+  .diagram__shell-badge text { font-size: 12px; }
+}
+
+.diagram__shell-toast {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+.diagram__shell-toast rect {
+  fill: color-mix(in srgb, var(--diagram-accent) 92%, var(--color-bg-elevated));
+  stroke: none;
+}
+.diagram__shell-toast text {
+  fill: #FFFFFF;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12.5px;
+}
+.diagram__shell.viz-anim--highlight .diagram__shell-toast {
+  animation: shell-toast-flash 1500ms var(--ease-out);
+}
+@keyframes shell-toast-flash {
+  0%   { opacity: 0; transform: translateY(5px) scale(0.94); }
+  16%  { opacity: 1; transform: translateY(0)   scale(1); }
+  74%  { opacity: 1; transform: translateY(0)   scale(1); }
+  100% { opacity: 0; transform: translateY(-4px) scale(1); }
+}
+
+.diagram__shell.viz-anim--highlight .diagram__shell-badge {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: shell-badge-pop 1500ms var(--ease-out);
+}
+@keyframes shell-badge-pop {
+  0%, 100% { transform: scale(1); }
+  20%      { transform: scale(1.14); }
+  40%      { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .diagram__shell.viz-anim--highlight .diagram__shell-toast,
+  .diagram__shell.viz-anim--highlight .diagram__shell-badge { animation: none; }
+}
+
+.diagram--nested .diagram__grad-end { stop-opacity: 0.92; }
+.diagram--nested .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.22))
+    drop-shadow(0 0 26px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
+}
+
+.diagram--nested .diagram__nodes > .diagram__card--emphasis {
+  animation: fade-in-up 460ms var(--ease-out) both,
+             core-breathe 3.4s var(--ease-in-out) 520ms infinite;
+}
+[data-theme="dark"] .diagram--nested .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 75%, transparent));
+}
+
+.diagram--nested .diagram__card--emphasis .diagram__card-bg {
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 1.5;
+}
+@keyframes core-breathe {
+  0%, 100% { filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.22))
+    drop-shadow(0 0 22px color-mix(in srgb, var(--diagram-accent) 48%, transparent)); }
+  50%      { filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.22))
+    drop-shadow(0 0 34px color-mix(in srgb, var(--diagram-accent) 78%, transparent)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .diagram--nested .diagram__card--emphasis { animation: none; }
+}
+
+.diagram__rail-base {
+  stroke: color-mix(in srgb, var(--diagram-accent) 20%, transparent);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+[data-theme="dark"] .diagram__rail-base {
+  stroke: color-mix(in srgb, var(--diagram-accent) 30%, transparent);
+}
+.diagram__flow--rail {
+  stroke: color-mix(in srgb, var(--diagram-accent) 34%, transparent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--rail {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram__chev path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--diagram-accent) 60%, transparent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.diagram--chain .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram__station {
+  outline: none;
+  cursor: default;
+  filter:
+    drop-shadow(0 2px 4px rgba(17, 24, 39, 0.06))
+    drop-shadow(0 10px 20px rgba(17, 24, 39, 0.10));
+}
+[data-theme="dark"] .diagram__station {
+  filter:
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55));
+}
+.diagram__station-bg {
+  fill: var(--color-bg-elevated);
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  transition: fill var(--duration-normal) var(--ease-out),
+              stroke var(--duration-normal) var(--ease-out);
+}
+.diagram__station:focus-visible .diagram__station-bg {
+  stroke: var(--diagram-accent);
+  stroke-width: 2;
+}
+
+.diagram__station[data-viz-state='passed'] { opacity: 0.72; }
+
+.diagram__station[data-viz-state='active'] .diagram__station-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 8%, var(--color-bg-elevated));
+  stroke: color-mix(in srgb, var(--diagram-accent) 60%, transparent);
+  stroke-width: 1.75;
+}
+
+.diagram__station--handle[data-viz-state='active'] .diagram__station-bg {
+  fill: color-mix(in srgb, var(--color-success) 10%, var(--color-bg-elevated));
+  stroke: color-mix(in srgb, var(--color-success) 68%, transparent);
+}
+
+.diagram__station-order circle {
+  fill: color-mix(in srgb, var(--diagram-accent) 12%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 40%, transparent);
+  stroke-width: 1;
+}
+.diagram__station-order text {
+  fill: var(--diagram-accent);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-bold);
+  font-size: 12px;
+}
+.diagram__station[data-viz-state='active'] .diagram__station-order circle {
+  fill: var(--diagram-accent);
+  stroke: none;
+}
+.diagram__station[data-viz-state='active'] .diagram__station-order text {
+  fill: #FFFFFF;
+}
+
+.diagram__station-chip {
+  fill: var(--color-accent-subtle);
+  stroke: none;
+}
+.diagram__station-icon { color: var(--diagram-accent); }
+.diagram__station-icon path,
+.diagram__station-icon circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.diagram__station-title {
+  fill: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+.diagram__station-guard {
+  fill: var(--color-text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.diagram__station-stamp {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+.diagram__station-stamp circle {
+  fill: var(--color-success);
+  stroke: none;
+}
+.diagram__station-stamp path {
+  fill: none;
+  stroke: #FFFFFF;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.diagram__station--handle[data-viz-state='active'] .diagram__station-stamp {
+  opacity: 1;
+}
+
+.diagram__station-decision {
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+.diagram__station-decision rect {
+  fill: var(--color-bg-elevated);
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+.diagram__station-decision text {
+  fill: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12px;
+}
+.diagram__station[data-viz-state='passed'] .diagram__station-decision,
+.diagram__station[data-viz-state='active'] .diagram__station-decision {
+  opacity: 1;
+}
+
+.diagram__station--handle[data-viz-state='active'] .diagram__station-decision rect {
+  fill: color-mix(in srgb, var(--color-success) 92%, var(--color-bg-elevated));
+  stroke: none;
+}
+.diagram__station--handle[data-viz-state='active'] .diagram__station-decision text {
+  fill: #FFFFFF;
+}
+
+.diagram--chain .diagram__station {
+  animation: fade-in-up 460ms var(--ease-out) both;
+}
+.diagram--chain .diagram__station[data-station-index='0'] { animation-delay: 160ms; }
+.diagram--chain .diagram__station[data-station-index='1'] { animation-delay: 240ms; }
+.diagram--chain .diagram__station[data-station-index='2'] { animation-delay: 320ms; }
+.diagram--chain .diagram__station[data-station-index='3'] { animation-delay: 400ms; }
+
+@media (max-width: 768px) {
+  .diagram__station-title { font-size: 14px; }
+  .diagram__station-guard { font-size: 11px; }
+}
+
+.diagram__region-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 6%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 30%, transparent);
+  stroke-width: 1.5;
+}
+[data-theme="dark"] .diagram__region-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 11%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 40%, transparent);
+}
+
+.diagram__region-wall {
+  stroke: color-mix(in srgb, var(--diagram-accent) 55%, transparent);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+[data-theme="dark"] .diagram__region-wall {
+  stroke: color-mix(in srgb, var(--diagram-accent) 66%, transparent);
+}
+
+.diagram__region-title {
+  fill: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.diagram__flow--facade {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--facade {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram--facade .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram--facade .diagram__flow-dash { display: none; }
+
+.diagram--facade .diagram__region-bg,
+.diagram--facade .diagram__region-wall,
+.diagram--facade .diagram__region-title {
+  animation: fade-in 700ms var(--ease-out) both;
+  animation-delay: 140ms;
+}
+
+.diagram--facade .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
+    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
+}
+[data-theme="dark"] .diagram--facade .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram--facade .diagram__region-bg,
+  .diagram--facade .diagram__region-wall,
+  .diagram--facade .diagram__region-title { animation: none; }
+}
+
+@media (max-width: 768px) {
+  .diagram__region-title { font-size: 11.5px; }
+}
+
+.diagram__pool-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 6%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 26%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+[data-theme="dark"] .diagram__pool-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 11%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 36%, transparent);
+}
+
+.diagram__pool-title {
+  fill: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.diagram__pool-item {
+  outline: none;
+  cursor: default;
+  filter:
+    drop-shadow(0 2px 4px rgba(17, 24, 39, 0.06))
+    drop-shadow(0 8px 16px rgba(17, 24, 39, 0.10));
+}
+[data-theme="dark"] .diagram__pool-item {
+  filter:
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 10px 20px rgba(0, 0, 0, 0.55));
+}
+.diagram__pool-token {
+  fill: var(--color-bg-elevated);
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  transition: fill var(--duration-normal) var(--ease-out),
+              stroke var(--duration-normal) var(--ease-out);
+}
+.diagram__pool-item:focus-visible .diagram__pool-token {
+  stroke: var(--diagram-accent);
+  stroke-width: 2;
+}
+.diagram__pool-item[data-viz-state='active'] .diagram__pool-token {
+  fill: color-mix(in srgb, var(--diagram-accent) 10%, var(--color-bg-elevated));
+  stroke: color-mix(in srgb, var(--diagram-accent) 62%, transparent);
+  stroke-width: 1.75;
+}
+
+.diagram__pool-icon { color: var(--diagram-accent); }
+.diagram__pool-icon path,
+.diagram__pool-icon circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.diagram__pool-label {
+  fill: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+
+.diagram__flow--pool {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--pool {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram--pool .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram--pool .diagram__flow-dash { display: none; }
+
+.diagram--pool .diagram__pool-bg,
+.diagram--pool .diagram__pool-title {
+  animation: fade-in 700ms var(--ease-out) both;
+  animation-delay: 140ms;
+}
+.diagram--pool .diagram__pool-item {
+  animation: fade-in-up 460ms var(--ease-out) both;
+}
+.diagram--pool .diagram__pool-item[data-pool-index='0'] { animation-delay: 220ms; }
+.diagram--pool .diagram__pool-item[data-pool-index='1'] { animation-delay: 300ms; }
+.diagram--pool .diagram__pool-item[data-pool-index='2'] { animation-delay: 380ms; }
+.diagram--pool .diagram__pool-item[data-pool-index='3'] { animation-delay: 460ms; }
+
+.diagram--pool .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
+    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
+}
+[data-theme="dark"] .diagram--pool .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram--pool .diagram__pool-bg,
+  .diagram--pool .diagram__pool-title,
+  .diagram--pool .diagram__pool-item { animation: none; }
+}
+
+@media (max-width: 768px) {
+  .diagram__pool-title { font-size: 11.5px; }
+  .diagram__pool-label { font-size: 12px; }
+}
+
+.diagram__gateway-blocked-path {
+  stroke: color-mix(in srgb, var(--color-text-tertiary) 42%, transparent);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-dasharray: 6 5;
+}
+[data-theme="dark"] .diagram__gateway-blocked-path {
+  stroke: color-mix(in srgb, var(--color-text-tertiary) 55%, transparent);
+}
+
+.diagram__gateway-blocked-badge circle {
+  fill: var(--color-bg-elevated);
+  stroke: color-mix(in srgb, var(--color-text-tertiary) 55%, transparent);
+  stroke-width: 1.75;
+}
+.diagram__gateway-blocked-badge line {
+  stroke: color-mix(in srgb, var(--color-text-tertiary) 70%, transparent);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+[data-theme="dark"] .diagram__gateway-blocked-badge circle {
+  stroke: color-mix(in srgb, var(--color-text-tertiary) 65%, transparent);
+}
+[data-theme="dark"] .diagram__gateway-blocked-badge line {
+  stroke: color-mix(in srgb, var(--color-text-tertiary) 80%, transparent);
+}
+
+.diagram__gateway-blocked-label {
+  fill: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.diagram__flow--gateway {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--gateway {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram--gateway .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram--gateway .diagram__flow-dash { display: none; }
+
+.diagram--gateway .diagram__nodes > .diagram__card {
+  animation-fill-mode: none;
+}
+
+.diagram--gateway .diagram__gateway-blocked-path,
+.diagram--gateway .diagram__gateway-blocked-badge,
+.diagram--gateway .diagram__gateway-blocked-label {
+  animation: fade-in 700ms var(--ease-out) both;
+  animation-delay: 140ms;
+}
+
+.diagram--gateway .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
+    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
+}
+[data-theme="dark"] .diagram--gateway .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram--gateway .diagram__gateway-blocked-path,
+  .diagram--gateway .diagram__gateway-blocked-badge,
+  .diagram--gateway .diagram__gateway-blocked-label { animation: none; }
+}
+
+@media (max-width: 768px) {
+  .diagram__gateway-blocked-label { font-size: 11px; }
+}
+
+.diagram__command-socket {
+  fill: color-mix(in srgb, var(--diagram-accent) 14%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 34%, transparent);
+  stroke-width: 1.5;
+}
+[data-theme="dark"] .diagram__command-socket {
+  fill: color-mix(in srgb, var(--diagram-accent) 20%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram__capsule {
+  outline: none;
+  cursor: default;
+  filter:
+    drop-shadow(0 3px 6px rgba(17, 24, 39, 0.10))
+    drop-shadow(0 10px 20px rgba(17, 24, 39, 0.14));
+}
+[data-theme="dark"] .diagram__capsule {
+  filter:
+    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6));
+}
+.diagram__capsule-bg {
+  fill: var(--color-bg-elevated);
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  transition: fill var(--duration-normal) var(--ease-out),
+              stroke var(--duration-normal) var(--ease-out);
+}
+.diagram__capsule:focus-visible .diagram__capsule-bg {
+  stroke: var(--diagram-accent);
+  stroke-width: 2;
+}
+.diagram__capsule[data-viz-state='active'] .diagram__capsule-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 10%, var(--color-bg-elevated));
+  stroke: color-mix(in srgb, var(--diagram-accent) 62%, transparent);
+  stroke-width: 1.75;
+}
+
+.diagram__capsule-chip {
+  fill: var(--color-accent-subtle);
+  stroke: none;
+}
+.diagram__capsule-icon { color: var(--diagram-accent); }
+.diagram__capsule-icon path,
+.diagram__capsule-icon circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.diagram__capsule-title {
+  fill: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.diagram__capsule-undo circle {
+  fill: var(--color-bg-elevated);
+  stroke: color-mix(in srgb, var(--diagram-accent) 45%, transparent);
+  stroke-width: 1.5;
+}
+.diagram__capsule-undo text {
+  fill: var(--diagram-accent);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-bold);
+  font-size: 14px;
+}
+[data-theme="dark"] .diagram__capsule-undo circle {
+  stroke: color-mix(in srgb, var(--diagram-accent) 55%, transparent);
+}
+
+.diagram__flow--command {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--command {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram--command .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram--command .diagram__flow-dash { display: none; }
+
+.diagram--command .diagram__command-socket {
+  animation: fade-in 700ms var(--ease-out) both;
+  animation-delay: 140ms;
+}
+.diagram--command .diagram__capsule {
+  animation: fade-in-up 460ms var(--ease-out) both;
+  animation-delay: 260ms;
+}
+
+.diagram--command .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
+    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
+}
+[data-theme="dark"] .diagram--command .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram--command .diagram__command-socket,
+  .diagram--command .diagram__capsule { animation: none; }
+}
+
+@media (max-width: 768px) {
+  .diagram__capsule-title { font-size: 13px; }
+  .diagram__capsule-undo text { font-size: 12px; }
+}
+
+.diagram__flow--expression {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--expression {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram--expression .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram--expression .diagram__flow-dash { display: none; }
+
+.diagram--expression .diagram__nodes > .diagram__card:nth-child(5) { animation-delay: 380ms; }
+.diagram--expression .diagram__nodes > .diagram__card:nth-child(6) { animation-delay: 460ms; }
+
+.diagram--expression .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
+    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
+}
+[data-theme="dark"] .diagram--expression .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
+}
+
+.diagram__cursor-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 6%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 26%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+[data-theme="dark"] .diagram__cursor-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 11%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 36%, transparent);
+}
+
+.diagram__cursor-title {
+  fill: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.diagram__cell {
+  outline: none;
+  cursor: default;
+  filter:
+    drop-shadow(0 2px 4px rgba(17, 24, 39, 0.06))
+    drop-shadow(0 8px 16px rgba(17, 24, 39, 0.10));
+}
+[data-theme="dark"] .diagram__cell {
+  filter:
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 10px 20px rgba(0, 0, 0, 0.55));
+}
+
+.diagram__cell-bg {
+  fill: var(--color-bg-elevated);
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  transition: fill var(--duration-normal) var(--ease-out),
+              stroke var(--duration-normal) var(--ease-out),
+              opacity var(--duration-normal) var(--ease-out);
+}
+.diagram__cell:focus-visible .diagram__cell-bg {
+  stroke: var(--diagram-accent);
+  stroke-width: 2;
+}
+.diagram__cell[data-viz-state='active'] .diagram__cell-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 12%, var(--color-bg-elevated));
+  stroke: color-mix(in srgb, var(--diagram-accent) 65%, transparent);
+  stroke-width: 1.75;
+}
+.diagram__cell[data-viz-state='passed'] {
+  opacity: 0.6;
+}
+.diagram__cell[data-viz-state='passed'] .diagram__cell-bg {
+  stroke: color-mix(in srgb, var(--diagram-accent) 30%, transparent);
+}
+
+.diagram__cell-icon { color: var(--diagram-accent); }
+.diagram__cell-icon path,
+.diagram__cell-icon circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.diagram__cell-label {
+  fill: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12.5px;
+  letter-spacing: -0.01em;
+}
+
+.diagram__cell-cursor {
+  fill: var(--diagram-accent);
+  stroke: none;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+.diagram__cell[data-viz-state='active'] .diagram__cell-cursor {
+  opacity: 1;
+  animation: cursor-bob 1.6s var(--ease-in-out) infinite;
+}
+@keyframes cursor-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+.diagram__flow--cursor {
+  stroke: color-mix(in srgb, var(--diagram-accent) 30%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--cursor {
+  stroke: color-mix(in srgb, var(--diagram-accent) 42%, transparent);
+}
+
+.diagram--cursor .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram--cursor .diagram__flow-dash { display: none; }
+
+.diagram--cursor .diagram__cursor-bg,
+.diagram--cursor .diagram__cursor-title {
+  animation: fade-in 700ms var(--ease-out) both;
+  animation-delay: 140ms;
+}
+.diagram--cursor .diagram__cell {
+  animation: fade-in-up 460ms var(--ease-out) both;
+}
+.diagram--cursor .diagram__cell[data-cell-index='0'] { animation-delay: 220ms; }
+.diagram--cursor .diagram__cell[data-cell-index='1'] { animation-delay: 300ms; }
+.diagram--cursor .diagram__cell[data-cell-index='2'] { animation-delay: 380ms; }
+.diagram--cursor .diagram__cell[data-cell-index='3'] { animation-delay: 460ms; }
+
+.diagram--cursor .diagram__nodes > .diagram__card,
+.diagram--cursor .diagram__cell {
+  animation-fill-mode: none;
+}
+
+.diagram--cursor .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
+    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
+}
+[data-theme="dark"] .diagram--cursor .diagram__card--emphasis {
+  filter:
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram--cursor .diagram__cursor-bg,
+  .diagram--cursor .diagram__cursor-title,
+  .diagram--cursor .diagram__cell { animation: none; }
+  .diagram__cell[data-viz-state='active'] .diagram__cell-cursor { animation: none; }
+}
+
+@media (max-width: 768px) {
+  .diagram__cursor-title { font-size: 11.5px; }
+  .diagram__cell-label { font-size: 11.5px; }
+}

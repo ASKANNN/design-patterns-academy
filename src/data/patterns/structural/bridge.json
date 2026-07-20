@@ -1,0 +1,300 @@
+{
+  "slug": "bridge",
+  "name": "Bridge",
+  "category": "structural",
+  "complexity": 3,
+  "popularity": 1,
+  "also_known_as": [
+    "Handle/Body"
+  ],
+  "tags": [
+    "structural",
+    "abstraction",
+    "implementation",
+    "decoupling"
+  ],
+  "intent": {
+    "en": "Bridge is a structural pattern that splits a class along two independent axes of change — what it does and how it does it — connecting the two halves through composition instead of inheritance.",
+    "ru": "Мост — структурный паттерн, разделяющий класс по двум независимым осям изменения — что он делает и как он это делает, — соединяя обе половины через композицию, а не наследование."
+  },
+  "problem": {
+    "en": "A notification system starts with a `Notification` base class and subclasses `UrgentNotification` and `RegularNotification`. Then the team needs to support multiple delivery channels — email, SMS, push. Following the same inheritance approach means creating `UrgentEmailNotification`, `RegularEmailNotification`, `UrgentSmsNotification`, `RegularSmsNotification`, and so on.\n\nEach new urgency level or new channel multiplies the existing subclasses instead of adding one class. The hierarchy is really modeling two separate concerns — the message's priority logic and the delivery mechanism — but inheritance forces them into a single chain, so they can't vary independently.",
+    "ru": "Система уведомлений начинается с базового класса `Notification` и подклассов `UrgentNotification` и `RegularNotification`. Затем команде нужно поддержать несколько каналов доставки — email, SMS, push. При том же подходе через наследование приходится создавать `UrgentEmailNotification`, `RegularEmailNotification`, `UrgentSmsNotification`, `RegularSmsNotification` и так далее.\n\nКаждый новый уровень срочности или новый канал умножает существующие подклассы вместо добавления одного класса. Иерархия на самом деле описывает две разные ответственности — логику приоритета сообщения и механизм доставки, — но наследование вынуждает объединить их в одну цепочку, из-за чего они не могут изменяться независимо."
+  },
+  "solution": {
+    "en": "Pull one of the two concerns out into its own hierarchy, and connect it to the original hierarchy through a held reference rather than inheritance. In the notification example, delivery channels (`EmailChannel`, `SmsChannel`, `PushChannel`) become a separate hierarchy behind a common interface. The `Notification` class stops implementing delivery itself and instead holds a channel object, forwarding the actual sending to it.\n\nThat held reference is the bridge: priority levels and delivery channels can now each grow their own hierarchy, and any priority level can be paired with any channel at runtime, without a combinatorial explosion of subclasses.",
+    "ru": "Выделите одну из двух ответственностей в отдельную иерархию и свяжите её с исходной иерархией через хранимую ссылку, а не через наследование. В примере с уведомлениями каналы доставки (`EmailChannel`, `SmsChannel`, `PushChannel`) становятся отдельной иерархией за общим интерфейсом. Класс `Notification` перестаёт сам реализовывать доставку и вместо этого хранит объект канала, делегируя ему фактическую отправку.\n\nЭта хранимая ссылка и есть мост: уровни приоритета и каналы доставки теперь могут каждый развивать собственную иерархию, а любой уровень приоритета можно сочетать с любым каналом во время выполнения, без комбинаторного взрыва подклассов."
+  },
+  "structure": {
+    "description": {
+      "en": "Two hierarchies sit side by side. The Abstraction side models what the client wants to do and holds a reference to an Implementation object; the Implementation side models how it actually gets done on a given platform or backend. The only connection between them is that stored reference — swapping it changes behavior without touching the Abstraction's code at all.",
+      "ru": "Две иерархии существуют бок о бок. Сторона Абстракции моделирует то, что хочет сделать клиент, и хранит ссылку на объект Реализации; сторона Реализации моделирует то, как это фактически выполняется на конкретной платформе или бэкенде. Единственная связь между ними — эта хранимая ссылка: её замена меняет поведение, вообще не затрагивая код Абстракции."
+    },
+    "participants": [
+      {
+        "name": "Abstraction",
+        "role": {
+          "en": "Exposes the high-level operations the client calls, and forwards the low-level work to whatever Implementation object it currently holds.",
+          "ru": "Предоставляет высокоуровневые операции, которые вызывает клиент, и передаёт низкоуровневую работу тому объекту Реализации, который она хранит в данный момент."
+        }
+      },
+      {
+        "name": "Extended Abstraction",
+        "role": {
+          "en": "Adds specialized operations on top of the base Abstraction without needing any changes on the Implementation side.",
+          "ru": "Добавляет специализированные операции поверх базовой Абстракции, не требуя изменений на стороне Реализации."
+        }
+      }
+      ,
+      {
+      "name": "Implementation",
+      "role": {
+      "en": "Defines the low-level operations available to any Abstraction — a contract that is deliberately independent from the Abstraction's own API.",
+      "ru": "Определяет набор низкоуровневых операций, доступных любой Абстракции, — контракт, намеренно независимый от собственного API Абстракции."
+      }
+      }
+      ,
+      {
+      "name": "Concrete Implementation",
+      "role": {
+      "en": "Supplies one actual backend or platform — the piece that gets swapped in or out when the Abstraction needs to target something different.",
+      "ru": "Предоставляет один конкретный бэкенд или платформу — часть, которую подставляют или заменяют, когда Абстракции нужно работать с чем-то другим."
+      }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Implementation interface\nclass Device {\n  isEnabled() { throw new Error('Not implemented'); }\n  enable() { throw new Error('Not implemented'); }\n  disable() { throw new Error('Not implemented'); }\n  getVolume() { throw new Error('Not implemented'); }\n  setVolume(percent) { throw new Error('Not implemented'); }\n}\n\n// Concrete Implementations\nclass TV extends Device {\n  constructor() {\n    super();\n    this._enabled = false;\n    this._volume = 30;\n  }\n\n  isEnabled() { return this._enabled; }\n  enable()  { this._enabled = true;  console.log('TV: powered on'); }\n  disable() { this._enabled = false; console.log('TV: powered off'); }\n  getVolume() { return this._volume; }\n  setVolume(percent) {\n    this._volume = Math.max(0, Math.min(100, percent));\n    console.log(`TV: volume set to ${this._volume}%`);\n  }\n}\n\nclass Radio extends Device {\n  constructor() {\n    super();\n    this._enabled = false;\n    this._volume = 50;\n  }\n\n  isEnabled() { return this._enabled; }\n  enable()  { this._enabled = true;  console.log('Radio: powered on'); }\n  disable() { this._enabled = false; console.log('Radio: powered off'); }\n  getVolume() { return this._volume; }\n  setVolume(percent) {\n    this._volume = Math.max(0, Math.min(100, percent));\n    console.log(`Radio: volume set to ${this._volume}%`);\n  }\n}\n\n// Abstraction\nclass RemoteControl {\n  constructor(device) {\n    this.device = device;\n  }\n\n  togglePower() {\n    if (this.device.isEnabled()) {\n      this.device.disable();\n    } else {\n      this.device.enable();\n    }\n  }\n\n  volumeUp()   { this.device.setVolume(this.device.getVolume() + 10); }\n  volumeDown() { this.device.setVolume(this.device.getVolume() - 10); }\n}\n\n// Refined Abstraction\nclass AdvancedRemote extends RemoteControl {\n  mute() {\n    this.device.setVolume(0);\n    console.log('Remote: muted');\n  }\n}\n\n// Usage — abstraction and implementation vary independently\nconst tv = new TV();\nconst remote = new AdvancedRemote(tv);\n\nremote.togglePower(); // TV: powered on\nremote.volumeUp();    // TV: volume set to 40%\nremote.mute();        // TV: volume set to 0%  |  Remote: muted\n\nconst radio = new Radio();\nconst basicRemote = new RemoteControl(radio);\nbasicRemote.togglePower(); // Radio: powered on\nbasicRemote.volumeDown();  // Radio: volume set to 40%",
+    "typescript": "interface Device {\n  isEnabled(): boolean;\n  enable(): void;\n  disable(): void;\n  getVolume(): number;\n  setVolume(percent: number): void;\n}\n\nclass TV implements Device {\n  private enabled = false;\n  private volume = 30;\n\n  public isEnabled(): boolean { return this.enabled; }\n  public enable():  void { this.enabled = true;  console.log('TV: powered on'); }\n  public disable(): void { this.enabled = false; console.log('TV: powered off'); }\n  public getVolume(): number { return this.volume; }\n  public setVolume(percent: number): void {\n    this.volume = Math.max(0, Math.min(100, percent));\n    console.log(`TV: volume set to ${this.volume}%`);\n  }\n}\n\nclass Radio implements Device {\n  private enabled = false;\n  private volume = 50;\n\n  public isEnabled(): boolean { return this.enabled; }\n  public enable():  void { this.enabled = true;  console.log('Radio: powered on'); }\n  public disable(): void { this.enabled = false; console.log('Radio: powered off'); }\n  public getVolume(): number { return this.volume; }\n  public setVolume(percent: number): void {\n    this.volume = Math.max(0, Math.min(100, percent));\n    console.log(`Radio: volume set to ${this.volume}%`);\n  }\n}\n\nclass RemoteControl {\n  constructor(protected device: Device) {}\n\n  public togglePower(): void {\n    if (this.device.isEnabled()) {\n      this.device.disable();\n    } else {\n      this.device.enable();\n    }\n  }\n\n  public volumeUp():   void { this.device.setVolume(this.device.getVolume() + 10); }\n  public volumeDown(): void { this.device.setVolume(this.device.getVolume() - 10); }\n}\n\nclass AdvancedRemote extends RemoteControl {\n  public mute(): void {\n    this.device.setVolume(0);\n    console.log('Remote: muted');\n  }\n}\n\n// Usage\nconst tv = new TV();\nconst remote = new AdvancedRemote(tv);\n\nremote.togglePower(); // TV: powered on\nremote.volumeUp();    // TV: volume set to 40%\nremote.mute();        // TV: volume set to 0%  |  Remote: muted\n\nconst radio = new Radio();\nconst basicRemote = new RemoteControl(radio);\nbasicRemote.togglePower(); // Radio: powered on\nbasicRemote.volumeDown();  // Radio: volume set to 40%",
+    "java": "// Implementation interface\ninterface Device {\n    boolean isEnabled();\n    void enable();\n    void disable();\n    int  getVolume();\n    void setVolume(int percent);\n}\n\nclass TV implements Device {\n    private boolean enabled = false;\n    private int volume = 30;\n\n    public boolean isEnabled() { return enabled; }\n    public void enable()  { enabled = true;  System.out.println(\"TV: powered on\"); }\n    public void disable() { enabled = false; System.out.println(\"TV: powered off\"); }\n    public int  getVolume() { return volume; }\n    public void setVolume(int p) {\n        volume = Math.max(0, Math.min(100, p));\n        System.out.println(\"TV: volume set to \" + volume + \"%\");\n    }\n}\n\nclass Radio implements Device {\n    private boolean enabled = false;\n    private int volume = 50;\n\n    public boolean isEnabled() { return enabled; }\n    public void enable()  { enabled = true;  System.out.println(\"Radio: powered on\"); }\n    public void disable() { enabled = false; System.out.println(\"Radio: powered off\"); }\n    public int  getVolume() { return volume; }\n    public void setVolume(int p) {\n        volume = Math.max(0, Math.min(100, p));\n        System.out.println(\"Radio: volume set to \" + volume + \"%\");\n    }\n}\n\n// Abstraction\nclass RemoteControl {\n    protected Device device;\n    RemoteControl(Device device) { this.device = device; }\n\n    public void togglePower() {\n        if (device.isEnabled()) device.disable(); else device.enable();\n    }\n    public void volumeUp()   { device.setVolume(device.getVolume() + 10); }\n    public void volumeDown() { device.setVolume(device.getVolume() - 10); }\n}\n\n// Refined Abstraction\nclass AdvancedRemote extends RemoteControl {\n    AdvancedRemote(Device device) { super(device); }\n    public void mute() { device.setVolume(0); System.out.println(\"Remote: muted\"); }\n}\n\n// Usage — abstraction and implementation vary independently\nTV tv = new TV();\nAdvancedRemote remote = new AdvancedRemote(tv);\nremote.togglePower(); // TV: powered on\nremote.volumeUp();    // TV: volume set to 40%\nremote.mute();        // TV: volume set to 0%  |  Remote: muted\n\nRadio radio = new Radio();\nnew RemoteControl(radio).togglePower(); // Radio: powered on",
+    "csharp": "// Implementation interface\ninterface IDevice\n{\n    bool IsEnabled();\n    void Enable();\n    void Disable();\n    int  GetVolume();\n    void SetVolume(int percent);\n}\n\nclass TV : IDevice\n{\n    private bool _enabled = false;\n    private int  _volume  = 30;\n\n    public bool IsEnabled() => _enabled;\n    public void Enable()  { _enabled = true;  Console.WriteLine(\"TV: powered on\"); }\n    public void Disable() { _enabled = false; Console.WriteLine(\"TV: powered off\"); }\n    public int  GetVolume() => _volume;\n    public void SetVolume(int p)\n    { _volume = Math.Clamp(p, 0, 100); Console.WriteLine($\"TV: volume set to {_volume}%\"); }\n}\n\nclass Radio : IDevice\n{\n    private bool _enabled = false;\n    private int  _volume  = 50;\n\n    public bool IsEnabled() => _enabled;\n    public void Enable()  { _enabled = true;  Console.WriteLine(\"Radio: powered on\"); }\n    public void Disable() { _enabled = false; Console.WriteLine(\"Radio: powered off\"); }\n    public int  GetVolume() => _volume;\n    public void SetVolume(int p)\n    { _volume = Math.Clamp(p, 0, 100); Console.WriteLine($\"Radio: volume set to {_volume}%\"); }\n}\n\n// Abstraction\nclass RemoteControl\n{\n    protected readonly IDevice Device;\n    public RemoteControl(IDevice device) => Device = device;\n\n    public void TogglePower() { if (Device.IsEnabled()) Device.Disable(); else Device.Enable(); }\n    public void VolumeUp()   => Device.SetVolume(Device.GetVolume() + 10);\n    public void VolumeDown() => Device.SetVolume(Device.GetVolume() - 10);\n}\n\n// Refined Abstraction\nclass AdvancedRemote : RemoteControl\n{\n    public AdvancedRemote(IDevice device) : base(device) {}\n    public void Mute() { Device.SetVolume(0); Console.WriteLine(\"Remote: muted\"); }\n}\n\n// Usage — abstraction and implementation vary independently\nvar tv     = new TV();\nvar remote = new AdvancedRemote(tv);\nremote.TogglePower(); // TV: powered on\nremote.VolumeUp();    // TV: volume set to 40%\nremote.Mute();        // TV: volume set to 0%  |  Remote: muted\n\nnew RemoteControl(new Radio()).TogglePower(); // Radio: powered on",
+    "python": "from abc import ABC, abstractmethod\n\n\nclass Device(ABC):\n    @abstractmethod\n    def is_enabled(self) -> bool:\n        pass\n\n    @abstractmethod\n    def enable(self) -> None:\n        pass\n\n    @abstractmethod\n    def disable(self) -> None:\n        pass\n\n    @abstractmethod\n    def get_volume(self) -> int:\n        pass\n\n    @abstractmethod\n    def set_volume(self, percent: int) -> None:\n        pass\n\n\nclass TV(Device):\n    def __init__(self) -> None:\n        self._enabled = False\n        self._volume = 30\n\n    def is_enabled(self) -> bool: return self._enabled\n    def enable(self)  -> None: self._enabled = True;  print('TV: powered on')\n    def disable(self) -> None: self._enabled = False; print('TV: powered off')\n    def get_volume(self) -> int: return self._volume\n\n    def set_volume(self, percent: int) -> None:\n        self._volume = max(0, min(100, percent))\n        print(f'TV: volume set to {self._volume}%')\n\n\nclass Radio(Device):\n    def __init__(self) -> None:\n        self._enabled = False\n        self._volume = 50\n\n    def is_enabled(self) -> bool: return self._enabled\n    def enable(self)  -> None: self._enabled = True;  print('Radio: powered on')\n    def disable(self) -> None: self._enabled = False; print('Radio: powered off')\n    def get_volume(self) -> int: return self._volume\n\n    def set_volume(self, percent: int) -> None:\n        self._volume = max(0, min(100, percent))\n        print(f'Radio: volume set to {self._volume}%')\n\n\nclass RemoteControl:\n    def __init__(self, device: Device) -> None:\n        self._device = device\n\n    def toggle_power(self) -> None:\n        if self._device.is_enabled():\n            self._device.disable()\n        else:\n            self._device.enable()\n\n    def volume_up(self)   -> None: self._device.set_volume(self._device.get_volume() + 10)\n    def volume_down(self) -> None: self._device.set_volume(self._device.get_volume() - 10)\n\n\nclass AdvancedRemote(RemoteControl):\n    def mute(self) -> None:\n        self._device.set_volume(0)\n        print('Remote: muted')\n\n\n# Usage — abstraction and implementation vary independently\ntv = TV()\nremote = AdvancedRemote(tv)\n\nremote.toggle_power()  # TV: powered on\nremote.volume_up()     # TV: volume set to 40%\nremote.mute()          # TV: volume set to 0%  |  Remote: muted\n\nradio = Radio()\nbasic_remote = RemoteControl(radio)\nbasic_remote.toggle_power()  # Radio: powered on\nbasic_remote.volume_down()   # Radio: volume set to 40%"
+  },
+  "pros": [
+    {
+      "en": "The two hierarchies genuinely stop interfering with each other — adding a priority level never touches channel code, and adding a channel never touches priority code.",
+      "ru": "Две иерархии по-настоящему перестают мешать друг другу — добавление уровня приоритета никогда не затрагивает код каналов, а добавление канала не затрагивает код приоритетов."
+    },
+    {
+      "en": "New abstractions and new implementations ship as isolated additions instead of edits to a shared class.",
+      "ru": "Новые абстракции и новые реализации добавляются как изолированные дополнения, а не как правки общего класса."
+    },
+    {
+      "en": "Keeps high-level orchestration logic and low-level platform detail in separate classes, so each stays easier to read and test.",
+      "ru": "Разделяет высокоуровневую логику оркестрации и низкоуровневые детали платформы по разным классам, благодаря чему каждый остаётся проще для чтения и тестирования."
+    },
+    {
+      "en": "The implementation object can be swapped at runtime — useful for switching a real backend for a test double, or changing behavior based on configuration.",
+      "ru": "Объект реализации можно заменить во время выполнения — полезно для подстановки тестового дублёра вместо реального бэкенда или для смены поведения на основе конфигурации."
+    }
+  ],
+  "cons": [
+    {
+      "en": "For a class with a single, stable implementation, splitting it into two hierarchies just adds indirection with no real payoff.",
+      "ru": "Для класса с единственной стабильной реализацией разбиение на две иерархии лишь добавляет косвенность без реальной пользы."
+    },
+    {
+      "en": "Tracing a call now means jumping from the Abstraction to whatever Implementation object it currently holds, which costs some readability upfront.",
+      "ru": "Отслеживание вызова теперь означает переход от Абстракции к тому объекту Реализации, который она хранит, что немного снижает читаемость на первых порах."
+    },
+    {
+      "en": "Choosing which concern belongs in the Abstraction and which in the Implementation isn't always obvious, and getting it wrong defeats the purpose.",
+      "ru": "Не всегда очевидно, какая забота должна относиться к Абстракции, а какая — к Реализации, и ошибка в этом выборе сводит на нет весь смысл паттерна."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "A class is growing subclasses along two unrelated dimensions at once — for example, message priority and delivery channel, or shape type and rendering backend.",
+      "ru": "Класс обрастает подклассами сразу по двум не связанным измерениям — например, приоритет сообщения и канал доставки, или тип фигуры и бэкенд рендеринга."
+    },
+    {
+      "en": "You expect to add new variants on either side over time and want that growth to stay linear, not multiplicative.",
+      "ru": "Ожидается, что со временем появятся новые варианты с любой из сторон, и важно, чтобы их рост оставался линейным, а не мультипликативным."
+    },
+    {
+      "en": "You need to swap the underlying implementation at runtime — for instance, pointing the same high-level code at a live service in production and a stub in tests.",
+      "ru": "Нужно менять базовую реализацию во время выполнения — например, направлять один и тот же высокоуровневый код то на реальный сервис в продакшене, то на заглушку в тестах."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**JDBC drivers** — application code calls the same `Connection`/`Statement` abstraction while MySQL, PostgreSQL, or SQLite each supply their own driver implementation underneath.",
+      "ru": "**Драйверы JDBC** — код приложения вызывает одну и ту же абстракцию `Connection`/`Statement`, а MySQL, PostgreSQL или SQLite подставляют под неё собственную реализацию драйвера."
+    },
+    {
+      "en": "**SLF4J logging facade** — code logs through one abstract API regardless of whether Logback, Log4j2, or java.util.logging ends up handling the actual output.",
+      "ru": "**Фасад логирования SLF4J** — код пишет в лог через единый абстрактный API независимо от того, кто в итоге обрабатывает вывод — Logback, Log4j2 или java.util.logging."
+    },
+    {
+      "en": "**Cross-platform rendering in game engines** — a `Renderer` abstraction stays the same while separate implementations target DirectX, Vulkan, or Metal depending on the platform.",
+      "ru": "**Кроссплатформенный рендеринг в игровых движках** — абстракция `Renderer` остаётся неизменной, а отдельные реализации нацелены на DirectX, Vulkan или Metal в зависимости от платформы."
+    }
+  ],
+  "related_patterns": [
+    "adapter",
+    "abstract-factory",
+    "strategy"
+  ],
+  "visuals": [
+    {
+      "id": "bridge-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "structural",
+      "width": 960,
+      "height": 440,
+      "title": {
+        "en": "How Bridge works",
+        "ru": "Как работает Мост"
+      },
+      "description": {
+        "en": "The Abstraction holds a reference to the Implementation interface — the bridge. The Refined Abstraction extends the Abstraction without touching the Implementation. Concrete devices (TV, Radio) can be swapped at runtime without changing either abstraction.",
+        "ru": "Абстракция хранит ссылку на интерфейс Реализации — мост. Уточнённая Абстракция расширяет Абстракцию, не затрагивая Реализацию. Конкретные устройства (TV, Radio) меняются во время выполнения без изменения ни одной из абстракций."
+      },
+      "caption": {
+        "en": "Two independent hierarchies — Abstraction and Implementation — connected by a single composition reference.",
+        "ru": "Две независимые иерархии — Абстракция и Реализация — соединены единственной ссылкой через композицию."
+      },
+      "nodes": [
+        {
+          "id": "refined",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Refined Abstraction",
+            "ru": "Уточнённая абстракция"
+          },
+          "subtitle": {
+            "en": "extends abstraction",
+            "ru": "расширяет абстракцию"
+          },
+          "position": {
+            "x": 20,
+            "y": 170,
+            "w": 210,
+            "h": 100
+          }
+        },
+        {
+          "id": "abstraction",
+          "kind": "actor",
+          "icon": "layers",
+          "emphasis": true,
+          "label": {
+            "en": "Abstraction",
+            "ru": "Абстракция"
+          },
+          "subtitle": {
+            "en": "holds impl reference",
+            "ru": "хранит ссылку на реализацию"
+          },
+          "position": {
+            "x": 278,
+            "y": 130,
+            "w": 215,
+            "h": 180
+          }
+        },
+        {
+          "id": "impl",
+          "kind": "interface",
+          "icon": "spark",
+          "label": {
+            "en": "Implementation",
+            "ru": "Реализация"
+          },
+          "subtitle": {
+            "en": "bridge interface",
+            "ru": "интерфейс моста"
+          },
+          "position": {
+            "x": 537,
+            "y": 130,
+            "w": 210,
+            "h": 180
+          }
+        },
+        {
+          "id": "concreteA",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "TV",
+            "ru": "TV"
+          },
+          "subtitle": {
+            "en": "concrete device",
+            "ru": "конкретное устройство"
+          },
+          "position": {
+            "x": 800,
+            "y": 40,
+            "w": 150,
+            "h": 100
+          }
+        },
+        {
+          "id": "concreteB",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Radio",
+            "ru": "Radio"
+          },
+          "subtitle": {
+            "en": "concrete device",
+            "ru": "конкретное устройство"
+          },
+          "position": {
+            "x": 800,
+            "y": 300,
+            "w": 150,
+            "h": 100
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "refined",
+          "target": "abstraction",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": {
+            "en": "extends",
+            "ru": "расширяет"
+          }
+        },
+        {
+          "source": "abstraction",
+          "target": "impl",
+          "relationship": "flow",
+          "variant": "create",
+          "label": {
+            "en": "bridge",
+            "ru": "мост"
+          }
+        },
+        {
+          "source": "impl",
+          "target": "concreteA",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": {
+            "en": "① TV",
+            "ru": "① TV"
+          }
+        },
+        {
+          "source": "impl",
+          "target": "concreteB",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": {
+            "en": "② Radio",
+            "ru": "② Radio"
+          }
+        }
+      ]
+    }
+  ]
+}

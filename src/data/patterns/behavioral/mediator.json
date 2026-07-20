@@ -1,0 +1,283 @@
+{
+  "slug": "mediator",
+  "name": "Mediator",
+  "category": "behavioral",
+  "complexity": 2,
+  "popularity": 2,
+  "also_known_as": [
+    "Intermediary",
+    "Controller"
+  ],
+  "tags": [
+    "behavioral",
+    "communication",
+    "decoupling"
+  ],
+  "intent": {
+    "en": "Mediator is a behavioral pattern that pulls the web of interactions between a group of objects out into a separate go-between object, so the objects themselves no longer need to know about each other.",
+    "ru": "Посредник — это поведенческий паттерн, который выносит сеть взаимодействий между группой объектов в отдельный объект-координатор, избавляя сами объекты от необходимости знать друг о друге."
+  },
+  "problem": {
+    "en": "A settings dialog has a language dropdown, a region field, a checkbox for advanced options, and a Save button. Picking a language should filter the region list; ticking advanced options should reveal extra fields; the Save button should stay disabled until the required fields hold valid values.\n\nA quick way to build this is to have each control reach into its neighbors directly: the dropdown updates the region field, the checkbox toggles the extra fields, and everyone pokes at the Save button. It works for a while, but every control now hardcodes knowledge of every other control. Drop this checkbox into a different dialog and it drags half the form's wiring with it. Add one more field and you're editing five existing classes to teach them about it.",
+    "ru": "В диалоге настроек есть выпадающий список языка, поле региона, флажок «дополнительные параметры» и кнопка «Сохранить». Выбор языка должен фильтровать список регионов, включение флажка — открывать дополнительные поля, а кнопка «Сохранить» должна оставаться неактивной, пока не заполнены обязательные поля.\n\nБыстрый способ реализовать это — дать каждому элементу напрямую обращаться к соседям: список меняет поле региона, флажок переключает видимость полей, и все по очереди трогают кнопку «Сохранить». Какое-то время это работает, но теперь каждый элемент жёстко завязан на знание о всех остальных. Перенеси этот флажок в другой диалог — и с собой он потянет половину проводки формы. Добавь ещё одно поле — и придётся править пять существующих классов, чтобы они о нём узнали."
+  },
+  "solution": {
+    "en": "Mediator pulls all the cross-references out of the components and moves them into one dedicated coordinator object. Components stop calling each other; instead, each one reports its own events to the mediator (\"I changed\", \"I was clicked\") through a single narrow method, and the mediator decides what should happen next and which other components to update.\n\nA component that used to say \"go disable that button over there\" now just says \"something happened to me\" and forgets about it. The mediator is the only place that knows the full web of reactions, which means a component can be lifted out and dropped into an unrelated screen without carrying any of that wiring along.",
+    "ru": "Посредник забирает все перекрёстные связи из компонентов и переносит их в один выделенный объект-координатор. Компоненты перестают вызывать друг друга напрямую — вместо этого каждый сообщает о своих событиях посреднику («я изменился», «по мне кликнули») через единственный узкий метод, а посредник уже решает, что делать дальше и какие компоненты обновить.\n\nКомпонент, который раньше говорил «отключи вон ту кнопку», теперь просто говорит «со мной что-то произошло» и забывает об этом. Только посредник знает всю сеть реакций целиком, а значит компонент можно вынуть и вставить в никак не связанный экран, не таща за собой эту проводку."
+  },
+  "structure": {
+    "description": {
+      "en": "Components no longer hold references to each other — only to the mediator. Each component reports events through a narrow mediator interface, and the concrete mediator, which knows about every component it coordinates, contains the actual reaction logic.",
+      "ru": "Компоненты больше не хранят ссылок друг на друга — только на посредника. Каждый компонент сообщает о событиях через узкий интерфейс посредника, а конкретный посредник, знающий обо всех координируемых компонентах, содержит саму логику реакций."
+    },
+    "participants": [
+      {
+        "name": "Mediator",
+        "role": {
+          "en": "A narrow interface, typically one method, through which components report what just happened to them without knowing who will act on it.",
+          "ru": "Узкий интерфейс, как правило из одного метода, через который компоненты сообщают о произошедшем с ними событии, не зная, кто на него отреагирует."
+        }
+      },
+      {
+        "name": "ConcreteMediator",
+        "role": {
+          "en": "Keeps references to the components it coordinates and contains the actual reaction rules — which components to update and how, in response to a reported event.",
+          "ru": "Хранит ссылки на координируемые компоненты и содержит сами правила реакции — какие компоненты и как обновлять в ответ на сообщённое событие."
+        }
+      },
+      {
+        "name": "Component (Colleague)",
+        "role": {
+          "en": "Only knows about the mediator, never about sibling components. Reports its own state changes and reacts only to calls the mediator makes on it.",
+          "ru": "Знает только о посреднике, но никогда — о соседних компонентах. Сообщает о собственных изменениях состояния и реагирует лишь на вызовы, которые делает посредник."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Mediator interface\nclass Mediator {\n  notify(sender, event) {}\n}\n\n// Base component\nclass Component {\n  setMediator(mediator) { this.mediator = mediator; }\n}\n\nclass Checkbox extends Component {\n  constructor(label) { super(); this.label = label; this.checked = false; }\n  check() {\n    this.checked = !this.checked;\n    console.log(`Checkbox \"${this.label}\" -> ${this.checked}`);\n    this.mediator.notify(this, 'toggle');\n  }\n}\n\nclass TextField extends Component {\n  constructor(label) { super(); this.label = label; this.visible = true; }\n  setVisible(visible) {\n    this.visible = visible;\n    console.log(`Field \"${this.label}\" ${visible ? 'shown' : 'hidden'}`);\n  }\n}\n\nclass Button extends Component {\n  constructor(label) { super(); this.label = label; this.enabled = true; }\n  setEnabled(enabled) {\n    this.enabled = enabled;\n    console.log(`Button \"${this.label}\" ${enabled ? 'enabled' : 'disabled'}`);\n  }\n}\n\n// Concrete mediator\nclass AuthDialog extends Mediator {\n  constructor() {\n    super();\n    this.guest = new Checkbox('Login as guest');\n    this.username = new TextField('Username');\n    this.submit = new Button('Submit');\n    [this.guest, this.username, this.submit].forEach(c => c.setMediator(this));\n  }\n\n  notify(sender, event) {\n    if (sender === this.guest && event === 'toggle') {\n      this.username.setVisible(!this.guest.checked);\n      this.submit.setEnabled(true);\n    }\n  }\n}\n\n// Usage\nconst dialog = new AuthDialog();\n\ndialog.guest.check(); // Checkbox \"Login as guest\" -> true / Field \"Username\" hidden / Button \"Submit\" enabled\ndialog.guest.check(); // Checkbox \"Login as guest\" -> false / Field \"Username\" shown / Button \"Submit\" enabled",
+    "typescript": "// Mediator interface\ninterface Mediator {\n  notify(sender: Component, event: string): void;\n}\n\n// Base component\nabstract class Component {\n  protected mediator!: Mediator;\n  setMediator(mediator: Mediator): void { this.mediator = mediator; }\n}\n\nclass Checkbox extends Component {\n  checked = false;\n  constructor(private readonly label: string) { super(); }\n  check(): void {\n    this.checked = !this.checked;\n    console.log(`Checkbox \"${this.label}\" -> ${this.checked}`);\n    this.mediator.notify(this, 'toggle');\n  }\n}\n\nclass TextField extends Component {\n  visible = true;\n  constructor(private readonly label: string) { super(); }\n  setVisible(visible: boolean): void {\n    this.visible = visible;\n    console.log(`Field \"${this.label}\" ${visible ? 'shown' : 'hidden'}`);\n  }\n}\n\nclass Button extends Component {\n  enabled = true;\n  constructor(private readonly label: string) { super(); }\n  setEnabled(enabled: boolean): void {\n    this.enabled = enabled;\n    console.log(`Button \"${this.label}\" ${enabled ? 'enabled' : 'disabled'}`);\n  }\n}\n\n// Concrete mediator\nclass AuthDialog implements Mediator {\n  readonly guest = new Checkbox('Login as guest');\n  readonly username = new TextField('Username');\n  readonly submit = new Button('Submit');\n\n  constructor() {\n    [this.guest, this.username, this.submit].forEach(c => c.setMediator(this));\n  }\n\n  notify(sender: Component, event: string): void {\n    if (sender === this.guest && event === 'toggle') {\n      this.username.setVisible(!this.guest.checked);\n      this.submit.setEnabled(true);\n    }\n  }\n}\n\n// Usage\nconst dialog = new AuthDialog();\n\ndialog.guest.check(); // Checkbox \"Login as guest\" -> true / Field \"Username\" hidden / Button \"Submit\" enabled\ndialog.guest.check(); // Checkbox \"Login as guest\" -> false / Field \"Username\" shown / Button \"Submit\" enabled",
+    "java": "// Mediator interface\ninterface Mediator {\n    void notify(Component sender, String event);\n}\n\n// Base component\nabstract class Component {\n    protected Mediator mediator;\n    public void setMediator(Mediator m) { this.mediator = m; }\n}\n\nclass Checkbox extends Component {\n    private final String label;\n    public boolean checked = false;\n\n    Checkbox(String label) { this.label = label; }\n\n    public void check() {\n        checked = !checked;\n        System.out.printf(\"Checkbox \\\"%s\\\" -> %b%n\", label, checked);\n        mediator.notify(this, \"toggle\");\n    }\n}\n\nclass TextField extends Component {\n    private final String label;\n    public boolean visible = true;\n\n    TextField(String label) { this.label = label; }\n\n    public void setVisible(boolean v) {\n        visible = v;\n        System.out.printf(\"Field \\\"%s\\\" %s%n\", label, v ? \"shown\" : \"hidden\");\n    }\n}\n\nclass Button extends Component {\n    private final String label;\n    public boolean enabled = true;\n\n    Button(String label) { this.label = label; }\n\n    public void setEnabled(boolean e) {\n        enabled = e;\n        System.out.printf(\"Button \\\"%s\\\" %s%n\", label, e ? \"enabled\" : \"disabled\");\n    }\n}\n\n// Concrete mediator\nclass AuthDialog implements Mediator {\n    final Checkbox  guest    = new Checkbox(\"Login as guest\");\n    final TextField username = new TextField(\"Username\");\n    final Button    submit   = new Button(\"Submit\");\n\n    AuthDialog() {\n        for (Component c : new Component[]{guest, username, submit})\n            c.setMediator(this);\n    }\n\n    public void notify(Component sender, String event) {\n        if (sender == guest && \"toggle\".equals(event)) {\n            username.setVisible(!guest.checked);\n            submit.setEnabled(true);\n        }\n    }\n}\n\n// Usage\nAuthDialog dialog = new AuthDialog();\ndialog.guest.check(); // Checkbox \"Login as guest\" -> true / Field \"Username\" hidden / Button \"Submit\" enabled\ndialog.guest.check(); // Checkbox \"Login as guest\" -> false / Field \"Username\" shown / Button \"Submit\" enabled",
+    "csharp": "// Mediator interface\ninterface IMediator { void Notify(Component sender, string @event); }\n\n// Base component\nabstract class Component\n{\n    protected IMediator Mediator = null!;\n    public void SetMediator(IMediator m) => Mediator = m;\n}\n\nclass Checkbox : Component\n{\n    private readonly string _label;\n    public bool Checked { get; private set; }\n    public Checkbox(string label) => _label = label;\n\n    public void Check()\n    {\n        Checked = !Checked;\n        Console.WriteLine($\"Checkbox \\\"{_label}\\\" -> {Checked}\");\n        Mediator.Notify(this, \"toggle\");\n    }\n}\n\nclass TextField : Component\n{\n    private readonly string _label;\n    public bool Visible { get; private set; } = true;\n    public TextField(string label) => _label = label;\n\n    public void SetVisible(bool v)\n    {\n        Visible = v;\n        Console.WriteLine($\"Field \\\"{_label}\\\" {(v ? \"shown\" : \"hidden\")}\");\n    }\n}\n\nclass Button : Component\n{\n    private readonly string _label;\n    public bool Enabled { get; private set; } = true;\n    public Button(string label) => _label = label;\n\n    public void SetEnabled(bool e)\n    {\n        Enabled = e;\n        Console.WriteLine($\"Button \\\"{_label}\\\" {(e ? \"enabled\" : \"disabled\")}\");\n    }\n}\n\n// Concrete mediator\nclass AuthDialog : IMediator\n{\n    public readonly Checkbox  Guest    = new(\"Login as guest\");\n    public readonly TextField Username = new(\"Username\");\n    public readonly Button    Submit   = new(\"Submit\");\n\n    public AuthDialog()\n    {\n        foreach (var c in new Component[] { Guest, Username, Submit })\n            c.SetMediator(this);\n    }\n\n    public void Notify(Component sender, string @event)\n    {\n        if (sender == Guest && @event == \"toggle\")\n        {\n            Username.SetVisible(!Guest.Checked);\n            Submit.SetEnabled(true);\n        }\n    }\n}\n\n// Usage\nvar dialog = new AuthDialog();\ndialog.Guest.Check(); // Checkbox \"Login as guest\" -> True / Field \"Username\" hidden / Button \"Submit\" enabled\ndialog.Guest.Check(); // Checkbox \"Login as guest\" -> False / Field \"Username\" shown / Button \"Submit\" enabled",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass Mediator(ABC):\n    @abstractmethod\n    def notify(self, sender: Component, event: str) -> None: ...\n\n\nclass Component:\n    def __init__(self) -> None:\n        self.mediator: Mediator | None = None\n\n    def set_mediator(self, mediator: Mediator) -> None:\n        self.mediator = mediator\n\n\nclass Checkbox(Component):\n    def __init__(self, label: str) -> None:\n        super().__init__()\n        self.label = label\n        self.checked = False\n\n    def check(self) -> None:\n        self.checked = not self.checked\n        print(f'Checkbox \"{self.label}\" -> {self.checked}')\n        self.mediator.notify(self, 'toggle')\n\n\nclass TextField(Component):\n    def __init__(self, label: str) -> None:\n        super().__init__()\n        self.label = label\n        self.visible = True\n\n    def set_visible(self, visible: bool) -> None:\n        self.visible = visible\n        print(f'Field \"{self.label}\" {\"shown\" if visible else \"hidden\"}')\n\n\nclass Button(Component):\n    def __init__(self, label: str) -> None:\n        super().__init__()\n        self.label = label\n        self.enabled = True\n\n    def set_enabled(self, enabled: bool) -> None:\n        self.enabled = enabled\n        print(f'Button \"{self.label}\" {\"enabled\" if enabled else \"disabled\"}')\n\n\nclass AuthDialog(Mediator):\n    def __init__(self) -> None:\n        self.guest = Checkbox('Login as guest')\n        self.username = TextField('Username')\n        self.submit = Button('Submit')\n        for component in (self.guest, self.username, self.submit):\n            component.set_mediator(self)\n\n    def notify(self, sender: Component, event: str) -> None:\n        if sender is self.guest and event == 'toggle':\n            self.username.set_visible(not self.guest.checked)\n            self.submit.set_enabled(True)\n\n\n# Usage\ndialog = AuthDialog()\n\ndialog.guest.check()  # Checkbox \"Login as guest\" -> True / Field \"Username\" hidden / Button \"Submit\" enabled\ndialog.guest.check()  # Checkbox \"Login as guest\" -> False / Field \"Username\" shown / Button \"Submit\" enabled"
+  },
+  "pros": [
+    {
+      "en": "Cross-component logic lives in one class instead of being smeared across every participant, so you can read the whole reaction chain in one place.",
+      "ru": "Логика взаимодействия компонентов сосредоточена в одном классе, а не размазана по каждому участнику, поэтому всю цепочку реакций можно прочитать в одном месте."
+    },
+    {
+      "en": "Components can be swapped, tested, or reused independently, since none of them hold references to the others.",
+      "ru": "Компоненты можно заменять, тестировать и переиспользовать независимо, поскольку ни один из них не хранит ссылок на другие."
+    },
+    {
+      "en": "Adding a new coordination rule usually means editing the mediator, not hunting through every component that might be affected.",
+      "ru": "Добавление нового правила координации обычно требует правки посредника, а не поиска по всем компонентам, которые могут быть задеты."
+    },
+    {
+      "en": "New component types can be plugged in by teaching the mediator about them, without touching the components that already work.",
+      "ru": "Новые типы компонентов подключаются через дополнение посредника, без изменения уже работающих компонентов."
+    }
+  ],
+  "cons": [
+    {
+      "en": "All the complexity that used to be spread across components now concentrates in the mediator, which can balloon into a class that knows and does too much.",
+      "ru": "Вся сложность, ранее распределённая по компонентам, теперь стягивается в посредника, который рискует разрастись в класс, знающий и делающий слишком много."
+    },
+    {
+      "en": "Debugging means tracing calls through an extra indirection layer instead of following a direct method call between two objects.",
+      "ru": "Отладка требует прослеживать вызовы через дополнительный слой косвенности, а не следовать за прямым вызовом метода между двумя объектами."
+    },
+    {
+      "en": "For a small, stable set of interactions the mediator can feel like unnecessary ceremony compared to a couple of direct calls.",
+      "ru": "Для небольшого и стабильного набора взаимодействий посредник может выглядеть как лишняя церемония по сравнению с парой прямых вызовов."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Mediator when a set of objects references so many of each other's methods that changing one ripples through the rest.",
+      "ru": "Применяйте Посредник, когда набор объектов обращается к методам друг друга настолько густо, что изменение одного отдаётся эхом по остальным."
+    },
+    {
+      "en": "Use it when a component can't be dropped into a new context because it's wired directly into a specific set of collaborators.",
+      "ru": "Используйте его, когда компонент нельзя перенести в новый контекст, потому что он жёстко связан с конкретным набором соседей."
+    },
+    {
+      "en": "Consider it when subclassing components just to vary how they react to each other has produced a pile of near-duplicate classes.",
+      "ru": "Рассмотрите его, если создание подклассов компонентов только ради вариаций их взаимной реакции породило кучу почти одинаковых классов."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Air traffic control towers** — aircraft never negotiate runway access with each other; every request and clearance passes through the tower.",
+      "ru": "**Диспетчерские вышки аэропортов** — воздушные суда никогда не согласовывают доступ к полосе друг с другом; каждый запрос и разрешение проходит через вышку."
+    },
+    {
+      "en": "**React Context / centralized state stores** — components dispatch actions to a shared store instead of passing callbacks down through every sibling.",
+      "ru": "**React Context и централизованные хранилища состояния** — компоненты отправляют действия в общее хранилище вместо передачи колбэков через каждого соседа по дереву."
+    },
+    {
+      "en": "**Message brokers like RabbitMQ** — publishers and consumers never connect to each other directly; the broker routes every message between them.",
+      "ru": "**Брокеры сообщений вроде RabbitMQ** — издатели и потребители никогда не соединяются друг с другом напрямую; брокер маршрутизирует между ними все сообщения."
+    }
+  ],
+  "related_patterns": [
+    "observer",
+    "command",
+    "facade",
+    "chain-of-responsibility"
+  ],
+  "visuals": [
+    {
+      "id": "mediator-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "behavioral",
+      "width": 960,
+      "height": 420,
+      "title": {
+        "en": "How Mediator works",
+        "ru": "Как работает Посредник"
+      },
+      "description": {
+        "en": "Components never communicate directly. Alice sends a message to the Chat Room (Mediator). The Mediator decides who receives it and routes the message to Bob, Charlie, and Diana. Adding a new participant only requires registering with the Mediator — no other component changes.",
+        "ru": "Компоненты никогда не общаются напрямую. Алиса отправляет сообщение в Чат (Посредник). Посредник решает, кто его получит, и доставляет сообщение Бобу, Чарли и Диане. Добавление нового участника требует только регистрации у Посредника — никакой другой компонент не меняется."
+      },
+      "caption": {
+        "en": "Components talk to the Mediator, never to each other.",
+        "ru": "Компоненты общаются с Посредником, но не друг с другом."
+      },
+      "nodes": [
+        {
+          "id": "mediator",
+          "kind": "class",
+          "icon": "layers",
+          "emphasis": true,
+          "label": {
+            "en": "Chat Room",
+            "ru": "Чат"
+          },
+          "subtitle": {
+            "en": "routes messages",
+            "ru": "маршрутизирует сообщения"
+          },
+          "position": {
+            "x": 380,
+            "y": 160,
+            "w": 200,
+            "h": 100
+          }
+        },
+        {
+          "id": "userA",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Alice",
+            "ru": "Алиса"
+          },
+          "subtitle": {
+            "en": "sends & receives",
+            "ru": "отправляет и получает"
+          },
+          "position": {
+            "x": 20,
+            "y": 20,
+            "w": 180,
+            "h": 100
+          }
+        },
+        {
+          "id": "userB",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Bob",
+            "ru": "Боб"
+          },
+          "subtitle": {
+            "en": "sends & receives",
+            "ru": "отправляет и получает"
+          },
+          "position": {
+            "x": 750,
+            "y": 20,
+            "w": 180,
+            "h": 100
+          }
+        },
+        {
+          "id": "userC",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Charlie",
+            "ru": "Чарли"
+          },
+          "subtitle": {
+            "en": "sends & receives",
+            "ru": "отправляет и получает"
+          },
+          "position": {
+            "x": 20,
+            "y": 300,
+            "w": 180,
+            "h": 100
+          }
+        },
+        {
+          "id": "userD",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Diana",
+            "ru": "Диана"
+          },
+          "subtitle": {
+            "en": "sends & receives",
+            "ru": "отправляет и получает"
+          },
+          "position": {
+            "x": 750,
+            "y": 300,
+            "w": 180,
+            "h": 100
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "userA",
+          "target": "mediator",
+          "relationship": "flow",
+          "variant": "create",
+          "label": {
+            "en": "send()",
+            "ru": "send()"
+          }
+        },
+        {
+          "source": "mediator",
+          "target": "userB",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "", "ru": "" }
+        },
+        {
+          "source": "mediator",
+          "target": "userC",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "", "ru": "" }
+        },
+        {
+          "source": "mediator",
+          "target": "userD",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "", "ru": "" }
+        }
+      ]
+    }
+  ]
+}

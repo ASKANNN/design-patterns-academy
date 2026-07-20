@@ -1,0 +1,122 @@
+{
+  "slug": "state",
+  "name": "State",
+  "category": "behavioral",
+  "complexity": 1,
+  "popularity": 2,
+  "also_known_as": [
+    "Objects for States",
+    "FSM"
+  ],
+  "tags": [
+    "behavioral",
+    "state-machine",
+    "context"
+  ],
+  "intent": {
+    "en": "State is a behavioral pattern that lets an object switch its entire behavior at runtime by delegating to one of several interchangeable state objects, so from the outside it looks as though the object's class changed.",
+    "ru": "Состояние — это поведенческий паттерн, позволяющий объекту полностью менять своё поведение во время выполнения за счёт делегирования одному из нескольких взаимозаменяемых объектов-состояний, так что со стороны кажется, будто изменился класс самого объекта."
+  },
+  "problem": {
+    "en": "A vending machine behaves completely differently depending on what's going on: waiting for a coin, having received payment, dispensing an item, or sitting empty. Inserting a coin while it's already dispensing should do nothing; pressing the select button before paying should prompt for a coin instead.\n\nThe natural first attempt is one class with a `status` field and a `switch` at the top of every method — `insertCoin()`, `selectItem()`, `dispense()` — each branching on all four statuses. Every method ends up needing to know about every state, so adding a fifth state (say, \"out of order\") means opening every single method and adding a case. The branches multiply faster than the states do, and it gets easy to miss a case in one method while updating the others.",
+    "ru": "Торговый автомат ведёт себя совершенно по-разному в зависимости от происходящего: ожидание монеты, получение оплаты, выдача товара или простой при пустом резерве. Вставка монеты во время выдачи товара должна ничего не делать, а нажатие кнопки выбора до оплаты должно предложить сначала бросить монету.\n\nЕстественная первая попытка — один класс с полем `status` и `switch` в начале каждого метода: `insertCoin()`, `selectItem()`, `dispense()` — и каждый ветвится по всем четырём статусам. В итоге каждому методу приходится знать обо всех состояниях, поэтому добавление пятого состояния (скажем, «неисправен») означает открытие каждого метода и добавление нового case. Веток становится больше, чем растёт число состояний, и легко пропустить случай в одном методе, обновляя остальные."
+  },
+  "solution": {
+    "en": "State takes each branch of that switch statement and turns it into its own class, one per possible state, each implementing the same small set of action methods. The original object, now called the **context**, stops asking \"what state am I in\" and instead just forwards every action call to whichever state object it currently holds.\n\nA state class handles an action the way that particular state should, and if the action should cause a transition, the state object itself replaces the context's current state reference with a different state object. The context's code never branches on state at all — it just holds a reference and delegates, while all the state-specific decisions and the transitions between them live inside the state classes.",
+    "ru": "Паттерн Состояние превращает каждую ветку того `switch` в отдельный класс — по одному на возможное состояние, — и каждый реализует один и тот же небольшой набор методов действий. Исходный объект, теперь называемый **контекстом**, перестаёт спрашивать «в каком я состоянии» и просто перенаправляет каждый вызов действия тому объекту-состоянию, который сейчас держит.\n\nКласс состояния обрабатывает действие так, как это подобает именно этому состоянию, а если действие должно вызвать переход, сам объект-состояние заменяет ссылку контекста на текущее состояние другим объектом-состоянием. Код контекста вообще не содержит ветвлений по состоянию — он просто хранит ссылку и делегирует, а вся специфичная для состояний логика и переходы между ними живут внутри классов состояний."
+  },
+  "structure": {
+    "description": {
+      "en": "The Context holds a reference to whichever State object currently represents it and forwards every relevant call to that object instead of branching internally. Each ConcreteState implements the shared State interface with behavior appropriate to one specific state, and may reassign the context's state reference to perform a transition.",
+      "ru": "Контекст хранит ссылку на объект-состояние, представляющий его в данный момент, и перенаправляет ему каждый относящийся к делу вызов вместо внутреннего ветвления. Каждое конкретное состояние реализует общий интерфейс State с поведением, подобающим именно этому состоянию, и может переназначить ссылку контекста на состояние, выполняя переход."
+    },
+    "participants": [
+      {
+        "name": "Context",
+        "role": {
+          "en": "Delegates every state-dependent call to the State object it currently references, and exposes a way for state objects to replace that reference.",
+          "ru": "Делегирует каждый зависящий от состояния вызов объекту-состоянию, на который ссылается в данный момент, и предоставляет способ заменить эту ссылку."
+        }
+      },
+      {
+        "name": "State",
+        "role": {
+          "en": "Declares one method per action the context supports, giving every concrete state a uniform shape the context can call through.",
+          "ru": "Объявляет по одному методу на каждое поддерживаемое контекстом действие, задавая единую форму, через которую контекст может вызывать любое конкретное состояние."
+        }
+      },
+      {
+        "name": "ConcreteState",
+        "role": {
+          "en": "Implements the reaction appropriate to one specific state, and decides whether and to which other state the context should transition next.",
+          "ru": "Реализует реакцию, подобающую конкретному состоянию, и решает, следует ли и в какое другое состояние должен перейти контекст."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// State interface (duck-typed)\nclass PlayerState {\n  play(player)  { throw new Error('play() not implemented');  }\n  pause(player) { throw new Error('pause() not implemented'); }\n  stop(player)  { throw new Error('stop() not implemented');  }\n  toString()    { return this.constructor.name; }\n}\n\nclass IdleState extends PlayerState {\n  play(player) {\n    console.log('Starting playback...');\n    player.setState(new PlayingState());\n  }\n  pause() { console.log('Nothing is playing.'); }\n  stop()  { console.log('Already stopped.'); }\n}\n\nclass PlayingState extends PlayerState {\n  play()  { console.log('Already playing.'); }\n  pause(player) {\n    console.log('Pausing...');\n    player.setState(new PausedState());\n  }\n  stop(player) {\n    console.log('Stopping...');\n    player.setState(new IdleState());\n  }\n}\n\nclass PausedState extends PlayerState {\n  play(player) {\n    console.log('Resuming...');\n    player.setState(new PlayingState());\n  }\n  pause() { console.log('Already paused.'); }\n  stop(player) {\n    console.log('Stopping...');\n    player.setState(new IdleState());\n  }\n}\n\n// Context\nclass MediaPlayer {\n  #state = new IdleState();\n\n  setState(state) { this.#state = state; }\n  getState()      { return this.#state.toString(); }\n\n  play()  { this.#state.play(this);  }\n  pause() { this.#state.pause(this); }\n  stop()  { this.#state.stop(this);  }\n}\n\n// Usage\nconst player = new MediaPlayer();\n\nplayer.play();                  // Starting playback...\nplayer.pause();                 // Pausing...\nplayer.play();                  // Resuming...\nplayer.stop();                  // Stopping...\n\nconsole.log(player.getState()); // IdleState",
+    "typescript": "// State interface\ninterface PlayerState {\n  play(player: MediaPlayer): void;\n  pause(player: MediaPlayer): void;\n  stop(player: MediaPlayer): void;\n  toString(): string;\n}\n\nclass IdleState implements PlayerState {\n  play(player: MediaPlayer): void {\n    console.log('Starting playback...');\n    player.setState(new PlayingState());\n  }\n  pause(_p: MediaPlayer): void { console.log('Nothing is playing.'); }\n  stop(_p: MediaPlayer): void  { console.log('Already stopped.'); }\n  toString(): string { return 'IdleState'; }\n}\n\nclass PlayingState implements PlayerState {\n  play(_p: MediaPlayer): void  { console.log('Already playing.'); }\n  pause(player: MediaPlayer): void {\n    console.log('Pausing...');\n    player.setState(new PausedState());\n  }\n  stop(player: MediaPlayer): void {\n    console.log('Stopping...');\n    player.setState(new IdleState());\n  }\n  toString(): string { return 'PlayingState'; }\n}\n\nclass PausedState implements PlayerState {\n  play(player: MediaPlayer): void {\n    console.log('Resuming...');\n    player.setState(new PlayingState());\n  }\n  pause(_p: MediaPlayer): void { console.log('Already paused.'); }\n  stop(player: MediaPlayer): void {\n    console.log('Stopping...');\n    player.setState(new IdleState());\n  }\n  toString(): string { return 'PausedState'; }\n}\n\n// Context\nclass MediaPlayer {\n  private state: PlayerState = new IdleState();\n\n  setState(state: PlayerState): void { this.state = state; }\n  getState(): string                 { return this.state.toString(); }\n\n  play():  void { this.state.play(this);  }\n  pause(): void { this.state.pause(this); }\n  stop():  void { this.state.stop(this);  }\n}\n\n// Usage\nconst player = new MediaPlayer();\n\nplayer.play();                  // Starting playback...\nplayer.pause();                 // Pausing...\nplayer.play();                  // Resuming...\nplayer.stop();                  // Stopping...\n\nconsole.log(player.getState()); // IdleState",
+    "java": "// State interface\ninterface PlayerState {\n    void play(MediaPlayer player);\n    void pause(MediaPlayer player);\n    void stop(MediaPlayer player);\n}\n\nclass IdleState implements PlayerState {\n    public void play(MediaPlayer p)  { System.out.println(\"Starting playback...\"); p.setState(new PlayingState()); }\n    public void pause(MediaPlayer p) { System.out.println(\"Nothing is playing.\"); }\n    public void stop(MediaPlayer p)  { System.out.println(\"Already stopped.\"); }\n    public String toString()         { return \"IdleState\"; }\n}\n\nclass PlayingState implements PlayerState {\n    public void play(MediaPlayer p)  { System.out.println(\"Already playing.\"); }\n    public void pause(MediaPlayer p) { System.out.println(\"Pausing...\");   p.setState(new PausedState()); }\n    public void stop(MediaPlayer p)  { System.out.println(\"Stopping...\"); p.setState(new IdleState()); }\n    public String toString()         { return \"PlayingState\"; }\n}\n\nclass PausedState implements PlayerState {\n    public void play(MediaPlayer p)  { System.out.println(\"Resuming...\"); p.setState(new PlayingState()); }\n    public void pause(MediaPlayer p) { System.out.println(\"Already paused.\"); }\n    public void stop(MediaPlayer p)  { System.out.println(\"Stopping...\"); p.setState(new IdleState()); }\n    public String toString()         { return \"PausedState\"; }\n}\n\n// Context\nclass MediaPlayer {\n    private PlayerState state = new IdleState();\n\n    public void setState(PlayerState s) { this.state = s; }\n    public String getState()            { return state.toString(); }\n\n    public void play()  { state.play(this); }\n    public void pause() { state.pause(this); }\n    public void stop()  { state.stop(this); }\n}\n\n// Usage\nMediaPlayer player = new MediaPlayer();\n\nplayer.play();                          // Starting playback...\nplayer.pause();                         // Pausing...\nplayer.play();                          // Resuming...\nplayer.stop();                          // Stopping...\n\nSystem.out.println(player.getState()); // IdleState",
+    "csharp": "// State interface\ninterface IPlayerState\n{\n    void Play(MediaPlayer player);\n    void Pause(MediaPlayer player);\n    void Stop(MediaPlayer player);\n}\n\nclass IdleState : IPlayerState\n{\n    public void Play(MediaPlayer p)  { Console.WriteLine(\"Starting playback...\"); p.SetState(new PlayingState()); }\n    public void Pause(MediaPlayer p) => Console.WriteLine(\"Nothing is playing.\");\n    public void Stop(MediaPlayer p)  => Console.WriteLine(\"Already stopped.\");\n    public override string ToString() => \"IdleState\";\n}\n\nclass PlayingState : IPlayerState\n{\n    public void Play(MediaPlayer p)  => Console.WriteLine(\"Already playing.\");\n    public void Pause(MediaPlayer p) { Console.WriteLine(\"Pausing...\");   p.SetState(new PausedState()); }\n    public void Stop(MediaPlayer p)  { Console.WriteLine(\"Stopping...\"); p.SetState(new IdleState()); }\n    public override string ToString() => \"PlayingState\";\n}\n\nclass PausedState : IPlayerState\n{\n    public void Play(MediaPlayer p)  { Console.WriteLine(\"Resuming...\"); p.SetState(new PlayingState()); }\n    public void Pause(MediaPlayer p) => Console.WriteLine(\"Already paused.\");\n    public void Stop(MediaPlayer p)  { Console.WriteLine(\"Stopping...\"); p.SetState(new IdleState()); }\n    public override string ToString() => \"PausedState\";\n}\n\n// Context\nclass MediaPlayer\n{\n    private IPlayerState _state = new IdleState();\n\n    public void SetState(IPlayerState s) => _state = s;\n    public string GetState()             => _state.ToString()!;\n\n    public void Play()  => _state.Play(this);\n    public void Pause() => _state.Pause(this);\n    public void Stop()  => _state.Stop(this);\n}\n\n// Usage\nvar player = new MediaPlayer();\n\nplayer.Play();                          // Starting playback...\nplayer.Pause();                         // Pausing...\nplayer.Play();                          // Resuming...\nplayer.Stop();                          // Stopping...\n\nConsole.WriteLine(player.GetState());  // IdleState",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass PlayerState(ABC):\n    @abstractmethod\n    def play(self, player: MediaPlayer) -> None: ...\n    @abstractmethod\n    def pause(self, player: MediaPlayer) -> None: ...\n    @abstractmethod\n    def stop(self, player: MediaPlayer) -> None: ...\n\n\nclass IdleState(PlayerState):\n    def play(self, player: MediaPlayer) -> None:\n        print('Starting playback...')\n        player.set_state(PlayingState())\n    def pause(self, player: MediaPlayer) -> None:\n        print('Nothing is playing.')\n    def stop(self, player: MediaPlayer) -> None:\n        print('Already stopped.')\n\n\nclass PlayingState(PlayerState):\n    def play(self, player: MediaPlayer) -> None:\n        print('Already playing.')\n    def pause(self, player: MediaPlayer) -> None:\n        print('Pausing...')\n        player.set_state(PausedState())\n    def stop(self, player: MediaPlayer) -> None:\n        print('Stopping...')\n        player.set_state(IdleState())\n\n\nclass PausedState(PlayerState):\n    def play(self, player: MediaPlayer) -> None:\n        print('Resuming...')\n        player.set_state(PlayingState())\n    def pause(self, player: MediaPlayer) -> None:\n        print('Already paused.')\n    def stop(self, player: MediaPlayer) -> None:\n        print('Stopping...')\n        player.set_state(IdleState())\n\n\n# Context\nclass MediaPlayer:\n    def __init__(self) -> None:\n        self._state: PlayerState = IdleState()\n\n    def set_state(self, state: PlayerState) -> None:\n        self._state = state\n\n    def get_state(self) -> str:\n        return type(self._state).__name__\n\n    def play(self)  -> None: self._state.play(self)\n    def pause(self) -> None: self._state.pause(self)\n    def stop(self)  -> None: self._state.stop(self)\n\n\n# Usage\nplayer = MediaPlayer()\n\nplayer.play()                   # Starting playback...\nplayer.pause()                  # Pausing...\nplayer.play()                   # Resuming...\nplayer.stop()                   # Stopping...\n\nprint(player.get_state())       # IdleState"
+  },
+  "pros": [
+    {
+      "en": "Each state's rules live in their own class, so understanding what happens in \"Paused\" means reading one small file instead of tracing a case through a giant method.",
+      "ru": "Правила каждого состояния живут в собственном классе, поэтому понять, что происходит в состоянии «Пауза», означает прочитать один небольшой файл, а не отслеживать case в гигантском методе."
+    },
+    {
+      "en": "A new state is added by writing a new class, with zero edits to the context or to any state that already works correctly.",
+      "ru": "Новое состояние добавляется написанием нового класса, без единой правки в контексте или уже корректно работающих состояниях."
+    },
+    {
+      "en": "The context's own code shrinks down to plain delegation — there's no conditional logic left in it to accidentally break.",
+      "ru": "Собственный код контекста сжимается до простого делегирования — в нём не остаётся условной логики, которую можно случайно сломать."
+    }
+  ],
+  "cons": [
+    {
+      "en": "For an object with two states and one transition, a full set of state classes is more machinery than the problem calls for.",
+      "ru": "Для объекта с двумя состояниями и одним переходом полноценный набор классов состояний — это больше механики, чем требует задача."
+    },
+    {
+      "en": "Because a state object often decides what the next state should be, following the full transition graph means reading through several state classes rather than one table.",
+      "ru": "Поскольку объект состояния часто сам решает, каким будет следующее состояние, чтобы проследить весь граф переходов, приходится читать несколько классов состояний, а не одну таблицу."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for State when an object's behavior depends heavily on which of several states it's in, and that set of states keeps growing.",
+      "ru": "Применяйте Состояние, когда поведение объекта сильно зависит от того, в каком из нескольких состояний он находится, и это множество состояний продолжает расти."
+    },
+    {
+      "en": "Use it when a class is dominated by conditionals that all check the same status field to decide how to act.",
+      "ru": "Используйте его, когда в классе преобладают условия, проверяющие одно и то же поле статуса, чтобы решить, как действовать."
+    },
+    {
+      "en": "Consider it when several near-identical states share so much duplicated transition logic that a shared base state class would remove the repetition.",
+      "ru": "Рассмотрите его, когда несколько почти одинаковых состояний настолько дублируют логику переходов, что общий базовый класс состояния устранил бы повторы."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Traffic lights** — a signal controller behaves differently in the Red, Yellow, and Green states, each dictating what the next state and timing will be.",
+      "ru": "**Светофоры** — контроллер сигнала ведёт себя по-разному в состояниях «красный», «жёлтый» и «зелёный», каждое из которых определяет следующее состояние и тайминг."
+    },
+    {
+      "en": "**Order fulfillment workflows** — an e-commerce order moves through Pending, Processing, Shipped, Delivered, and Cancelled, each allowing a different set of actions.",
+      "ru": "**Обработка заказов в интернет-магазинах** — заказ проходит через состояния Pending, Processing, Shipped, Delivered и Cancelled, каждое из которых допускает свой набор действий."
+    },
+    {
+      "en": "**TCP sockets** — a connection moves through Listen, Established, and Closed, reacting differently to the same incoming packet depending on which one it's in.",
+      "ru": "**TCP-сокеты** — соединение проходит через состояния Listen, Established и Closed, по-разному реагируя на один и тот же входящий пакет в зависимости от текущего состояния."
+    }
+  ],
+  "related_patterns": [
+    "strategy",
+    "singleton",
+    "flyweight",
+    "observer"
+  ]
+}

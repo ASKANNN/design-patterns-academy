@@ -1,0 +1,239 @@
+{
+  "slug": "composite",
+  "name": "Composite",
+  "category": "structural",
+  "complexity": 2,
+  "popularity": 2,
+  "also_known_as": [
+    "Object Tree"
+  ],
+  "tags": [
+    "structural",
+    "tree",
+    "recursive",
+    "hierarchy"
+  ],
+  "intent": {
+    "en": "Composite is a structural pattern that lets individual objects and groups of objects be treated through the same interface, so client code can operate on a whole tree without caring how deep it goes.",
+    "ru": "Компоновщик — структурный паттерн, позволяющий работать с отдельными объектами и группами объектов через один и тот же интерфейс, благодаря чему клиентский код может обрабатывать целое дерево, не заботясь о его глубине."
+  },
+  "problem": {
+    "en": "An e-commerce catalog page needs to render a price for anything a merchant lists: a single product, or a bundle that itself contains products and other bundles nested several levels deep. The obvious first attempt writes a function that checks `if (item.type === 'product')` versus `if (item.type === 'bundle')` and sums up children in the bundle branch.\n\nThat branch multiplies everywhere price is computed — checkout totals, cart previews, discount calculations — and every one of them has to be kept in sync. Add a third kind of listable item, like a subscription plan that bundles products, and every one of those call sites needs a new branch.",
+    "ru": "Странице каталога интернет-магазина нужно показывать цену для любого товара, который выставил продавец: как для отдельного продукта, так и для набора, который сам может содержать продукты и другие наборы, вложенные на несколько уровней. Первая очевидная попытка — написать функцию, которая проверяет `if (item.type === 'product')` и `if (item.type === 'bundle')`, суммируя дочерние элементы в ветке набора.\n\nЭта ветка размножается везде, где считается цена, — в итогах корзины, в предпросмотре, в расчёте скидок, — и все эти места нужно держать синхронными. Добавьте третий вид позиции, например подписку, включающую набор продуктов, — и в каждом из этих мест понадобится новая ветка."
+  },
+  "solution": {
+    "en": "Give every listable item — single products and bundles alike — the same interface, say a `getPrice()` method. A single product simply returns its own price. A bundle implements `getPrice()` by looping over whatever it contains and summing each child's `getPrice()`, regardless of whether that child is itself a single product or another bundle.\n\nBecause a bundle calls the exact same method it exposes, the recursion handles arbitrary nesting for free. Any code that needs a price just calls `getPrice()` on whatever it was handed, without ever branching on what kind of item it is.",
+    "ru": "Дайте каждой позиции каталога — и отдельным продуктам, и наборам — один и тот же интерфейс, скажем, метод `getPrice()`. Отдельный продукт просто возвращает свою цену. Набор реализует `getPrice()`, перебирая всё, что в нём содержится, и суммируя `getPrice()` каждого дочернего элемента — независимо от того, является ли этот элемент продуктом или другим набором.\n\nПоскольку набор вызывает тот же самый метод, который сам предоставляет, рекурсия бесплатно справляется с произвольной вложенностью. Любому коду, которому нужна цена, достаточно вызвать `getPrice()` у переданного объекта, ни разу не проверяя, с каким видом позиции он имеет дело."
+  },
+  "structure": {
+    "description": {
+      "en": "A single shared interface covers both ends of the tree. Leaf nodes implement it by computing their own answer directly; container nodes implement the very same interface by looping over their children and combining whatever those children return — including other containers.",
+      "ru": "Единый общий интерфейс покрывает оба конца дерева. Листовые узлы реализуют его, вычисляя собственный ответ напрямую; узлы-контейнеры реализуют тот же интерфейс, перебирая своих потомков и объединяя то, что те возвращают, — включая другие контейнеры."
+    },
+    "participants": [
+      {
+        "name": "Component",
+        "role": {
+          "en": "The shared interface that both single elements and containers implement, defining the operations client code is allowed to call.",
+          "ru": "Общий интерфейс, который реализуют и отдельные элементы, и контейнеры, определяющий операции, доступные клиентскому коду."
+        }
+      },
+      {
+        "name": "Leaf",
+        "role": {
+          "en": "A terminal node with no children of its own; it answers a Component call directly instead of forwarding it anywhere.",
+          "ru": "Конечный узел без собственных потомков; он отвечает на вызов Компонента напрямую, а не передаёт его кому-либо ещё."
+        }
+      },
+      {
+        "name": "Composite",
+        "role": {
+          "en": "A node that keeps a collection of child Components — leaves, other composites, or a mix — and answers a Component call by combining the results of calling it on each child.",
+          "ru": "Узел, хранящий коллекцию дочерних Компонентов — листьев, других составных элементов или их смеси, — и отвечающий на вызов Компонента, объединяя результаты вызова на каждом потомке."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Calls Component operations on whatever object it's given, never checking whether it's holding a single element or an entire subtree.",
+          "ru": "Вызывает операции Компонента на переданном ему объекте, никогда не проверяя, держит ли он отдельный элемент или целое поддерево."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Component interface\nclass FileSystemItem {\n  getName() { throw new Error('Not implemented'); }\n  getSize() { throw new Error('Not implemented'); }\n  print(indent = '') { throw new Error('Not implemented'); }\n}\n\n// Leaf\nclass File extends FileSystemItem {\n  constructor(name, size) {\n    super();\n    this.name = name;\n    this.size = size;\n  }\n\n  getName() { return this.name; }\n  getSize() { return this.size; }\n\n  print(indent = '') {\n    console.log(`${indent}[file] ${this.name} (${this.size} KB)`);\n  }\n}\n\n// Composite\nclass Directory extends FileSystemItem {\n  #children = [];\n\n  constructor(name) {\n    super();\n    this.name = name;\n  }\n\n  add(item) { this.#children.push(item); return this; }\n  remove(item) { this.#children = this.#children.filter(c => c !== item); }\n\n  getName() { return this.name; }\n  getSize() { return this.#children.reduce((sum, c) => sum + c.getSize(), 0); }\n\n  print(indent = '') {\n    console.log(`${indent}[dir] ${this.name}/`);\n    this.#children.forEach(c => c.print(indent + '  '));\n  }\n}\n\n// Usage — client treats files and directories uniformly\nconst root = new Directory('project');\nconst src = new Directory('src');\nconst tests = new Directory('tests');\n\nsrc.add(new File('index.js', 12)).add(new File('app.js', 34));\ntests.add(new File('app.test.js', 8));\nroot.add(src).add(tests).add(new File('package.json', 2));\n\nroot.print();\n// [dir] project/\n//   [dir] src/\n//     [file] index.js (12 KB)\n//     [file] app.js (34 KB)\n//   [dir] tests/\n//     [file] app.test.js (8 KB)\n//   [file] package.json (2 KB)\n\nconsole.log(`Total size: ${root.getSize()} KB`); // Total size: 56 KB",
+    "typescript": "interface FileSystemItem {\n  getName(): string;\n  getSize(): number;\n  print(indent?: string): void;\n}\n\nclass File implements FileSystemItem {\n  constructor(private name: string, private size: number) {}\n\n  public getName(): string { return this.name; }\n  public getSize(): number { return this.size; }\n\n  public print(indent: string = ''): void {\n    console.log(`${indent}[file] ${this.name} (${this.size} KB)`);\n  }\n}\n\nclass Directory implements FileSystemItem {\n  private children: FileSystemItem[] = [];\n\n  constructor(private name: string) {}\n\n  public add(item: FileSystemItem): this {\n    this.children.push(item);\n    return this;\n  }\n\n  public remove(item: FileSystemItem): void {\n    this.children = this.children.filter(c => c !== item);\n  }\n\n  public getName(): string { return this.name; }\n\n  public getSize(): number {\n    return this.children.reduce((sum, c) => sum + c.getSize(), 0);\n  }\n\n  public print(indent: string = ''): void {\n    console.log(`${indent}[dir] ${this.name}/`);\n    this.children.forEach(c => c.print(indent + '  '));\n  }\n}\n\n// Usage\nconst root = new Directory('project');\nconst src = new Directory('src');\nconst tests = new Directory('tests');\n\nsrc.add(new File('index.ts', 12)).add(new File('app.ts', 34));\ntests.add(new File('app.test.ts', 8));\nroot.add(src).add(tests).add(new File('package.json', 2));\n\nroot.print();\n// [dir] project/\n//   [dir] src/\n//     [file] index.ts (12 KB)\n//     [file] app.ts (34 KB)\n//   [dir] tests/\n//     [file] app.test.ts (8 KB)\n//   [file] package.json (2 KB)\n\nconsole.log(`Total size: ${root.getSize()} KB`); // Total size: 56 KB",
+    "java": "import java.util.*;\n\n// Component interface\ninterface FileSystemItem {\n    String getName();\n    int    getSize();\n    void   print(String indent);\n}\n\n// Leaf\nclass File implements FileSystemItem {\n    private final String name;\n    private final int size;\n\n    File(String name, int size) { this.name = name; this.size = size; }\n\n    public String getName() { return name; }\n    public int    getSize() { return size; }\n    public void   print(String indent) {\n        System.out.printf(\"%s[file] %s (%d KB)%n\", indent, name, size);\n    }\n}\n\n// Composite\nclass Directory implements FileSystemItem {\n    private final String name;\n    private final List<FileSystemItem> children = new ArrayList<>();\n\n    Directory(String name) { this.name = name; }\n\n    public Directory add(FileSystemItem item) { children.add(item); return this; }\n    public void remove(FileSystemItem item)   { children.remove(item); }\n\n    public String getName() { return name; }\n    public int    getSize() { return children.stream().mapToInt(FileSystemItem::getSize).sum(); }\n    public void   print(String indent) {\n        System.out.printf(\"%s[dir] %s/%n\", indent, name);\n        children.forEach(c -> c.print(indent + \"  \"));\n    }\n}\n\n// Usage — client treats files and directories uniformly\nDirectory root  = new Directory(\"project\");\nDirectory src   = new Directory(\"src\");\nDirectory tests = new Directory(\"tests\");\n\nsrc.add(new File(\"index.java\", 12)).add(new File(\"App.java\", 34));\ntests.add(new File(\"AppTest.java\", 8));\nroot.add(src).add(tests).add(new File(\"pom.xml\", 2));\n\nroot.print(\"\");\n// [dir] project/\n//   [dir] src/\n//     [file] index.java (12 KB)\n//     [file] App.java (34 KB)\n//   [dir] tests/\n//     [file] AppTest.java (8 KB)\n//   [file] pom.xml (2 KB)\n\nSystem.out.println(\"Total size: \" + root.getSize() + \" KB\"); // Total size: 56 KB",
+    "csharp": "// Component interface\ninterface IFileSystemItem\n{\n    string GetName();\n    int    GetSize();\n    void   Print(string indent = \"\");\n}\n\n// Leaf\nclass File : IFileSystemItem\n{\n    private readonly string _name;\n    private readonly int    _size;\n\n    public File(string name, int size) { _name = name; _size = size; }\n\n    public string GetName() => _name;\n    public int    GetSize() => _size;\n    public void   Print(string indent = \"\") =>\n        Console.WriteLine($\"{indent}[file] {_name} ({_size} KB)\");\n}\n\n// Composite\nclass Directory : IFileSystemItem\n{\n    private readonly string _name;\n    private readonly List<IFileSystemItem> _children = new();\n\n    public Directory(string name) => _name = name;\n\n    public Directory Add(IFileSystemItem item) { _children.Add(item); return this; }\n    public void Remove(IFileSystemItem item)   => _children.Remove(item);\n\n    public string GetName() => _name;\n    public int    GetSize() => _children.Sum(c => c.GetSize());\n\n    public void Print(string indent = \"\")\n    {\n        Console.WriteLine($\"{indent}[dir] {_name}/\");\n        foreach (var child in _children) child.Print(indent + \"  \");\n    }\n}\n\n// Usage — client treats files and directories uniformly\nvar root  = new Directory(\"project\");\nvar src   = new Directory(\"src\");\nvar tests = new Directory(\"tests\");\n\nsrc.Add(new File(\"index.cs\", 12)).Add(new File(\"App.cs\", 34));\ntests.Add(new File(\"AppTest.cs\", 8));\nroot.Add(src).Add(tests).Add(new File(\"project.csproj\", 2));\n\nroot.Print();\n// [dir] project/\n//   [dir] src/\n//     [file] index.cs (12 KB)\n//     [file] App.cs (34 KB)\n//   [dir] tests/\n//     [file] AppTest.cs (8 KB)\n//   [file] project.csproj (2 KB)\n\nConsole.WriteLine($\"Total size: {root.GetSize()} KB\"); // Total size: 56 KB",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass FileSystemItem(ABC):\n    @abstractmethod\n    def get_name(self) -> str:\n        pass\n\n    @abstractmethod\n    def get_size(self) -> int:\n        pass\n\n    @abstractmethod\n    def print(self, indent: str = '') -> None:\n        pass\n\n\nclass File(FileSystemItem):\n    def __init__(self, name: str, size: int) -> None:\n        self._name = name\n        self._size = size\n\n    def get_name(self) -> str:\n        return self._name\n\n    def get_size(self) -> int:\n        return self._size\n\n    def print(self, indent: str = '') -> None:\n        print(f\"{indent}[file] {self._name} ({self._size} KB)\")\n\n\nclass Directory(FileSystemItem):\n    def __init__(self, name: str) -> None:\n        self._name = name\n        self._children: list[FileSystemItem] = []\n\n    def add(self, item: FileSystemItem) -> 'Directory':\n        self._children.append(item)\n        return self\n\n    def remove(self, item: FileSystemItem) -> None:\n        self._children.remove(item)\n\n    def get_name(self) -> str:\n        return self._name\n\n    def get_size(self) -> int:\n        return sum(c.get_size() for c in self._children)\n\n    def print(self, indent: str = '') -> None:\n        print(f\"{indent}[dir] {self._name}/\")\n        for child in self._children:\n            child.print(indent + '  ')\n\n\n# Usage — client treats files and directories uniformly\nroot = Directory('project')\nsrc = Directory('src')\ntests = Directory('tests')\n\nsrc.add(File('main.py', 12)).add(File('app.py', 34))\ntests.add(File('test_app.py', 8))\nroot.add(src).add(tests).add(File('requirements.txt', 2))\n\nroot.print()\n# [dir] project/\n#   [dir] src/\n#     [file] main.py (12 KB)\n#     [file] app.py (34 KB)\n#   [dir] tests/\n#     [file] test_app.py (8 KB)\n#   [file] requirements.txt (2 KB)\n\nprint(f\"Total size: {root.get_size()} KB\")  # Total size: 56 KB"
+  },
+  "pros": [
+    {
+      "en": "Eliminates type-checking branches for tree traversal entirely — recursion through a shared interface handles any depth automatically.",
+      "ru": "Полностью устраняет ветвления по типу при обходе дерева — рекурсия через общий интерфейс автоматически справляется с любой глубиной."
+    },
+    {
+      "en": "New kinds of leaves or containers slot in by implementing the Component interface, with zero changes to code that already traverses the tree.",
+      "ru": "Новые виды листьев или контейнеров подключаются реализацией интерфейса Компонента без единого изменения в коде, уже обходящем дерево."
+    },
+    {
+      "en": "Client code shrinks and simplifies, since it always calls one interface regardless of whether it's handed a single object or a whole subtree.",
+      "ru": "Клиентский код становится проще и короче, поскольку всегда вызывает один интерфейс независимо от того, передан ли отдельный объект или целое поддерево."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Forcing leaves and containers to share one interface can leave leaves with methods that make no sense for them (like managing children).",
+      "ru": "Принуждение листьев и контейнеров к общему интерфейсу может оставить у листьев методы, которые для них бессмысленны (например, управление потомками)."
+    },
+    {
+      "en": "It's tempting to put container-only operations like `add`/`remove` on the shared interface, which then forces leaves to implement no-ops or throw.",
+      "ru": "Возникает соблазн разместить операции, свойственные только контейнерам (`add`/`remove`), в общем интерфейсе, из-за чего листьям приходится реализовывать пустые заглушки или бросать исключения."
+    },
+    {
+      "en": "Very deep or very large trees can make simple aggregate operations expensive, since a single call may fan out recursively across the whole structure.",
+      "ru": "Очень глубокие или очень большие деревья могут сделать простые агрегирующие операции затратными, поскольку один вызов может рекурсивно развернуться по всей структуре."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Your domain is naturally a part-whole hierarchy — folders and files, menus and menu items, org charts, nested UI layouts.",
+      "ru": "Ваша предметная область естественным образом представляет иерархию часть-целое — папки и файлы, меню и пункты меню, оргструктуры, вложенные UI-макеты."
+    },
+    {
+      "en": "You want callers to run the same operation on a single item or an entire subtree without writing separate code paths for each case.",
+      "ru": "Нужно, чтобы вызывающий код выполнял одну и ту же операцию как для отдельного элемента, так и для целого поддерева, без отдельных веток кода для каждого случая."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Filesystem APIs** — a `File` and a `Directory` both expose size and traversal operations; computing a folder's total size just recurses through whatever it contains.",
+      "ru": "**API файловых систем** — и `File`, и `Directory` предоставляют операции получения размера и обхода; вычисление размера папки — это просто рекурсия по её содержимому."
+    },
+    {
+      "en": "**DOM tree** — a text node and an element node both implement the same `Node` interface, so traversal code like `querySelectorAll` works uniformly at any depth.",
+      "ru": "**Дерево DOM** — текстовый узел и узел-элемент оба реализуют один интерфейс `Node`, поэтому обходящий код вроде `querySelectorAll` работает единообразно на любой глубине."
+    },
+    {
+      "en": "**Protobuf / JSON AST parsers** — a scalar value and a nested object both conform to one node interface, letting a single visitor function walk the entire parsed tree.",
+      "ru": "**Парсеры AST для Protobuf / JSON** — скалярное значение и вложенный объект оба соответствуют одному интерфейсу узла, что позволяет одной функции-обходчику пройтись по всему разобранному дереву."
+    }
+  ],
+  "related_patterns": [
+    "decorator",
+    "iterator",
+    "visitor",
+    "flyweight"
+  ],
+  "visuals": [
+    {
+      "id": "composite-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "structural",
+      "width": 960,
+      "height": 400,
+      "title": {
+        "en": "How Composite works",
+        "ru": "Как работает Компоновщик"
+      },
+      "description": {
+        "en": "The Client calls operation() on the Component interface. The Composite implements Component and delegates the call recursively to each child Leaf. Both Composite and Leaf are treated uniformly through the same interface.",
+        "ru": "Клиент вызывает operation() через интерфейс Компонента. Составной элемент реализует Компонент и рекурсивно делегирует вызов каждому дочернему Листу. И Составной, и Лист обрабатываются единообразно через один интерфейс."
+      },
+      "caption": {
+        "en": "Composite and Leaf both implement Component — Client never needs to distinguish them.",
+        "ru": "Составной и Лист оба реализуют Компонент — Клиент не различает их."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиент" },
+          "subtitle": { "en": "calls operation()", "ru": "вызывает operation()" },
+          "position": { "x": 20, "y": 156, "w": 155, "h": 88 }
+        },
+        {
+          "id": "component",
+          "kind": "interface",
+          "icon": "spark",
+          "emphasis": true,
+          "label": { "en": "Component", "ru": "Компонент" },
+          "subtitle": { "en": "uniform interface", "ru": "единый интерфейс" },
+          "position": { "x": 245, "y": 126, "w": 205, "h": 148 }
+        },
+        {
+          "id": "composite",
+          "kind": "class",
+          "icon": "layers",
+          "label": { "en": "Composite", "ru": "Составной" },
+          "subtitle": { "en": "holds children[]", "ru": "хранит children[]" },
+          "position": { "x": 525, "y": 116, "w": 200, "h": 128 }
+        },
+        {
+          "id": "leafA",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Leaf A", "ru": "Лист A" },
+          "subtitle": { "en": "terminal node", "ru": "конечный узел" },
+          "position": { "x": 800, "y": 30, "w": 148, "h": 80 }
+        },
+        {
+          "id": "leafB",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Leaf B", "ru": "Лист B" },
+          "subtitle": { "en": "terminal node", "ru": "конечный узел" },
+          "position": { "x": 800, "y": 160, "w": 148, "h": 80 }
+        },
+        {
+          "id": "leafC",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Leaf C", "ru": "Лист C" },
+          "subtitle": { "en": "terminal node", "ru": "конечный узел" },
+          "position": { "x": 800, "y": 290, "w": 148, "h": 80 }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "component",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "① operation()", "ru": "① operation()" }
+        },
+        {
+          "source": "component",
+          "target": "composite",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "② delegates", "ru": "② делегирует" }
+        },
+        {
+          "source": "composite",
+          "target": "leafA",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "③ children[0]", "ru": "③ children[0]" }
+        },
+        {
+          "source": "composite",
+          "target": "leafB",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "④ children[1]", "ru": "④ children[1]" }
+        },
+        {
+          "source": "composite",
+          "target": "leafC",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "⑤ children[2]", "ru": "⑤ children[2]" }
+        }
+      ]
+    }
+  ]
+}

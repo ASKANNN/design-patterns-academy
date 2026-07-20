@@ -1,0 +1,223 @@
+{
+  "slug": "abstract-factory",
+  "name": "Abstract Factory",
+  "category": "creational",
+  "complexity": 2,
+  "popularity": 3,
+  "also_known_as": [
+    "Kit"
+  ],
+  "tags": [
+    "creational",
+    "factory",
+    "family",
+    "interface"
+  ],
+  "intent": {
+    "en": "Abstract Factory groups the creation of several related objects behind one interface, so the objects a program builds always come from the same matching set.",
+    "ru": "Абстрактная фабрика объединяет создание нескольких связанных объектов за одним интерфейсом, чтобы все объекты, которые собирает программа, всегда принадлежали одному согласованному набору."
+  },
+  "problem": {
+    "en": "A UI library needs to render buttons, checkboxes, and text fields that look native on Windows, macOS, and Linux. Each platform has its own widget classes, and a screen only looks right if every widget on it comes from the same platform's set — mixing a Windows-style button with a macOS-style checkbox breaks the illusion immediately.\n\nIf the screen-building code instantiates `WindowsButton`, `MacCheckbox`, and so on directly, two things go wrong. First, the code that assembles a screen is littered with `if (platform === 'mac')` branches wherever a widget is created. Second, nothing stops a careless call from grabbing a widget from the wrong platform's set — the compiler has no concept of \"these classes belong together.\"",
+    "ru": "UI-библиотеке нужно отрисовывать кнопки, флажки и текстовые поля, которые выглядят нативно на Windows, macOS и Linux. У каждой платформы свои классы виджетов, и экран выглядит правильно только тогда, когда все виджеты на нём взяты из набора одной платформы — смешение кнопки в стиле Windows с флажком в стиле macOS сразу разрушает иллюзию нативности.\n\nЕсли код построения экрана создаёт `WindowsButton`, `MacCheckbox` и подобные классы напрямую, возникают две проблемы. Во-первых, код сборки экрана заполняется условиями вида `if (platform === 'mac')` в каждом месте создания виджета. Во-вторых, ничто не мешает по ошибке взять виджет из набора чужой платформы — компилятор не знает, что эти классы должны использоваться вместе."
+  },
+  "solution": {
+    "en": "Give every product type in the family its own interface (`Button`, `Checkbox`) and write one implementation class per platform per product. Then introduce a factory interface with one creation method per product type — `createButton()`, `createCheckbox()` — and implement it once per platform: `WindowsFactory`, `MacFactory`, `LinuxFactory`. Each concrete factory only ever knows how to build its own platform's widgets, so it physically cannot hand out a mismatched pair.\n\nThe screen-assembly code receives a factory instance (chosen once, e.g., at startup, based on the detected OS) and calls its creation methods without ever naming a concrete widget class. Switching platforms means swapping which factory gets injected — nothing else in the code changes.",
+    "ru": "Каждому типу продукта в семействе даётся собственный интерфейс (`Button`, `Checkbox`), и под него пишется по одному классу реализации на платформу. Затем вводится интерфейс фабрики с одним методом создания на каждый тип продукта — `createButton()`, `createCheckbox()` — и реализуется отдельно для каждой платформы: `WindowsFactory`, `MacFactory`, `LinuxFactory`. Каждая конкретная фабрика умеет создавать виджеты только своей платформы, поэтому физически не может выдать несовместимую пару.\n\nКод сборки экрана получает готовый экземпляр фабрики (выбранный один раз, например при старте приложения, по определённой ОС) и вызывает её методы создания, ни разу не упоминая конкретный класс виджета. Переход на другую платформу сводится к подмене внедряемой фабрики — остальной код не меняется."
+  },
+  "structure": {
+    "description": {
+      "en": "A factory interface exposes one creation method per product type in the family. Each concrete factory implements every method to produce one consistent variant of the whole family, while each product type has its own interface implemented separately per variant. Client code depends only on the factory and product interfaces, never on the concrete classes behind them.",
+      "ru": "Интерфейс фабрики объявляет по одному методу создания на каждый тип продукта в семействе. Каждая конкретная фабрика реализует все эти методы так, чтобы производить один согласованный вариант всего семейства, а у каждого типа продукта есть свой интерфейс, реализуемый отдельно под каждый вариант. Клиентский код зависит только от интерфейсов фабрики и продуктов, но никогда — от скрытых за ними конкретных классов."
+    },
+    "participants": [
+      {
+        "name": "AbstractFactory",
+        "role": {
+          "en": "Interface listing one creation method per product type the family needs, e.g. createChair() and createSofa().",
+          "ru": "Интерфейс, перечисляющий по одному методу создания на каждый нужный семейству тип продукта, например createChair() и createSofa()."
+        }
+      },
+      {
+        "name": "ConcreteFactory",
+        "role": {
+          "en": "One class per variant, implementing every creation method so it only ever returns objects belonging to that single variant.",
+          "ru": "Отдельный класс на каждый вариант, реализующий все методы создания так, чтобы возвращать объекты только одного этого варианта."
+        }
+      },
+      {
+        "name": "AbstractProduct",
+        "role": {
+          "en": "Interface shared by every variant of one product type, letting client code treat them interchangeably.",
+          "ru": "Интерфейс, общий для всех вариантов одного типа продукта, позволяющий клиентскому коду работать с ними взаимозаменяемо."
+        }
+      },
+      {
+        "name": "ConcreteProduct",
+        "role": {
+          "en": "A specific variant's implementation of a product interface, instantiated only by the matching ConcreteFactory.",
+          "ru": "Реализация интерфейса продукта для конкретного варианта, создаваемая только соответствующей ConcreteFactory."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Receives one factory instance and builds everything through it, never referencing a concrete product or factory class by name.",
+          "ru": "Получает один экземпляр фабрики и строит через него все объекты, ни разу не обращаясь напрямую к конкретному классу продукта или фабрики."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Abstract Products (defined by contract/duck typing in JS)\nclass Chair {\n  sitOn() { throw new Error('sitOn() must be implemented'); }\n}\n\nclass Sofa {\n  sitOn() { throw new Error('sitOn() must be implemented'); }\n}\n\n// Concrete Products — Modern\nclass ModernChair extends Chair {\n  sitOn() { console.log('Sitting on a sleek modern chair.'); }\n}\n\nclass ModernSofa extends Sofa {\n  sitOn() { console.log('Sitting on a comfortable modern sofa.'); }\n}\n\n// Concrete Products — Victorian\nclass VictorianChair extends Chair {\n  sitOn() { console.log('Sitting on an ornate Victorian chair.'); }\n}\n\nclass VictorianSofa extends Sofa {\n  sitOn() { console.log('Sitting on a grand Victorian sofa.'); }\n}\n\n// Abstract Factory\nclass FurnitureFactory {\n  createChair() { throw new Error('createChair() must be implemented'); }\n  createSofa() { throw new Error('createSofa() must be implemented'); }\n}\n\n// Concrete Factories\nclass ModernFurnitureFactory extends FurnitureFactory {\n  createChair() { return new ModernChair(); }\n  createSofa() { return new ModernSofa(); }\n}\n\nclass VictorianFurnitureFactory extends FurnitureFactory {\n  createChair() { return new VictorianChair(); }\n  createSofa() { return new VictorianSofa(); }\n}\n\n// Client — works only with abstract interfaces\nfunction furnishRoom(factory) {\n  const chair = factory.createChair();\n  const sofa = factory.createSofa();\n  chair.sitOn();\n  sofa.sitOn();\n}\n\n// Usage\nfurnishRoom(new ModernFurnitureFactory());\n// Sitting on a sleek modern chair.\n// Sitting on a comfortable modern sofa.\n\nfurnishRoom(new VictorianFurnitureFactory());\n// Sitting on an ornate Victorian chair.\n// Sitting on a grand Victorian sofa.",
+    "typescript": "// Abstract Products\ninterface Chair {\n  sitOn(): void;\n}\n\ninterface Sofa {\n  sitOn(): void;\n}\n\n// Concrete Products — Modern\nclass ModernChair implements Chair {\n  sitOn(): void { console.log('Sitting on a sleek modern chair.'); }\n}\n\nclass ModernSofa implements Sofa {\n  sitOn(): void { console.log('Sitting on a comfortable modern sofa.'); }\n}\n\n// Concrete Products — Victorian\nclass VictorianChair implements Chair {\n  sitOn(): void { console.log('Sitting on an ornate Victorian chair.'); }\n}\n\nclass VictorianSofa implements Sofa {\n  sitOn(): void { console.log('Sitting on a grand Victorian sofa.'); }\n}\n\n// Abstract Factory\ninterface FurnitureFactory {\n  createChair(): Chair;\n  createSofa(): Sofa;\n}\n\n// Concrete Factories\nclass ModernFurnitureFactory implements FurnitureFactory {\n  createChair(): Chair { return new ModernChair(); }\n  createSofa(): Sofa { return new ModernSofa(); }\n}\n\nclass VictorianFurnitureFactory implements FurnitureFactory {\n  createChair(): Chair { return new VictorianChair(); }\n  createSofa(): Sofa { return new VictorianSofa(); }\n}\n\n// Client — depends only on abstract interfaces\nfunction furnishRoom(factory: FurnitureFactory): void {\n  const chair = factory.createChair();\n  const sofa = factory.createSofa();\n  chair.sitOn();\n  sofa.sitOn();\n}\n\n// Usage\nfurnishRoom(new ModernFurnitureFactory());\n// Sitting on a sleek modern chair.\n// Sitting on a comfortable modern sofa.\n\nfurnishRoom(new VictorianFurnitureFactory());\n// Sitting on an ornate Victorian chair.\n// Sitting on a grand Victorian sofa.",
+    "java": "// Abstract Products\ninterface Chair { void sitOn(); }\ninterface Sofa  { void sitOn(); }\n\n// Concrete Products — Modern\nclass ModernChair implements Chair { public void sitOn() { System.out.println(\"Sitting on a sleek modern chair.\"); } }\nclass ModernSofa  implements Sofa  { public void sitOn() { System.out.println(\"Sitting on a comfortable modern sofa.\"); } }\n\n// Concrete Products — Victorian\nclass VictorianChair implements Chair { public void sitOn() { System.out.println(\"Sitting on an ornate Victorian chair.\"); } }\nclass VictorianSofa  implements Sofa  { public void sitOn() { System.out.println(\"Sitting on a grand Victorian sofa.\"); } }\n\n// Abstract Factory\ninterface FurnitureFactory {\n    Chair createChair();\n    Sofa  createSofa();\n}\n\n// Concrete Factories\nclass ModernFurnitureFactory implements FurnitureFactory {\n    public Chair createChair() { return new ModernChair(); }\n    public Sofa  createSofa()  { return new ModernSofa(); }\n}\n\nclass VictorianFurnitureFactory implements FurnitureFactory {\n    public Chair createChair() { return new VictorianChair(); }\n    public Sofa  createSofa()  { return new VictorianSofa(); }\n}\n\n// Client — works only with abstract interfaces\nstatic void furnishRoom(FurnitureFactory factory) {\n    factory.createChair().sitOn();\n    factory.createSofa().sitOn();\n}\n\n// Usage\nfurnishRoom(new ModernFurnitureFactory());\n// Sitting on a sleek modern chair.\n// Sitting on a comfortable modern sofa.\n\nfurnishRoom(new VictorianFurnitureFactory());\n// Sitting on an ornate Victorian chair.\n// Sitting on a grand Victorian sofa.",
+    "csharp": "// Abstract Products\ninterface IChair { void SitOn(); }\ninterface ISofa  { void SitOn(); }\n\n// Concrete Products — Modern\nclass ModernChair : IChair { public void SitOn() => Console.WriteLine(\"Sitting on a sleek modern chair.\"); }\nclass ModernSofa  : ISofa  { public void SitOn() => Console.WriteLine(\"Sitting on a comfortable modern sofa.\"); }\n\n// Concrete Products — Victorian\nclass VictorianChair : IChair { public void SitOn() => Console.WriteLine(\"Sitting on an ornate Victorian chair.\"); }\nclass VictorianSofa  : ISofa  { public void SitOn() => Console.WriteLine(\"Sitting on a grand Victorian sofa.\"); }\n\n// Abstract Factory\ninterface IFurnitureFactory { IChair CreateChair(); ISofa CreateSofa(); }\n\n// Concrete Factories\nclass ModernFurnitureFactory : IFurnitureFactory\n{\n    public IChair CreateChair() => new ModernChair();\n    public ISofa  CreateSofa()  => new ModernSofa();\n}\n\nclass VictorianFurnitureFactory : IFurnitureFactory\n{\n    public IChair CreateChair() => new VictorianChair();\n    public ISofa  CreateSofa()  => new VictorianSofa();\n}\n\n// Client — depends only on abstract interfaces\nstatic void FurnishRoom(IFurnitureFactory factory)\n{\n    factory.CreateChair().SitOn();\n    factory.CreateSofa().SitOn();\n}\n\n// Usage\nFurnishRoom(new ModernFurnitureFactory());\n// Sitting on a sleek modern chair.\n// Sitting on a comfortable modern sofa.\n\nFurnishRoom(new VictorianFurnitureFactory());\n// Sitting on an ornate Victorian chair.\n// Sitting on a grand Victorian sofa.",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\n# Abstract Products\nclass Chair(ABC):\n    @abstractmethod\n    def sit_on(self) -> None: ...\n\n\nclass Sofa(ABC):\n    @abstractmethod\n    def sit_on(self) -> None: ...\n\n\n# Concrete Products — Modern\nclass ModernChair(Chair):\n    def sit_on(self) -> None:\n        print('Sitting on a sleek modern chair.')\n\n\nclass ModernSofa(Sofa):\n    def sit_on(self) -> None:\n        print('Sitting on a comfortable modern sofa.')\n\n\n# Concrete Products — Victorian\nclass VictorianChair(Chair):\n    def sit_on(self) -> None:\n        print('Sitting on an ornate Victorian chair.')\n\n\nclass VictorianSofa(Sofa):\n    def sit_on(self) -> None:\n        print('Sitting on a grand Victorian sofa.')\n\n\n# Abstract Factory\nclass FurnitureFactory(ABC):\n    @abstractmethod\n    def create_chair(self) -> Chair: ...\n\n    @abstractmethod\n    def create_sofa(self) -> Sofa: ...\n\n\n# Concrete Factories\nclass ModernFurnitureFactory(FurnitureFactory):\n    def create_chair(self) -> Chair:\n        return ModernChair()\n\n    def create_sofa(self) -> Sofa:\n        return ModernSofa()\n\n\nclass VictorianFurnitureFactory(FurnitureFactory):\n    def create_chair(self) -> Chair:\n        return VictorianChair()\n\n    def create_sofa(self) -> Sofa:\n        return VictorianSofa()\n\n\n# Client — depends only on abstract interfaces\ndef furnish_room(factory: FurnitureFactory) -> None:\n    chair = factory.create_chair()\n    sofa = factory.create_sofa()\n    chair.sit_on()\n    sofa.sit_on()\n\n\n# Usage\nfurnish_room(ModernFurnitureFactory())\n# Sitting on a sleek modern chair.\n# Sitting on a comfortable modern sofa.\n\nfurnish_room(VictorianFurnitureFactory())\n# Sitting on an ornate Victorian chair.\n# Sitting on a grand Victorian sofa."
+  },
+  "pros": [
+    {
+      "en": "Every object a factory produces is guaranteed to belong to the same variant, so mismatched combinations become structurally impossible.",
+      "ru": "Все объекты, произведённые одной фабрикой, гарантированно принадлежат одному варианту, поэтому несовместимые сочетания становятся структурно невозможны."
+    },
+    {
+      "en": "Client code depends only on interfaces, so it never has to know or care which concrete classes are behind them.",
+      "ru": "Клиентский код зависит только от интерфейсов, поэтому ему не нужно знать, какие конкретные классы стоят за ними."
+    },
+    {
+      "en": "Adding an entirely new variant (a new platform, theme, or region) means adding one new factory class — existing code that consumes the abstraction stays untouched.",
+      "ru": "Добавление целого нового варианта (новой платформы, темы, региона) сводится к добавлению одного нового класса фабрики — существующий код, использующий абстракцию, не меняется."
+    },
+    {
+      "en": "Object-creation logic for a whole family lives in one place instead of being scattered across the codebase as conditionals.",
+      "ru": "Логика создания объектов всего семейства сосредоточена в одном месте вместо того, чтобы быть разбросанной по кодовой базе в виде условных конструкций."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Adding a brand-new product type (not just a new variant) forces you to touch the factory interface and every concrete factory that implements it.",
+      "ru": "Добавление совершенно нового типа продукта (а не просто нового варианта) требует правки интерфейса фабрики и каждой реализующей его конкретной фабрики."
+    },
+    {
+      "en": "Small applications with only one product family gain little from the extra layer of interfaces and factory classes.",
+      "ru": "Небольшие приложения с единственным семейством продуктов почти ничего не выигрывают от дополнительного слоя интерфейсов и классов фабрик."
+    },
+    {
+      "en": "Following the strict flow — factory interface, product interfaces, one implementation per cell of the matrix — front-loads a fair amount of boilerplate before any real logic is written.",
+      "ru": "Строгое следование схеме — интерфейс фабрики, интерфейсы продуктов, по реализации на каждую ячейку матрицы — требует заметного объёма шаблонного кода ещё до появления реальной логики."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for it when a system must stay agnostic to which concrete family of products it works with, and that family is chosen at runtime or configuration time.",
+      "ru": "Применяйте паттерн, когда система должна оставаться независимой от конкретного семейства продуктов, а само семейство выбирается во время выполнения или через конфигурацию."
+    },
+    {
+      "en": "Reach for it when several related product types must always be used together as a matching set, and accidentally mixing variants would be a real bug.",
+      "ru": "Применяйте паттерн, когда несколько связанных типов продуктов всегда должны использоваться вместе как согласованный набор, а случайное смешение вариантов было бы реальной ошибкой."
+    },
+    {
+      "en": "Reach for it when you already have a Factory Method for one product and realize a second, third, and fourth related product need the same variant-based creation logic.",
+      "ru": "Применяйте паттерн, когда у вас уже есть Фабричный метод для одного продукта, и вы понимаете, что второму, третьему и четвёртому связанным продуктам нужна та же логика создания на основе варианта."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Java AWT/Swing `UIManager`** — swapping the look-and-feel (Metal, Nimbus, or a platform-native one) swaps out an entire factory that produces matching buttons, scrollbars, and menus.",
+      "ru": "**`UIManager` в Java AWT/Swing** — смена look-and-feel (Metal, Nimbus или платформенно-нативный) заменяет целую фабрику, производящую согласованные кнопки, полосы прокрутки и меню."
+    },
+    {
+      "en": "**`document.createElement` behind DOM implementations** — different rendering engines (jsdom vs. a real browser) act as interchangeable factories producing element objects that all satisfy the same DOM interfaces.",
+      "ru": "**`document.createElement` в разных реализациях DOM** — разные движки рендеринга (jsdom и настоящий браузер) выступают как взаимозаменяемые фабрики, создающие объекты элементов, удовлетворяющие одним и тем же интерфейсам DOM."
+    },
+    {
+      "en": "**Database driver packages in ORMs (e.g., TypeORM, Sequelize)** — selecting `postgres` vs. `mysql` in the config swaps in a whole family of dialect-specific connection, query, and transaction objects.",
+      "ru": "**Пакеты драйверов баз данных в ORM (например, TypeORM, Sequelize)** — выбор `postgres` или `mysql` в конфигурации подменяет целое семейство диалект-специфичных объектов соединения, запросов и транзакций."
+    }
+  ],
+  "related_patterns": [
+    "factory-method",
+    "builder",
+    "singleton",
+    "prototype"
+  ],
+  "visuals": [
+    {
+      "id": "abstract-factory-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "creational",
+      "width": 1246,
+      "height": 300,
+      "title": {
+        "en": "How Abstract Factory works",
+        "ru": "Как работает Абстрактная фабрика"
+      },
+      "description": {
+        "en": "The Client requests a UI family from the AbstractFactory. The factory creates compatible products — Button and Checkbox — that belong to the same family.",
+        "ru": "Клиент запрашивает семейство UI у AbstractFactory. Фабрика создаёт совместимые продукты — Button и Checkbox — принадлежащие одному семейству."
+      },
+      "caption": {
+        "en": "One factory creates a family of compatible products.",
+        "ru": "Одна фабрика создаёт семейство совместимых продуктов."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиенту" },
+          "subtitle": { "en": "needs a product", "ru": "нужен продукт" },
+          "position": { "x": 20, "y": 110, "w": 200, "h": 80 }
+        },
+        {
+          "id": "factory",
+          "kind": "class",
+          "icon": "layers",
+          "emphasis": true,
+          "label": "AbstractFactory",
+          "subtitle": { "en": "creates a UI family", "ru": "создаёт семейство UI" },
+          "position": { "x": 488, "y": 50, "w": 210, "h": 200 }
+        },
+        {
+          "id": "button",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Button", "ru": "Кнопка" },
+          "subtitle": { "en": "new instance", "ru": "новый экземпляр" },
+          "position": { "x": 1006, "y": 30, "w": 220, "h": 90 }
+        },
+        {
+          "id": "checkbox",
+          "kind": "class",
+          "icon": "spark",
+          "label": { "en": "Checkbox", "ru": "Флажок" },
+          "subtitle": { "en": "new instance", "ru": "новый экземпляр" },
+          "position": { "x": 1006, "y": 180, "w": 220, "h": 90 }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "factory",
+          "relationship": "flow",
+          "label": { "en": "① request", "ru": "① запрос" }
+        },
+        {
+          "source": "factory",
+          "target": "button",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "② createButton()", "ru": "② createButton()" }
+        },
+        {
+          "source": "factory",
+          "target": "checkbox",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "③ createCheckbox()", "ru": "③ createCheckbox()" }
+        }
+      ]
+    }
+  ]
+}

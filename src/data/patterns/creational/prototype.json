@@ -1,0 +1,195 @@
+{
+  "slug": "prototype",
+  "name": "Prototype",
+  "category": "creational",
+  "complexity": 1,
+  "popularity": 2,
+  "also_known_as": [
+    "Clone"
+  ],
+  "tags": [
+    "creational",
+    "clone",
+    "copy"
+  ],
+  "intent": {
+    "en": "Prototype creates new objects by copying an existing instance rather than instantiating a class directly, so an object can be duplicated without the copying code knowing its concrete type.",
+    "ru": "Прототип создаёт новые объекты путём копирования существующего экземпляра, а не прямого создания через конструктор класса, — благодаря этому копирующему коду не обязательно знать конкретный тип дублируемого объекта."
+  },
+  "problem": {
+    "en": "A game spawns enemy units that were expensively configured at runtime — loaded stats, attached AI behavior trees, randomized appearance seeds. Spawning ten more of the same enemy by calling `new Enemy()` and re-running that whole setup from scratch is wasteful, and often impossible: some of that state (e.g., a procedurally-tweaked mesh) was never stored anywhere outside the live object.\n\nOn top of that, generic spawning code that only holds a reference to an object through a base `Unit` interface has no way to call `new` on it at all — it doesn't know, and shouldn't need to know, which concrete subclass it's holding.",
+    "ru": "Игра порождает вражеских юнитов, чья настройка во время выполнения обходится дорого — загружены характеристики, подключены деревья поведения ИИ, рандомизированы параметры внешнего вида. Создать ещё десять таких же врагов вызовом `new Enemy()` и заново прогнать всю эту настройку с нуля — расточительно, а часто и невозможно: часть этого состояния (например, процедурно подправленная геометрия модели) нигде, кроме живого объекта, не хранилась.\n\nВдобавок универсальный код порождения объектов, держащий ссылку на объект только через базовый интерфейс `Unit`, вообще не может вызвать на нём `new` — он не знает и не должен знать, какой конкретный подкласс держит в руках."
+  },
+  "solution": {
+    "en": "Give every object that needs to be duplicable a `clone()` method it implements on itself, declared through a shared interface. Because the method lives inside the class being copied, it has direct access to private fields and can decide exactly how much of the internal state to carry over — including deep-copying nested objects when a shallow field-by-field copy would leave both instances pointing at the same mutable data.\n\nCalling code never constructs anything with `new` — it just calls `.clone()` on whatever object it's holding, through the shared interface, and gets back an independent copy of the same concrete type, with no need to know what that type is.",
+    "ru": "Каждому объекту, который должен поддерживать дублирование, даётся собственный метод `clone()`, реализуемый им самим и объявленный через общий интерфейс. Поскольку метод находится внутри копируемого класса, он имеет прямой доступ к приватным полям и может точно определить, сколько внутреннего состояния переносить, — включая глубокое копирование вложенных объектов там, где поверхностное копирование по полям оставило бы оба экземпляра указывающими на одни и те же изменяемые данные.\n\nВызывающий код никогда не создаёт объект через `new` — он просто вызывает `.clone()` на том, что держит, через общий интерфейс, и получает независимую копию того же конкретного типа, не зная, что это за тип."
+  },
+  "structure": {
+    "description": {
+      "en": "A shared interface guarantees that any conforming object can clone itself on request. Each concrete class implements that cloning logic internally, where it has full access to its own private state and can decide what needs a deep copy versus a shared reference. Calling code only ever invokes the interface method, staying oblivious to which concrete class is actually being duplicated.",
+      "ru": "Общий интерфейс гарантирует, что любой соответствующий ему объект способен клонировать себя по запросу. Каждый конкретный класс реализует логику клонирования внутри себя, имея полный доступ к собственному приватному состоянию и решая, что требует глубокого копирования, а что может остаться общей ссылкой. Вызывающий код обращается только к методу интерфейса, оставаясь в неведении о том, какой конкретный класс на самом деле дублируется."
+    },
+    "participants": [
+      {
+        "name": "Prototype",
+        "role": {
+          "en": "Interface guaranteeing a self-cloning capability, typically exposed as a single clone() method.",
+          "ru": "Интерфейс, гарантирующий способность к самоклонированию, обычно представленный единственным методом clone()."
+        }
+      },
+      {
+        "name": "ConcretePrototype",
+        "role": {
+          "en": "Implements clone() with direct access to its own private fields, deciding what to deep-copy so the clone doesn't secretly share mutable state with the original.",
+          "ru": "Реализует clone() с прямым доступом к собственным приватным полям, решая, что нужно копировать глубоко, чтобы клон не разделял скрытно изменяемое состояние с оригиналом."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Requests a copy through the Prototype interface alone, never referencing or depending on the concrete class being duplicated.",
+          "ru": "Запрашивает копию исключительно через интерфейс Prototype, ни разу не обращаясь к конкретному дублируемому классу и не завися от него."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "class Shape {\n  constructor({ x = 0, y = 0, color = 'black' } = {}) {\n    this.x = x;\n    this.y = y;\n    this.color = color;\n  }\n\n  clone() {\n    return new this.constructor({ ...this });\n  }\n}\n\nclass Circle extends Shape {\n  constructor({ x, y, color, radius = 0 } = {}) {\n    super({ x, y, color });\n    this.radius = radius;\n  }\n}\n\nclass Rectangle extends Shape {\n  constructor({ x, y, color, width = 0, height = 0 } = {}) {\n    super({ x, y, color });\n    this.width = width;\n    this.height = height;\n  }\n}\n\n// Usage\nconst original = new Circle({ x: 10, y: 20, color: 'red', radius: 15 });\nconst copy = original.clone();\n\ncopy.color = 'blue';\n\nconsole.log(original.color);      // red  — original unchanged\nconsole.log(copy.color);          // blue\nconsole.log(copy instanceof Circle); // true",
+    "typescript": "interface Cloneable {\n  clone(): this;\n}\n\nclass Shape implements Cloneable {\n  constructor(\n    public x: number = 0,\n    public y: number = 0,\n    public color: string = 'black',\n  ) {}\n\n  clone(): this {\n    return Object.assign(Object.create(Object.getPrototypeOf(this)), this);\n  }\n}\n\nclass Circle extends Shape {\n  constructor(\n    x: number,\n    y: number,\n    color: string,\n    public radius: number = 0,\n  ) {\n    super(x, y, color);\n  }\n}\n\nclass Rectangle extends Shape {\n  constructor(\n    x: number,\n    y: number,\n    color: string,\n    public width: number = 0,\n    public height: number = 0,\n  ) {\n    super(x, y, color);\n  }\n}\n\n// Usage\nconst original = new Circle(10, 20, 'red', 15);\nconst copy = original.clone();\n\ncopy.color = 'blue';\n\nconsole.log(original.color);        // red\nconsole.log(copy.color);            // blue\nconsole.log(copy instanceof Circle); // true",
+    "java": "// Base prototype — Java's Cloneable + clone() enables shallow copy\nabstract class Shape implements Cloneable {\n    protected double x, y;\n    protected String color;\n\n    protected Shape(double x, double y, String color) {\n        this.x = x; this.y = y; this.color = color;\n    }\n\n    @Override\n    public Shape clone() {\n        try { return (Shape) super.clone(); }\n        catch (CloneNotSupportedException e) { throw new AssertionError(); }\n    }\n}\n\nclass Circle extends Shape {\n    public double radius;\n    Circle(double x, double y, String color, double radius) {\n        super(x, y, color); this.radius = radius;\n    }\n}\n\nclass Rectangle extends Shape {\n    public double width, height;\n    Rectangle(double x, double y, String color, double width, double height) {\n        super(x, y, color); this.width = width; this.height = height;\n    }\n}\n\n// Usage\nCircle original = new Circle(10, 20, \"red\", 15);\nCircle copy     = (Circle) original.clone();\n\ncopy.color = \"blue\";\n\nSystem.out.println(original.color);         // red — original unchanged\nSystem.out.println(copy.color);             // blue\nSystem.out.println(copy instanceof Circle); // true",
+    "csharp": "abstract class Shape\n{\n    public double X { get; set; }\n    public double Y { get; set; }\n    public string Color { get; set; }\n\n    protected Shape(double x, double y, string color)\n    { X = x; Y = y; Color = color; }\n\n    // MemberwiseClone performs a shallow copy — sufficient for value-type fields\n    public virtual Shape Clone() => (Shape) MemberwiseClone();\n}\n\nclass Circle : Shape\n{\n    public double Radius { get; set; }\n    public Circle(double x, double y, string color, double radius)\n        : base(x, y, color) => Radius = radius;\n}\n\nclass Rectangle : Shape\n{\n    public double Width  { get; set; }\n    public double Height { get; set; }\n    public Rectangle(double x, double y, string color, double width, double height)\n        : base(x, y, color) { Width = width; Height = height; }\n}\n\n// Usage\nvar original = new Circle(10, 20, \"red\", 15);\nvar copy     = (Circle) original.Clone();\n\ncopy.Color = \"blue\";\n\nConsole.WriteLine(original.Color);   // red — original unchanged\nConsole.WriteLine(copy.Color);       // blue\nConsole.WriteLine(copy is Circle);   // True",
+    "python": "from __future__ import annotations\nimport copy\n\nclass Shape:\n    def __init__(self, x: float = 0, y: float = 0, color: str = 'black') -> None:\n        self.x = x\n        self.y = y\n        self.color = color\n\n    def clone(self) -> Shape:\n        return copy.copy(self)\n\n\nclass Circle(Shape):\n    def __init__(self, x: float, y: float, color: str, radius: float = 0) -> None:\n        super().__init__(x, y, color)\n        self.radius = radius\n\n\nclass Rectangle(Shape):\n    def __init__(self, x: float, y: float, color: str,\n                 width: float = 0, height: float = 0) -> None:\n        super().__init__(x, y, color)\n        self.width = width\n        self.height = height\n\n\n# Usage\noriginal = Circle(x=10, y=20, color='red', radius=15)\ncopy_ = original.clone()\n\ncopy_.color = 'blue'\n\nprint(original.color)        # red\nprint(copy_.color)           # blue\nprint(type(copy_).__name__)  # Circle"
+  },
+  "pros": [
+    {
+      "en": "Code that duplicates an object never has to name its concrete class — it only relies on the shared cloning interface.",
+      "ru": "Код, дублирующий объект, никогда не называет его конкретный класс — он опирается только на общий интерфейс клонирования."
+    },
+    {
+      "en": "Expensive setup work — loading data, running configuration logic, computing derived state — is paid once and then copied, instead of repeated for every new instance.",
+      "ru": "Затратная настройка — загрузка данных, выполнение конфигурационной логики, вычисление производного состояния — оплачивается один раз, а затем копируется, вместо того чтобы повторяться для каждого нового экземпляра."
+    },
+    {
+      "en": "Runtime-built configurations can be captured and reused as living templates, which plain constructors can't replicate since some of that state was never serialized anywhere.",
+      "ru": "Конфигурации, собранные во время выполнения, можно сохранить и переиспользовать как живые шаблоны — обычные конструкторы так не могут, поскольку часть этого состояния нигде не была сериализована."
+    },
+    {
+      "en": "Producing many pre-configured variants no longer requires a subclass per variant — a library of prototype instances covers the same ground.",
+      "ru": "Производство множества преднастроенных вариантов больше не требует подкласса на каждый вариант — ту же задачу решает библиотека экземпляров-прототипов."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Getting deep copies right for objects with circular references or shared nested structures takes careful, easy-to-get-wrong logic inside clone().",
+      "ru": "Корректное глубокое копирование объектов с циклическими ссылками или общими вложенными структурами требует аккуратной логики внутри clone(), в которой легко ошибиться."
+    },
+    {
+      "en": "Every class in a hierarchy needs to implement or correctly inherit its own cloning logic, which is easy to forget when a new subclass is added.",
+      "ru": "Каждый класс в иерархии должен реализовать или корректно унаследовать собственную логику клонирования, о чём легко забыть при добавлении нового подкласса."
+    },
+    {
+      "en": "A clone that silently shares a mutable nested object with its source can produce hard-to-trace bugs where changes to one instance leak into the other.",
+      "ru": "Клон, незаметно разделяющий изменяемый вложенный объект с исходником, может привести к трудноотслеживаемым ошибкам, когда изменения в одном экземпляре просачиваются в другой."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for it when code holds objects only through a common interface and has to duplicate them without ever knowing their concrete class.",
+      "ru": "Применяйте паттерн, когда код держит объекты только через общий интерфейс и должен их дублировать, не зная их конкретного класса."
+    },
+    {
+      "en": "Reach for it when building a new instance from scratch is measurably more expensive than copying an already-configured one.",
+      "ru": "Применяйте паттерн, когда построение нового экземпляра с нуля заметно дороже, чем копирование уже настроенного."
+    },
+    {
+      "en": "Reach for it when you're maintaining a growing set of subclasses that differ only in preset field values — a library of cloneable prototypes replaces that hierarchy.",
+      "ru": "Применяйте паттерн, когда вы поддерживаете растущий набор подклассов, отличающихся только преднастроенными значениями полей, — библиотека клонируемых прототипов заменяет эту иерархию."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**`structuredClone()` in browsers and Node.js** — a built-in deep-clone operation that duplicates arbitrary objects, including nested structures, without external libraries.",
+      "ru": "**`structuredClone()` в браузерах и Node.js** — встроенная операция глубокого клонирования, дублирующая произвольные объекты, включая вложенные структуры, без внешних библиотек."
+    },
+    {
+      "en": "**Java's `Object.clone()` and `Cloneable` interface** — a built-in language-level protocol for objects to define their own shallow or deep copy behavior.",
+      "ru": "**`Object.clone()` и интерфейс `Cloneable` в Java** — встроенный на уровне языка протокол, позволяющий объектам определять собственное поверхностное или глубокое копирование."
+    },
+    {
+      "en": "**Unity/Unreal prefab and blueprint instantiation** — spawning a game object from a preconfigured template copies a fully set-up prototype rather than rebuilding its components from scratch each time.",
+      "ru": "**Создание объектов из префабов Unity и Blueprint'ов Unreal** — порождение игрового объекта из преднастроенного шаблона копирует уже полностью собранный прототип, а не строит его компоненты заново каждый раз."
+    }
+  ],
+  "related_patterns": [
+    "abstract-factory",
+    "composite",
+    "decorator",
+    "memento",
+    "singleton"
+  ],
+
+  "visuals": [
+    {
+      "id": "prototype-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "creational",
+      "width": 1246,
+      "height": 300,
+      "title": {
+        "en": "How Prototype works",
+        "ru": "Как работает Прототип"
+      },
+      "description": {
+        "en": "A client calls clone() on an existing object. The original object copies itself into a new independent instance. The clone starts as an exact copy but can evolve independently — changes to the clone never affect the original.",
+        "ru": "Клиент вызывает clone() на существующем объекте. Оригинальный объект копирует себя в новый независимый экземпляр. Клон начинается как точная копия, но может развиваться самостоятельно — изменения клона никогда не затрагивают оригинал."
+      },
+      "caption": {
+        "en": "One clone() call — two independent instances.",
+        "ru": "Один вызов clone() — два независимых экземпляра."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиент" },
+          "subtitle": { "en": "calls clone()", "ru": "вызывает clone()" },
+          "position": { "x": 20, "y": 108, "w": 200, "h": 84 }
+        },
+        {
+          "id": "original",
+          "kind": "class",
+          "icon": "cube",
+          "emphasis": true,
+          "label": { "en": "Original", "ru": "Оригинал" },
+          "subtitle": { "en": "clone()", "ru": "clone()" },
+          "position": { "x": 488, "y": 60, "w": 210, "h": 180 }
+        },
+        {
+          "id": "clone",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Clone", "ru": "Клон" },
+          "subtitle": { "en": "independent copy", "ru": "независимая копия" },
+          "position": { "x": 1026, "y": 108, "w": 200, "h": 84 }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "original",
+          "relationship": "flow",
+          "label": { "en": "① clone()", "ru": "① clone()" }
+        },
+        {
+          "source": "original",
+          "target": "clone",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "② new copy", "ru": "② новая копия" }
+        }
+      ]
+    }
+  ]
+}

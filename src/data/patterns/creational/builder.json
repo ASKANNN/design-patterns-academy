@@ -1,0 +1,244 @@
+{
+  "slug": "builder",
+  "name": "Builder",
+  "category": "creational",
+  "complexity": 2,
+  "popularity": 3,
+  "also_known_as": [],
+  "tags": [
+    "creational",
+    "construction",
+    "step-by-step",
+    "fluent-interface"
+  ],
+  "intent": {
+    "en": "Builder pulls the step-by-step assembly of a complex object out into a separate object, so the same sequence of steps can produce different finished configurations of that object.",
+    "ru": "Строитель выносит пошаговую сборку сложного объекта в отдельный класс, благодаря чему один и тот же порядок шагов позволяет собирать разные варианты этого объекта."
+  },
+  "problem": {
+    "en": "A `Pizza` object needs a size, a crust type, a list of toppings, a sauce, and optional extras like extra cheese — most of which are optional and many of which depend on each other. A constructor covering every combination either explodes into `new Pizza(size, crust, sauce, cheese, toppings, isStuffedCrust, isExtraCheese, ...)` with half the arguments set to defaults nobody remembers the order of, or it multiplies into a subclass for every popular combination: `MediumPepperoniPizza`, `LargeVeggieStuffedCrustPizza`, and so on, which stops scaling the moment a customer wants something slightly different.\n\nBoth escape routes trade one problem for another: an unreadable, error-prone giant constructor, or a subclass explosion that still can't cover every custom order.",
+    "ru": "Объекту `Pizza` нужны размер, тип теста, список начинок, соус и необязательные добавки вроде двойного сыра — большинство параметров опциональны, и многие зависят друг от друга. Конструктор, покрывающий все комбинации, либо разрастается до `new Pizza(size, crust, sauce, cheese, toppings, isStuffedCrust, isExtraCheese, ...)`, где половина аргументов — значения по умолчанию, порядок которых никто не помнит, либо размножается в подклассы под каждую популярную комбинацию: `MediumPepperoniPizza`, `LargeVeggieStuffedCrustPizza` и так далее — а это перестаёт работать, как только клиент хочет что-то чуть-чуть отличающееся.\n\nОба пути решают одну проблему ценой другой: нечитаемый, подверженный ошибкам гигантский конструктор либо взрыв подклассов, который всё равно не покрывает каждый нестандартный заказ."
+  },
+  "solution": {
+    "en": "Move the assembly logic into a separate **builder** object that exposes one method per configurable part — `addSize()`, `setCrust()`, `addTopping()` — each returning the builder itself so calls can be chained. The caller invokes only the steps relevant to a particular order and skips the rest; there's no giant parameter list to fill in blanks for.\n\nDifferent builder classes implementing the same step interface can assemble entirely different representations from the same sequence of calls — a `PizzaBuilder` and an `OrderSummaryBuilder` could both consume the same steps but produce a cooked pizza object versus a printable receipt. When a handful of standard configurations are ordered often, a separate **Director** object can encode those recipes as fixed sequences of builder calls, while ad-hoc orders still go straight through the builder without a director at all.",
+    "ru": "Логика сборки переносится в отдельный объект-**строитель**, у которого есть по методу на каждую настраиваемую часть — `addSize()`, `setCrust()`, `addTopping()` — причём каждый метод возвращает сам строитель, чтобы вызовы можно было выстраивать в цепочку. Вызывающий код использует только те шаги, что нужны для конкретного заказа, и пропускает остальные — не нужно заполнять пробелы в гигантском списке параметров.\n\nРазные классы строителей, реализующие один и тот же набор шагов, могут собирать совершенно разные представления из одной последовательности вызовов — `PizzaBuilder` и `OrderSummaryBuilder` могут принимать одни и те же шаги, но производить готовую пиццу и печатный чек соответственно. Когда несколько стандартных конфигураций заказываются часто, отдельный объект-**Директор** может закодировать эти рецепты как фиксированные последовательности вызовов строителя, а нестандартные заказы по-прежнему идут напрямую через строитель без всякого директора."
+  },
+  "structure": {
+    "description": {
+      "en": "A shared step interface lists every assembly operation a product might need. Each concrete builder implements those steps to accumulate state on its own internal product and exposes a way to retrieve the finished result. An optional Director holds fixed sequences of step calls for common configurations, while ad-hoc assembly can call the builder's steps directly.",
+      "ru": "Общий интерфейс шагов перечисляет все операции сборки, которые могут понадобиться продукту. Каждый конкретный строитель реализует эти шаги, накапливая состояние во внутреннем продукте, и предоставляет способ получить готовый результат. Необязательный Директор хранит фиксированные последовательности вызовов шагов для типовых конфигураций, а нестандартная сборка может вызывать шаги строителя напрямую."
+    },
+    "participants": [
+      {
+        "name": "Builder",
+        "role": {
+          "en": "Interface listing every step needed to assemble a product, independent of how any particular builder implements them.",
+          "ru": "Интерфейс, перечисляющий все шаги, необходимые для сборки продукта, независимо от того, как их реализует конкретный строитель."
+        }
+      },
+      {
+        "name": "ConcreteBuilder",
+        "role": {
+          "en": "Implements each step by mutating its own in-progress product instance, and exposes a getResult() method to hand over the finished object.",
+          "ru": "Реализует каждый шаг, изменяя собственный собираемый экземпляр продукта, и предоставляет метод getResult() для передачи готового объекта."
+        }
+      },
+      {
+        "name": "Director",
+        "role": {
+          "en": "Encodes fixed recipes as ordered sequences of builder calls, so common configurations can be built with one method call instead of repeating steps everywhere.",
+          "ru": "Кодирует фиксированные рецепты как упорядоченные последовательности вызовов строителя, чтобы типовые конфигурации собирались одним вызовом метода вместо повторения шагов повсюду."
+        }
+      },
+      {
+        "name": "Product",
+        "role": {
+          "en": "The object under construction. Different builders may assemble unrelated product types through the same step interface — nothing forces them to share a hierarchy.",
+          "ru": "Объект, находящийся в процессе сборки. Разные строители могут собирать никак не связанные типы продуктов через один и тот же интерфейс шагов — общая иерархия не обязательна."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "class House {\n  constructor() {\n    this.walls = 0;\n    this.doors = 0;\n    this.windows = 0;\n    this.hasRoof = false;\n    this.hasGarage = false;\n  }\n\n  toString() {\n    return `House: ${this.walls} walls, ${this.doors} doors, ` +\n      `${this.windows} windows, roof: ${this.hasRoof}, garage: ${this.hasGarage}`;\n  }\n}\n\nclass HouseBuilder {\n  constructor() {\n    this.house = new House();\n  }\n\n  buildWalls(count) { this.house.walls = count; return this; }\n  buildDoors(count) { this.house.doors = count; return this; }\n  buildWindows(count) { this.house.windows = count; return this; }\n  buildRoof() { this.house.hasRoof = true; return this; }\n  buildGarage() { this.house.hasGarage = true; return this; }\n\n  getResult() {\n    const result = this.house;\n    this.house = new House();\n    return result;\n  }\n}\n\nclass Director {\n  setBuilder(builder) { this.builder = builder; }\n\n  buildSimpleHouse() {\n    this.builder.buildWalls(4).buildDoors(1).buildWindows(2).buildRoof();\n  }\n\n  buildFamilyHouse() {\n    this.builder.buildWalls(6).buildDoors(3).buildWindows(8).buildRoof().buildGarage();\n  }\n}\n\n// Usage\nconst builder = new HouseBuilder();\nconst director = new Director();\ndirector.setBuilder(builder);\n\ndirector.buildSimpleHouse();\nconsole.log(builder.getResult().toString());\n// House: 4 walls, 1 doors, 2 windows, roof: true, garage: false\n\ndirector.buildFamilyHouse();\nconsole.log(builder.getResult().toString());\n// House: 6 walls, 3 doors, 8 windows, roof: true, garage: true\n\n// Without director — custom product\nconst custom = new HouseBuilder()\n  .buildWalls(4)\n  .buildDoors(2)\n  .buildWindows(4)\n  .getResult();\nconsole.log(custom.toString());\n// House: 4 walls, 2 doors, 4 windows, roof: false, garage: false",
+    "typescript": "interface HouseBuilderInterface {\n  buildWalls(count: number): this;\n  buildDoors(count: number): this;\n  buildWindows(count: number): this;\n  buildRoof(): this;\n  buildGarage(): this;\n}\n\nclass House {\n  walls: number = 0;\n  doors: number = 0;\n  windows: number = 0;\n  hasRoof: boolean = false;\n  hasGarage: boolean = false;\n\n  toString(): string {\n    return `House: ${this.walls} walls, ${this.doors} doors, ` +\n      `${this.windows} windows, roof: ${this.hasRoof}, garage: ${this.hasGarage}`;\n  }\n}\n\nclass HouseBuilder implements HouseBuilderInterface {\n  private house: House = new House();\n\n  buildWalls(count: number): this { this.house.walls = count; return this; }\n  buildDoors(count: number): this { this.house.doors = count; return this; }\n  buildWindows(count: number): this { this.house.windows = count; return this; }\n  buildRoof(): this { this.house.hasRoof = true; return this; }\n  buildGarage(): this { this.house.hasGarage = true; return this; }\n\n  getResult(): House {\n    const result = this.house;\n    this.house = new House();\n    return result;\n  }\n}\n\nclass Director {\n  private builder!: HouseBuilder;\n\n  setBuilder(builder: HouseBuilder): void {\n    this.builder = builder;\n  }\n\n  buildSimpleHouse(): void {\n    this.builder.buildWalls(4).buildDoors(1).buildWindows(2).buildRoof();\n  }\n\n  buildFamilyHouse(): void {\n    this.builder.buildWalls(6).buildDoors(3).buildWindows(8).buildRoof().buildGarage();\n  }\n}\n\n// Usage\nconst builder = new HouseBuilder();\nconst director = new Director();\ndirector.setBuilder(builder);\n\ndirector.buildSimpleHouse();\nconsole.log(builder.getResult().toString());\n// House: 4 walls, 1 doors, 2 windows, roof: true, garage: false\n\ndirector.buildFamilyHouse();\nconsole.log(builder.getResult().toString());\n// House: 6 walls, 3 doors, 8 windows, roof: true, garage: true",
+    "java": "class House {\n    int walls, doors, windows;\n    boolean hasRoof, hasGarage;\n\n    public String toString() {\n        return String.format(\n            \"House: %d walls, %d doors, %d windows, roof: %b, garage: %b\",\n            walls, doors, windows, hasRoof, hasGarage);\n    }\n}\n\nclass HouseBuilder {\n    private House house = new House();\n\n    public HouseBuilder buildWalls(int n)   { house.walls     = n;    return this; }\n    public HouseBuilder buildDoors(int n)   { house.doors     = n;    return this; }\n    public HouseBuilder buildWindows(int n) { house.windows   = n;    return this; }\n    public HouseBuilder buildRoof()         { house.hasRoof   = true; return this; }\n    public HouseBuilder buildGarage()       { house.hasGarage = true; return this; }\n\n    public House getResult() { House r = house; house = new House(); return r; }\n}\n\nclass Director {\n    private HouseBuilder builder;\n    public void setBuilder(HouseBuilder b) { this.builder = b; }\n\n    public void buildSimpleHouse() {\n        builder.buildWalls(4).buildDoors(1).buildWindows(2).buildRoof();\n    }\n    public void buildFamilyHouse() {\n        builder.buildWalls(6).buildDoors(3).buildWindows(8).buildRoof().buildGarage();\n    }\n}\n\n// Usage\nHouseBuilder builder = new HouseBuilder();\nDirector director    = new Director();\ndirector.setBuilder(builder);\n\ndirector.buildSimpleHouse();\nSystem.out.println(builder.getResult());\n// House: 4 walls, 1 doors, 2 windows, roof: true, garage: false\n\ndirector.buildFamilyHouse();\nSystem.out.println(builder.getResult());\n// House: 6 walls, 3 doors, 8 windows, roof: true, garage: true\n\n// Without director — custom product\nHouse custom = new HouseBuilder()\n    .buildWalls(4).buildDoors(2).buildWindows(4).getResult();\nSystem.out.println(custom);\n// House: 4 walls, 2 doors, 4 windows, roof: false, garage: false",
+    "csharp": "class House\n{\n    public int Walls, Doors, Windows;\n    public bool HasRoof, HasGarage;\n\n    public override string ToString() =>\n        $\"House: {Walls} walls, {Doors} doors, {Windows} windows, \" +\n        $\"roof: {HasRoof}, garage: {HasGarage}\";\n}\n\nclass HouseBuilder\n{\n    private House _house = new();\n\n    public HouseBuilder BuildWalls(int n)   { _house.Walls     = n;    return this; }\n    public HouseBuilder BuildDoors(int n)   { _house.Doors     = n;    return this; }\n    public HouseBuilder BuildWindows(int n) { _house.Windows   = n;    return this; }\n    public HouseBuilder BuildRoof()         { _house.HasRoof   = true; return this; }\n    public HouseBuilder BuildGarage()       { _house.HasGarage = true; return this; }\n\n    public House GetResult() { var r = _house; _house = new House(); return r; }\n}\n\nclass Director\n{\n    private HouseBuilder _builder = null!;\n    public void SetBuilder(HouseBuilder b) => _builder = b;\n\n    public void BuildSimpleHouse() =>\n        _builder.BuildWalls(4).BuildDoors(1).BuildWindows(2).BuildRoof();\n\n    public void BuildFamilyHouse() =>\n        _builder.BuildWalls(6).BuildDoors(3).BuildWindows(8).BuildRoof().BuildGarage();\n}\n\n// Usage\nvar builder  = new HouseBuilder();\nvar director = new Director();\ndirector.SetBuilder(builder);\n\ndirector.BuildSimpleHouse();\nConsole.WriteLine(builder.GetResult());\n// House: 4 walls, 1 doors, 2 windows, roof: True, garage: False\n\ndirector.BuildFamilyHouse();\nConsole.WriteLine(builder.GetResult());\n// House: 6 walls, 3 doors, 8 windows, roof: True, garage: True\n\n// Without director — custom product\nConsole.WriteLine(new HouseBuilder().BuildWalls(4).BuildDoors(2).BuildWindows(4).GetResult());\n// House: 4 walls, 2 doors, 4 windows, roof: False, garage: False",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass House:\n    def __init__(self) -> None:\n        self.walls: int = 0\n        self.doors: int = 0\n        self.windows: int = 0\n        self.has_roof: bool = False\n        self.has_garage: bool = False\n\n    def __str__(self) -> str:\n        return (\n            f\"House: {self.walls} walls, {self.doors} doors, \"\n            f\"{self.windows} windows, roof: {self.has_roof}, garage: {self.has_garage}\"\n        )\n\n\nclass Builder(ABC):\n    @abstractmethod\n    def build_walls(self, count: int) -> Builder: ...\n    @abstractmethod\n    def build_doors(self, count: int) -> Builder: ...\n    @abstractmethod\n    def build_windows(self, count: int) -> Builder: ...\n    @abstractmethod\n    def build_roof(self) -> Builder: ...\n    @abstractmethod\n    def build_garage(self) -> Builder: ...\n\n\nclass HouseBuilder(Builder):\n    def __init__(self) -> None:\n        self._house = House()\n\n    def build_walls(self, count: int) -> HouseBuilder:\n        self._house.walls = count\n        return self\n\n    def build_doors(self, count: int) -> HouseBuilder:\n        self._house.doors = count\n        return self\n\n    def build_windows(self, count: int) -> HouseBuilder:\n        self._house.windows = count\n        return self\n\n    def build_roof(self) -> HouseBuilder:\n        self._house.has_roof = True\n        return self\n\n    def build_garage(self) -> HouseBuilder:\n        self._house.has_garage = True\n        return self\n\n    def get_result(self) -> House:\n        result = self._house\n        self._house = House()\n        return result\n\n\nclass Director:\n    def __init__(self, builder: HouseBuilder) -> None:\n        self._builder = builder\n\n    def build_simple_house(self) -> None:\n        self._builder.build_walls(4).build_doors(1).build_windows(2).build_roof()\n\n    def build_family_house(self) -> None:\n        (self._builder\n            .build_walls(6)\n            .build_doors(3)\n            .build_windows(8)\n            .build_roof()\n            .build_garage())\n\n\n# Usage\nbuilder = HouseBuilder()\ndirector = Director(builder)\n\ndirector.build_simple_house()\nprint(builder.get_result())\n# House: 4 walls, 1 doors, 2 windows, roof: True, garage: False\n\ndirector.build_family_house()\nprint(builder.get_result())\n# House: 6 walls, 3 doors, 8 windows, roof: True, garage: True"
+  },
+  "pros": [
+    {
+      "en": "Object creation reads as a sequence of intent-revealing method calls instead of a wall of positional arguments.",
+      "ru": "Создание объекта выглядит как последовательность понятных по названию вызовов методов, а не стена позиционных аргументов."
+    },
+    {
+      "en": "The same step sequence, run through different concrete builders, can produce entirely different product representations.",
+      "ru": "Одна и та же последовательность шагов, выполненная через разные конкретные строители, может производить совершенно разные представления продукта."
+    },
+    {
+      "en": "Assembly logic is isolated in the builder, keeping the product class focused on what it represents rather than how it gets built.",
+      "ru": "Логика сборки изолирована в строителе, благодаря чему класс продукта сосредоточен на том, что он представляет, а не на том, как он собирается."
+    },
+    {
+      "en": "Callers only invoke the steps a particular configuration actually needs, avoiding unused parameters entirely.",
+      "ru": "Вызывающий код использует только те шаги, которые действительно нужны конкретной конфигурации, полностью избегая неиспользуемых параметров."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Simple objects with two or three fields don't justify a builder class, a step interface, and a product — a plain constructor is clearer.",
+      "ru": "Для простых объектов с двумя-тремя полями класс строителя, интерфейс шагов и продукт избыточны — обычный конструктор нагляднее."
+    },
+    {
+      "en": "Forgetting to call a required step produces an incomplete object at runtime rather than a compile-time error, unless the builder adds explicit validation.",
+      "ru": "Забытый вызов обязательного шага приводит к неполному объекту во время выполнения, а не к ошибке компиляции, если строитель не добавляет явную валидацию."
+    },
+    {
+      "en": "A separate Director layer adds indirection that's only worth it once the same fixed configurations get built repeatedly.",
+      "ru": "Отдельный слой Директора добавляет косвенность, оправданную только тогда, когда одни и те же фиксированные конфигурации собираются многократно."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for it when a constructor would need many optional parameters and most calls would only set a handful of them.",
+      "ru": "Применяйте паттерн, когда конструктору потребовалось бы много необязательных параметров, а большинство вызовов задавало бы лишь часть из них."
+    },
+    {
+      "en": "Reach for it when the same underlying construction process needs to yield visibly different end results depending on which builder or steps are used.",
+      "ru": "Применяйте паттерн, когда один и тот же процесс конструирования должен давать заметно разные конечные результаты в зависимости от используемого строителя или набора шагов."
+    },
+    {
+      "en": "Reach for it when assembling an object involves ordering constraints or nested sub-objects that are easier to express as discrete steps than as one call.",
+      "ru": "Применяйте паттерн, когда сборка объекта подразумевает ограничения на порядок операций или вложенные подобъекты, которые проще выразить отдельными шагами, чем одним вызовом."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**`fetch`/`Request` construction via chained config objects and libraries like `axios`** — request options accumulate through method calls or merged config before the actual network call fires.",
+      "ru": "**Формирование запроса через цепочки конфигурации в `fetch`/`Request` и библиотеках вроде `axios`** — параметры запроса накапливаются через вызовы методов или объединяемую конфигурацию до фактической отправки запроса."
+    },
+    {
+      "en": "**`StringBuilder` in Java and `StringBuilder`/template literals in .NET** — long strings are assembled through repeated `append()` calls instead of costly repeated concatenation.",
+      "ru": "**`StringBuilder` в Java и .NET** — длинные строки собираются через повторные вызовы `append()` вместо затратной многократной конкатенации."
+    },
+    {
+      "en": "**Query builders in ORMs like Knex.js and TypeORM** — `.select().where().orderBy().limit()` chains assemble a SQL query step by step before it's compiled and executed.",
+      "ru": "**Построители запросов в ORM вроде Knex.js и TypeORM** — цепочки `.select().where().orderBy().limit()` собирают SQL-запрос по шагам перед его компиляцией и выполнением."
+    }
+  ],
+  "related_patterns": [
+    "abstract-factory",
+    "factory-method",
+    "prototype",
+    "composite"
+  ],
+  "visuals": [
+    {
+      "id": "builder-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "creational",
+      "width": 1246,
+      "height": 340,
+      "title": {
+        "en": "How Builder works",
+        "ru": "Как работает Строитель"
+      },
+      "description": {
+        "en": "The Client delegates construction to the Builder. The Builder assembles the Product step by step — Part A, Part B, Part C — and returns the completed object.",
+        "ru": "Клиент делегирует конструирование Строителю. Строитель собирает Продукт пошагово — Часть A, Часть B, Часть C — и возвращает готовый объект."
+      },
+      "caption": {
+        "en": "One builder assembles a complex product step by step.",
+        "ru": "Один строитель собирает сложный продукт пошагово."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиент" },
+          "subtitle": { "en": "build request", "ru": "запрос сборки" },
+          "position": { "x": 20, "y": 130, "w": 190, "h": 80 }
+        },
+        {
+          "id": "builder",
+          "kind": "class",
+          "icon": "layers",
+          "emphasis": true,
+          "label": "Builder",
+          "subtitle": { "en": "assembles step by step", "ru": "собирает пошагово" },
+          "position": { "x": 280, "y": 40, "w": 200, "h": 260 }
+        },
+        {
+          "id": "partA",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Part A", "ru": "Часть A" },
+          "subtitle": { "en": "buildPartA()", "ru": "buildPartA()" },
+          "position": { "x": 580, "y": 20, "w": 190, "h": 80 }
+        },
+        {
+          "id": "partB",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Part B", "ru": "Часть B" },
+          "subtitle": { "en": "buildPartB()", "ru": "buildPartB()" },
+          "position": { "x": 580, "y": 130, "w": 190, "h": 80 }
+        },
+        {
+          "id": "partC",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Part C", "ru": "Часть C" },
+          "subtitle": { "en": "buildPartC()", "ru": "buildPartC()" },
+          "position": { "x": 580, "y": 240, "w": 190, "h": 80 }
+        },
+        {
+          "id": "product",
+          "kind": "class",
+          "icon": "spark",
+          "label": { "en": "Product", "ru": "Продукт" },
+          "subtitle": { "en": "getResult()", "ru": "getResult()" },
+          "position": { "x": 950, "y": 110, "w": 210, "h": 120 }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "builder",
+          "relationship": "flow",
+          "label": { "en": "① request", "ru": "① запрос" }
+        },
+        {
+          "source": "builder",
+          "target": "partA",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "② buildPartA()", "ru": "② buildPartA()" }
+        },
+        {
+          "source": "builder",
+          "target": "partB",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "③ buildPartB()", "ru": "③ buildPartB()" }
+        },
+        {
+          "source": "builder",
+          "target": "partC",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "④ buildPartC()", "ru": "④ buildPartC()" }
+        },
+        {
+          "source": "builder",
+          "target": "product",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "⑤ getResult()", "ru": "⑤ getResult()" }
+        }
+      ]
+    }
+  ]
+}

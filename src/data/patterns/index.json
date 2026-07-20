@@ -1,0 +1,311 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "total": 23,
+    "source": "Gang of Four — Design Patterns: Elements of Reusable Object-Oriented Software"
+  },
+
+  "patterns": [
+    {
+      "slug": "abstract-factory",
+      "name": "Abstract Factory",
+      "category": "creational",
+      "complexity": 2,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["creational", "factory", "family", "interface"],
+      "summary": {
+        "en": "Produces whole families of related objects through one interface, so the objects always match.",
+        "ru": "Создаёт целые семейства связанных объектов через единый интерфейс, гарантируя их совместимость."
+      }
+    },
+    {
+      "slug": "builder",
+      "name": "Builder",
+      "category": "creational",
+      "complexity": 2,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["creational", "construction", "step-by-step"],
+      "summary": {
+        "en": "Assembles a complex object step by step, so the same steps can yield different configurations.",
+        "ru": "Пошагово собирает сложный объект, позволяя получать разные конфигурации из одних и тех же шагов."
+      }
+    },
+    {
+      "slug": "factory-method",
+      "name": "Factory Method",
+      "category": "creational",
+      "complexity": 1,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["creational", "factory", "virtual-constructor"],
+      "summary": {
+        "en": "Delegates object creation to a method subclasses can override, hiding the exact type being built.",
+        "ru": "Делегирует создание объекта методу, который могут переопределять подклассы, скрывая конкретный создаваемый тип."
+      }
+    },
+    {
+      "slug": "prototype",
+      "name": "Prototype",
+      "category": "creational",
+      "complexity": 1,
+      "popularity": 2,
+      "status": "available",
+      "tags": ["creational", "clone", "copy"],
+      "summary": {
+        "en": "Creates new objects by cloning an existing instance instead of building one from scratch.",
+        "ru": "Создаёт новые объекты путём клонирования существующего экземпляра, а не построения с нуля."
+      }
+    },
+    {
+      "slug": "singleton",
+      "name": "Singleton",
+      "category": "creational",
+      "complexity": 1,
+      "popularity": 2,
+      "status": "available",
+      "tags": ["creational", "instance", "global-state"],
+      "summary": {
+        "en": "Guarantees a class has exactly one instance and gives the whole program one way to reach it.",
+        "ru": "Гарантирует существование только одного экземпляра класса и даёт программе единый способ его получить."
+      }
+    },
+
+    {
+      "slug": "adapter",
+      "name": "Adapter",
+      "category": "structural",
+      "complexity": 1,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["structural", "wrapper", "compatibility", "interface"],
+      "summary": {
+        "en": "Wraps an object with a mismatched interface so it can work with code that expects a different one.",
+        "ru": "Оборачивает объект с несовместимым интерфейсом, чтобы он мог работать с кодом, ожидающим другой интерфейс."
+      }
+    },
+    {
+      "slug": "bridge",
+      "name": "Bridge",
+      "category": "structural",
+      "complexity": 3,
+      "popularity": 1,
+      "status": "available",
+      "tags": ["structural", "abstraction", "implementation"],
+      "summary": {
+        "en": "Splits a class into two independent hierarchies — abstraction and implementation — connected through composition.",
+        "ru": "Разделяет класс на две независимые иерархии — абстракцию и реализацию, — связанные через композицию."
+      }
+    },
+    {
+      "slug": "composite",
+      "name": "Composite",
+      "category": "structural",
+      "complexity": 2,
+      "popularity": 2,
+      "status": "available",
+      "tags": ["structural", "tree", "recursive"],
+      "summary": {
+        "en": "Lets individual objects and groups of them be handled through the same interface, regardless of nesting depth.",
+        "ru": "Позволяет обрабатывать отдельные объекты и их группы через единый интерфейс независимо от глубины вложенности."
+      }
+    },
+    {
+      "slug": "decorator",
+      "name": "Decorator",
+      "category": "structural",
+      "complexity": 2,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["structural", "wrapper", "extension"],
+      "summary": {
+        "en": "Adds new behavior to a single object by wrapping it in layers that share its interface.",
+        "ru": "Добавляет объекту новое поведение, оборачивая его в слои с тем же интерфейсом."
+      }
+    },
+    {
+      "slug": "facade",
+      "name": "Facade",
+      "category": "structural",
+      "complexity": 1,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["structural", "interface", "simplification", "subsystem"],
+      "summary": {
+        "en": "Hides a tangle of interacting classes behind one simple entry point.",
+        "ru": "Скрывает клубок взаимодействующих классов за одной простой точкой входа."
+      }
+    },
+    {
+      "slug": "flyweight",
+      "name": "Flyweight",
+      "category": "structural",
+      "complexity": 3,
+      "popularity": 1,
+      "status": "available",
+      "tags": ["structural", "cache", "memory"],
+      "summary": {
+        "en": "Shares the common data of many similar objects to cut memory usage.",
+        "ru": "Разделяет общие данные множества похожих объектов, снижая расход памяти."
+      }
+    },
+    {
+      "slug": "proxy",
+      "name": "Proxy",
+      "category": "structural",
+      "complexity": 2,
+      "popularity": 1,
+      "status": "available",
+      "tags": ["structural", "surrogate", "access-control"],
+      "summary": {
+        "en": "Stands in for another object behind the same interface, intercepting calls to add checks, caching, or lazy loading.",
+        "ru": "Подменяет собой другой объект за тем же интерфейсом, перехватывая вызовы для проверок, кэширования или ленивой загрузки."
+      }
+    },
+
+    {
+      "slug": "chain-of-responsibility",
+      "name": "Chain of Responsibility",
+      "category": "behavioral",
+      "complexity": 2,
+      "popularity": 2,
+      "status": "available",
+      "tags": ["behavioral", "chain", "handler"],
+      "summary": {
+        "en": "Passes a request along a line of handlers until one of them takes care of it.",
+        "ru": "Передаёт запрос по цепочке обработчиков, пока один из них не возьмётся его выполнить."
+      }
+    },
+    {
+      "slug": "command",
+      "name": "Command",
+      "category": "behavioral",
+      "complexity": 1,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["behavioral", "action", "transaction"],
+      "summary": {
+        "en": "Wraps a request as a standalone object, so it can be queued, logged, or undone independently of its trigger.",
+        "ru": "Оборачивает запрос в отдельный объект, который можно поставить в очередь, залогировать или отменить независимо от источника вызова."
+      }
+    },
+    {
+      "slug": "interpreter",
+      "name": "Interpreter",
+      "category": "behavioral",
+      "complexity": 3,
+      "popularity": 1,
+      "status": "available",
+      "tags": ["behavioral", "grammar", "language"],
+      "summary": {
+        "en": "Represents each grammar rule of a small language as a class, so a sentence becomes a tree that can evaluate itself.",
+        "ru": "Представляет каждое правило грамматики небольшого языка отдельным классом, превращая выражение в дерево, способное само себя вычислить."
+      }
+    },
+    {
+      "slug": "iterator",
+      "name": "Iterator",
+      "category": "behavioral",
+      "complexity": 1,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["behavioral", "traversal", "collection"],
+      "summary": {
+        "en": "Provides one consistent way to walk through a collection without exposing how it's stored.",
+        "ru": "Даёт единый способ обхода коллекции, не раскрывая, как она устроена внутри."
+      }
+    },
+    {
+      "slug": "mediator",
+      "name": "Mediator",
+      "category": "behavioral",
+      "complexity": 2,
+      "popularity": 2,
+      "status": "available",
+      "tags": ["behavioral", "communication", "decoupling"],
+      "summary": {
+        "en": "Moves the tangled communication between a group of objects into one go-between object.",
+        "ru": "Переносит запутанное взаимодействие между группой объектов в отдельный класс-посредник."
+      }
+    },
+    {
+      "slug": "memento",
+      "name": "Memento",
+      "category": "behavioral",
+      "complexity": 2,
+      "popularity": 1,
+      "status": "available",
+      "tags": ["behavioral", "undo", "snapshot"],
+      "summary": {
+        "en": "Captures an object's state in a snapshot that can restore it later without exposing its internals.",
+        "ru": "Сохраняет состояние объекта в снимке, который позже восстанавливает его, не раскрывая внутреннего устройства."
+      }
+    },
+    {
+      "slug": "observer",
+      "name": "Observer",
+      "category": "behavioral",
+      "complexity": 2,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["behavioral", "event", "subscription", "pub-sub"],
+      "summary": {
+        "en": "Lets any number of objects subscribe to and get notified about another object's changes.",
+        "ru": "Позволяет любому числу объектов подписываться на изменения другого объекта и получать о них уведомления."
+      }
+    },
+    {
+      "slug": "state",
+      "name": "State",
+      "category": "behavioral",
+      "complexity": 1,
+      "popularity": 2,
+      "status": "available",
+      "tags": ["behavioral", "state-machine", "context"],
+      "summary": {
+        "en": "Lets an object change its entire behavior at runtime by switching between interchangeable state objects.",
+        "ru": "Позволяет объекту полностью менять поведение во время выполнения, переключаясь между взаимозаменяемыми объектами-состояниями."
+      }
+    },
+    {
+      "slug": "strategy",
+      "name": "Strategy",
+      "category": "behavioral",
+      "complexity": 1,
+      "popularity": 3,
+      "status": "available",
+      "tags": ["behavioral", "algorithm", "interchangeable"],
+      "summary": {
+        "en": "Packages interchangeable algorithms into their own classes so they can be swapped at runtime.",
+        "ru": "Оформляет взаимозаменяемые алгоритмы в отдельные классы, позволяя переключаться между ними во время выполнения."
+      }
+    },
+    {
+      "slug": "template-method",
+      "name": "Template Method",
+      "category": "behavioral",
+      "complexity": 1,
+      "popularity": 2,
+      "status": "available",
+      "tags": ["behavioral", "skeleton", "inheritance"],
+      "summary": {
+        "en": "Fixes the overall steps of an algorithm in a base class while letting subclasses fill in the details.",
+        "ru": "Закрепляет общую последовательность шагов алгоритма в базовом классе, оставляя детали на усмотрение подклассов."
+      }
+    },
+    {
+      "slug": "visitor",
+      "name": "Visitor",
+      "category": "behavioral",
+      "complexity": 3,
+      "popularity": 1,
+      "status": "available",
+      "tags": ["behavioral", "double-dispatch", "operations"],
+      "summary": {
+        "en": "Moves an operation out of the classes it works on and into its own class, so adding operations doesn't require changing those classes.",
+        "ru": "Выносит операцию из классов, над которыми она выполняется, в отдельный класс, чтобы новые операции не требовали изменения этих классов."
+      }
+    }
+  ]
+}

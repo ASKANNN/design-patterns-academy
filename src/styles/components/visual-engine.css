@@ -1,0 +1,234 @@
+
+
+.diagram {
+  --viz-accent: var(--color-accent);
+}
+.diagram--creational { --viz-accent: var(--palette-category-creational); }
+.diagram--structural { --viz-accent: var(--palette-category-structural); }
+.diagram--behavioral { --viz-accent: var(--palette-category-behavioral); }
+
+.viz-overlay {
+  pointer-events: none;
+}
+
+[data-node-id] {
+  transition:
+    opacity var(--duration-moderate) var(--ease-in-out),
+    transform var(--duration-moderate) var(--ease-out);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+[data-viz-state='dim']     { opacity: 0.32; }
+[data-viz-state='idle']    { opacity: 1; }
+[data-viz-state='active']  { opacity: 1; }
+
+[data-viz-highlight='true'] {
+  filter: drop-shadow(0 0 6px var(--viz-accent));
+}
+
+[data-viz-glow='true'] {
+  filter:
+    drop-shadow(0 0 10px color-mix(in srgb, var(--viz-accent) 55%, transparent))
+    drop-shadow(0 0 2px color-mix(in srgb, var(--viz-accent) 80%, transparent));
+}
+
+[data-viz-focus='true'],
+[data-node-id]:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 0 2px var(--color-border-focus, var(--viz-accent)));
+}
+
+[data-theme="dark"] [data-viz-highlight='true'] {
+  filter:
+    drop-shadow(0 0 8px var(--viz-accent))
+    drop-shadow(0 0 2px var(--viz-accent));
+}
+[data-theme="dark"] [data-viz-glow='true'] {
+  filter:
+    drop-shadow(0 0 14px color-mix(in srgb, var(--viz-accent) 85%, transparent))
+    drop-shadow(0 0  4px var(--viz-accent));
+}
+[data-theme="dark"] .diagram__flow[data-viz-active='true'],
+[data-theme="dark"] .diagram__edge[data-viz-active='true'] {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--viz-accent) 80%, transparent));
+}
+
+.viz-anim--reveal {
+  animation: viz-reveal var(--duration-slow) var(--ease-out) both;
+}
+
+.viz-anim--creation {
+  animation: viz-creation var(--duration-slow) var(--ease-spring) both;
+}
+
+.viz-anim--reuse {
+  animation: viz-pulse var(--duration-slower) var(--ease-in-out);
+}
+
+.viz-anim--pulse {
+  animation: viz-pulse var(--duration-slower) var(--ease-in-out) infinite;
+}
+
+.viz-anim--highlight {
+  animation: viz-highlight var(--duration-slow) var(--ease-out);
+}
+
+.viz-anim--focus {
+  animation: viz-focus var(--duration-moderate) var(--ease-out) both;
+}
+
+.viz-anim--expansion {
+  animation: viz-expand var(--duration-slow) var(--ease-out) both;
+}
+.viz-anim--collapse {
+  animation: viz-collapse var(--duration-slow) var(--ease-in) both;
+}
+
+.viz-anim--swap-out {
+  animation: viz-swap-out var(--duration-moderate) var(--ease-in) both;
+}
+.viz-anim--swap-in {
+  animation: viz-swap-in var(--duration-moderate) var(--ease-out) both;
+}
+
+.viz-anim--wrap {
+  animation: viz-wrap var(--duration-slow) var(--ease-spring) both;
+}
+
+.viz-anim--transition {
+  animation: viz-highlight var(--duration-slow) var(--ease-in-out);
+}
+
+.viz-packet {
+  fill: var(--viz-accent);
+  offset-path: var(--viz-path);
+  offset-rotate: 0deg;
+  animation: viz-travel var(--duration-crawl) var(--ease-smooth) forwards;
+}
+.viz-packet--response {
+  fill: var(--color-info);
+  animation-direction: reverse;
+}
+.viz-packet--loop {
+  animation-iteration-count: infinite;
+}
+
+.viz-wave {
+  fill: none;
+  stroke: var(--viz-accent);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: viz-wave var(--duration-crawl) var(--ease-out) forwards;
+}
+.viz-wave--loop { animation-iteration-count: infinite; }
+
+.diagram__flow[data-viz-active='true'],
+.diagram__edge[data-viz-active='true'] {
+  stroke: var(--viz-accent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--viz-accent) 60%, transparent));
+}
+
+@keyframes viz-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes viz-creation {
+  0%   { opacity: 0; transform: scale(0.6); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes viz-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+@keyframes viz-highlight {
+  0%, 100% { opacity: 1; }
+  40%      { opacity: 0.55; }
+}
+@keyframes viz-focus {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+@keyframes viz-expand {
+  from { opacity: 0; transform: scaleY(0.4); }
+  to   { opacity: 1; transform: scaleY(1); }
+}
+@keyframes viz-collapse {
+  from { opacity: 1; transform: scaleY(1); }
+  to   { opacity: 0; transform: scaleY(0.4); }
+}
+@keyframes viz-swap-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-14px); }
+}
+@keyframes viz-swap-in {
+  from { opacity: 0; transform: translateX(14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes viz-wrap {
+  from { opacity: 0; transform: scale(1.12); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes viz-travel {
+  from { offset-distance: 0%;   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  to   { offset-distance: 100%; opacity: 0; }
+}
+@keyframes viz-wave {
+  from { opacity: 0.5; transform: scale(0.3); }
+  to   { opacity: 0;   transform: scale(1); }
+}
+
+.viz-replay {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-4) auto 0;
+  padding: var(--space-2) var(--space-5);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: color var(--duration-normal) var(--ease-out),
+              border-color var(--duration-normal) var(--ease-out),
+              background var(--duration-normal) var(--ease-out);
+}
+.viz-replay:hover {
+  color: var(--color-text-primary);
+  border-color: var(--viz-accent);
+  background: var(--color-bg-subtle);
+}
+.viz-replay--visible {
+  display: flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-node-id],
+  .viz-anim--reveal,
+  .viz-anim--creation,
+  .viz-anim--reuse,
+  .viz-anim--pulse,
+  .viz-anim--highlight,
+  .viz-anim--focus,
+  .viz-anim--expansion,
+  .viz-anim--collapse,
+  .viz-anim--swap-out,
+  .viz-anim--swap-in,
+  .viz-anim--wrap,
+  .viz-anim--transition {
+    animation: none !important;
+    transition: none !important;
+  }
+  .viz-packet,
+  .viz-wave {
+    display: none !important;
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "slug": "factory-method",
+  "name": "Factory Method",
+  "category": "creational",
+  "complexity": 1,
+  "popularity": 3,
+  "also_known_as": [
+    "Virtual Constructor"
+  ],
+  "tags": [
+    "creational",
+    "factory",
+    "virtual-constructor"
+  ],
+  "intent": {
+    "en": "Factory Method delegates object creation to a method that subclasses can override, so a base class can work with products whose exact type it doesn't need to know.",
+    "ru": "Фабричный метод выносит создание объекта в отдельный метод, который могут переопределять подклассы, — благодаря этому базовому классу не нужно знать точный тип создаваемых продуктов."
+  },
+  "problem": {
+    "en": "A notification service starts out sending only email, so `NotificationService.send()` builds an `EmailMessage` object right inside its own method body. Months later, push notifications and SMS are added. Every place that constructed an `EmailMessage` directly now needs an `if/else` or `switch` on notification type, and that branching logic tends to get copy-pasted into every method that needs to build a message rather than living in one place.\n\nThe underlying issue is that the class doing the useful work — formatting, queuing, logging — is welded to one specific concrete class it happens to instantiate, so extending it to a new type means editing code that has nothing to do with the new type conceptually.",
+    "ru": "Сервис уведомлений начинался с отправки только email, поэтому `NotificationService.send()` создаёт объект `EmailMessage` прямо внутри своего метода. Спустя месяцы добавляются push-уведомления и SMS. В каждом месте, где раньше напрямую создавался `EmailMessage`, теперь нужен `if/else` или `switch` по типу уведомления, и такую ветвящуюся логику приходится копировать в каждый метод, которому нужно построить сообщение, вместо того чтобы держать её в одном месте.\n\nКорень проблемы в том, что класс, выполняющий полезную работу — форматирование, постановку в очередь, логирование, — намертво привязан к одному конкретному классу, который он создаёт, поэтому расширение под новый тип требует правки кода, концептуально не имеющего отношения к этому новому типу."
+  },
+  "solution": {
+    "en": "Pull the `new EmailMessage(...)` call out of the method body and into its own method — the **factory method** — and have the rest of the class call that method instead of a constructor directly. The base class only knows that the factory method returns something implementing a common `Message` interface; it never names a concrete class.\n\nEach notification channel then becomes a subclass that overrides just the factory method: `EmailNotificationService` returns an `EmailMessage`, `SmsNotificationService` returns an `SmsMessage`. All the shared logic — formatting, queuing, logging — stays untouched in the base class and automatically works with whatever concrete product the subclass decides to hand back.",
+    "ru": "Вызов `new EmailMessage(...)` выносится из тела метода в собственный метод — **фабричный метод**, — и остальной код класса вызывает уже этот метод, а не конструктор напрямую. Базовый класс знает лишь, что фабричный метод возвращает нечто, реализующее общий интерфейс `Message`; он никогда не называет конкретный класс.\n\nКаждый канал уведомлений становится подклассом, переопределяющим только фабричный метод: `EmailNotificationService` возвращает `EmailMessage`, `SmsNotificationService` — `SmsMessage`. Вся общая логика — форматирование, постановка в очередь, логирование — остаётся нетронутой в базовом классе и автоматически работает с тем конкретным продуктом, который вернёт подкласс."
+  },
+  "structure": {
+    "description": {
+      "en": "The Creator hosts the shared workflow and calls its own factory method whenever it needs a new product, without knowing which concrete class that method will return. Each ConcreteCreator overrides just the factory method to supply one specific ConcreteProduct, and every product — regardless of which creator built it — is used through the same Product interface.",
+      "ru": "Создатель содержит общий рабочий процесс и вызывает собственный фабричный метод всякий раз, когда ему нужен новый продукт, не зная, какой конкретный класс этот метод вернёт. Каждый ConcreteCreator переопределяет только фабричный метод, поставляя один конкретный ConcreteProduct, а любой продукт — независимо от того, каким создателем он построен — используется через один и тот же интерфейс Product."
+    },
+    "participants": [
+      {
+        "name": "Creator",
+        "role": {
+          "en": "Contains the workflow that needs a product and calls its own factory method to obtain one, optionally with a default implementation.",
+          "ru": "Содержит рабочий процесс, которому нужен продукт, и вызывает собственный фабричный метод, чтобы его получить, при необходимости с реализацией по умолчанию."
+        }
+      },
+      {
+        "name": "ConcreteCreator",
+        "role": {
+          "en": "Overrides only the factory method, returning one specific ConcreteProduct instance while inheriting all the shared workflow unchanged.",
+          "ru": "Переопределяет только фабричный метод, возвращая экземпляр одного конкретного ConcreteProduct, при этом наследуя весь общий рабочий процесс без изменений."
+        }
+      },
+      {
+        "name": "Product",
+        "role": {
+          "en": "The interface every product must satisfy, letting the Creator's workflow stay identical regardless of which concrete product is actually in play.",
+          "ru": "Интерфейс, которому должен соответствовать любой продукт, — благодаря ему рабочий процесс Создателя остаётся неизменным независимо от того, какой конкретный продукт используется."
+        }
+      },
+      {
+        "name": "ConcreteProduct",
+        "role": {
+          "en": "A specific class implementing Product, instantiated only inside the matching ConcreteCreator's factory method.",
+          "ru": "Конкретный класс, реализующий Product, создаваемый только внутри фабричного метода соответствующего ConcreteCreator."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Product interface (duck-typed)\nclass Transport {\n  deliver() {\n    throw new Error('deliver() must be implemented');\n  }\n}\n\n// Concrete Products\nclass Truck extends Transport {\n  deliver() {\n    return 'Deliver by land in a box';\n  }\n}\n\nclass Ship extends Transport {\n  deliver() {\n    return 'Deliver by sea in a container';\n  }\n}\n\n// Creator\nclass Logistics {\n  // Factory method\n  createTransport() {\n    throw new Error('createTransport() must be implemented');\n  }\n\n  planDelivery() {\n    const transport = this.createTransport();\n    return `Planning: ${transport.deliver()}`;\n  }\n}\n\n// Concrete Creators\nclass RoadLogistics extends Logistics {\n  createTransport() {\n    return new Truck();\n  }\n}\n\nclass SeaLogistics extends Logistics {\n  createTransport() {\n    return new Ship();\n  }\n}\n\n// Usage\nconst road = new RoadLogistics();\nconsole.log(road.planDelivery()); // Planning: Deliver by land in a box\n\nconst sea = new SeaLogistics();\nconsole.log(sea.planDelivery());  // Planning: Deliver by sea in a container",
+    "typescript": "interface Transport {\n  deliver(): string;\n}\n\nclass Truck implements Transport {\n  deliver(): string {\n    return 'Deliver by land in a box';\n  }\n}\n\nclass Ship implements Transport {\n  deliver(): string {\n    return 'Deliver by sea in a container';\n  }\n}\n\nabstract class Logistics {\n  // Factory method\n  abstract createTransport(): Transport;\n\n  planDelivery(): string {\n    const transport = this.createTransport();\n    return `Planning: ${transport.deliver()}`;\n  }\n}\n\nclass RoadLogistics extends Logistics {\n  createTransport(): Transport {\n    return new Truck();\n  }\n}\n\nclass SeaLogistics extends Logistics {\n  createTransport(): Transport {\n    return new Ship();\n  }\n}\n\n// Usage\nconst road = new RoadLogistics();\nconsole.log(road.planDelivery()); // Planning: Deliver by land in a box\n\nconst sea = new SeaLogistics();\nconsole.log(sea.planDelivery());  // Planning: Deliver by sea in a container",
+    "java": "// Product interface\ninterface Transport { String deliver(); }\n\n// Concrete Products\nclass Truck implements Transport { public String deliver() { return \"Deliver by land in a box\"; } }\nclass Ship  implements Transport { public String deliver() { return \"Deliver by sea in a container\"; } }\n\n// Creator — declares the factory method\nabstract class Logistics {\n    public abstract Transport createTransport();\n\n    public String planDelivery() {\n        return \"Planning: \" + createTransport().deliver();\n    }\n}\n\n// Concrete Creators\nclass RoadLogistics extends Logistics {\n    public Transport createTransport() { return new Truck(); }\n}\n\nclass SeaLogistics extends Logistics {\n    public Transport createTransport() { return new Ship(); }\n}\n\n// Usage\nLogistics road = new RoadLogistics();\nSystem.out.println(road.planDelivery()); // Planning: Deliver by land in a box\n\nLogistics sea = new SeaLogistics();\nSystem.out.println(sea.planDelivery());  // Planning: Deliver by sea in a container",
+    "csharp": "// Product interface\ninterface ITransport { string Deliver(); }\n\n// Concrete Products\nclass Truck : ITransport { public string Deliver() => \"Deliver by land in a box\"; }\nclass Ship  : ITransport { public string Deliver() => \"Deliver by sea in a container\"; }\n\n// Creator — declares the factory method\nabstract class Logistics\n{\n    public abstract ITransport CreateTransport();\n\n    public string PlanDelivery() => $\"Planning: {CreateTransport().Deliver()}\";\n}\n\n// Concrete Creators\nclass RoadLogistics : Logistics { public override ITransport CreateTransport() => new Truck(); }\nclass SeaLogistics  : Logistics { public override ITransport CreateTransport() => new Ship(); }\n\n// Usage\nLogistics road = new RoadLogistics();\nConsole.WriteLine(road.PlanDelivery()); // Planning: Deliver by land in a box\n\nLogistics sea = new SeaLogistics();\nConsole.WriteLine(sea.PlanDelivery());  // Planning: Deliver by sea in a container",
+    "python": "from abc import ABC, abstractmethod\n\n# Product interface\nclass Transport(ABC):\n    @abstractmethod\n    def deliver(self) -> str:\n        pass\n\n# Concrete Products\nclass Truck(Transport):\n    def deliver(self) -> str:\n        return 'Deliver by land in a box'\n\nclass Ship(Transport):\n    def deliver(self) -> str:\n        return 'Deliver by sea in a container'\n\n# Creator\nclass Logistics(ABC):\n    @abstractmethod\n    def create_transport(self) -> Transport:\n        pass\n\n    def plan_delivery(self) -> str:\n        transport = self.create_transport()\n        return f'Planning: {transport.deliver()}'\n\n# Concrete Creators\nclass RoadLogistics(Logistics):\n    def create_transport(self) -> Transport:\n        return Truck()\n\nclass SeaLogistics(Logistics):\n    def create_transport(self) -> Transport:\n        return Ship()\n\n# Usage\nroad = RoadLogistics()\nprint(road.plan_delivery())  # Planning: Deliver by land in a box\n\nsea = SeaLogistics()\nprint(sea.plan_delivery())   # Planning: Deliver by sea in a container"
+  },
+  "pros": [
+    {
+      "en": "The base class's workflow never names a concrete product class, so it stays valid no matter how many product types get added later.",
+      "ru": "Рабочий процесс базового класса ни разу не называет конкретный класс продукта, поэтому он остаётся рабочим независимо от того, сколько типов продуктов добавят позже."
+    },
+    {
+      "en": "All the object-creation decisions for a family of related classes live in one overridable method instead of being copy-pasted wherever a new instance is needed.",
+      "ru": "Все решения о создании объектов для семейства связанных классов сосредоточены в одном переопределяемом методе, а не разбросаны копипастой по местам, где нужен новый экземпляр."
+    },
+    {
+      "en": "Adding a new product variant is purely additive — write one new ConcreteCreator/ConcreteProduct pair, and nothing in the existing hierarchy has to change.",
+      "ru": "Добавление нового варианта продукта — чисто аддитивная операция: пишется одна новая пара ConcreteCreator/ConcreteProduct, а существующая иерархия не меняется."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Each new product variant typically means a new subclass, so a family with many variants can produce a sizeable parallel class hierarchy.",
+      "ru": "Каждый новый вариант продукта обычно означает новый подкласс, поэтому семейство с большим числом вариантов может породить заметную параллельную иерархию классов."
+    },
+    {
+      "en": "For a class that only ever needs to build one type of object, introducing a factory method is pure overhead with no payoff.",
+      "ru": "Для класса, которому нужно создавать объекты только одного типа, введение фабричного метода — чистые накладные расходы без какой-либо выгоды."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for it when a class can't know in advance the exact type of object it will need to create — that decision belongs to a subclass or is resolved at runtime.",
+      "ru": "Применяйте паттерн, когда класс заранее не может знать точный тип объекта, который ему нужно создать, — это решение принадлежит подклассу или разрешается во время выполнения."
+    },
+    {
+      "en": "Reach for it when you're building a library or framework and want callers to be able to plug in their own product types without modifying your internal code.",
+      "ru": "Применяйте паттерн, когда вы создаёте библиотеку или фреймворк и хотите, чтобы пользователи могли подключать собственные типы продуктов, не изменяя ваш внутренний код."
+    },
+    {
+      "en": "Reach for it when several classes share almost identical logic and differ only in which kind of object they instantiate at one specific point.",
+      "ru": "Применяйте паттерн, когда несколько классов имеют почти идентичную логику и различаются только тем, объект какого типа они создают в одной конкретной точке."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**`document.createElement(tag)`** — the browser returns different concrete element classes (`HTMLButtonElement`, `HTMLInputElement`) behind the same `Element` interface, chosen by the tag argument.",
+      "ru": "**`document.createElement(tag)`** — браузер возвращает разные конкретные классы элементов (`HTMLButtonElement`, `HTMLInputElement`) за одним интерфейсом `Element`, выбирая их по имени тега."
+    },
+    {
+      "en": "**Java's `Calendar.getInstance()`** — returns a locale-appropriate concrete calendar subclass (Gregorian, Buddhist, Japanese) without the caller ever choosing the class directly.",
+      "ru": "**`Calendar.getInstance()` в Java** — возвращает конкретный подкласс календаря, подходящий для локали (григорианский, буддийский, японский), причём вызывающий код никогда не выбирает класс напрямую."
+    },
+    {
+      "en": "**Logger factories in frameworks like Log4j/SLF4J** — `LoggerFactory.getLogger()` hands back a concrete logger implementation appropriate for the configured backend, behind one common `Logger` interface.",
+      "ru": "**Фабрики логгеров во фреймворках вроде Log4j/SLF4J** — `LoggerFactory.getLogger()` возвращает конкретную реализацию логгера, подходящую под настроенный бэкенд, за одним общим интерфейсом `Logger`."
+    }
+  ],
+  "related_patterns": [
+    "abstract-factory",
+    "template-method",
+    "prototype",
+    "iterator"
+  ],
+  "visuals": [
+    {
+      "id": "factory-method-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "creational",
+      "width": 1246,
+      "height": 300,
+      "title": {
+        "en": "How Factory Method works",
+        "ru": "Как работает Фабричный метод"
+      },
+      "description": {
+        "en": "A client sends a request to the Creator. The Creator delegates to its factory method, which instantiates a concrete Product and returns it. The client never calls new directly — it only receives the result.",
+        "ru": "Клиент отправляет запрос Создателю. Создатель делегирует вызов фабричному методу, который создаёт конкретный Продукт и возвращает его. Клиент никогда не вызывает new напрямую — он получает только результат."
+      },
+      "caption": {
+        "en": "The Creator decides what to build — the Client only asks for a Product.",
+        "ru": "Создатель решает, что строить — Клиент лишь запрашивает Продукт."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиенту" },
+          "subtitle": { "en": "needs a product", "ru": "нужен продукт" },
+          "position": { "x": 20, "y": 108, "w": 200, "h": 84 }
+        },
+        {
+          "id": "creator",
+          "kind": "class",
+          "icon": "layers",
+          "emphasis": true,
+          "label": { "en": "Creator", "ru": "Создатель" },
+          "subtitle": { "en": "createProduct()", "ru": "createProduct()" },
+          "position": { "x": 488, "y": 60, "w": 210, "h": 180 }
+        },
+        {
+          "id": "product",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Product", "ru": "Продукт" },
+          "subtitle": { "en": "new instance", "ru": "новый экземпляр" },
+          "position": { "x": 1026, "y": 108, "w": 200, "h": 84 }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "creator",
+          "relationship": "flow",
+          "label": { "en": "① request", "ru": "① запрос" }
+        },
+        {
+          "source": "creator",
+          "target": "product",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "② createProduct()", "ru": "② createProduct()" }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,212 @@
+{
+  "slug": "decorator",
+  "name": "Decorator",
+  "category": "structural",
+  "complexity": 2,
+  "popularity": 3,
+  "also_known_as": [
+    "Wrapper"
+  ],
+  "tags": [
+    "structural",
+    "wrapper",
+    "extension",
+    "dynamic-behavior"
+  ],
+  "intent": {
+    "en": "Decorator is a structural pattern that adds behavior to an individual object by wrapping it in layers that share its interface, without touching the object's class or affecting other instances.",
+    "ru": "Декоратор — структурный паттерн, добавляющий поведение отдельному объекту путём оборачивания его в слои с тем же интерфейсом, не изменяя класс объекта и не затрагивая другие экземпляры."
+  },
+  "problem": {
+    "en": "A coffee shop's ordering system starts with a `Coffee` class that has a `cost()` method. Customers can add milk, an extra shot, whipped cream, or any combination of the three. Modeling every combination as a subclass — `CoffeeWithMilk`, `CoffeeWithMilkAndShot`, `CoffeeWithMilkAndShotAndCream` — multiplies out of control as more add-ons are introduced, and most of those subclasses only differ by which extras they tack onto the price.\n\nWorse, inheritance locks the combination in at class-definition time. If a customer wants to add whipped cream to an order that's already in progress, there's no subclass for \"whatever this order already is, plus cream.\"",
+    "ru": "Система заказов в кофейне начинается с класса `Coffee` с методом `cost()`. Клиенты могут добавить молоко, дополнительный эспрессо-шот, взбитые сливки или любую их комбинацию. Моделирование каждой комбинации отдельным подклассом — `CoffeeWithMilk`, `CoffeeWithMilkAndShot`, `CoffeeWithMilkAndShotAndCream` — выходит из-под контроля по мере добавления новых опций, при этом большинство таких подклассов отличаются только тем, какие добавки прибавляются к цене.\n\nХуже того, наследование фиксирует комбинацию ещё на этапе определения класса. Если клиент хочет добавить взбитые сливки к уже оформленному заказу, подходящего подкласса «то, чем уже является этот заказ, плюс сливки» просто не существует."
+  },
+  "solution": {
+    "en": "Give each add-on its own small wrapper class that implements the same interface as the base object and holds a reference to whatever it's wrapping. Calling `cost()` on a wrapper first asks the wrapped object for its cost, then adds its own charge on top.\n\nBecause every wrapper looks exactly like the object it wraps, wrappers stack: a `Coffee` can be wrapped in a `MilkDecorator`, then that result wrapped again in a `WhipDecorator`, and the outermost object still answers to `cost()` and any other shared method. Combinations are assembled at runtime by choosing which wrappers to apply, instead of being baked into a fixed subclass.",
+    "ru": "Дайте каждой добавке собственный небольшой класс-обёртку, реализующий тот же интерфейс, что и базовый объект, и хранящий ссылку на то, что он оборачивает. Вызов `cost()` у обёртки сначала запрашивает стоимость у вложенного объекта, а затем добавляет к ней собственную наценку.\n\nПоскольку каждая обёртка выглядит в точности как объект, который она оборачивает, обёртки складываются в стек: `Coffee` можно обернуть в `MilkDecorator`, затем результат снова обернуть в `WhipDecorator`, и самый внешний объект по-прежнему отвечает на `cost()` и любой другой общий метод. Комбинации собираются во время выполнения выбором применяемых обёрток, а не зашиваются в фиксированный подкласс."
+  },
+  "structure": {
+    "description": {
+      "en": "A single interface covers the object being extended and every wrapper around it. A base decorator class holds a reference to whatever it wraps and simply forwards calls by default; concrete decorators override that forwarding to inject their own behavior before or after the call reaches the wrapped object.",
+      "ru": "Единый интерфейс покрывает как расширяемый объект, так и каждую обёртку вокруг него. Базовый класс декоратора хранит ссылку на то, что он оборачивает, и по умолчанию просто передаёт вызовы дальше; конкретные декораторы переопределяют эту передачу, добавляя собственное поведение до или после того, как вызов достигнет вложенного объекта."
+    },
+    "participants": [
+      {
+        "name": "Component (Notifier)",
+        "role": {
+          "en": "The interface every layer must satisfy — both the original object and every decorator around it. In the diagram, that's `Notifier` and its send() method.",
+          "ru": "Интерфейс, которому должен соответствовать каждый слой — и исходный объект, и каждый декоратор вокруг него. На схеме это `Notifier` с методом send()."
+        }
+      },
+      {
+        "name": "Concrete Component (EmailNotifier)",
+        "role": {
+          "en": "The plain, undecorated object at the center of the stack, carrying the original behavior the wrappers will build on — the Email Notifier in the diagram.",
+          "ru": "Обычный, ещё не декорированный объект в центре стека, несущий исходное поведение, на котором строятся обёртки, — Email-нотификатор на схеме."
+        }
+      },
+      {
+        "name": "Base Decorator (NotifierDecorator)",
+        "role": {
+          "en": "A shared parent for all decorators that stores the wrapped Component and forwards calls to it, so each concrete decorator only needs to add its own piece.",
+          "ru": "Общий родитель для всех декораторов, хранящий вложенный Компонент и передающий ему вызовы, — благодаря чему каждый конкретный декоратор добавляет только свою часть."
+        }
+      },
+      {
+        "name": "Concrete Decorator (SMSDecorator / SlackDecorator)",
+        "role": {
+          "en": "One extra behavior layered on top — calls into the wrapped object first, then performs its own step. The SMS and Slack decorators in the diagram are two such layers.",
+          "ru": "Один дополнительный слой поведения — сначала вызывает вложенный объект, затем выполняет собственный шаг. SMS- и Slack-декораторы на схеме — два таких слоя."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Assembles the desired stack of decorators around the base object, then calls the outermost layer through the shared Component interface — a single send() call in the diagram.",
+          "ru": "Собирает нужный стек декораторов вокруг базового объекта, а затем вызывает самый внешний слой через общий интерфейс Компонента — на схеме это единственный вызов send()."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Component interface (base class)\nclass Notifier {\n  send(message) {\n    throw new Error('send() must be implemented');\n  }\n}\n\n// Concrete Component\nclass EmailNotifier extends Notifier {\n  constructor(email) {\n    super();\n    this.email = email;\n  }\n\n  send(message) {\n    console.log(`Email to ${this.email}: ${message}`);\n  }\n}\n\n// Base Decorator\nclass NotifierDecorator extends Notifier {\n  #wrapped;\n\n  constructor(notifier) {\n    super();\n    this.#wrapped = notifier;\n  }\n\n  send(message) {\n    this.#wrapped.send(message);\n  }\n}\n\n// Concrete Decorators\nclass SMSDecorator extends NotifierDecorator {\n  constructor(notifier, phone) {\n    super(notifier);\n    this.phone = phone;\n  }\n\n  send(message) {\n    super.send(message);\n    console.log(`SMS to ${this.phone}: ${message}`);\n  }\n}\n\nclass SlackDecorator extends NotifierDecorator {\n  constructor(notifier, channel) {\n    super(notifier);\n    this.channel = channel;\n  }\n\n  send(message) {\n    super.send(message);\n    console.log(`Slack #${this.channel}: ${message}`);\n  }\n}\n\n// Usage\nlet notifier = new EmailNotifier('user@example.com');\nnotifier = new SMSDecorator(notifier, '+1234567890');\nnotifier = new SlackDecorator(notifier, 'alerts');\n\nnotifier.send('Server is down!');\n// Email to user@example.com: Server is down!\n// SMS to +1234567890: Server is down!\n// Slack #alerts: Server is down!",
+    "typescript": "interface Notifier {\n  send(message: string): void;\n}\n\nclass EmailNotifier implements Notifier {\n  constructor(private email: string) {}\n\n  public send(message: string): void {\n    console.log(`Email to ${this.email}: ${message}`);\n  }\n}\n\nabstract class NotifierDecorator implements Notifier {\n  constructor(protected wrapped: Notifier) {}\n\n  public send(message: string): void {\n    this.wrapped.send(message);\n  }\n}\n\nclass SMSDecorator extends NotifierDecorator {\n  constructor(notifier: Notifier, private phone: string) {\n    super(notifier);\n  }\n\n  public send(message: string): void {\n    super.send(message);\n    console.log(`SMS to ${this.phone}: ${message}`);\n  }\n}\n\nclass SlackDecorator extends NotifierDecorator {\n  constructor(notifier: Notifier, private channel: string) {\n    super(notifier);\n  }\n\n  public send(message: string): void {\n    super.send(message);\n    console.log(`Slack #${this.channel}: ${message}`);\n  }\n}\n\n// Usage\nlet notifier: Notifier = new EmailNotifier('user@example.com');\nnotifier = new SMSDecorator(notifier, '+1234567890');\nnotifier = new SlackDecorator(notifier, 'alerts');\n\nnotifier.send('Server is down!');\n// Email to user@example.com: Server is down!\n// SMS to +1234567890: Server is down!\n// Slack #alerts: Server is down!",
+    "java": "// Component interface\ninterface Notifier { void send(String message); }\n\n// Concrete Component\nclass EmailNotifier implements Notifier {\n    private final String email;\n    EmailNotifier(String email) { this.email = email; }\n    public void send(String message) {\n        System.out.println(\"Email to \" + email + \": \" + message);\n    }\n}\n\n// Base Decorator\nabstract class NotifierDecorator implements Notifier {\n    protected final Notifier wrapped;\n    NotifierDecorator(Notifier notifier) { this.wrapped = notifier; }\n    public void send(String message)     { wrapped.send(message); }\n}\n\n// Concrete Decorators\nclass SMSDecorator extends NotifierDecorator {\n    private final String phone;\n    SMSDecorator(Notifier n, String phone) { super(n); this.phone = phone; }\n    public void send(String message) {\n        super.send(message);\n        System.out.println(\"SMS to \" + phone + \": \" + message);\n    }\n}\n\nclass SlackDecorator extends NotifierDecorator {\n    private final String channel;\n    SlackDecorator(Notifier n, String channel) { super(n); this.channel = channel; }\n    public void send(String message) {\n        super.send(message);\n        System.out.println(\"Slack #\" + channel + \": \" + message);\n    }\n}\n\n// Usage\nNotifier notifier = new EmailNotifier(\"user@example.com\");\nnotifier = new SMSDecorator(notifier, \"+1234567890\");\nnotifier = new SlackDecorator(notifier, \"alerts\");\n\nnotifier.send(\"Server is down!\");\n// Email to user@example.com: Server is down!\n// SMS to +1234567890: Server is down!\n// Slack #alerts: Server is down!",
+    "csharp": "// Component interface\ninterface INotifier { void Send(string message); }\n\n// Concrete Component\nclass EmailNotifier : INotifier\n{\n    private readonly string _email;\n    public EmailNotifier(string email) => _email = email;\n    public void Send(string message) =>\n        Console.WriteLine($\"Email to {_email}: {message}\");\n}\n\n// Base Decorator\nabstract class NotifierDecorator : INotifier\n{\n    protected readonly INotifier Wrapped;\n    protected NotifierDecorator(INotifier notifier) => Wrapped = notifier;\n    public virtual void Send(string message) => Wrapped.Send(message);\n}\n\n// Concrete Decorators\nclass SMSDecorator : NotifierDecorator\n{\n    private readonly string _phone;\n    public SMSDecorator(INotifier n, string phone) : base(n) => _phone = phone;\n    public override void Send(string message)\n    { base.Send(message); Console.WriteLine($\"SMS to {_phone}: {message}\"); }\n}\n\nclass SlackDecorator : NotifierDecorator\n{\n    private readonly string _channel;\n    public SlackDecorator(INotifier n, string channel) : base(n) => _channel = channel;\n    public override void Send(string message)\n    { base.Send(message); Console.WriteLine($\"Slack #{_channel}: {message}\"); }\n}\n\n// Usage\nINotifier notifier = new EmailNotifier(\"user@example.com\");\nnotifier = new SMSDecorator(notifier, \"+1234567890\");\nnotifier = new SlackDecorator(notifier, \"alerts\");\n\nnotifier.Send(\"Server is down!\");\n// Email to user@example.com: Server is down!\n// SMS to +1234567890: Server is down!\n// Slack #alerts: Server is down!",
+    "python": "from abc import ABC, abstractmethod\n\n\nclass Notifier(ABC):\n    @abstractmethod\n    def send(self, message: str) -> None:\n        pass\n\n\nclass EmailNotifier(Notifier):\n    def __init__(self, email: str) -> None:\n        self._email = email\n\n    def send(self, message: str) -> None:\n        print(f\"Email to {self._email}: {message}\")\n\n\nclass NotifierDecorator(Notifier):\n    def __init__(self, wrapped: Notifier) -> None:\n        self._wrapped = wrapped\n\n    def send(self, message: str) -> None:\n        self._wrapped.send(message)\n\n\nclass SMSDecorator(NotifierDecorator):\n    def __init__(self, notifier: Notifier, phone: str) -> None:\n        super().__init__(notifier)\n        self._phone = phone\n\n    def send(self, message: str) -> None:\n        super().send(message)\n        print(f\"SMS to {self._phone}: {message}\")\n\n\nclass SlackDecorator(NotifierDecorator):\n    def __init__(self, notifier: Notifier, channel: str) -> None:\n        super().__init__(notifier)\n        self._channel = channel\n\n    def send(self, message: str) -> None:\n        super().send(message)\n        print(f\"Slack #{self._channel}: {message}\")\n\n\n# Usage\nnotifier: Notifier = EmailNotifier(\"user@example.com\")\nnotifier = SMSDecorator(notifier, \"+1234567890\")\nnotifier = SlackDecorator(notifier, \"alerts\")\n\nnotifier.send(\"Server is down!\")\n# Email to user@example.com: Server is down!\n# SMS to +1234567890: Server is down!\n# Slack #alerts: Server is down!"
+  },
+  "pros": [
+    {
+      "en": "New optional behavior becomes a small independent wrapper class instead of another branch in an ever-growing subclass tree.",
+      "ru": "Новое опциональное поведение оформляется как небольшой независимый класс-обёртка, а не как ещё одна ветка в разрастающемся дереве подклассов."
+    },
+    {
+      "en": "Behavior can be attached to or removed from one specific object at runtime, without touching the class definition or any other instance.",
+      "ru": "Поведение можно подключить к конкретному объекту или убрать от него во время выполнения, не трогая определение класса или другие экземпляры."
+    },
+    {
+      "en": "Each wrapper stays focused on a single concern, so responsibilities don't pile up inside one bloated class.",
+      "ru": "Каждая обёртка сосредоточена на одной задаче, благодаря чему ответственности не накапливаются в одном раздутом классе."
+    },
+    {
+      "en": "Adding a new kind of wrapper never requires touching the base object or any decorator already shipped.",
+      "ru": "Добавление нового вида обёртки никогда не требует изменения базового объекта или уже выпущенных декораторов."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Pulling one specific wrapper out of the middle of an existing stack usually means rebuilding the stack, since each layer only knows about its immediate neighbor.",
+      "ru": "Извлечение конкретной обёртки из середины уже собранного стека обычно требует пересборки всего стека, поскольку каждый слой знает только о своём непосредственном соседе."
+    },
+    {
+      "en": "When decorators aren't commutative, the order they're applied in changes the result, which makes assembling the stack error-prone.",
+      "ru": "Если декораторы не коммутативны, порядок их применения влияет на результат, что делает сборку стека источником ошибок."
+    },
+    {
+      "en": "A deeply nested stack of wrappers can be tedious to step through in a debugger compared to one flat class.",
+      "ru": "Глубоко вложенный стек обёрток может быть утомительно проходить в отладчике по сравнению с одним плоским классом."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "You need to attach extra behavior to specific object instances at runtime, while leaving every other instance of the same class untouched.",
+      "ru": "Нужно подключить дополнительное поведение к конкретным экземплярам объекта во время выполнения, не затрагивая остальные экземпляры того же класса."
+    },
+    {
+      "en": "Subclassing would require one class per combination of optional features, and that number is only going to grow.",
+      "ru": "Наследование потребовало бы отдельного класса на каждую комбинацию опциональных возможностей, и их число будет только расти."
+    },
+    {
+      "en": "Different objects need different mixes of the same set of add-on behaviors, decided at runtime rather than fixed in advance.",
+      "ru": "Разным объектам нужны разные сочетания одного и того же набора дополнительных возможностей, определяемые во время выполнения, а не заранее."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Java I/O streams** — `BufferedInputStream` and `GZIPInputStream` wrap a raw `InputStream` to add buffering or decompression without changing the underlying stream class.",
+      "ru": "**Потоки ввода-вывода Java** — `BufferedInputStream` и `GZIPInputStream` оборачивают исходный `InputStream`, добавляя буферизацию или разжатие без изменения самого класса потока."
+    },
+    {
+      "en": "**Python function decorators** — `@lru_cache` and `@retry` wrap a function with caching or retry logic while leaving the original function definition untouched.",
+      "ru": "**Декораторы функций в Python** — `@lru_cache` и `@retry` оборачивают функцию логикой кэширования или повторных попыток, не изменяя саму функцию."
+    },
+    {
+      "en": "**Express/Koa middleware chains** — each middleware wraps the next handler, layering on logging, authentication, or compression without modifying the route logic itself.",
+      "ru": "**Цепочки middleware в Express/Koa** — каждый middleware оборачивает следующий обработчик, добавляя логирование, аутентификацию или сжатие без изменения логики самого маршрута."
+    }
+  ],
+  "related_patterns": [
+    "adapter",
+    "composite",
+    "strategy",
+    "proxy"
+  ],
+  "visuals": [
+    {
+      "id": "decorator-concept",
+      "type": "flow",
+      "style": "nested",
+      "category": "structural",
+      "width": 960,
+      "height": 470,
+      "title": {
+        "en": "How Decorator works",
+        "ru": "Как работает Декоратор"
+      },
+      "description": {
+        "en": "The Client makes a single send() call. It enters the outermost wrapper — the Slack Decorator — then travels inward through the SMS Decorator to the Email Notifier at the core. The core runs the original behaviour, then each wrapper adds its own on the way back out. The core object is never modified: every layer only wraps the one inside it.",
+        "ru": "Клиент делает один вызов send(). Он входит во внешнюю обёртку — Slack-декоратор — и движется внутрь через SMS-декоратор к ядру Email-нотификатору. Ядро выполняет исходное поведение, а затем каждая обёртка добавляет своё на обратном пути наружу. Ядро при этом не меняется: каждый слой лишь оборачивает тот, что внутри."
+      },
+      "caption": {
+        "en": "One send() passes through the wrappers. Each layer adds behaviour — the core stays unchanged.",
+        "ru": "Один send() проходит сквозь обёртки. Каждый слой добавляет поведение — ядро остаётся прежним."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиент" },
+          "subtitle": { "en": "one send() call", "ru": "один вызов send()" }
+        },
+        {
+          "id": "slackDec",
+          "role": "shell",
+          "kind": "class",
+          "icon": "layers",
+          "label": { "en": "Slack Decorator", "ru": "Slack-декоратор" },
+          "badge": { "en": "+ Slack", "ru": "+ Slack" },
+          "action": { "en": "send to Slack", "ru": "отправить в Slack" }
+        },
+        {
+          "id": "smsDec",
+          "role": "shell",
+          "kind": "class",
+          "icon": "layers",
+          "label": { "en": "SMS Decorator", "ru": "SMS-декоратор" },
+          "badge": { "en": "+ SMS", "ru": "+ SMS" },
+          "action": { "en": "send SMS", "ru": "отправить SMS" }
+        },
+        {
+          "id": "emailNotifier",
+          "role": "core",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Email Notifier", "ru": "Email-нотификатор" },
+          "subtitle": { "en": "base object · sends Email", "ru": "базовый объект · шлёт Email" },
+          "action": { "en": "send Email", "ru": "отправить Email" }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "slackDec",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "① send()", "ru": "① send()" }
+        }
+      ]
+    }
+  ]
+}

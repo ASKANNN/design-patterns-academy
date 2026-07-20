@@ -1,0 +1,227 @@
+{
+  "slug": "proxy",
+  "name": "Proxy",
+  "category": "structural",
+  "complexity": 2,
+  "popularity": 1,
+  "also_known_as": [
+    "Surrogate"
+  ],
+  "tags": [
+    "structural",
+    "surrogate",
+    "access-control",
+    "caching",
+    "lazy-initialization"
+  ],
+  "intent": {
+    "en": "Proxy stands in for another object behind an identical interface, letting it intercept every call to add checks, caching, lazy creation, or logging without the real object or its callers knowing.",
+    "ru": "Заместитель подменяет собой другой объект за счёт идентичного интерфейса, позволяя перехватывать каждый вызов и добавлять проверки, кэширование, отложенное создание или логирование — незаметно ни для реального объекта, ни для вызывающего кода."
+  },
+  "problem": {
+    "en": "A reporting service wraps a slow, network-bound call to a remote analytics API. Every screen that displays a report re-triggers that call, even when the underlying data hasn't changed in the last five minutes — burning bandwidth and making the UI feel sluggish.\n\nThe obvious fix is to add caching, but the service class is generated from an API spec (or shared across teams), so editing it directly means the caching logic gets tangled with unrelated code, or lost on the next regeneration. Meanwhile the service object itself is expensive enough to construct that creating it eagerly at startup — before anyone has even opened a report — wastes resources on every run.",
+    "ru": "Сервис отчётов оборачивает медленный сетевой вызов к удалённому API аналитики. Каждый экран, отображающий отчёт, заново запускает этот вызов, даже если исходные данные не менялись последние пять минут — впустую расходуя трафик и делая интерфейс менее отзывчивым.\n\nОчевидное решение — добавить кэширование, но класс сервиса сгенерирован по спецификации API (или используется совместно несколькими командами), поэтому прямое редактирование либо перемешает логику кэширования с посторонним кодом, либо потеряется при следующей регенерации. При этом сам объект сервиса достаточно дорог в создании, чтобы жадно инициализировать его при старте приложения — ещё до того, как кто-то откроет отчёт, — впустую тратя ресурсы при каждом запуске."
+  },
+  "solution": {
+    "en": "Introduce a **Proxy** class that implements the exact same interface as the service and gets substituted for it everywhere the service was expected. Every call to the proxy first passes through its own logic — check the cache, verify permissions, construct the real service on first use — before optionally delegating to the wrapped object.\n\nBecause the interface is identical, nothing on the calling side changes: code that used to hold a service reference now holds a proxy reference and is none the wiser. The original service class stays untouched, so its logic and the cross-cutting behavior evolve independently.",
+    "ru": "Вводится класс **Заместителя**, реализующий тот же самый интерфейс, что и сервис, и подставляемый вместо него везде, где ожидался сервис. Каждый вызов сначала проходит через собственную логику заместителя — проверку кэша, прав доступа, создание реального сервиса при первом обращении — и лишь затем, при необходимости, делегируется обёрнутому объекту.\n\nПоскольку интерфейс идентичен, на стороне вызывающего кода ничего не меняется: код, ранее хранивший ссылку на сервис, теперь хранит ссылку на заместителя и не замечает разницы. Исходный класс сервиса остаётся нетронутым, поэтому его логика и сквозное поведение развиваются независимо друг от друга."
+  },
+  "structure": {
+    "description": {
+      "en": "A common ServiceInterface is implemented by both the real Service and its Proxy, which is what makes the substitution transparent. The Service focuses purely on its business logic. The Proxy holds a reference to the Service (created eagerly, lazily, or supplied externally) and wraps each call with extra behavior — caching, access checks, logging — before or after delegating. The Client depends only on ServiceInterface and never needs to know which implementation it received.",
+      "ru": "Общий интерфейс ServiceInterface реализуют и реальный Сервис, и его Заместитель — именно это делает подмену прозрачной. Сервис сосредоточен исключительно на бизнес-логике. Заместитель хранит ссылку на Сервис (созданную заранее, лениво или переданную извне) и оборачивает каждый вызов дополнительным поведением — кэшированием, проверкой доступа, логированием — до или после делегирования. Клиент зависит только от ServiceInterface и никогда не обязан знать, какую реализацию он получил."
+    },
+    "participants": [
+      {
+        "name": "ServiceInterface",
+        "role": {
+          "en": "Defines the contract that both the real object and its stand-in must honor, making the two interchangeable from the caller's point of view.",
+          "ru": "Определяет контракт, которому должны следовать и реальный объект, и его заменитель, делая их взаимозаменяемыми с точки зрения вызывающего кода."
+        }
+      },
+      {
+        "name": "Service",
+        "role": {
+          "en": "Implements the real behavior clients ultimately want. Typically the expensive or sensitive part of the equation — slow to construct, costly to call, or requiring guarded access.",
+          "ru": "Реализует то реальное поведение, которое в конечном счёте нужно клиентам. Как правило, это затратная или чувствительная часть системы — медленная в создании, дорогая в вызове или требующая контролируемого доступа."
+        }
+      },
+      {
+        "name": "Proxy",
+        "role": {
+          "en": "Implements the same interface and forwards calls to a Service instance it owns or creates, inserting its own logic — a cache lookup, a permission check, deferred construction — around the delegation.",
+          "ru": "Реализует тот же интерфейс и перенаправляет вызовы экземпляру Сервиса, которым владеет или который создаёт, вставляя вокруг делегирования собственную логику — обращение к кэшу, проверку прав, отложенное создание."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Depends only on ServiceInterface, so it can be handed a Proxy in place of the real Service with no code changes on its side.",
+          "ru": "Зависит только от ServiceInterface, поэтому вместо реального Сервиса ему можно передать Заместителя без каких-либо изменений в его коде."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Service Interface\nclass DataService {\n  fetchData(query) {\n    throw new Error('fetchData() must be implemented');\n  }\n}\n\n// Real Service — expensive database calls\nclass DatabaseService extends DataService {\n  fetchData(query) {\n    console.log(`DatabaseService: executing query \"${query}\"...`);\n    return { query, result: `data for \"${query}\"`, timestamp: Date.now() };\n  }\n}\n\n// Proxy — adds caching transparently\nclass CachingProxy extends DataService {\n  #service;\n  #cache = new Map();\n\n  constructor(service) {\n    super();\n    this.#service = service;\n  }\n\n  fetchData(query) {\n    if (this.#cache.has(query)) {\n      console.log(`CachingProxy: returning cached result for \"${query}\"`);\n      return this.#cache.get(query);\n    }\n\n    const result = this.#service.fetchData(query);\n    this.#cache.set(query, result);\n    return result;\n  }\n}\n\n// Usage — client code works with the same interface\nconst service = new CachingProxy(new DatabaseService());\n\nconsole.log(service.fetchData('users'));\n// DatabaseService: executing query \"users\"...\n\nconsole.log(service.fetchData('users'));\n// CachingProxy: returning cached result for \"users\"\n\nconsole.log(service.fetchData('orders'));\n// DatabaseService: executing query \"orders\"...",
+    "typescript": "interface DataService {\n  fetchData(query: string): Record<string, unknown>;\n}\n\nclass DatabaseService implements DataService {\n  public fetchData(query: string): Record<string, unknown> {\n    console.log(`DatabaseService: executing query \"${query}\"...`);\n    return { query, result: `data for \"${query}\"`, timestamp: Date.now() };\n  }\n}\n\nclass CachingProxy implements DataService {\n  private cache = new Map<string, Record<string, unknown>>();\n\n  constructor(private service: DataService) {}\n\n  public fetchData(query: string): Record<string, unknown> {\n    if (this.cache.has(query)) {\n      console.log(`CachingProxy: returning cached result for \"${query}\"`);\n      return this.cache.get(query)!;\n    }\n\n    const result = this.service.fetchData(query);\n    this.cache.set(query, result);\n    return result;\n  }\n}\n\n// Usage\nconst service: DataService = new CachingProxy(new DatabaseService());\n\nconsole.log(service.fetchData('users'));\n// DatabaseService: executing query \"users\"...\n\nconsole.log(service.fetchData('users'));\n// CachingProxy: returning cached result for \"users\"\n\nconsole.log(service.fetchData('orders'));\n// DatabaseService: executing query \"orders\"...",
+    "java": "import java.util.*;\n\n// Service interface\ninterface DataService {\n    Map<String, Object> fetchData(String query);\n}\n\n// Real Service — expensive operations\nclass DatabaseService implements DataService {\n    public Map<String, Object> fetchData(String query) {\n        System.out.println(\"DatabaseService: executing query \\\"\" + query + \"\\\"...\");\n        return Map.of(\"query\", query, \"result\", \"data for \\\"\" + query + \"\\\"\");\n    }\n}\n\n// Proxy — adds caching transparently\nclass CachingProxy implements DataService {\n    private final DataService service;\n    private final Map<String, Map<String, Object>> cache = new HashMap<>();\n\n    CachingProxy(DataService service) { this.service = service; }\n\n    public Map<String, Object> fetchData(String query) {\n        if (cache.containsKey(query)) {\n            System.out.println(\"CachingProxy: returning cached result for \\\"\" + query + \"\\\"\");\n            return cache.get(query);\n        }\n        Map<String, Object> result = service.fetchData(query);\n        cache.put(query, result);\n        return result;\n    }\n}\n\n// Usage — client works with the same interface\nDataService service = new CachingProxy(new DatabaseService());\n\nSystem.out.println(service.fetchData(\"users\"));\n// DatabaseService: executing query \"users\"...\n\nSystem.out.println(service.fetchData(\"users\"));\n// CachingProxy: returning cached result for \"users\"\n\nSystem.out.println(service.fetchData(\"orders\"));\n// DatabaseService: executing query \"orders\"...",
+    "csharp": "// Service interface\ninterface IDataService\n{\n    Dictionary<string, object> FetchData(string query);\n}\n\n// Real Service — expensive operations\nclass DatabaseService : IDataService\n{\n    public Dictionary<string, object> FetchData(string query)\n    {\n        Console.WriteLine($\"DatabaseService: executing query \\\"{query}\\\"...\");\n        return new() { [\"query\"] = query, [\"result\"] = $\"data for \\\"{query}\\\"\" };\n    }\n}\n\n// Proxy — adds caching transparently\nclass CachingProxy : IDataService\n{\n    private readonly IDataService _service;\n    private readonly Dictionary<string, Dictionary<string, object>> _cache = new();\n\n    public CachingProxy(IDataService service) => _service = service;\n\n    public Dictionary<string, object> FetchData(string query)\n    {\n        if (_cache.TryGetValue(query, out var cached))\n        {\n            Console.WriteLine($\"CachingProxy: returning cached result for \\\"{query}\\\"\");\n            return cached;\n        }\n        var result = _service.FetchData(query);\n        _cache[query] = result;\n        return result;\n    }\n}\n\n// Usage — client works with the same interface\nIDataService service = new CachingProxy(new DatabaseService());\n\nConsole.WriteLine(service.FetchData(\"users\"));\n// DatabaseService: executing query \"users\"...\n\nConsole.WriteLine(service.FetchData(\"users\"));\n// CachingProxy: returning cached result for \"users\"\n\nConsole.WriteLine(service.FetchData(\"orders\"));\n// DatabaseService: executing query \"orders\"...",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\nfrom typing import Any\n\n\nclass DataService(ABC):\n    @abstractmethod\n    def fetch_data(self, query: str) -> dict[str, Any]:\n        pass\n\n\nclass DatabaseService(DataService):\n    def fetch_data(self, query: str) -> dict[str, Any]:\n        print(f'DatabaseService: executing query \"{query}\"...')\n        return {\"query\": query, \"result\": f'data for \"{query}\"'}\n\n\nclass CachingProxy(DataService):\n    def __init__(self, service: DataService) -> None:\n        self._service = service\n        self._cache: dict[str, dict[str, Any]] = {}\n\n    def fetch_data(self, query: str) -> dict[str, Any]:\n        if query in self._cache:\n            print(f'CachingProxy: returning cached result for \"{query}\"')\n            return self._cache[query]\n\n        result = self._service.fetch_data(query)\n        self._cache[query] = result\n        return result\n\n\n# Usage — client code works with the same interface\nservice: DataService = CachingProxy(DatabaseService())\n\nprint(service.fetch_data(\"users\"))\n# DatabaseService: executing query \"users\"...\n\nprint(service.fetch_data(\"users\"))\n# CachingProxy: returning cached result for \"users\"\n\nprint(service.fetch_data(\"orders\"))\n# DatabaseService: executing query \"orders\"..."
+  },
+  "pros": [
+    {
+      "en": "Cross-cutting concerns like caching, auditing, or throttling can be bolted onto a service without touching its source, keeping unrelated logic out of the business class.",
+      "ru": "Сквозная функциональность вроде кэширования, аудита или ограничения частоты вызовов пристраивается к сервису без изменения его исходного кода, не засоряя бизнес-класс посторонней логикой."
+    },
+    {
+      "en": "A virtual proxy can defer creating an expensive object until the moment it's genuinely needed, saving startup time and resources for the common case where it's never touched.",
+      "ru": "Виртуальный заместитель может отложить создание дорогого объекта до момента, когда он действительно понадобится, экономя время запуска и ресурсы в типичном случае, когда объект вообще не используется."
+    },
+    {
+      "en": "Because the proxy and the service share an interface, new proxy behaviors can be introduced or swapped without editing the service class or its callers.",
+      "ru": "Поскольку заместитель и сервис используют общий интерфейс, новое поведение заместителя можно добавлять или менять, не редактируя ни класс сервиса, ни его вызывающий код."
+    },
+    {
+      "en": "A protection proxy can enforce authorization rules at the exact call boundary, independent of whatever checks (or lack of them) exist inside the service itself.",
+      "ru": "Защищающий заместитель может применять правила авторизации ровно на границе вызова, независимо от того, какие проверки (или их отсутствие) есть внутри самого сервиса."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Every call now passes through an extra hop, which adds a small but nonzero latency cost, and can matter in tight loops calling the service repeatedly.",
+      "ru": "Каждый вызов теперь проходит через дополнительный промежуточный слой, что добавляет небольшую, но ненулевую задержку и может быть заметно в плотных циклах с частыми вызовами сервиса."
+    },
+    {
+      "en": "A stale or overly aggressive cache inside the proxy can silently return outdated results, a class of bug that's easy to introduce and awkward to trace back to the proxy layer.",
+      "ru": "Устаревший или слишком агрессивный кэш внутри заместителя может незаметно возвращать неактуальные результаты — такую ошибку легко внести и трудно проследить до слоя заместителя."
+    },
+    {
+      "en": "The response received by the client might now come from the proxy (a cached value) rather than the service itself, which can be surprising if callers assume they're always hitting live data.",
+      "ru": "Ответ, получаемый клиентом, теперь может исходить от заместителя (кэшированное значение), а не от самого сервиса, что может удивить вызывающий код, если он предполагает, что всегда работает с актуальными данными."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "A service object is expensive to create, and most execution paths through the application never actually end up needing it.",
+      "ru": "Когда объект сервиса дорог в создании, а большинство путей выполнения в приложении на самом деле в нём не нуждаются."
+    },
+    {
+      "en": "Only certain callers should be allowed to invoke a service, and that check needs to live outside the service's own logic.",
+      "ru": "Когда вызывать сервис должны иметь право только определённые вызывающие, и эта проверка должна находиться вне логики самого сервиса."
+    },
+    {
+      "en": "Repeated calls with the same arguments return the same result for a meaningful window of time, making caching worthwhile without touching the service's implementation.",
+      "ru": "Когда повторные вызовы с одинаковыми аргументами дают одинаковый результат в течение заметного промежутка времени, что делает кэширование оправданным без изменения реализации сервиса."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Nginx / HAProxy reverse proxies** — sit in front of application servers, terminating TLS, rate-limiting, and serving cached responses before a request ever reaches the backend.",
+      "ru": "**Обратные прокси Nginx / HAProxy** — стоят перед серверами приложений, завершая TLS-соединение, ограничивая частоту запросов и отдавая кэшированные ответы ещё до того, как запрос дойдёт до бэкенда."
+    },
+    {
+      "en": "**The built-in JavaScript `Proxy` object** — wraps a target object and lets you intercept `get`, `set`, and function-call traps, which is how libraries like Vue 3 implement reactive data.",
+      "ru": "**Встроенный объект `Proxy` в JavaScript** — оборачивает целевой объект и позволяет перехватывать ловушки `get`, `set` и вызовы функций; именно так библиотеки вроде Vue 3 реализуют реактивные данные."
+    },
+    {
+      "en": "**ORM lazy-loaded associations (Hibernate, SQLAlchemy, Entity Framework)** — a related entity is represented by a placeholder proxy object, and the actual SQL query only fires the first time a field on it is accessed.",
+      "ru": "**Отложенно загружаемые связи в ORM (Hibernate, SQLAlchemy, Entity Framework)** — связанная сущность представлена объектом-заместителем, а реальный SQL-запрос выполняется только при первом обращении к её полю."
+    }
+  ],
+  "related_patterns": [
+    "adapter",
+    "decorator",
+    "facade"
+  ],
+  "visuals": [
+    {
+      "id": "proxy-concept",
+      "type": "flow",
+      "style": "gateway",
+      "category": "structural",
+      "width": 820,
+      "height": 460,
+      "title": {
+        "en": "How Proxy works",
+        "ru": "Как работает Заместитель"
+      },
+      "description": {
+        "en": "The Client calls fetchData(\"users\") on the Caching Proxy — never directly on the Database Service. The first call is a cache MISS: the Proxy delegates to the real Service and stores the result. The identical second call is a cache HIT: the Proxy returns the stored result itself. The Service is never contacted again.",
+        "ru": "Клиент вызывает fetchData(\"users\") у Кэширующего заместителя — никогда напрямую у Сервиса базы данных. Первый вызов — промах кэша: Заместитель делегирует его реальному Сервису и сохраняет результат. Повторный такой же вызов — попадание: Заместитель сам возвращает сохранённый результат. К Сервису больше не обращаются."
+      },
+      "caption": {
+        "en": "The client never knew. The proxy decided.",
+        "ru": "Клиент так и не узнал. Решение принял заместитель."
+      },
+      "blockedLabel": {
+        "en": "No direct access",
+        "ru": "Прямого доступа нет"
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "fetchData(\"users\")",
+            "ru": "fetchData(\"users\")"
+          }
+        },
+        {
+          "id": "proxy",
+          "role": "proxy",
+          "kind": "class",
+          "icon": "layers",
+          "label": {
+            "en": "Caching Proxy",
+            "ru": "Кэширующий заместитель"
+          },
+          "subtitle": {
+            "en": "stands in for the service",
+            "ru": "подменяет собой сервис"
+          }
+        },
+        {
+          "id": "service",
+          "role": "service",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Database Service",
+            "ru": "Сервис базы данных"
+          },
+          "subtitle": {
+            "en": "the real object",
+            "ru": "реальный объект"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "proxy",
+          "relationship": "flow",
+          "label": {
+            "en": "fetchData()",
+            "ru": "fetchData()"
+          }
+        },
+        {
+          "source": "proxy",
+          "target": "service",
+          "relationship": "flow",
+          "label": {
+            "en": "delegate (on MISS)",
+            "ru": "делегирование (при промахе)"
+          }
+        }
+      ]
+    }
+  ]
+}

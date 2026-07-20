@@ -1,0 +1,254 @@
+{
+  "slug": "template-method",
+  "name": "Template Method",
+  "category": "behavioral",
+  "complexity": 1,
+  "popularity": 2,
+  "also_known_as": [
+    "Hook Method"
+  ],
+  "tags": [
+    "behavioral",
+    "skeleton",
+    "inheritance"
+  ],
+  "intent": {
+    "en": "Template Method fixes the overall shape of an algorithm in a base class while leaving individual steps for subclasses to fill in, so the sequence of operations never changes even though its details do.",
+    "ru": "Шаблонный метод закрепляет общую последовательность алгоритма в базовом классе, оставляя отдельные шаги на усмотрение подклассов, — порядок операций всегда один и тот же, даже если детали каждого шага меняются."
+  },
+  "problem": {
+    "en": "Imagine you're building a reporting tool that generates documents in different formats: HTML and Markdown. Both formats follow the same overall structure — a title header, a list of content rows, and a footer — but the exact markup for each step differs.\n\nYou could copy the entire algorithm into each report class. But then changing the overall flow (say, adding a timestamp section) requires modifying every class individually.\n\nAlternatively, you could pack all the logic into one class and use conditionals to choose the output format — but that violates the Open/Closed Principle every time a new format is added.",
+    "ru": "Представьте, что вы создаёте инструмент для генерации отчётов в разных форматах: HTML и Markdown. Оба формата следуют одной и той же общей структуре — заголовок с названием, список строк с содержимым и нижний колонтитул — но конкретная разметка для каждого шага различается.\n\nМожно скопировать весь алгоритм в каждый класс отчёта. Но тогда изменение общего потока (например, добавление секции с временной меткой) потребует изменения каждого класса отдельно.\n\nКак вариант, можно поместить всю логику в один класс и использовать условные операторы для выбора формата вывода — но это нарушает принцип открытости/закрытости при добавлении каждого нового формата."
+  },
+  "solution": {
+    "en": "The Template Method pattern suggests breaking the algorithm into steps, turning each step into a method, and putting a series of calls to those methods inside a single **template method** in the abstract class.\n\nThe steps may either be `abstract` (forcing subclasses to provide an implementation) or have a default implementation that subclasses can optionally override (**hooks**).\n\nSubclasses can override specific steps without touching the template method itself. This guarantees that the overall algorithm structure stays the same while individual steps remain customizable.",
+    "ru": "Паттерн Шаблонный метод предлагает разбить алгоритм на шаги, оформить каждый шаг как метод и поместить серию вызовов этих методов в единственный **шаблонный метод** абстрактного класса.\n\nШаги могут быть `abstract` (принуждая подклассы предоставлять реализацию) или иметь реализацию по умолчанию, которую подклассы могут опционально переопределить (**хуки**).\n\nПодклассы могут переопределять конкретные шаги, не трогая шаблонный метод. Это гарантирует неизменность общей структуры алгоритма при свободной настройке отдельных шагов."
+  },
+  "structure": {
+    "description": {
+      "en": "The AbstractClass declares the template method and all algorithm steps. Some steps are abstract; others are hooks with empty default implementations. ConcreteClass overrides the steps it needs to customize.",
+      "ru": "Абстрактный класс объявляет шаблонный метод и все шаги алгоритма. Одни шаги являются абстрактными, другие — хуками с пустой реализацией по умолчанию. Конкретный класс переопределяет нужные шаги."
+    },
+    "participants": [
+      {
+        "name": "AbstractClass",
+        "role": {
+          "en": "Declares the template method that defines the algorithm skeleton. Also declares abstract primitive operations that subclasses must implement, and optional hook methods with empty or default implementations.",
+          "ru": "Объявляет шаблонный метод, определяющий скелет алгоритма. Также объявляет абстрактные примитивные операции, которые подклассы должны реализовать, и опциональные методы-хуки с пустой или стандартной реализацией."
+        }
+      },
+      {
+        "name": "ConcreteClass",
+        "role": {
+          "en": "Implements the abstract primitive operations to carry out the subclass-specific steps of the algorithm. Does not override the template method itself.",
+          "ru": "Реализует абстрактные примитивные операции для выполнения специфичных для подкласса шагов алгоритма. Не переопределяет сам шаблонный метод."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Abstract class\nclass ReportGenerator {\n  // Template method — defines the algorithm skeleton\n  generate(title, rows) {\n    const parts = [\n      this.header(title),\n      this.body(rows),\n      this.footer(),\n    ];\n    return parts.filter(Boolean).join('\\n');\n  }\n\n  // Hook — optional override\n  header(title) { return ''; }\n  footer()      { return ''; }\n\n  // Primitive operation — must be overridden\n  body(rows) {\n    throw new Error('body() must be implemented');\n  }\n}\n\nclass HtmlReport extends ReportGenerator {\n  header(title) { return `<h1>${title}</h1><ul>`; }\n  body(rows)    { return rows.map(r => `  <li>${r}</li>`).join('\\n'); }\n  footer()      { return '</ul>'; }\n}\n\nclass MarkdownReport extends ReportGenerator {\n  header(title) { return `# ${title}\\n`; }\n  body(rows)    { return rows.map(r => `- ${r}`).join('\\n'); }\n}\n\n// Usage\nconst rows = ['Design Patterns', 'Clean Code', 'SOLID'];\n\nconst html = new HtmlReport();\nconsole.log(html.generate('Books', rows));\n// <h1>Books</h1><ul>\n//   <li>Design Patterns</li>\n//   <li>Clean Code</li>\n//   <li>SOLID</li>\n// </ul>\n\nconst md = new MarkdownReport();\nconsole.log(md.generate('Books', rows));\n// # Books\n//\n// - Design Patterns\n// - Clean Code\n// - SOLID",
+    "typescript": "// Abstract class\nabstract class ReportGenerator {\n  // Template method\n  generate(title: string, rows: string[]): string {\n    const parts = [\n      this.header(title),\n      this.body(rows),\n      this.footer(),\n    ];\n    return parts.filter(Boolean).join('\\n');\n  }\n\n  // Hooks with default implementations\n  protected header(_title: string): string { return ''; }\n  protected footer(): string               { return ''; }\n\n  // Primitive operation — subclasses must implement\n  protected abstract body(rows: string[]): string;\n}\n\nclass HtmlReport extends ReportGenerator {\n  protected header(title: string): string {\n    return `<h1>${title}</h1><ul>`;\n  }\n  protected body(rows: string[]): string {\n    return rows.map(r => `  <li>${r}</li>`).join('\\n');\n  }\n  protected footer(): string { return '</ul>'; }\n}\n\nclass MarkdownReport extends ReportGenerator {\n  protected header(title: string): string { return `# ${title}\\n`; }\n  protected body(rows: string[]): string {\n    return rows.map(r => `- ${r}`).join('\\n');\n  }\n}\n\n// Usage\nconst rows = ['Design Patterns', 'Clean Code', 'SOLID'];\n\nconst html = new HtmlReport();\nconsole.log(html.generate('Books', rows));\n\nconst md = new MarkdownReport();\nconsole.log(md.generate('Books', rows));",
+    "java": "abstract class ReportGenerator {\n    // Template method — defines the algorithm skeleton\n    public final String generate(String title, String[] rows) {\n        StringBuilder sb = new StringBuilder();\n        String h = header(title);\n        if (!h.isEmpty()) sb.append(h).append('\\n');\n        sb.append(body(rows));\n        String f = footer();\n        if (!f.isEmpty()) sb.append('\\n').append(f);\n        return sb.toString();\n    }\n\n    // Hooks — optional override\n    protected String header(String title) { return \"\"; }\n    protected String footer()             { return \"\"; }\n\n    // Primitive operation — must be overridden\n    protected abstract String body(String[] rows);\n}\n\nclass HtmlReport extends ReportGenerator {\n    protected String header(String title) { return \"<h1>\" + title + \"</h1><ul>\"; }\n    protected String body(String[] rows) {\n        StringBuilder sb = new StringBuilder();\n        for (String r : rows) sb.append(\"  <li>\").append(r).append(\"</li>\\n\");\n        return sb.toString().stripTrailing();\n    }\n    protected String footer() { return \"</ul>\"; }\n}\n\nclass MarkdownReport extends ReportGenerator {\n    protected String header(String title) { return \"# \" + title + \"\\n\"; }\n    protected String body(String[] rows) {\n        StringBuilder sb = new StringBuilder();\n        for (String r : rows) sb.append(\"- \").append(r).append('\\n');\n        return sb.toString().stripTrailing();\n    }\n}\n\n// Usage\nString[] rows = {\"Design Patterns\", \"Clean Code\", \"SOLID\"};\n\nSystem.out.println(new HtmlReport().generate(\"Books\", rows));\n// <h1>Books</h1><ul>\n//   <li>Design Patterns</li>\n//   <li>Clean Code</li>\n//   <li>SOLID</li>\n// </ul>\n\nSystem.out.println(new MarkdownReport().generate(\"Books\", rows));\n// # Books\n//\n// - Design Patterns\n// - Clean Code\n// - SOLID",
+    "csharp": "abstract class ReportGenerator\n{\n    // Template method — sealed to prevent override\n    public sealed string Generate(string title, string[] rows)\n    {\n        var parts = new[] { Header(title), Body(rows), Footer() };\n        return string.Join(\"\\n\", parts.Where(p => !string.IsNullOrEmpty(p)));\n    }\n\n    // Hooks — optional override\n    protected virtual string Header(string title) => \"\";\n    protected virtual string Footer()             => \"\";\n\n    // Primitive operation — must be overridden\n    protected abstract string Body(string[] rows);\n}\n\nclass HtmlReport : ReportGenerator\n{\n    protected override string Header(string title) => $\"<h1>{title}</h1><ul>\";\n    protected override string Body(string[] rows)  =>\n        string.Join(\"\\n\", rows.Select(r => $\"  <li>{r}</li>\"));\n    protected override string Footer() => \"</ul>\";\n}\n\nclass MarkdownReport : ReportGenerator\n{\n    protected override string Header(string title) => $\"# {title}\\n\";\n    protected override string Body(string[] rows)  =>\n        string.Join(\"\\n\", rows.Select(r => $\"- {r}\"));\n}\n\n// Usage\nstring[] rows = { \"Design Patterns\", \"Clean Code\", \"SOLID\" };\n\nConsole.WriteLine(new HtmlReport().Generate(\"Books\", rows));\n// <h1>Books</h1><ul>\n//   <li>Design Patterns</li>\n//   <li>Clean Code</li>\n//   <li>SOLID</li>\n// </ul>\n\nConsole.WriteLine(new MarkdownReport().Generate(\"Books\", rows));\n// # Books\n//\n// - Design Patterns\n// - Clean Code\n// - SOLID",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass ReportGenerator(ABC):\n    # Template method\n    def generate(self, title: str, rows: list[str]) -> str:\n        parts = [self.header(title), self.body(rows), self.footer()]\n        return '\\n'.join(p for p in parts if p)\n\n    # Hooks — optional override\n    def header(self, title: str) -> str: return ''\n    def footer(self) -> str:             return ''\n\n    # Primitive operation — must be overridden\n    @abstractmethod\n    def body(self, rows: list[str]) -> str: ...\n\n\nclass HtmlReport(ReportGenerator):\n    def header(self, title: str) -> str:\n        return f'<h1>{title}</h1><ul>'\n\n    def body(self, rows: list[str]) -> str:\n        return '\\n'.join(f'  <li>{r}</li>' for r in rows)\n\n    def footer(self) -> str:\n        return '</ul>'\n\n\nclass MarkdownReport(ReportGenerator):\n    def header(self, title: str) -> str:\n        return f'# {title}\\n'\n\n    def body(self, rows: list[str]) -> str:\n        return '\\n'.join(f'- {r}' for r in rows)\n\n\n# Usage\nrows = ['Design Patterns', 'Clean Code', 'SOLID']\n\nhtml = HtmlReport()\nprint(html.generate('Books', rows))\n# <h1>Books</h1><ul>\n#   <li>Design Patterns</li>\n#   <li>Clean Code</li>\n#   <li>SOLID</li>\n# </ul>\n\nmd = MarkdownReport()\nprint(md.generate('Books', rows))\n# # Books\n#\n# - Design Patterns\n# - Clean Code\n# - SOLID"
+  },
+  "pros": [
+    {
+      "en": "Subclasses only need to fill in the steps that actually vary, instead of re-implementing the whole algorithm.",
+      "ru": "Подклассам нужно реализовать только те шаги, которые действительно отличаются, а не весь алгоритм заново."
+    },
+    {
+      "en": "The parts of the algorithm that never change live in one place, in the base class, instead of being copy-pasted across every subclass.",
+      "ru": "Неизменные части алгоритма находятся в одном месте — в базовом классе, а не копируются в каждый подкласс."
+    },
+    {
+      "en": "Because the sequence of steps is fixed by the base class, subclasses cannot accidentally reorder or skip a stage of the algorithm.",
+      "ru": "Поскольку порядок шагов задан базовым классом, подклассы не могут случайно поменять их местами или пропустить один из этапов."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Every new step added to the skeleton means another method every existing subclass may need to review or override.",
+      "ru": "Каждый новый шаг, добавленный в каркас, — это ещё один метод, который может потребовать внимания или переопределения во всех существующих подклассах."
+    },
+    {
+      "en": "A subclass that overrides a hook carelessly can break an assumption the base algorithm relies on, since the base class can't enforce what the override actually does.",
+      "ru": "Подкласс, небрежно переопределивший хук, может нарушить предположение, на которое опирается базовый алгоритм, — ведь базовый класс не может проконтролировать, что именно делает переопределение."
+    },
+    {
+      "en": "Because the algorithm's shape is fixed through inheritance, adding a genuinely different variant usually means a new subclass rather than a runtime choice — Strategy is a better fit when that flexibility matters.",
+      "ru": "Поскольку форма алгоритма закреплена через наследование, для действительно нового варианта обычно нужен новый подкласс, а не выбор во время выполнения — если такая гибкость важна, лучше подойдёт Стратегия."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Template Method when subclasses should be free to customize a few specific steps of an algorithm, but must not be able to change its overall sequence.",
+      "ru": "Применяйте Шаблонный метод, когда подклассам нужно разрешить настраивать отдельные шаги алгоритма, но нельзя позволять менять его общую последовательность."
+    },
+    {
+      "en": "It also fits when you notice several classes implementing almost the same algorithm with small variations, which today forces you to update every copy whenever the shared logic changes.",
+      "ru": "Паттерн также уместен, если несколько классов реализуют почти одинаковый алгоритм с небольшими отличиями, из-за чего сейчас при изменении общей логики приходится обновлять каждую копию."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Data parsers** — a document parser follows the same steps (open, parse, close) for CSV, JSON, and XML files, but each format requires different parsing logic.",
+      "ru": "**Парсеры данных** — парсер документов следует одним и тем же шагам (открыть, разобрать, закрыть) для файлов CSV, JSON и XML, но каждый формат требует своей логики разбора."
+    },
+    {
+      "en": "**Web frameworks** — request handling pipelines (authenticate, authorize, handle, respond) define a skeleton that controllers override with specific handler logic.",
+      "ru": "**Веб-фреймворки** — конвейеры обработки запросов (аутентификация, авторизация, обработка, ответ) определяют скелет, который контроллеры переопределяют собственной логикой."
+    },
+    {
+      "en": "**Game AI** — a turn-based AI defines a fixed turn structure (collect resources, build, attack) while different difficulty levels override each step with varying strategies.",
+      "ru": "**ИИ игры** — пошаговый ИИ определяет фиксированную структуру хода (сбор ресурсов, строительство, атака), а разные уровни сложности переопределяют каждый шаг различными стратегиями."
+    }
+  ],
+  "related_patterns": [
+    "strategy",
+    "factory-method",
+    "decorator",
+    "observer"
+  ],
+  "visuals": [
+    {
+      "id": "template-method-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "behavioral",
+      "width": 960,
+      "height": 420,
+      "title": {
+        "en": "How Template Method works",
+        "ru": "Как работает Шаблонный метод"
+      },
+      "description": {
+        "en": "The AbstractClass defines the algorithm skeleton in parse(): open → extract → analyze → close. Steps open, analyze, and close are fixed. The extract() step is a hook that subclasses override. CSVParser parses comma-separated rows; XMLParser walks the DOM tree. The skeleton never changes.",
+        "ru": "Абстрактный класс определяет скелет алгоритма в parse(): открыть → извлечь → проанализировать → закрыть. Шаги открытия, анализа и закрытия фиксированы. Шаг extract() является хуком, который переопределяют подклассы. CSVParser разбирает строки, разделённые запятыми; XMLParser обходит дерево DOM. Скелет никогда не меняется."
+      },
+      "caption": {
+        "en": "Fixed skeleton. Variable steps. The algorithm is always the same shape.",
+        "ru": "Фиксированный скелет. Переменные шаги. Алгоритм всегда имеет одну форму."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "runs parser",
+            "ru": "запускает парсер"
+          },
+          "position": {
+            "x": 60,
+            "y": 165,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "abstract",
+          "kind": "class",
+          "icon": "layers",
+          "emphasis": true,
+          "label": {
+            "en": "DataParser",
+            "ru": "ПарсерДанных"
+          },
+          "subtitle": {
+            "en": "skeleton algorithm",
+            "ru": "каркас алгоритма"
+          },
+          "position": {
+            "x": 340,
+            "y": 165,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "concreteA",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "CSVParser",
+            "ru": "CSVПарсер"
+          },
+          "subtitle": {
+            "en": "fills hook step",
+            "ru": "заполняет пропуск"
+          },
+          "position": {
+            "x": 680,
+            "y": 60,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "concreteB",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "XMLParser",
+            "ru": "XMLПарсер"
+          },
+          "subtitle": {
+            "en": "fills hook step",
+            "ru": "заполняет пропуск"
+          },
+          "position": {
+            "x": 680,
+            "y": 270,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "abstract",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "side",
+          "label": {
+            "en": "① parse()",
+            "ru": "① разобрать()"
+          }
+        },
+        {
+          "source": "abstract",
+          "target": "concreteA",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "border",
+          "label": {
+            "en": "② extractData()",
+            "ru": "② извлечьДанные()"
+          }
+        },
+        {
+          "source": "abstract",
+          "target": "concreteB",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "border",
+          "label": {
+            "en": "③ extractData()",
+            "ru": "③ извлечьДанные()"
+          }
+        }
+      ]
+    }
+  ]
+}

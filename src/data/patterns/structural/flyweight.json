@@ -1,0 +1,226 @@
+{
+  "slug": "flyweight",
+  "name": "Flyweight",
+  "category": "structural",
+  "complexity": 3,
+  "popularity": 1,
+  "also_known_as": [
+    "Cache"
+  ],
+  "tags": [
+    "structural",
+    "cache",
+    "memory",
+    "intrinsic-state",
+    "object-pool"
+  ],
+  "intent": {
+    "en": "Flyweight cuts memory usage for large populations of similar objects by factoring out the data they have in common into shared instances, leaving each object to hold only what makes it unique.",
+    "ru": "Легковес сокращает потребление памяти при работе с множеством похожих объектов, вынося их общие данные в разделяемые экземпляры и оставляя в каждом объекте только то, что делает его уникальным."
+  },
+  "problem": {
+    "en": "A map-rendering engine needs to place a million trees across a forest layer. Each tree object naively stores its coordinates, current growth stage, plus a mesh, a texture atlas, and material settings describing what an oak or a pine looks like.\n\nThe mesh and texture data alone might be several megabytes per species, and it's identical across every tree of that species — yet if it lives inside each `Tree` instance, a million trees means a million redundant copies of the same few megabytes, quickly exceeding any reasonable memory budget and stalling the renderer.",
+    "ru": "Движку рендеринга карты нужно разместить миллион деревьев на слое леса. Каждый наивно реализованный объект дерева хранит свои координаты, текущую стадию роста, а также меш, текстурный атлас и настройки материала, описывающие внешний вид дуба или сосны.\n\nОдни только данные меша и текстуры могут занимать несколько мегабайт на вид дерева, и они одинаковы для каждого дерева этого вида — но если хранить их внутри каждого экземпляра `Tree`, миллион деревьев означает миллион избыточных копий одних и тех же нескольких мегабайт, что быстро исчерпывает любой разумный бюджет памяти и замедляет рендерер."
+  },
+  "solution": {
+    "en": "Split each object's data along a fault line: the part that's identical across many instances (species, mesh, texture — the **intrinsic state**) versus the part that's unique to this one instance (position, growth stage — the **extrinsic state**).\n\nPull the intrinsic part out into a small, shared object — the flyweight — and store only one copy per distinct combination. The extrinsic part stays with the caller and gets passed into the flyweight's methods as arguments whenever behavior is needed. A **factory** sits in front of flyweight creation: it hands back an existing shared instance if one already matches the requested intrinsic data, and only builds a new one when it doesn't.",
+    "ru": "Разделите данные каждого объекта по линии разлома: часть, одинаковую для многих экземпляров (вид, меш, текстура — **внутреннее состояние**), и часть, уникальную для конкретного экземпляра (позиция, стадия роста — **внешнее состояние**).\n\nВынесите внутреннюю часть в небольшой разделяемый объект — легковес — и храните лишь одну копию на каждую отдельную комбинацию данных. Внешняя часть остаётся у вызывающего кода и передаётся в методы легковеса аргументами, когда нужно выполнить какое-то поведение. Перед созданием легковесов стоит **фабрика**: она возвращает уже существующий разделяемый экземпляр, если он подходит по внутренним данным, и создаёт новый только тогда, когда подходящего нет."
+  },
+  "structure": {
+    "description": {
+      "en": "A Flyweight bundles the shared intrinsic data and exposes methods that take extrinsic data as arguments rather than storing it. A Flyweight Factory owns the pool of flyweight instances and hands out a matching one on request, creating it only the first time it's needed. A Context object pairs a reference to some flyweight with the extrinsic data unique to that particular usage. The Client supplies extrinsic data and requests flyweights through the factory rather than instantiating them directly.",
+      "ru": "Легковес объединяет общие внутренние данные и предоставляет методы, принимающие внешние данные как аргументы, а не хранящие их. Фабрика Легковесов владеет пулом экземпляров легковесов и выдаёт подходящий по запросу, создавая его лишь при первой необходимости. Объект Контекста связывает ссылку на легковес с внешними данными, уникальными для конкретного случая использования. Клиент передаёт внешние данные и запрашивает легковесы через фабрику, а не создаёт их напрямую."
+    },
+    "participants": [
+      {
+        "name": "Flyweight",
+        "role": {
+          "en": "Holds only the data that's identical across a whole class of objects and exposes operations parameterized by whatever unique data the caller supplies at call time.",
+          "ru": "Хранит только те данные, что одинаковы для целого класса объектов, и предоставляет операции, параметризуемые уникальными данными, которые вызывающий код передаёт в момент вызова."
+        }
+      },
+      {
+        "name": "Flyweight Factory",
+        "role": {
+          "en": "Keeps a lookup pool keyed by intrinsic data. Given a request, it returns a matching flyweight from the pool or constructs and stores one if none exists yet.",
+          "ru": "Хранит пул объектов с индексацией по внутренним данным. По запросу возвращает подходящий легковес из пула либо создаёт и сохраняет новый, если подходящего ещё нет."
+        }
+      },
+      {
+        "name": "Context",
+        "role": {
+          "en": "Pairs the per-instance unique data (extrinsic state) with a pointer to the shared flyweight that supplies the common behavior and data.",
+          "ru": "Связывает уникальные для экземпляра данные (внешнее состояние) со ссылкой на общий легковес, предоставляющий общее поведение и данные."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Tracks or computes each object's extrinsic state and obtains the matching flyweight from the factory instead of allocating a fully self-contained object.",
+          "ru": "Отслеживает или вычисляет внешнее состояние каждого объекта и получает подходящий легковес через фабрику вместо создания полностью самодостаточного объекта."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Flyweight — stores intrinsic (shared) state\nclass TreeType {\n  constructor(name, color, texture) {\n    this.name    = name;\n    this.color   = color;\n    this.texture = texture;\n  }\n\n  draw(x, y) {\n    console.log(\n      `Drawing ${this.name} [${this.color}, ${this.texture}] at (${x}, ${y})`\n    );\n  }\n}\n\n// Flyweight Factory — manages the shared pool\nclass TreeTypeFactory {\n  static #types = new Map();\n\n  static getTreeType(name, color, texture) {\n    const key = `${name}_${color}_${texture}`;\n    if (!TreeTypeFactory.#types.has(key)) {\n      TreeTypeFactory.#types.set(key, new TreeType(name, color, texture));\n      console.log(`Factory: created new type '${name}'`);\n    }\n    return TreeTypeFactory.#types.get(key);\n  }\n\n  static getCount() { return TreeTypeFactory.#types.size; }\n}\n\n// Context — stores extrinsic (unique) state, references the flyweight\nclass Tree {\n  constructor(x, y, type) {\n    this.x    = x;\n    this.y    = y;\n    this.type = type;\n  }\n\n  draw() { this.type.draw(this.x, this.y); }\n}\n\n// Client — creates many trees reusing shared flyweights\nclass Forest {\n  #trees = [];\n\n  plantTree(x, y, name, color, texture) {\n    const type = TreeTypeFactory.getTreeType(name, color, texture);\n    this.#trees.push(new Tree(x, y, type));\n  }\n\n  draw() { this.#trees.forEach(t => t.draw()); }\n}\n\n// Usage\nconst forest = new Forest();\nforest.plantTree(1, 2, 'Oak',  'green',      'rough');  // Factory: created new type 'Oak'\nforest.plantTree(5, 8, 'Oak',  'green',      'rough');  // reused\nforest.plantTree(3, 4, 'Pine', 'dark-green', 'smooth'); // Factory: created new type 'Pine'\nforest.plantTree(7, 1, 'Pine', 'dark-green', 'smooth'); // reused\n\nconsole.log(`Trees: 4 | Unique types: ${TreeTypeFactory.getCount()}`);\n// Trees: 4 | Unique types: 2\n\nforest.draw();\n// Drawing Oak  [green, rough]       at (1, 2)\n// Drawing Oak  [green, rough]       at (5, 8)\n// Drawing Pine [dark-green, smooth] at (3, 4)\n// Drawing Pine [dark-green, smooth] at (7, 1)",
+    "typescript": "class TreeType {\n  constructor(\n    public readonly name:    string,\n    public readonly color:   string,\n    public readonly texture: string\n  ) {}\n\n  public draw(x: number, y: number): void {\n    console.log(\n      `Drawing ${this.name} [${this.color}, ${this.texture}] at (${x}, ${y})`\n    );\n  }\n}\n\nclass TreeTypeFactory {\n  private static types = new Map<string, TreeType>();\n\n  public static getTreeType(name: string, color: string, texture: string): TreeType {\n    const key = `${name}_${color}_${texture}`;\n    if (!TreeTypeFactory.types.has(key)) {\n      TreeTypeFactory.types.set(key, new TreeType(name, color, texture));\n      console.log(`Factory: created new type '${name}'`);\n    }\n    return TreeTypeFactory.types.get(key)!;\n  }\n\n  public static getCount(): number { return TreeTypeFactory.types.size; }\n}\n\nclass Tree {\n  constructor(\n    private x: number,\n    private y: number,\n    private type: TreeType\n  ) {}\n\n  public draw(): void { this.type.draw(this.x, this.y); }\n}\n\nclass Forest {\n  private trees: Tree[] = [];\n\n  public plantTree(x: number, y: number, name: string, color: string, texture: string): void {\n    const type = TreeTypeFactory.getTreeType(name, color, texture);\n    this.trees.push(new Tree(x, y, type));\n  }\n\n  public draw(): void { this.trees.forEach(t => t.draw()); }\n}\n\n// Usage\nconst forest = new Forest();\nforest.plantTree(1, 2, 'Oak',  'green',      'rough');  // Factory: created new type 'Oak'\nforest.plantTree(5, 8, 'Oak',  'green',      'rough');  // reused\nforest.plantTree(3, 4, 'Pine', 'dark-green', 'smooth'); // Factory: created new type 'Pine'\nforest.plantTree(7, 1, 'Pine', 'dark-green', 'smooth'); // reused\n\nconsole.log(`Trees: 4 | Unique types: ${TreeTypeFactory.getCount()}`);\n// Trees: 4 | Unique types: 2",
+    "java": "import java.util.*;\n\n// Flyweight — stores intrinsic (shared) state\nclass TreeType {\n    private final String name, color, texture;\n    TreeType(String name, String color, String texture) {\n        this.name = name; this.color = color; this.texture = texture;\n    }\n    public void draw(int x, int y) {\n        System.out.printf(\"Drawing %s [%s, %s] at (%d, %d)%n\", name, color, texture, x, y);\n    }\n}\n\n// Flyweight Factory — manages the shared pool\nclass TreeTypeFactory {\n    private static final Map<String, TreeType> types = new HashMap<>();\n\n    public static TreeType getTreeType(String name, String color, String texture) {\n        String key = name + \"_\" + color + \"_\" + texture;\n        if (!types.containsKey(key)) {\n            types.put(key, new TreeType(name, color, texture));\n            System.out.println(\"Factory: created new type '\" + name + \"'\");\n        }\n        return types.get(key);\n    }\n\n    public static int getCount() { return types.size(); }\n}\n\n// Context — stores extrinsic (unique) state, references a flyweight\nclass Tree {\n    private final int x, y;\n    private final TreeType type;\n    Tree(int x, int y, TreeType type) { this.x = x; this.y = y; this.type = type; }\n    public void draw() { type.draw(x, y); }\n}\n\nclass Forest {\n    private final List<Tree> trees = new ArrayList<>();\n\n    public void plantTree(int x, int y, String name, String color, String texture) {\n        trees.add(new Tree(x, y, TreeTypeFactory.getTreeType(name, color, texture)));\n    }\n    public void draw() { trees.forEach(Tree::draw); }\n}\n\n// Usage\nForest forest = new Forest();\nforest.plantTree(1, 2, \"Oak\",  \"green\",      \"rough\");  // Factory: created new type 'Oak'\nforest.plantTree(5, 8, \"Oak\",  \"green\",      \"rough\");  // reused\nforest.plantTree(3, 4, \"Pine\", \"dark-green\", \"smooth\"); // Factory: created new type 'Pine'\nforest.plantTree(7, 1, \"Pine\", \"dark-green\", \"smooth\"); // reused\n\nSystem.out.println(\"Trees: 4 | Unique types: \" + TreeTypeFactory.getCount()); // 2\nforest.draw();",
+    "csharp": "// Flyweight — stores intrinsic (shared) state\nclass TreeType\n{\n    public readonly string Name, Color, Texture;\n    public TreeType(string name, string color, string texture)\n    { Name = name; Color = color; Texture = texture; }\n\n    public void Draw(int x, int y) =>\n        Console.WriteLine($\"Drawing {Name} [{Color}, {Texture}] at ({x}, {y})\");\n}\n\n// Flyweight Factory — manages the shared pool\nclass TreeTypeFactory\n{\n    private static readonly Dictionary<string, TreeType> _types = new();\n\n    public static TreeType GetTreeType(string name, string color, string texture)\n    {\n        string key = $\"{name}_{color}_{texture}\";\n        if (!_types.ContainsKey(key))\n        {\n            _types[key] = new TreeType(name, color, texture);\n            Console.WriteLine($\"Factory: created new type '{name}'\");\n        }\n        return _types[key];\n    }\n\n    public static int GetCount() => _types.Count;\n}\n\n// Context — stores extrinsic (unique) state\nclass Tree\n{\n    private readonly int _x, _y;\n    private readonly TreeType _type;\n    public Tree(int x, int y, TreeType type) { _x = x; _y = y; _type = type; }\n    public void Draw() => _type.Draw(_x, _y);\n}\n\nclass Forest\n{\n    private readonly List<Tree> _trees = new();\n\n    public void PlantTree(int x, int y, string name, string color, string texture)\n        => _trees.Add(new Tree(x, y, TreeTypeFactory.GetTreeType(name, color, texture)));\n\n    public void Draw() => _trees.ForEach(t => t.Draw());\n}\n\n// Usage\nvar forest = new Forest();\nforest.PlantTree(1, 2, \"Oak\",  \"green\",      \"rough\");  // Factory: created new type 'Oak'\nforest.PlantTree(5, 8, \"Oak\",  \"green\",      \"rough\");  // reused\nforest.PlantTree(3, 4, \"Pine\", \"dark-green\", \"smooth\"); // Factory: created new type 'Pine'\nforest.PlantTree(7, 1, \"Pine\", \"dark-green\", \"smooth\"); // reused\n\nConsole.WriteLine($\"Trees: 4 | Unique types: {TreeTypeFactory.GetCount()}\"); // 2\nforest.Draw();",
+    "python": "from __future__ import annotations\n\n\nclass TreeType:\n    def __init__(self, name: str, color: str, texture: str) -> None:\n        self.name    = name\n        self.color   = color\n        self.texture = texture\n\n    def draw(self, x: int, y: int) -> None:\n        print(f'Drawing {self.name} [{self.color}, {self.texture}] at ({x}, {y})')\n\n\nclass TreeTypeFactory:\n    _types: dict[str, TreeType] = {}\n\n    @classmethod\n    def get_tree_type(cls, name: str, color: str, texture: str) -> TreeType:\n        key = f'{name}_{color}_{texture}'\n        if key not in cls._types:\n            cls._types[key] = TreeType(name, color, texture)\n            print(f\"Factory: created new type '{name}'\")\n        return cls._types[key]\n\n    @classmethod\n    def get_count(cls) -> int:\n        return len(cls._types)\n\n\nclass Tree:\n    def __init__(self, x: int, y: int, tree_type: TreeType) -> None:\n        self.x    = x\n        self.y    = y\n        self.type = tree_type\n\n    def draw(self) -> None:\n        self.type.draw(self.x, self.y)\n\n\nclass Forest:\n    def __init__(self) -> None:\n        self._trees: list[Tree] = []\n\n    def plant_tree(self, x: int, y: int, name: str, color: str, texture: str) -> None:\n        tree_type = TreeTypeFactory.get_tree_type(name, color, texture)\n        self._trees.append(Tree(x, y, tree_type))\n\n    def draw(self) -> None:\n        for tree in self._trees:\n            tree.draw()\n\n\n# Usage\nforest = Forest()\nforest.plant_tree(1, 2, 'Oak',  'green',      'rough')   # Factory: created new type 'Oak'\nforest.plant_tree(5, 8, 'Oak',  'green',      'rough')   # reused\nforest.plant_tree(3, 4, 'Pine', 'dark-green', 'smooth')  # Factory: created new type 'Pine'\nforest.plant_tree(7, 1, 'Pine', 'dark-green', 'smooth')  # reused\n\nprint(f'Trees: 4 | Unique types: {TreeTypeFactory.get_count()}')\n# Trees: 4 | Unique types: 2\n\nforest.draw()\n# Drawing Oak  [green, rough]       at (1, 2)\n# Drawing Oak  [green, rough]       at (5, 8)\n# Drawing Pine [dark-green, smooth] at (3, 4)\n# Drawing Pine [dark-green, smooth] at (7, 1)"
+  },
+  "pros": [
+    {
+      "en": "Memory footprint drops sharply once a large object population is dominated by a small number of distinct intrinsic-state combinations.",
+      "ru": "Потребление памяти резко падает, как только среди большого числа объектов начинает преобладать небольшое число различных комбинаций внутреннего состояния."
+    },
+    {
+      "en": "Deduplicating shared state through a factory also means shared data gets initialized once, which can speed up construction of new instances.",
+      "ru": "Дедупликация общего состояния через фабрику также означает, что общие данные инициализируются один раз, что может ускорить создание новых экземпляров."
+    },
+    {
+      "en": "Keeping intrinsic state immutable and shared makes it inherently safe to read from multiple threads without extra synchronization.",
+      "ru": "Хранение внутреннего состояния неизменяемым и общим делает его по своей природе безопасным для чтения из нескольких потоков без дополнительной синхронизации."
+    }
+  ],
+  "cons": [
+    {
+      "en": "You're spending CPU time to save memory — recomputing or re-passing extrinsic state on every call can outweigh the savings if objects aren't numerous enough.",
+      "ru": "Экономия памяти достигается за счёт затрат процессорного времени — повторное вычисление или передача внешнего состояния при каждом вызове может перевесить выигрыш, если объектов не так уж много."
+    },
+    {
+      "en": "Separating state into intrinsic and extrinsic parts adds a layer of indirection that makes the code harder to follow than a plain self-contained object.",
+      "ru": "Разделение состояния на внутреннее и внешнее добавляет уровень косвенности, из-за чего код читать сложнее, чем при работе с обычным самодостаточным объектом."
+    },
+    {
+      "en": "Since flyweights are shared, mutating one accidentally affects every context referencing it — intrinsic state has to stay strictly read-only.",
+      "ru": "Поскольку легковесы разделяются между объектами, случайное изменение одного из них затронет все контексты, на него ссылающиеся, — внутреннее состояние обязано оставаться строго неизменяемым."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "The application needs to keep an enormous number of objects alive at once, and their combined memory footprint is becoming a real constraint.",
+      "ru": "Когда приложению нужно одновременно держать в памяти огромное количество объектов, и их суммарный объём становится реальным ограничением."
+    },
+    {
+      "en": "Most of what makes those objects heavy is data that repeats identically across many of them, leaving only a small, cheap remainder that's genuinely unique per instance.",
+      "ru": "Когда основная часть «веса» этих объектов — данные, которые в точности повторяются у многих из них, а по-настоящему уникальным остаётся лишь небольшой, дешёвый остаток."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Browser text rendering** — a font/size/weight glyph bitmap is rasterized once and shared by every occurrence of that character on the page; each occurrence only needs its own screen position.",
+      "ru": "**Рендеринг текста в браузере** — растровое изображение глифа для конкретного шрифта, размера и начертания создаётся один раз и используется всеми вхождениями этого символа на странице; для каждого вхождения хранится лишь собственная позиция на экране."
+    },
+    {
+      "en": "**Java's `Integer.valueOf()` cache** — small boxed integers (-128 to 127) are pooled and reused rather than allocated fresh, since the same handful of values recur constantly in typical programs.",
+      "ru": "**Кэш `Integer.valueOf()` в Java** — небольшие упакованные целые числа (от -128 до 127) берутся из пула и переиспользуются вместо создания заново, поскольку одни и те же значения постоянно повторяются в типичных программах."
+    },
+    {
+      "en": "**Game engine particle/instance systems** — thousands of bullets or foliage sprites reference one shared mesh-and-material record, while each instance keeps only its own transform and velocity.",
+      "ru": "**Системы частиц и инстансинга в игровых движках** — тысячи пуль или спрайтов растительности ссылаются на одну общую запись меша и материала, а каждый экземпляр хранит только собственную трансформацию и скорость."
+    }
+  ],
+  "related_patterns": [
+    "composite",
+    "singleton",
+    "proxy"
+  ],
+  "visuals": [
+    {
+      "id": "flyweight-concept",
+      "type": "flow",
+      "style": "pool",
+      "category": "structural",
+      "width": 900,
+      "height": 440,
+      "title": {
+        "en": "How Flyweight works",
+        "ru": "Как работает Легковес"
+      },
+      "description": {
+        "en": "The Client asks the Flyweight Factory for a tree type by name. The first \"Oak\" request is a MISS — the factory creates a new shared TreeType and adds it to the pool. Every later \"Oak\" request is a HIT: the factory returns that exact same object instead of creating a duplicate. A different key, like \"Pine\", still gets its own new shared instance.",
+        "ru": "Клиент запрашивает у Фабрики легковесов тип дерева по имени. Первый запрос «Oak» — промах: фабрика создаёт новый общий TreeType и добавляет его в пул. Каждый следующий запрос «Oak» — попадание: фабрика возвращает тот же самый объект вместо создания дубликата. Другой ключ, например «Pine», всё равно получает свой собственный новый общий экземпляр."
+      },
+      "caption": {
+        "en": "One shared token per key. Every later request for the same key reuses it — nothing is duplicated.",
+        "ru": "Один общий объект на ключ. Каждый повторный запрос с тем же ключом использует его снова — без дублирования."
+      },
+      "poolLabel": {
+        "en": "Flyweight pool",
+        "ru": "Пул легковесов"
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "plantTree()",
+            "ru": "plantTree()"
+          }
+        },
+        {
+          "id": "factory",
+          "role": "factory",
+          "kind": "class",
+          "icon": "spark",
+          "label": {
+            "en": "Flyweight Factory",
+            "ru": "Фабрика легковесов"
+          },
+          "subtitle": {
+            "en": "getTreeType()",
+            "ru": "getTreeType()"
+          }
+        },
+        {
+          "id": "oakFW",
+          "role": "flyweight",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Oak",
+            "ru": "Дуб"
+          }
+        },
+        {
+          "id": "pineFW",
+          "role": "flyweight",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Pine",
+            "ru": "Сосна"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "factory",
+          "relationship": "flow",
+          "label": {
+            "en": "getTreeType()",
+            "ru": "getTreeType()"
+          }
+        },
+        {
+          "source": "factory",
+          "target": "oakFW",
+          "relationship": "flow"
+        },
+        {
+          "source": "factory",
+          "target": "pineFW",
+          "relationship": "flow"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "nav": {
+    "home": "Home",
+    "patterns": "Patterns",
+    "categories": "Categories",
+    "about": "About",
+    "skip_to_content": "Skip to content",
+    "menu": "Menu"
+  },
+
+  "theme": {
+    "toggle": "Toggle color theme",
+    "label": "Theme",
+    "light": "Switch to light mode",
+    "dark": "Switch to dark mode"
+  },
+
+  "lang": {
+    "switch": "Switch language",
+    "en": "English",
+    "ru": "Russian",
+    "code_en": "EN",
+    "code_ru": "RU"
+  },
+
+  "search": {
+    "placeholder": "Search patterns…",
+    "label": "Search",
+    "clear": "Clear search",
+    "no_results": "No results for \"{{query}}\"",
+    "no_results_hint": "Try different keywords or browse by category.",
+    "result_count": "Found <strong>{{count}}</strong> result{{s}} for <strong>\"{{query}}\"</strong>",
+    "no_match": "No results for <strong>\"{{query}}\"</strong>",
+    "enter_keyword": "Enter a keyword to search all 23 patterns.",
+    "no_match_desc": "Try different keywords — pattern name, category, or a tag like \"factory\" or \"event\".",
+    "browse_all": "Browse All Patterns"
+  },
+
+  "actions": {
+    "copy": "Copy",
+    "copied": "Copied!",
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "open_menu": "Open navigation menu",
+    "close_menu": "Close navigation menu",
+    "open_search": "Open search",
+    "view_all": "View all",
+    "learn_more": "Learn more",
+    "go_back": "Go back",
+    "read_more": "Read more",
+    "show_more": "Show more",
+    "show_less": "Show less"
+  },
+
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page {{n}} of {{total}}",
+    "go_to_page": "Go to page {{n}}"
+  },
+
+  "footer": {
+    "tagline": "A premium open-source educational platform for learning the 23 Gang of Four Design Patterns.",
+    "copyright": "Design Patterns Academy. Open source under MIT license.",
+    "github": "View on GitHub",
+    "col_patterns": "Patterns",
+    "col_resources": "Resources",
+    "link_creational": "Creational",
+    "link_structural": "Structural",
+    "link_behavioral": "Behavioral",
+    "link_all": "All 23 Patterns",
+    "link_about": "About",
+    "link_contributing": "Contributing",
+    "link_changelog": "Changelog"
+  },
+
+  "empty": {
+    "patterns_title": "No patterns found",
+    "patterns_desc": "Try adjusting your search query or selected filters.",
+    "search_title": "No search results",
+    "search_desc": "Try different keywords or browse the full catalog.",
+    "error_title": "Something went wrong",
+    "error_desc": "An unexpected error occurred. Please try refreshing the page."
+  },
+
+  "loading": {
+    "patterns": "Loading patterns…",
+    "pattern": "Loading pattern…",
+    "generic": "Loading…"
+  },
+
+  "errors": {
+    "not_found": "Page not found",
+    "not_found_desc": "The page you are looking for does not exist or has been moved.",
+    "pattern_not_found": "Pattern not found",
+    "pattern_not_found_desc": "This pattern does not exist or has not been published yet.",
+    "go_home": "Go to Home",
+    "browse_patterns": "Browse Patterns",
+    "browse_all_patterns": "Browse All Patterns",
+    "load_failed": "Failed to load page. Please refresh."
+  },
+
+  "a11y": {
+    "main_content": "Main content",
+    "primary_nav": "Main navigation",
+    "mobile_nav": "Mobile navigation",
+    "footer_nav": "Footer navigation",
+    "breadcrumb": "Breadcrumb",
+    "pagination": "Pagination",
+    "code_example": "Code example",
+    "pattern_card": "{{name}} pattern",
+    "external_link": "Opens in new tab",
+    "logo_home": "Design Patterns Academy — Home",
+    "site_utilities": "Site utilities",
+    "nav_dialog": "Navigation menu",
+    "loading": "Loading",
+    "platform_stats": "Platform statistics"
+  },
+
+  "breadcrumbs": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "patterns": "Patterns",
+    "about": "About",
+    "search": "Search"
+  },
+
+  "home": {
+    "hero_badge": "23 GoF Patterns",
+    "hero_title": "Master Design Patterns",
+    "hero_subtitle": "Learn all 23 Gang of Four design patterns with clear examples, diagrams, and real-world code.",
+    "hero_cta_primary": "Explore Patterns",
+    "hero_cta_secondary": "View on GitHub",
+    "section_patterns": "All 23 Patterns",
+    "section_categories": "Browse by Category",
+    "section_about": "About the Project",
+    "stats_patterns": "Patterns",
+    "stats_categories": "Categories",
+    "stats_code_langs": "Code Languages",
+    "stats_ui_langs": "UI Languages",
+    "category_creational_desc": "Object creation mechanisms for flexible, reusable code.",
+    "category_structural_desc": "Compose objects into larger, flexible structures.",
+    "category_behavioral_desc": "Efficient communication and responsibility between objects.",
+    "category_count": "{{count}} patterns",
+    "section_featured": "Popular Patterns",
+    "section_featured_sub": "The most widely used GoF patterns",
+    "view_all_patterns": "View all 23 →",
+    "oss_title": "Open Source",
+    "oss_desc": "Design Patterns Academy is built in the open. Contributions, feedback, and pull requests are welcome.",
+    "btn_contribute": "Contribute on GitHub",
+    "btn_about": "About the Project"
+  },
+
+  "catalog": {
+    "subtitle": "Choose a learning path. More modules arriving soon.",
+    "badge_active": "Active",
+    "badge_coming_soon": "Coming Soon",
+    "aria_coming_soon": " — coming soon"
+  },
+
+  "about": {
+    "lead": "A premium open-source educational platform for learning the 23 Gang of Four design patterns — built with modern web standards, no frameworks, and a passion for great developer experience.",
+    "section_project": "The Project",
+    "project_p1": "Design Patterns Academy was created to provide a clean, distraction-free learning experience for one of the most important topics in software engineering: design patterns.",
+    "project_p2": "Unlike many resources, every pattern explanation here comes with clear intent, real-world context, implementation examples in multiple languages, and honest trade-off analysis.",
+    "project_p3": "The platform is designed to grow into a full knowledge catalog covering algorithms, data structures, software architecture, and more — all following the same editorial standards.",
+    "section_philosophy": "Design Philosophy",
+    "philosophy_p1": "Every decision — from typography to component structure — follows the same principles that the patterns themselves teach: separation of concerns, single responsibility, and clean interfaces.",
+    "tooltip_solid": "Five object-oriented design principles that help create maintainable, flexible and scalable software.",
+    "tooltip_dry": "Don't Repeat Yourself. Avoid duplicating knowledge or business logic in multiple places.",
+    "tooltip_kiss": "Keep It Simple, Stupid. Prefer the simplest solution that correctly solves the problem.",
+    "tooltip_yagni": "You Aren't Gonna Need It. Do not implement functionality until it is actually required.",
+    "tooltip_semantic_html": "Use HTML elements according to their meaning to improve accessibility and SEO.",
+    "tooltip_accessibility": "Design interfaces that are usable by everyone, including people with disabilities.",
+    "tooltip_performance": "Performance is a product requirement, not an afterthought.",
+    "tooltip_mobile_first": "Design for mobile devices first, then progressively enhance larger screens.",
+    "section_stack": "Tech Stack",
+    "stack_intro": "Zero frameworks. Every feature is intentionally built with the platform stack it demonstrates.",
+    "stack_col_tech": "Technology",
+    "stack_col_purpose": "Purpose",
+    "stack_col_why": "Why",
+    "tech_markup": "Markup",
+    "tech_styling": "Styling",
+    "tech_logic": "Logic",
+    "tech_bundler": "Bundler",
+    "tech_data": "Data",
+    "tech_why_html": "Semantic structure, accessibility, SEO",
+    "tech_why_css": "Design tokens, themes, zero runtime cost",
+    "tech_why_js": "No framework overhead, migration-ready architecture",
+    "tech_why_vite": "Instant HMR, optimised builds, code splitting",
+    "tech_why_json": "Portable, versionable, human-readable content",
+    "section_roadmap": "Roadmap",
+    "roadmap_intro": "The current version covers all 23 Gang of Four Design Patterns. Future modules planned:",
+    "roadmap_algorithms": "Algorithms",
+    "roadmap_data_structures": "Data Structures",
+    "roadmap_architecture": "Software Architecture",
+    "roadmap_databases": "Databases",
+    "roadmap_networking": "Networking",
+    "roadmap_devops": "DevOps & Cloud",
+    "section_contribute": "Contribute",
+    "contribute_desc": "Found an error? Want to add a language example? Have a pattern suggestion? All contributions are welcome.",
+    "btn_open_issue": "Open an Issue",
+    "btn_contributing": "Read CONTRIBUTING.md"
+  }
+}

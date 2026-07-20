@@ -1,0 +1,319 @@
+
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes filter-in {
+  from { opacity: 0; transform: scale(0.95) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes count-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+body:not(.is-loaded) #router-outlet {
+  opacity: 0;
+}
+
+body.is-loaded #router-outlet {
+  opacity: 1;
+}
+
+#router-outlet {
+  transition:
+    opacity   140ms var(--ease-out),
+    transform 140ms var(--ease-out),
+    filter    140ms var(--ease-out);
+  transform-origin: center top;
+  filter: blur(0);
+}
+
+body.is-loaded #router-outlet.is-transitioning {
+  transition-timing-function: var(--ease-in-out);
+  opacity: 0;
+  transform: scale(0.992) translateY(2px);
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.footer {
+  transition:
+    opacity 140ms var(--ease-out),
+    filter  140ms var(--ease-out);
+  filter: blur(0);
+}
+
+.footer.is-transitioning {
+  transition-timing-function: var(--ease-in-out);
+  opacity: 0;
+  filter: blur(2px);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: opacity, transform;
+  transition:
+    opacity  var(--duration-slower) var(--ease-out),
+    transform var(--duration-slower) var(--ease-out);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+
+  transform: none;
+  will-change: auto;
+}
+
+@media (scripting: none) {
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.hero__inner .hero__badge,
+.hero__inner .hero__title,
+.hero__inner .hero__subtitle,
+.hero__inner .hero__actions {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.hero__inner .hero__badge {
+  transform: translateY(10px) scale(0.97);
+  transition: opacity 380ms var(--ease-out), transform 380ms var(--ease-spring);
+}
+.hero__inner .hero__title {
+  transition: opacity 480ms var(--ease-out), transform 480ms var(--ease-out);
+}
+.hero__inner .hero__subtitle {
+  transition: opacity 460ms var(--ease-out), transform 460ms var(--ease-out);
+}
+.hero__inner .hero__actions {
+  transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out);
+}
+
+.hero.hero-ready .hero__badge    { opacity: 1; transform: none; transition-delay:   0ms; }
+.hero.hero-ready .hero__title    { opacity: 1; transform: none; transition-delay: 100ms; }
+.hero.hero-ready .hero__subtitle { opacity: 1; transform: none; transition-delay: 200ms; }
+.hero.hero-ready .hero__actions  { opacity: 1; transform: none; transition-delay: 300ms; }
+
+.stats__grid .stat:nth-child(1) { animation-delay:   0ms; }
+.stats__grid .stat:nth-child(2) { animation-delay:  60ms; }
+.stats__grid .stat:nth-child(3) { animation-delay: 120ms; }
+.stats__grid .stat:nth-child(4) { animation-delay: 180ms; }
+
+.header__nav-link {
+  position: relative;
+}
+
+.header__nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  right: 50%;
+  height: 2px;
+  background-color: var(--color-accent);
+  border-radius: var(--radius-full);
+  transition:
+    left  var(--duration-normal) var(--ease-out),
+    right var(--duration-normal) var(--ease-out);
+}
+
+.header__nav-link.is-active::after,
+.header__nav-link:hover::after {
+  left: var(--space-3);
+  right: var(--space-3);
+}
+
+.header__logo-mark {
+  transition: transform var(--duration-moderate) var(--ease-spring);
+}
+.header__logo:hover .header__logo-mark {
+  transform: rotate(20deg) scale(1.1);
+}
+
+.header__dropdown {
+  transform-origin: top center;
+}
+
+.mobile-nav.is-open .mobile-nav__item:nth-child(1) {
+  animation: fade-in-up 260ms var(--ease-out) both;
+  animation-delay:  90ms;
+}
+.mobile-nav.is-open .mobile-nav__item:nth-child(2) {
+  animation: fade-in-up 260ms var(--ease-out) both;
+  animation-delay: 150ms;
+}
+.mobile-nav.is-open .mobile-nav__item:nth-child(3) {
+  animation: fade-in-up 260ms var(--ease-out) both;
+  animation-delay: 210ms;
+}
+.mobile-nav.is-open .mobile-nav__item:nth-child(4) {
+  animation: fade-in-up 260ms var(--ease-out) both;
+  animation-delay: 270ms;
+}
+
+.pattern-card {
+  position: relative;
+}
+
+.pattern-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-in-out);
+  pointer-events: none;
+}
+
+.pattern-card:hover::after { opacity: 1; }
+
+[data-filter-item].filter-entering {
+  animation: filter-in var(--duration-moderate) var(--ease-out) both;
+}
+
+.code-block:focus-within .code-block__header {
+  background-color: rgba(255, 255, 255, 0.07);
+  transition: background-color var(--duration-fast) var(--ease-in-out);
+}
+
+.search-page .search-page__header {
+  animation: fade-in-up 300ms var(--ease-out) both;
+  animation-delay: 40ms;
+}
+
+.breadcrumb {
+  animation: fade-in-down var(--duration-moderate) var(--ease-out) both;
+  animation-delay: 20ms;
+}
+
+.pattern-detail__header {
+  animation: fade-in-up 350ms var(--ease-out) both;
+  animation-delay: 60ms;
+}
+
+.error-page__code    { animation: fade-in-scale 600ms var(--ease-spring) both; animation-delay:  50ms; }
+.error-page__title   { animation: fade-in-up    400ms var(--ease-out)    both; animation-delay: 200ms; }
+.error-page__desc    { animation: fade-in-up    400ms var(--ease-out)    both; animation-delay: 300ms; }
+.error-page__actions { animation: fade-in-up    400ms var(--ease-out)    both; animation-delay: 400ms; }
+
+.coming-soon-page { animation: fade-in-up 400ms var(--ease-out) both; animation-delay: 80ms; }
+
+.catalog-page__header { animation: fade-in-up 360ms var(--ease-out) both; animation-delay: 40ms; }
+
+.about-page__hero { animation: fade-in-up 380ms var(--ease-out) both; animation-delay: 40ms; }
+
+.page-loading {
+  animation: fade-in var(--duration-moderate) var(--ease-out) both;
+}
+
+:focus-visible {
+  transition: outline-offset var(--duration-fast) var(--ease-out) !important;
+}
+
+.btn:active:not(:disabled):not(.btn--loading) {
+  transform: scale(0.97);
+  transition-duration: 60ms;
+}
+
+[data-theme-transitioning],
+[data-theme-transitioning] *,
+[data-theme-transitioning] *::before,
+[data-theme-transitioning] *::after {
+  transition:
+    background-color 320ms var(--ease-in-out),
+    color            320ms var(--ease-in-out),
+    border-color     320ms var(--ease-in-out),
+    box-shadow       320ms var(--ease-in-out) !important;
+}
+
+[data-lang-transitioning] #router-outlet {
+  opacity: 0.75;
+  transition: opacity 180ms var(--ease-in-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+
+  #router-outlet,
+  #router-outlet.is-transitioning,
+  .footer,
+  .footer.is-transitioning {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+
+  .hero__inner .hero__badge,
+  .hero__inner .hero__title,
+  .hero__inner .hero__subtitle,
+  .hero__inner .hero__actions,
+  .hero.hero-ready .hero__badge,
+  .hero.hero-ready .hero__title,
+  .hero.hero-ready .hero__subtitle,
+  .hero.hero-ready .hero__actions {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    transition-delay: 0ms !important;
+  }
+
+  .mobile-nav__item,
+  .mobile-nav.is-open .mobile-nav__item,
+  .hero::before,
+  .hero::after {
+    animation: none !important;
+  }
+
+  [data-filter-item].filter-entering,
+  .pattern-card::after,
+  .breadcrumb,
+  .pattern-detail__header,
+  .catalog-page__header,
+  .about-page__hero,
+  .coming-soon-page,
+  .search-page .search-page__header,
+  .error-page__code,
+  .error-page__title,
+  .error-page__desc,
+  .error-page__actions,
+  .page-loading {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .header__nav-link::after,
+  .header__logo-mark {
+    transition: none !important;
+  }
+}

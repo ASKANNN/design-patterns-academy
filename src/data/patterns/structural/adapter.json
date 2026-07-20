@@ -1,0 +1,213 @@
+{
+  "slug": "adapter",
+  "name": "Adapter",
+  "category": "structural",
+  "complexity": 1,
+  "popularity": 3,
+  "also_known_as": [
+    "Wrapper"
+  ],
+  "tags": [
+    "structural",
+    "wrapper",
+    "compatibility",
+    "interface"
+  ],
+  "intent": {
+    "en": "Adapter is a structural pattern that wraps an object with a mismatched interface behind a translator, letting client code call it as if it spoke the expected language all along.",
+    "ru": "Адаптер — структурный паттерн, оборачивающий объект с неподходящим интерфейсом в переходник-транслятор, позволяя клиентскому коду вызывать его так, будто он изначально говорил на нужном «языке»."
+  },
+  "problem": {
+    "en": "A payment module in your checkout flow was built around a `charge(amountCents, cardToken)` method, and every screen in the app calls it that way. Now the business wants to add a new payment provider whose SDK only exposes `submitTransaction({ total, currency, source })`.\n\nYou can't rename the SDK's method — it's someone else's package, updated independently. Rewriting your entire checkout flow to match the new SDK's shape would touch dozens of call sites for the sake of one provider. And the next provider you integrate will likely have yet another shape, repeating the problem.",
+    "ru": "Модуль оплаты в вашем чекауте построен вокруг метода `charge(amountCents, cardToken)`, и все экраны приложения вызывают его именно так. Теперь бизнес просит подключить нового платёжного провайдера, чей SDK предоставляет только `submitTransaction({ total, currency, source })`.\n\nПереименовать метод в чужом SDK нельзя — он обновляется отдельно от вашего кода. Переписывать весь чекаут под форму нового SDK ради одного провайдера означало бы правку десятков мест вызова. А следующий провайдер почти наверняка предложит третью, непохожую сигнатуру — и проблема повторится."
+  },
+  "solution": {
+    "en": "Introduce a thin wrapper class that implements the interface your code already expects, and internally translates each call into whatever the external object actually needs. The wrapper receives calls in the familiar shape, reformats the arguments, invokes the wrapped object, and reshapes the result back if needed.\n\nNeither side has to change: the caller keeps using the interface it always used, and the wrapped object keeps its own interface untouched. All the translation logic — renaming fields, converting units, reordering parameters — lives in one isolated place instead of being smeared across the codebase.",
+    "ru": "Введите тонкий класс-обёртку, реализующий интерфейс, который уже ожидает ваш код, и внутри переводящий каждый вызов в форму, понятную внешнему объекту. Обёртка принимает вызовы в привычном виде, переформатирует аргументы, вызывает оборачиваемый объект и при необходимости преобразует результат обратно.\n\nНи одна из сторон не меняется: вызывающий код продолжает использовать привычный интерфейс, а оборачиваемый объект сохраняет собственный интерфейс нетронутым. Вся логика перевода — переименование полей, конвертация единиц, изменение порядка параметров — сосредоточена в одном изолированном месте, а не размазана по всей кодовой базе."
+  },
+  "structure": {
+    "description": {
+      "en": "Client code is written against the Target interface only. The Adapter class implements Target, but instead of doing the work itself, it holds an Adaptee instance and translates every incoming call into the shape Adaptee actually understands.",
+      "ru": "Клиентский код написан только под интерфейс Target. Класс Adapter реализует Target, но вместо выполнения работы самостоятельно хранит экземпляр Adaptee и переводит каждый входящий вызов в форму, понятную Adaptee."
+    },
+    "participants": [
+      {
+        "name": "Client",
+        "role": {
+          "en": "Drives the application logic and calls objects strictly through the Target interface, unaware of any adapting happening behind it.",
+          "ru": "Управляет логикой приложения и вызывает объекты строго через интерфейс Target, не подозревая о происходящем за ним преобразовании."
+        }
+      },
+      {
+        "name": "Target",
+        "role": {
+          "en": "The interface the Client already relies on — the contract that any object handed to the Client must satisfy.",
+          "ru": "Интерфейс, на который уже полагается клиент, — контракт, которому должен соответствовать любой передаваемый ему объект."
+        }
+      },
+      {
+        "name": "Adaptee",
+        "role": {
+          "en": "The existing class with the useful behavior — often a third-party SDK or legacy module — whose method signatures don't match Target.",
+          "ru": "Существующий класс с нужным поведением — часто сторонний SDK или унаследованный модуль, — чьи сигнатуры методов не совпадают с Target."
+        }
+      },
+      {
+        "name": "Adapter",
+        "role": {
+          "en": "Sits between the two: implements Target so the Client can call it normally, and internally reformats each call before forwarding it to the wrapped Adaptee.",
+          "ru": "Находится между двумя сторонами: реализует Target, чтобы клиент мог вызывать его как обычно, и внутренне переформатирует каждый вызов перед передачей его обёрнутому Adaptee."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Target interface expected by the client\nclass Target {\n  request() {\n    return 'Target: default behavior';\n  }\n}\n\n// Adaptee has an incompatible interface\nclass Adaptee {\n  specificRequest() {\n    return '.eetpadA eht fo roivaheb laicepS';\n  }\n}\n\n// Adapter makes Adaptee compatible with the Target interface\nclass Adapter extends Target {\n  #adaptee;\n\n  constructor(adaptee) {\n    super();\n    this.#adaptee = adaptee;\n  }\n\n  request() {\n    const reversed = this.#adaptee.specificRequest().split('').reverse().join('');\n    return `Adapter: (TRANSLATED) ${reversed}`;\n  }\n}\n\n// Client code works with any Target-compatible object\nfunction clientCode(target) {\n  console.log(target.request());\n}\n\nconst target = new Target();\nclientCode(target);\n// Target: default behavior\n\nconst adaptee = new Adaptee();\nconst adapter = new Adapter(adaptee);\nclientCode(adapter);\n// Adapter: (TRANSLATED) Special behavior of the Adaptee.",
+    "typescript": "interface Target {\n  request(): string;\n}\n\nclass Adaptee {\n  public specificRequest(): string {\n    return '.eetpadA eht fo roivaheb laicepS';\n  }\n}\n\nclass Adapter implements Target {\n  private adaptee: Adaptee;\n\n  constructor(adaptee: Adaptee) {\n    this.adaptee = adaptee;\n  }\n\n  public request(): string {\n    const reversed = this.adaptee.specificRequest().split('').reverse().join('');\n    return `Adapter: (TRANSLATED) ${reversed}`;\n  }\n}\n\nfunction clientCode(target: Target): void {\n  console.log(target.request());\n}\n\nconst adaptee = new Adaptee();\nconst adapter = new Adapter(adaptee);\nclientCode(adapter);\n// Adapter: (TRANSLATED) Special behavior of the Adaptee.",
+    "java": "// Target interface expected by the client\ninterface Target { String request(); }\n\n// Adaptee has an incompatible interface\nclass Adaptee {\n    public String specificRequest() { return \".eetpadA eht fo roivaheb laicepS\"; }\n}\n\n// Adapter makes Adaptee compatible with Target\nclass Adapter implements Target {\n    private final Adaptee adaptee;\n    Adapter(Adaptee adaptee) { this.adaptee = adaptee; }\n\n    public String request() {\n        String reversed = new StringBuilder(adaptee.specificRequest()).reverse().toString();\n        return \"Adapter: (TRANSLATED) \" + reversed;\n    }\n}\n\n// Client code works with any Target-compatible object\nstatic void clientCode(Target target) { System.out.println(target.request()); }\n\nclientCode(new Adapter(new Adaptee()));\n// Adapter: (TRANSLATED) Special behavior of the Adaptee.",
+    "csharp": "// Target interface expected by the client\ninterface ITarget { string Request(); }\n\n// Adaptee has an incompatible interface\nclass Adaptee\n{\n    public string SpecificRequest() => \".eetpadA eht fo roivaheb laicepS\";\n}\n\n// Adapter makes Adaptee compatible with ITarget\nclass Adapter : ITarget\n{\n    private readonly Adaptee _adaptee;\n    public Adapter(Adaptee adaptee) => _adaptee = adaptee;\n\n    public string Request()\n    {\n        string reversed = new string(_adaptee.SpecificRequest().Reverse().ToArray());\n        return $\"Adapter: (TRANSLATED) {reversed}\";\n    }\n}\n\n// Client code works with any ITarget-compatible object\nstatic void ClientCode(ITarget target) => Console.WriteLine(target.Request());\n\nClientCode(new Adapter(new Adaptee()));\n// Adapter: (TRANSLATED) Special behavior of the Adaptee.",
+    "python": "class Target:\n    def request(self) -> str:\n        return \"Target: default behavior\"\n\n\nclass Adaptee:\n    def specific_request(self) -> str:\n        return \".eetpadA eht fo roivaheb laicepS\"\n\n\nclass Adapter(Target):\n    def __init__(self, adaptee: Adaptee) -> None:\n        self._adaptee = adaptee\n\n    def request(self) -> str:\n        reversed_str = self._adaptee.specific_request()[::-1]\n        return f\"Adapter: (TRANSLATED) {reversed_str}\"\n\n\ndef client_code(target: Target) -> None:\n    print(target.request())\n\n\ntarget = Target()\nclient_code(target)\n# Target: default behavior\n\nadaptee = Adaptee()\nadapter = Adapter(adaptee)\nclient_code(adapter)\n# Adapter: (TRANSLATED) Special behavior of the Adaptee."
+  },
+  "pros": [
+    {
+      "en": "Keeps translation logic out of your business code — each adapter is a small, focused unit that only knows how to speak to one external interface.",
+      "ru": "Держит логику преобразования вне бизнес-кода — каждый адаптер представляет собой небольшой, сфокусированный модуль, умеющий работать только с одним внешним интерфейсом."
+    },
+    {
+      "en": "New external systems get their own adapter without touching the Client or any adapter already in production.",
+      "ru": "Для новых внешних систем достаточно завести отдельный адаптер, не трогая клиента или уже работающие адаптеры."
+    },
+    {
+      "en": "Lets you plug in third-party or legacy code you can't modify, without contaminating your codebase with its quirks.",
+      "ru": "Позволяет подключать сторонний или унаследованный код, который нельзя изменить, не засоряя свою кодовую базу его особенностями."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Adds an extra class and an extra hop for every adaptation — for a one-off integration, editing the original class (if you can) may be simpler.",
+      "ru": "Добавляет лишний класс и лишний шаг вызова на каждое преобразование — для разовой интеграции проще (если возможно) просто изменить исходный класс."
+    },
+    {
+      "en": "Stacking several adapters on top of one another obscures where a value actually gets transformed, complicating debugging.",
+      "ru": "Наложение нескольких адаптеров друг на друга скрывает место, где значение фактически преобразуется, усложняя отладку."
+    },
+    {
+      "en": "An adapter can only translate what the underlying interface exposes — it can't invent capabilities the Adaptee doesn't have.",
+      "ru": "Адаптер может транслировать только то, что предоставляет базовый интерфейс, — он не способен добавить возможности, которых у Adaptee нет."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "You need an existing class to work with your code, but its method names, argument order, or data format don't line up with what your code expects.",
+      "ru": "Нужно, чтобы существующий класс заработал с вашим кодом, но названия методов, порядок аргументов или формат данных не совпадают с ожидаемыми."
+    },
+    {
+      "en": "You're integrating a third-party SDK or legacy module you cannot edit, and don't want its interface leaking into the rest of the application.",
+      "ru": "Вы подключаете сторонний SDK или унаследованный модуль, который нельзя редактировать, и не хотите, чтобы его интерфейс проникал в остальную часть приложения."
+    },
+    {
+      "en": "Several related classes provide similar functionality through slightly different interfaces, and you want to unify them under one shape.",
+      "ru": "Несколько похожих классов предоставляют схожую функциональность через немного разные интерфейсы, и их нужно привести к единой форме."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Travel power plug adapters** — let a device built for one country's socket shape connect to a different country's outlet without altering the device.",
+      "ru": "**Дорожные переходники для розеток** — позволяют устройству, рассчитанному на вилку одной страны, подключиться к розетке другой страны без изменения самого устройства."
+    },
+    {
+      "en": "**Java's `Arrays.asList()`** — wraps a plain array so it can be handed to any code expecting the `List` interface, without copying the underlying data.",
+      "ru": "**`Arrays.asList()` в Java** — оборачивает обычный массив, позволяя передать его в код, ожидающий интерфейс `List`, без копирования исходных данных."
+    },
+    {
+      "en": "**Payment gateway SDK wrappers** — normalize Stripe's, PayPal's, and Adyen's differently-shaped charge APIs behind one internal `PaymentProvider` interface.",
+      "ru": "**Обёртки над SDK платёжных шлюзов** — приводят разные по форме API оплаты Stripe, PayPal и Adyen к единому внутреннему интерфейсу `PaymentProvider`."
+    }
+  ],
+  "related_patterns": [
+    "facade",
+    "decorator",
+    "bridge",
+    "proxy"
+  ],
+  "visuals": [
+    {
+      "id": "adapter-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "structural",
+      "width": 960,
+      "height": 440,
+      "title": {
+        "en": "How Adapter works",
+        "ru": "Как работает Адаптер"
+      },
+      "description": {
+        "en": "The Client sends a request to the Adapter. The Adapter receives data from the Legacy Service with an incompatible interface, converts it, and forwards a compatible request to the Modern Service. The response returns to the Client through the Adapter.",
+        "ru": "Клиент отправляет запрос Адаптеру. Адаптер получает данные от Устаревшего сервиса с несовместимым интерфейсом, преобразует их и передаёт совместимый запрос Современному сервису. Ответ возвращается Клиенту через Адаптер."
+      },
+      "caption": {
+        "en": "The Adapter converts an incompatible interface so two services can collaborate.",
+        "ru": "Адаптер преобразует несовместимый интерфейс, чтобы два сервиса могли работать вместе."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиент" },
+          "subtitle": { "en": "sends request", "ru": "отправляет запрос" },
+          "position": { "x": 40, "y": 174, "w": 180, "h": 92 }
+        },
+        {
+          "id": "legacy",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Legacy Service", "ru": "Устаревший сервис" },
+          "subtitle": { "en": "incompatible API", "ru": "несовместимый API" },
+          "position": { "x": 720, "y": 36, "w": 190, "h": 92 }
+        },
+        {
+          "id": "adapter",
+          "kind": "class",
+          "icon": "layers",
+          "emphasis": true,
+          "label": { "en": "Adapter", "ru": "Адаптер" },
+          "subtitle": { "en": "converts interface", "ru": "преобразует интерфейс" },
+          "position": { "x": 340, "y": 148, "w": 220, "h": 148 }
+        },
+        {
+          "id": "modern",
+          "kind": "class",
+          "icon": "spark",
+          "label": { "en": "Modern Service", "ru": "Современный сервис" },
+          "subtitle": { "en": "compatible API", "ru": "совместимый API" },
+          "position": { "x": 720, "y": 312, "w": 190, "h": 92 }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "adapter",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "① request", "ru": "① запрос" }
+        },
+        {
+          "source": "adapter",
+          "target": "legacy",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "② legacy call", "ru": "② вызов legacy" }
+        },
+        {
+          "source": "adapter",
+          "target": "modern",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "③ adapted call", "ru": "③ адаптированный вызов" }
+        }
+      ]
+    }
+  ]
+}

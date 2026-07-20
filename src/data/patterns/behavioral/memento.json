@@ -1,0 +1,123 @@
+{
+  "slug": "memento",
+  "name": "Memento",
+  "category": "behavioral",
+  "complexity": 2,
+  "popularity": 1,
+  "also_known_as": [
+    "Snapshot",
+    "Token"
+  ],
+  "tags": [
+    "behavioral",
+    "undo",
+    "snapshot",
+    "state"
+  ],
+  "intent": {
+    "en": "Memento is a behavioral pattern that captures an object's internal state into a separate snapshot object, so that state can later be restored without any outside code ever seeing what the snapshot contains.",
+    "ru": "Снимок — это поведенческий паттерн, который фиксирует внутреннее состояние объекта в отдельном объекте-снимке, чтобы позже восстановить это состояние, не раскрывая посторонним, что именно снимок хранит."
+  },
+  "problem": {
+    "en": "A vector-graphics app needs undo: before every move, resize, or color change, it should remember how the shape looked a moment ago. The obvious approach is to have the undo manager reach into the shape and copy out its fields.\n\nThat forces the shape to expose everything an outside snapshot-taker might ever need — position, dimensions, fill, stroke, z-order — as public fields or getters. The shape's internals are now part of its public contract, so refactoring its internal representation later means also rewriting the undo manager. And every new property added to the shape has to be remembered by whoever is copying it from outside.",
+    "ru": "Векторному редактору нужна отмена действий: перед каждым перемещением, изменением размера или цвета он должен запомнить, как фигура выглядела мгновение назад. Напрашивающийся вариант — дать менеджеру отмены залезть внутрь фигуры и скопировать её поля.\n\nЭто вынуждает фигуру раскрыть всё, что может понадобиться внешнему коду для снимка, — позицию, размеры, заливку, обводку, порядок отрисовки — в виде публичных полей или геттеров. Внутреннее устройство фигуры становится частью её публичного контракта, поэтому изменение внутреннего представления позже потребует переписывать и менеджер отмены. А каждое новое свойство фигуры придётся не забыть учесть тому, кто копирует её состояние снаружи."
+  },
+  "solution": {
+    "en": "Memento moves the job of taking a snapshot inside the object that owns the state — the **originator**. Since the originator already has full access to its own fields, it can package a private copy of them into a **memento** object and hand that memento back to whoever asked for it.\n\nThe memento itself is opaque to everyone except the originator that created it: outside code can hold onto it, store it, or pass it back later to be restored, but it can't peek inside or modify what it holds. The object responsible for keeping a history of these mementos — the **caretaker** — never needs to know what a shape's position or fill color actually is; it just archives snapshots and returns them on request.",
+    "ru": "Паттерн Снимок переносит создание снимка внутрь объекта, владеющего состоянием, — объекта-**создателя** (originator). Поскольку у создателя уже есть полный доступ к собственным полям, он может упаковать их приватную копию в объект-**снимок** (memento) и вернуть его тому, кто запросил.\n\nСам снимок непрозрачен для всех, кроме создавшего его создателя: внешний код может хранить снимок, передавать его дальше и позже вернуть для восстановления, но не может заглянуть внутрь или изменить содержимое. Объект, отвечающий за хранение истории таких снимков, — **опекун** (caretaker) — вообще не должен знать, чему равна позиция фигуры или цвет заливки; он просто архивирует снимки и возвращает их по запросу."
+  },
+  "structure": {
+    "description": {
+      "en": "The Originator is the only party that can read or write the full contents of a Memento — it builds one from its current fields and can later reset itself from one. The Caretaker holds a collection of mementos (say, an undo stack) purely as opaque handles, requesting a save or a restore from the originator without ever touching the state inside.",
+      "ru": "Создатель — единственная сторона, способная читать и записывать полное содержимое снимка: он формирует снимок из текущих полей и позже может сбросить своё состояние по снимку. Опекун хранит коллекцию снимков (например, стек отмены) как непрозрачные дескрипторы, запрашивая у создателя сохранение или восстановление, но никогда не трогая состояние внутри."
+    },
+    "participants": [
+      {
+        "name": "Originator",
+        "role": {
+          "en": "Owns the actual state. Builds a memento from its current fields on request, and can reset itself from a memento it's handed back.",
+          "ru": "Владеет реальным состоянием. По запросу формирует снимок из текущих полей и может сбросить своё состояние по переданному ему снимку."
+        }
+      },
+      {
+        "name": "Memento",
+        "role": {
+          "en": "A sealed container for one copy of the originator's state. Its contents are readable only by the originator class that produced it.",
+          "ru": "Закрытый контейнер для одной копии состояния создателя. Его содержимое читаемо только классом создателя, который его сформировал."
+        }
+      },
+      {
+        "name": "Caretaker",
+        "role": {
+          "en": "Manages a collection of mementos over time — for example, a linear undo stack — without ever inspecting or altering what any single memento contains.",
+          "ru": "Управляет коллекцией снимков во времени — например, линейным стеком отмены, — никогда не заглядывая внутрь отдельного снимка и не изменяя его."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Memento — an opaque snapshot of the editor's state\nclass EditorMemento {\n  #content;\n  #cursor;\n\n  constructor(content, cursor) {\n    this.#content = content;\n    this.#cursor = cursor;\n  }\n\n  // Only the originator uses these accessors\n  getContent() { return this.#content; }\n  getCursor()  { return this.#cursor; }\n}\n\n// Originator\nclass Editor {\n  #content = '';\n  #cursor = 0;\n\n  type(text) {\n    this.#content += text;\n    this.#cursor = this.#content.length;\n  }\n\n  getContent() { return this.#content; }\n\n  save() {\n    return new EditorMemento(this.#content, this.#cursor);\n  }\n\n  restore(memento) {\n    this.#content = memento.getContent();\n    this.#cursor = memento.getCursor();\n  }\n}\n\n// Caretaker — keeps the undo history\nclass History {\n  #mementos = [];\n\n  push(memento) { this.#mementos.push(memento); }\n  pop()         { return this.#mementos.pop(); }\n}\n\n// Usage\nconst editor = new Editor();\nconst history = new History();\n\neditor.type('Hello');\nhistory.push(editor.save());\n\neditor.type(', world');\nconsole.log(editor.getContent()); // Hello, world\n\neditor.restore(history.pop());\nconsole.log(editor.getContent()); // Hello",
+    "typescript": "// Memento — an opaque snapshot of the editor's state\nclass EditorMemento {\n  constructor(\n    private readonly content: string,\n    private readonly cursor: number,\n  ) {}\n\n  getContent(): string { return this.content; }\n  getCursor(): number  { return this.cursor; }\n}\n\n// Originator\nclass Editor {\n  private content = '';\n  private cursor = 0;\n\n  type(text: string): void {\n    this.content += text;\n    this.cursor = this.content.length;\n  }\n\n  getContent(): string { return this.content; }\n\n  save(): EditorMemento {\n    return new EditorMemento(this.content, this.cursor);\n  }\n\n  restore(memento: EditorMemento): void {\n    this.content = memento.getContent();\n    this.cursor = memento.getCursor();\n  }\n}\n\n// Caretaker — keeps the undo history\nclass History {\n  private mementos: EditorMemento[] = [];\n\n  push(memento: EditorMemento): void { this.mementos.push(memento); }\n  pop(): EditorMemento | undefined   { return this.mementos.pop(); }\n}\n\n// Usage\nconst editor = new Editor();\nconst history = new History();\n\neditor.type('Hello');\nhistory.push(editor.save());\n\neditor.type(', world');\nconsole.log(editor.getContent()); // Hello, world\n\nconst snapshot = history.pop();\nif (snapshot) editor.restore(snapshot);\nconsole.log(editor.getContent()); // Hello",
+    "java": "import java.util.ArrayDeque;\nimport java.util.Deque;\n\n// Memento — immutable snapshot of the editor's state\nfinal class EditorMemento {\n    private final String content;\n    private final int cursor;\n\n    EditorMemento(String content, int cursor) {\n        this.content = content; this.cursor = cursor;\n    }\n\n    String getContent() { return content; }\n    int    getCursor()  { return cursor; }\n}\n\n// Originator\nclass Editor {\n    private String content = \"\";\n    private int    cursor  = 0;\n\n    public void type(String text) { content += text; cursor = content.length(); }\n    public String getContent()    { return content; }\n\n    public EditorMemento save() { return new EditorMemento(content, cursor); }\n\n    public void restore(EditorMemento m) { content = m.getContent(); cursor = m.getCursor(); }\n}\n\n// Caretaker — keeps the undo history\nclass History {\n    private final Deque<EditorMemento> stack = new ArrayDeque<>();\n    public void push(EditorMemento m) { stack.push(m); }\n    public EditorMemento pop()        { return stack.isEmpty() ? null : stack.pop(); }\n}\n\n// Usage\nEditor editor  = new Editor();\nHistory history = new History();\n\neditor.type(\"Hello\");\nhistory.push(editor.save());\n\neditor.type(\", world\");\nSystem.out.println(editor.getContent()); // Hello, world\n\nEditorMemento snapshot = history.pop();\nif (snapshot != null) editor.restore(snapshot);\nSystem.out.println(editor.getContent()); // Hello",
+    "csharp": "// Memento — immutable snapshot (C# record provides value equality and immutability)\nsealed record EditorMemento(string Content, int Cursor);\n\n// Originator\nclass Editor\n{\n    private string _content = \"\";\n    private int    _cursor  = 0;\n\n    public void Type(string text) { _content += text; _cursor = _content.Length; }\n    public string GetContent() => _content;\n\n    public EditorMemento Save() => new(_content, _cursor);\n\n    public void Restore(EditorMemento m) { _content = m.Content; _cursor = m.Cursor; }\n}\n\n// Caretaker — keeps the undo history\nclass History\n{\n    private readonly Stack<EditorMemento> _stack = new();\n    public void Push(EditorMemento m) => _stack.Push(m);\n    public EditorMemento? Pop()       => _stack.Count > 0 ? _stack.Pop() : null;\n}\n\n// Usage\nvar editor  = new Editor();\nvar history = new History();\n\neditor.Type(\"Hello\");\nhistory.Push(editor.Save());\n\neditor.Type(\", world\");\nConsole.WriteLine(editor.GetContent()); // Hello, world\n\nvar snapshot = history.Pop();\nif (snapshot is not null) editor.Restore(snapshot);\nConsole.WriteLine(editor.GetContent()); // Hello",
+    "python": "from __future__ import annotations\nfrom dataclasses import dataclass\n\n\n# Memento — an immutable snapshot of the editor's state\n@dataclass(frozen=True)\nclass EditorMemento:\n    content: str\n    cursor: int\n\n\n# Originator\nclass Editor:\n    def __init__(self) -> None:\n        self._content = ''\n        self._cursor = 0\n\n    def type(self, text: str) -> None:\n        self._content += text\n        self._cursor = len(self._content)\n\n    def get_content(self) -> str:\n        return self._content\n\n    def save(self) -> EditorMemento:\n        return EditorMemento(self._content, self._cursor)\n\n    def restore(self, memento: EditorMemento) -> None:\n        self._content = memento.content\n        self._cursor = memento.cursor\n\n\n# Caretaker — keeps the undo history\nclass History:\n    def __init__(self) -> None:\n        self._mementos: list[EditorMemento] = []\n\n    def push(self, memento: EditorMemento) -> None:\n        self._mementos.append(memento)\n\n    def pop(self) -> EditorMemento | None:\n        return self._mementos.pop() if self._mementos else None\n\n\n# Usage\neditor = Editor()\nhistory = History()\n\neditor.type('Hello')\nhistory.push(editor.save())\n\neditor.type(', world')\nprint(editor.get_content())  # Hello, world\n\nsnapshot = history.pop()\nif snapshot:\n    editor.restore(snapshot)\nprint(editor.get_content())  # Hello"
+  },
+  "pros": [
+    {
+      "en": "The originator's internal layout stays private — no field, getter, or setter needs to be exposed just so external code can take a snapshot.",
+      "ru": "Внутреннее устройство создателя остаётся приватным — не нужно открывать ни поля, ни геттеры, ни сеттеры только ради того, чтобы внешний код мог сделать снимок."
+    },
+    {
+      "en": "History bookkeeping (how many snapshots to keep, when to discard old ones) is entirely the caretaker's job, keeping that logic out of the originator.",
+      "ru": "Учёт истории (сколько снимков хранить, когда удалять старые) полностью ложится на опекуна, оставляя эту логику вне создателя."
+    },
+    {
+      "en": "Because a memento is just a value carrying a copy of state, it's easy to serialize, log, or send across a network for later replay.",
+      "ru": "Поскольку снимок — это просто значение с копией состояния, его легко сериализовать, логировать или отправлять по сети для последующего воспроизведения."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Keeping a long history of full snapshots can burn through memory fast, especially if the originator's state is large.",
+      "ru": "Хранение длинной истории полных снимков может быстро съедать память, особенно если состояние создателя велико."
+    },
+    {
+      "en": "The caretaker has to actively prune snapshots it no longer needs, or the history grows without bound as the originator keeps changing.",
+      "ru": "Опекун должен активно удалять ненужные снимки, иначе история будет расти без ограничений по мере изменения создателя."
+    },
+    {
+      "en": "In languages without real private fields, nothing stops other code from reaching into a memento and mutating it despite the intended encapsulation.",
+      "ru": "В языках без настоящих приватных полей ничто не мешает постороннему коду залезть в снимок и изменить его, несмотря на задуманную инкапсуляцию."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Memento when you need to capture and later restore an object's state — undo stacks, rollback points, checkpoints.",
+      "ru": "Применяйте Снимок, когда нужно фиксировать и позже восстанавливать состояние объекта — стеки отмены, точки отката, контрольные точки."
+    },
+    {
+      "en": "Use it when the only way to grab that state from outside the object would mean exposing fields that should stay implementation detail.",
+      "ru": "Используйте его, когда единственный способ получить это состояние снаружи объекта означал бы раскрытие полей, которые должны оставаться деталями реализации."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Ctrl+Z in editors** — word processors and design tools like Figma snapshot the document before each edit so changes can be stepped back through.",
+      "ru": "**Ctrl+Z в редакторах** — текстовые процессоры и инструменты вроде Figma делают снимок документа перед каждым изменением, чтобы можно было шагать по истории назад."
+    },
+    {
+      "en": "**SQL SAVEPOINT** — a database transaction marks a savepoint it can roll back to without discarding the whole transaction.",
+      "ru": "**SQL SAVEPOINT** — транзакция базы данных отмечает точку сохранения, к которой можно откатиться, не отменяя всю транзакцию целиком."
+    },
+    {
+      "en": "**Git stash** — Git packs away the working tree's current state as an opaque commit-like object you can reapply later.",
+      "ru": "**Git stash** — Git упаковывает текущее состояние рабочего дерева в непрозрачный объект наподобие коммита, который можно применить позже."
+    }
+  ],
+  "related_patterns": [
+    "command",
+    "iterator",
+    "prototype",
+    "state"
+  ]
+}

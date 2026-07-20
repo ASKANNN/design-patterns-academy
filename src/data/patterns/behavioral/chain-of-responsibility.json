@@ -1,0 +1,247 @@
+{
+  "slug": "chain-of-responsibility",
+  "name": "Chain of Responsibility",
+  "category": "behavioral",
+  "complexity": 2,
+  "popularity": 2,
+  "also_known_as": [
+    "CoR",
+    "Chain of Command"
+  ],
+  "tags": [
+    "behavioral",
+    "chain",
+    "handler",
+    "pipeline"
+  ],
+  "intent": {
+    "en": "Chain of Responsibility is a behavioral pattern that routes a request through a series of independent handlers, each free to process the request itself or hand it off to the next one in line.",
+    "ru": "Цепочка обязанностей — это поведенческий паттерн, который пропускает запрос через последовательность независимых обработчиков, каждый из которых сам решает — обработать запрос или передать его дальше по цепочке."
+  },
+  "problem": {
+    "en": "Picture a support desk where every incoming ticket has to be routed based on its complexity: a bot answers FAQ-style questions, a first-line agent handles common account issues, and only hard technical cases reach an engineer.\n\nA straightforward implementation stuffs all the routing logic into one dispatcher function full of nested conditionals — one branch per tier. The moment someone wants to insert a new tier (say, a billing specialist between the agent and the engineer), they have to touch that same fragile function and re-verify every existing branch still works.\n\nWorse, the dispatcher ends up permanently coupled to every tier it routes to, even though each tier only cares about its own slice of the work.",
+    "ru": "Представьте службу поддержки, где каждое обращение нужно направлять в зависимости от сложности: бот отвечает на типовые вопросы из FAQ, оператор первой линии разбирает распространённые проблемы с аккаунтом, а до инженера доходят только сложные технические случаи.\n\nПрямолинейная реализация собирает всю маршрутизацию в одной функции-диспетчере с вложенными условиями — по ветке на каждый уровень. Стоит кому-то добавить новый уровень (скажем, специалиста по биллингу между оператором и инженером), как приходится лезть в эту же хрупкую функцию и заново проверять, что все существующие ветки по-прежнему работают.\n\nХуже того, диспетчер оказывается намертво привязан ко всем уровням, которые он маршрутизирует, хотя каждому уровню на самом деле важен лишь свой собственный участок работы."
+  },
+  "solution": {
+    "en": "Chain of Responsibility replaces the monolithic dispatcher with a sequence of small handler objects, each aware only of the next handler in line. When a request arrives at a handler, it inspects the request and either deals with it on the spot or forwards it unchanged to its successor.\n\nBecause every handler implements the same interface, the caller never needs to know which concrete handler will end up processing the request — it just hands the request to the first link and lets the chain sort itself out. New tiers are added by writing one more handler class and slotting it into the chain; nothing else in the system needs to change, and the chain itself can be assembled or rearranged at runtime.",
+    "ru": "Цепочка обязанностей заменяет монолитный диспетчер последовательностью небольших объектов-обработчиков, каждый из которых знает только о следующем обработчике в цепи. Получив запрос, обработчик проверяет его и либо решает задачу сам, либо без изменений передаёт запрос преемнику.\n\nПоскольку все обработчики реализуют один и тот же интерфейс, вызывающему коду не нужно знать, какой именно обработчик в итоге справится с запросом — он просто отдаёт запрос первому звену, а дальше цепочка сама разбирается. Новый уровень добавляется написанием ещё одного класса-обработчика и его встраиванием в цепь; остальной код менять не нужно, а саму цепочку можно собирать и перестраивать во время выполнения."
+  },
+  "structure": {
+    "description": {
+      "en": "A common Handler interface exposes the method every link must implement, plus a way to point at a successor. An optional base class factors out the bookkeeping — storing the successor reference and forwarding by default — so concrete handlers only need to write the logic specific to what they check. The client wires the handlers together into a chain and always starts by sending the request to the first one.",
+      "ru": "Общий интерфейс обработчика объявляет метод, который должно реализовать каждое звено, и способ указать на преемника. Необязательный базовый класс берёт на себя рутину — хранение ссылки на преемника и пересылку по умолчанию, — так что конкретным обработчикам остаётся написать только логику своей проверки. Клиент связывает обработчики в цепочку и всегда отправляет запрос первому звену."
+    },
+    "participants": [
+      {
+        "name": "Handler",
+        "role": {
+          "en": "Defines the contract every link in the chain must follow: a method to handle (or forward) a request, and usually a method to attach the next link.",
+          "ru": "Определяет контракт, которому должно следовать каждое звено цепи: метод обработки (или пересылки) запроса и, как правило, метод присоединения следующего звена."
+        }
+      },
+      {
+        "name": "BaseHandler",
+        "role": {
+          "en": "An optional convenience class that keeps the successor reference and default pass-through logic in one place, so concrete handlers don't repeat that plumbing.",
+          "ru": "Необязательный вспомогательный класс, который хранит ссылку на преемника и логику пересылки по умолчанию в одном месте, избавляя конкретные обработчики от дублирования этой рутины."
+        }
+      },
+      {
+        "name": "ConcreteHandler",
+        "role": {
+          "en": "Implements the actual check for one specific case. Either resolves the request itself or delegates to whatever comes next in the chain.",
+          "ru": "Реализует конкретную проверку для одного частного случая. Либо сам разрешает запрос, либо делегирует его следующему звену цепи."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Assembles the handlers into a chain (in whatever order the use case requires) and submits requests only to the first handler, never to the ones further down.",
+          "ru": "Собирает обработчики в цепочку (в порядке, который требует конкретная задача) и отправляет запросы только первому обработчику, никогда — тем, что дальше по цепи."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Base handler with default chaining\nclass Approver {\n  constructor(name, limit) {\n    this.name = name;\n    this.limit = limit;\n    this.next = null;\n  }\n\n  setNext(handler) {\n    this.next = handler;\n    return handler; // enables fluent chaining\n  }\n\n  approve(amount) {\n    if (amount <= this.limit) {\n      console.log(`${this.name} approved $${amount}`);\n    } else if (this.next) {\n      this.next.approve(amount);\n    } else {\n      console.log(`No one can approve $${amount}`);\n    }\n  }\n}\n\nclass TeamLead extends Approver { constructor() { super('Team Lead', 1000); } }\nclass Manager  extends Approver { constructor() { super('Manager', 10000); } }\nclass Director  extends Approver { constructor() { super('Director', 100000); } }\n\n// Usage\nconst lead = new TeamLead();\nconst manager = new Manager();\nconst director = new Director();\n\nlead.setNext(manager).setNext(director);\n\nlead.approve(800);     // Team Lead approved $800\nlead.approve(5000);    // Manager approved $5000\nlead.approve(90000);   // Director approved $90000\nlead.approve(500000);  // No one can approve $500000",
+    "typescript": "interface Handler {\n  setNext(handler: Handler): Handler;\n  approve(amount: number): void;\n}\n\nabstract class Approver implements Handler {\n  private next: Handler | null = null;\n\n  constructor(\n    protected readonly name: string,\n    protected readonly limit: number,\n  ) {}\n\n  setNext(handler: Handler): Handler {\n    this.next = handler;\n    return handler;\n  }\n\n  approve(amount: number): void {\n    if (amount <= this.limit) {\n      console.log(`${this.name} approved $${amount}`);\n    } else if (this.next) {\n      this.next.approve(amount);\n    } else {\n      console.log(`No one can approve $${amount}`);\n    }\n  }\n}\n\nclass TeamLead extends Approver { constructor() { super('Team Lead', 1_000); } }\nclass Manager  extends Approver { constructor() { super('Manager', 10_000); } }\nclass Director  extends Approver { constructor() { super('Director', 100_000); } }\n\n// Usage\nconst lead = new TeamLead();\nconst manager = new Manager();\nconst director = new Director();\n\nlead.setNext(manager).setNext(director);\n\nlead.approve(800);     // Team Lead approved $800\nlead.approve(5_000);   // Manager approved $5000\nlead.approve(90_000);  // Director approved $90000\nlead.approve(500_000); // No one can approve $500000",
+    "java": "abstract class Approver {\n    protected final String name;\n    protected final int limit;\n    private Approver next;\n\n    protected Approver(String name, int limit) {\n        this.name = name;\n        this.limit = limit;\n    }\n\n    public Approver setNext(Approver handler) {\n        this.next = handler;\n        return handler; // enables fluent chaining\n    }\n\n    public void approve(int amount) {\n        if (amount <= limit) {\n            System.out.printf(\"%s approved $%d%n\", name, amount);\n        } else if (next != null) {\n            next.approve(amount);\n        } else {\n            System.out.printf(\"No one can approve $%d%n\", amount);\n        }\n    }\n}\n\nclass TeamLead extends Approver { TeamLead() { super(\"Team Lead\",  1_000); } }\nclass Manager  extends Approver { Manager()  { super(\"Manager\",   10_000); } }\nclass Director extends Approver { Director() { super(\"Director\", 100_000); } }\n\n// Usage\nApprover lead     = new TeamLead();\nApprover manager  = new Manager();\nApprover director = new Director();\n\nlead.setNext(manager).setNext(director);\n\nlead.approve(800);     // Team Lead approved $800\nlead.approve(5_000);   // Manager approved $5000\nlead.approve(90_000);  // Director approved $90000\nlead.approve(500_000); // No one can approve $500000",
+    "csharp": "abstract class Approver\n{\n    protected readonly string Name;\n    protected readonly int    Limit;\n    private Approver _next;\n\n    protected Approver(string name, int limit) { Name = name; Limit = limit; }\n\n    public Approver SetNext(Approver handler) { _next = handler; return handler; }\n\n    public void Approve(int amount)\n    {\n        if (amount <= Limit)\n            Console.WriteLine($\"{Name} approved ${amount}\");\n        else if (_next != null)\n            _next.Approve(amount);\n        else\n            Console.WriteLine($\"No one can approve ${amount}\");\n    }\n}\n\nclass TeamLead : Approver { public TeamLead() : base(\"Team Lead\",   1_000) {} }\nclass Manager  : Approver { public Manager()  : base(\"Manager\",    10_000) {} }\nclass Director : Approver { public Director() : base(\"Director\",  100_000) {} }\n\n// Usage\nvar lead     = new TeamLead();\nvar manager  = new Manager();\nvar director = new Director();\n\nlead.SetNext(manager).SetNext(director);\n\nlead.Approve(800);     // Team Lead approved $800\nlead.Approve(5_000);   // Manager approved $5000\nlead.Approve(90_000);  // Director approved $90000\nlead.Approve(500_000); // No one can approve $500000",
+    "python": "from __future__ import annotations\nfrom abc import ABC\n\n\nclass Approver(ABC):\n    def __init__(self, name: str, limit: int) -> None:\n        self.name = name\n        self.limit = limit\n        self._next: Approver | None = None\n\n    def set_next(self, handler: Approver) -> Approver:\n        self._next = handler\n        return handler  # enables fluent chaining\n\n    def approve(self, amount: int) -> None:\n        if amount <= self.limit:\n            print(f'{self.name} approved ${amount}')\n        elif self._next:\n            self._next.approve(amount)\n        else:\n            print(f'No one can approve ${amount}')\n\n\nclass TeamLead(Approver):\n    def __init__(self) -> None:\n        super().__init__('Team Lead', 1_000)\n\n\nclass Manager(Approver):\n    def __init__(self) -> None:\n        super().__init__('Manager', 10_000)\n\n\nclass Director(Approver):\n    def __init__(self) -> None:\n        super().__init__('Director', 100_000)\n\n\n# Usage\nlead = TeamLead()\nmanager = Manager()\ndirector = Director()\n\nlead.set_next(manager).set_next(director)\n\nlead.approve(800)      # Team Lead approved $800\nlead.approve(5_000)    # Manager approved $5000\nlead.approve(90_000)   # Director approved $90000\nlead.approve(500_000)  # No one can approve $500000"
+  },
+  "pros": [
+    {
+      "en": "Callers stay ignorant of which handler ultimately does the work, so the code that issues a request and the code that fulfills it can evolve independently.",
+      "ru": "Вызывающий код не знает, какой именно обработчик в итоге выполнит работу, поэтому код, инициирующий запрос, и код, его выполняющий, развиваются независимо друг от друга."
+    },
+    {
+      "en": "New handling steps are added by writing a new class and splicing it into the chain — nothing that already works has to be edited.",
+      "ru": "Новый шаг обработки добавляется написанием нового класса и его встраиванием в цепочку — то, что уже работает, редактировать не нужно."
+    },
+    {
+      "en": "The order in which handlers get a chance to act is explicit and fully under your control, since it's just the order they're linked in.",
+      "ru": "Порядок, в котором обработчики получают шанс сработать, задан явно и полностью под вашим контролем — это просто порядок их связывания."
+    },
+    {
+      "en": "Chains can be assembled differently for different scenarios, or rebuilt on the fly, without touching the handler classes themselves.",
+      "ru": "Для разных сценариев цепочки можно собирать по-разному или перестраивать на лету, не трогая сами классы обработчиков."
+    }
+  ],
+  "cons": [
+    {
+      "en": "If every handler declines and nobody remembered to add a catch-all at the end, a request can silently fall off the chain unhandled.",
+      "ru": "Если все обработчики отказываются, а завершающий обработчик «по умолчанию» никто не добавил, запрос может незаметно выпасть из цепочки необработанным."
+    },
+    {
+      "en": "Tracing why a particular handler ended up processing (or not processing) a request means stepping through every link that came before it.",
+      "ru": "Чтобы понять, почему конкретный обработчик в итоге обработал (или не обработал) запрос, приходится проходить по всем предыдущим звеньям."
+    },
+    {
+      "en": "A very long chain adds a small but real overhead, since a request may pass through several handlers that ultimately do nothing with it.",
+      "ru": "Очень длинная цепочка добавляет небольшие, но реальные накладные расходы — запрос может пройти через несколько обработчиков, которые в итоге ничего с ним не делают."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for this pattern when a request might need one of several different treatments and you can't pin down in advance which handler, or how many, will actually run.",
+      "ru": "Применяйте паттерн, когда запрос может потребовать одну из нескольких разных обработок, и заранее нельзя определить, какой обработчик и сколько их сработает."
+    },
+    {
+      "en": "Use it when several independent steps must run against the same request in a specific, well-defined order.",
+      "ru": "Используйте его, когда несколько независимых шагов должны выполняться над одним запросом в чётко определённом порядке."
+    },
+    {
+      "en": "It fits well when the roster of handlers — or their order — needs to change while the application is running, not just at compile time.",
+      "ru": "Паттерн хорошо подходит, когда список обработчиков или их порядок должен меняться во время работы приложения, а не только на этапе компиляции."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**HTTP middleware stacks** — frameworks like Express and Koa pass every incoming request through a sequence of middleware functions, each free to respond, mutate the request, or call `next()`.",
+      "ru": "**Стеки HTTP-middleware** — фреймворки вроде Express и Koa пропускают каждый входящий запрос через последовательность функций-middleware, каждая из которых может ответить, изменить запрос или вызвать `next()`."
+    },
+    {
+      "en": "**DOM event propagation** — a click or keypress bubbles up from the target element through each ancestor, and any listener along the way can call `stopPropagation()` to end the journey.",
+      "ru": "**Распространение событий в DOM** — клик или нажатие клавиши всплывает от целевого элемента через каждого предка, и любой обработчик на пути может вызвать `stopPropagation()`, чтобы прервать движение."
+    },
+    {
+      "en": "**Logging framework filters** — libraries like Log4j or Python's `logging` route a log record through a chain of filters and handlers, each deciding whether to act on it or pass it along.",
+      "ru": "**Фильтры логирующих фреймворков** — библиотеки вроде Log4j или модуля `logging` в Python пропускают запись лога через цепочку фильтров и обработчиков, каждый из которых решает, обработать её или передать дальше."
+    }
+  ],
+  "related_patterns": [
+    "command",
+    "composite",
+    "decorator",
+    "mediator"
+  ],
+  "visuals": [
+    {
+      "id": "cor-concept",
+      "type": "flow",
+      "style": "chain",
+      "category": "behavioral",
+      "width": 1000,
+      "height": 260,
+      "title": {
+        "en": "How Chain of Responsibility works",
+        "ru": "Как работает Цепочка обязанностей"
+      },
+      "description": {
+        "en": "A $50,000 expense request travels forward along a rail of approvers. Team Lead and Manager each check their limit and pass it on; Director's limit covers it, so Director handles the request and the journey stops there. CEO is never reached — later handlers stay dark because the chain only runs until someone accepts.",
+        "ru": "Заявка на расход $50 000 движется вперёд по рельсе согласующих. Тимлид и Менеджер сверяют свой лимит и передают дальше; лимит Директора её покрывает, поэтому Директор обрабатывает запрос — и на этом путь останавливается. Генеральный директор так и не задействован: последующие обработчики остаются тёмными, ведь цепочка работает лишь до того, кто примет запрос."
+      },
+      "caption": {
+        "en": "The request moves forward until one handler accepts it — then it stops. The rest never run.",
+        "ru": "Запрос движется вперёд, пока один обработчик не примет его — и на этом останавливается. Остальные не запускаются."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "submits $50,000",
+            "ru": "подаёт $50 000"
+          }
+        },
+        {
+          "id": "teamLead",
+          "role": "handler",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Team Lead",
+            "ru": "Тимлид"
+          },
+          "guard": {
+            "en": "≤ $1,000",
+            "ru": "≤ $1 000"
+          },
+          "verdict": "pass",
+          "decision": {
+            "en": "pass →",
+            "ru": "передать →"
+          }
+        },
+        {
+          "id": "manager",
+          "role": "handler",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Manager",
+            "ru": "Менеджер"
+          },
+          "guard": {
+            "en": "≤ $10,000",
+            "ru": "≤ $10 000"
+          },
+          "verdict": "pass",
+          "decision": {
+            "en": "pass →",
+            "ru": "передать →"
+          }
+        },
+        {
+          "id": "director",
+          "role": "handler",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Director",
+            "ru": "Директор"
+          },
+          "guard": {
+            "en": "≤ $100,000",
+            "ru": "≤ $100 000"
+          },
+          "verdict": "handle",
+          "decision": {
+            "en": "✓ handle",
+            "ru": "✓ обработал"
+          }
+        },
+        {
+          "id": "ceo",
+          "role": "handler",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "CEO",
+            "ru": "Гендиректор"
+          },
+          "guard": {
+            "en": "any amount",
+            "ru": "любая сумма"
+          }
+        }
+      ]
+    }
+  ]
+}

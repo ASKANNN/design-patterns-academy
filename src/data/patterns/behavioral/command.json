@@ -1,0 +1,218 @@
+{
+  "slug": "command",
+  "name": "Command",
+  "category": "behavioral",
+  "complexity": 1,
+  "popularity": 3,
+  "also_known_as": [
+    "Action",
+    "Transaction"
+  ],
+  "tags": [
+    "behavioral",
+    "action",
+    "transaction"
+  ],
+  "intent": {
+    "en": "Command is a behavioral pattern that wraps a request — the receiver, the action, and its arguments — into a self-contained object, so the request itself can be passed around, stored, and invoked independently of whatever triggered it.",
+    "ru": "Команда — это поведенческий паттерн, который упаковывает запрос (получателя, действие и его аргументы) в самостоятельный объект, благодаря чему запрос можно передавать, хранить и выполнять независимо от того, что его инициировало."
+  },
+  "problem": {
+    "en": "Consider a drawing app where the same \"delete shape\" action can be triggered from a toolbar button, a keyboard shortcut, and a right-click menu — and where the app also needs to support undo.\n\nIf each UI element calls the deletion logic directly, that logic ends up duplicated in three places, and none of them has any record of what just happened, so undo has nowhere to hook in. Wiring undo support after the fact usually means threading extra state through every place that can trigger an action.\n\nThe real issue is that \"what to do\" and \"how it got triggered\" are tangled together, with no single object representing the action itself that could be stored, replayed, or reversed.",
+    "ru": "Рассмотрим графический редактор, где одно и то же действие «удалить фигуру» можно вызвать кнопкой на панели инструментов, горячей клавишей и пунктом контекстного меню — и где приложению вдобавок нужна отмена действий.\n\nЕсли каждый элемент интерфейса напрямую вызывает логику удаления, эта логика дублируется в трёх местах, и ни в одном из них нет записи о том, что произошло, — отмене попросту не за что зацепиться. Добавить отмену задним числом обычно означает протащить дополнительное состояние через каждое место, способное инициировать действие.\n\nНастоящая проблема в том, что «что сделать» и «чем это было вызвано» перепутаны, и нет ни одного объекта, представляющего само действие, который можно было бы сохранить, повторить или откатить."
+  },
+  "solution": {
+    "en": "Command pulls the request itself out into its own object: everything needed to perform the action — which receiver to call, which operation, with which arguments — is captured behind a single `execute()` method.\n\nThe UI element that triggers the action no longer calls the receiver directly; it just holds a command object and calls `execute()` on it, without caring what that command actually does or which object ends up doing the work. Because the command is a real object rather than a bare function call, it can be stored in a history list, serialized to disk, handed to a queue for later execution, or paired with an `undo()` method that reverses whatever `execute()` did.",
+    "ru": "Команда выносит сам запрос в отдельный объект: всё необходимое для выполнения действия (какого получателя вызвать, какую операцию, с какими аргументами) прячется за единственным методом `execute()`.\n\nЭлемент интерфейса, инициирующий действие, больше не вызывает получателя напрямую — он лишь хранит объект-команду и вызывает у него `execute()`, не зная, что именно эта команда делает и какой объект в итоге выполнит работу. Поскольку команда — полноценный объект, а не голый вызов функции, её можно сохранить в списке истории, сериализовать на диск, передать в очередь для отложенного выполнения или снабдить методом `undo()`, откатывающим то, что сделал `execute()`."
+  },
+  "structure": {
+    "description": {
+      "en": "The Invoker holds a command and triggers it without knowing what it does. The Command interface exposes a uniform way to run (and optionally undo) an action. ConcreteCommand instances bind together a specific Receiver and the operation to call on it. The Receiver is where the actual work happens; the Client wires receivers, commands, and invokers together.",
+      "ru": "Инициатор хранит команду и запускает её, не зная, что она делает. Интерфейс команды предоставляет единообразный способ выполнить (и опционально отменить) действие. Конкретная команда связывает воедино конкретного получателя и операцию, которую нужно у него вызвать. Получатель — место, где происходит реальная работа; клиент связывает получателей, команды и инициаторов между собой."
+    },
+    "participants": [
+      {
+        "name": "Invoker (Sender)",
+        "role": {
+          "en": "Holds a reference to a command and triggers its execution — right away, on a delay, or as part of a queue — without knowing what the command does internally.",
+          "ru": "Хранит ссылку на команду и запускает её выполнение — сразу, с задержкой или как часть очереди, — не зная, что команда делает внутри."
+        }
+      },
+      {
+        "name": "Command",
+        "role": {
+          "en": "A minimal interface, usually just `execute()` and optionally `undo()`, that every concrete command must provide so invokers can treat them uniformly.",
+          "ru": "Минимальный интерфейс, обычно состоящий из `execute()` и опционально `undo()`, который должна предоставлять каждая конкретная команда, чтобы инициаторы могли работать с ними единообразно."
+        }
+      },
+      {
+        "name": "ConcreteCommand",
+        "role": {
+          "en": "Stores a reference to its Receiver plus whatever arguments the operation needs, and forwards the actual work to the receiver when executed.",
+          "ru": "Хранит ссылку на своего получателя и аргументы, нужные операции, а при выполнении передаёт реальную работу получателю."
+        }
+      },
+      {
+        "name": "Receiver",
+        "role": {
+          "en": "Owns the domain logic that gets the work done. It has no idea it's being driven by a command — any object with a callable method can play this role.",
+          "ru": "Владеет доменной логикой, которая выполняет работу. Он не подозревает, что им управляет команда, — эту роль может играть любой объект с вызываемым методом."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Assembles the pieces: creates a Receiver, wraps the desired operation on it in a ConcreteCommand, and hands the command to an Invoker.",
+          "ru": "Собирает всё воедино: создаёт получателя, оборачивает нужную операцию над ним в конкретную команду и передаёт команду инициатору."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Receiver\nclass TextEditor {\n  #content = '';\n\n  insert(text, position) {\n    this.#content =\n      this.#content.slice(0, position) +\n      text +\n      this.#content.slice(position);\n  }\n\n  delete(position, length) {\n    this.#content =\n      this.#content.slice(0, position) +\n      this.#content.slice(position + length);\n  }\n\n  getContent() { return this.#content; }\n}\n\n// Concrete command\nclass InsertCommand {\n  constructor(editor, text, position) {\n    this.editor = editor;\n    this.text = text;\n    this.position = position;\n  }\n\n  execute() {\n    this.editor.insert(this.text, this.position);\n  }\n\n  undo() {\n    this.editor.delete(this.position, this.text.length);\n  }\n}\n\n// Invoker with undo stack\nclass CommandHistory {\n  #history = [];\n\n  execute(command) {\n    command.execute();\n    this.#history.push(command);\n  }\n\n  undo() {\n    this.#history.pop()?.undo();\n  }\n}\n\n// Usage\nconst editor = new TextEditor();\nconst history = new CommandHistory();\n\nhistory.execute(new InsertCommand(editor, 'Hello', 0));\nhistory.execute(new InsertCommand(editor, ' World', 5));\nconsole.log(editor.getContent()); // 'Hello World'\n\nhistory.undo();\nconsole.log(editor.getContent()); // 'Hello'",
+    "typescript": "// Receiver\nclass TextEditor {\n  private content = '';\n\n  insert(text: string, position: number): void {\n    this.content =\n      this.content.slice(0, position) +\n      text +\n      this.content.slice(position);\n  }\n\n  delete(position: number, length: number): void {\n    this.content =\n      this.content.slice(0, position) +\n      this.content.slice(position + length);\n  }\n\n  getContent(): string { return this.content; }\n}\n\n// Command interface\ninterface Command {\n  execute(): void;\n  undo(): void;\n}\n\n// Concrete command\nclass InsertCommand implements Command {\n  constructor(\n    private readonly editor: TextEditor,\n    private readonly text: string,\n    private readonly position: number\n  ) {}\n\n  execute(): void {\n    this.editor.insert(this.text, this.position);\n  }\n\n  undo(): void {\n    this.editor.delete(this.position, this.text.length);\n  }\n}\n\n// Invoker\nclass CommandHistory {\n  private history: Command[] = [];\n\n  execute(command: Command): void {\n    command.execute();\n    this.history.push(command);\n  }\n\n  undo(): void {\n    this.history.pop()?.undo();\n  }\n}\n\n// Usage\nconst editor = new TextEditor();\nconst history = new CommandHistory();\n\nhistory.execute(new InsertCommand(editor, 'Hello', 0));\nhistory.execute(new InsertCommand(editor, ' World', 5));\nconsole.log(editor.getContent()); // 'Hello World'\n\nhistory.undo();\nconsole.log(editor.getContent()); // 'Hello'",
+    "java": "import java.util.ArrayDeque;\nimport java.util.Deque;\n\n// Receiver\nclass TextEditor {\n    private StringBuilder content = new StringBuilder();\n\n    public void insert(String text, int position) { content.insert(position, text); }\n    public void delete(int position, int length)  { content.delete(position, position + length); }\n    public String getContent() { return content.toString(); }\n}\n\n// Command interface\ninterface Command {\n    void execute();\n    void undo();\n}\n\n// Concrete command\nclass InsertCommand implements Command {\n    private final TextEditor editor;\n    private final String text;\n    private final int position;\n\n    InsertCommand(TextEditor editor, String text, int position) {\n        this.editor = editor; this.text = text; this.position = position;\n    }\n\n    public void execute() { editor.insert(text, position); }\n    public void undo()    { editor.delete(position, text.length()); }\n}\n\n// Invoker with undo stack\nclass CommandHistory {\n    private final Deque<Command> history = new ArrayDeque<>();\n\n    public void execute(Command command) { command.execute(); history.push(command); }\n    public void undo() { if (!history.isEmpty()) history.pop().undo(); }\n}\n\n// Usage\nTextEditor editor   = new TextEditor();\nCommandHistory hist = new CommandHistory();\n\nhist.execute(new InsertCommand(editor, \"Hello\", 0));\nhist.execute(new InsertCommand(editor, \" World\", 5));\nSystem.out.println(editor.getContent()); // Hello World\n\nhist.undo();\nSystem.out.println(editor.getContent()); // Hello",
+    "csharp": "// Receiver\nclass TextEditor\n{\n    private string _content = \"\";\n\n    public void Insert(string text, int position) =>\n        _content = _content[..position] + text + _content[position..];\n\n    public void Delete(int position, int length) =>\n        _content = _content[..position] + _content[(position + length)..];\n\n    public string GetContent() => _content;\n}\n\n// Command interface\ninterface ICommand { void Execute(); void Undo(); }\n\n// Concrete command\nclass InsertCommand : ICommand\n{\n    private readonly TextEditor _editor;\n    private readonly string _text;\n    private readonly int _position;\n\n    public InsertCommand(TextEditor editor, string text, int position)\n    { _editor = editor; _text = text; _position = position; }\n\n    public void Execute() => _editor.Insert(_text, _position);\n    public void Undo()    => _editor.Delete(_position, _text.Length);\n}\n\n// Invoker with undo stack\nclass CommandHistory\n{\n    private readonly Stack<ICommand> _history = new();\n\n    public void Execute(ICommand cmd) { cmd.Execute(); _history.Push(cmd); }\n    public void Undo() { if (_history.Count > 0) _history.Pop().Undo(); }\n}\n\n// Usage\nvar editor  = new TextEditor();\nvar history = new CommandHistory();\n\nhistory.Execute(new InsertCommand(editor, \"Hello\", 0));\nhistory.Execute(new InsertCommand(editor, \" World\", 5));\nConsole.WriteLine(editor.GetContent()); // Hello World\n\nhistory.Undo();\nConsole.WriteLine(editor.GetContent()); // Hello",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\n# Receiver\nclass TextEditor:\n    def __init__(self) -> None:\n        self._content = ''\n\n    def insert(self, text: str, position: int) -> None:\n        self._content = (\n            self._content[:position] + text + self._content[position:]\n        )\n\n    def delete(self, position: int, length: int) -> None:\n        self._content = (\n            self._content[:position] + self._content[position + length:]\n        )\n\n    def get_content(self) -> str:\n        return self._content\n\n\n# Command interface\nclass Command(ABC):\n    @abstractmethod\n    def execute(self) -> None: ...\n\n    @abstractmethod\n    def undo(self) -> None: ...\n\n\n# Concrete command\nclass InsertCommand(Command):\n    def __init__(self, editor: TextEditor, text: str, position: int) -> None:\n        self._editor = editor\n        self._text = text\n        self._position = position\n\n    def execute(self) -> None:\n        self._editor.insert(self._text, self._position)\n\n    def undo(self) -> None:\n        self._editor.delete(self._position, len(self._text))\n\n\n# Invoker\nclass CommandHistory:\n    def __init__(self) -> None:\n        self._history: list[Command] = []\n\n    def execute(self, command: Command) -> None:\n        command.execute()\n        self._history.append(command)\n\n    def undo(self) -> None:\n        if self._history:\n            self._history.pop().undo()\n\n\n# Usage\neditor = TextEditor()\nhistory = CommandHistory()\n\nhistory.execute(InsertCommand(editor, 'Hello', 0))\nhistory.execute(InsertCommand(editor, ' World', 5))\nprint(editor.get_content())  # Hello World\n\nhistory.undo()\nprint(editor.get_content())  # Hello"
+  },
+  "pros": [
+    {
+      "en": "UI or trigger code no longer needs to know how a request is fulfilled — it just holds a command object, which keeps the two sides free to change independently.",
+      "ru": "Код-инициатор больше не обязан знать, как выполняется запрос, — он просто держит объект-команду, благодаря чему обе стороны меняются независимо друг от друга."
+    },
+    {
+      "en": "Adding a brand-new action means writing one new command class; nothing about the invoker or the existing commands has to change.",
+      "ru": "Чтобы добавить новое действие, достаточно написать один новый класс команды; ничего в инициаторе или существующих командах менять не нужно."
+    },
+    {
+      "en": "Because a command is a real object, it can be stacked in a history list to give you undo/redo almost for free.",
+      "ru": "Поскольку команда — полноценный объект, её можно складывать в список истории, что почти бесплатно даёт отмену и повтор действий."
+    },
+    {
+      "en": "Commands can be serialized, queued, retried, or shipped off to run on a different thread or machine, since they carry everything needed to execute later.",
+      "ru": "Команды можно сериализовать, ставить в очередь, повторять или отправлять на выполнение в другом потоке или на другой машине, поскольку они несут в себе всё необходимое для отложенного запуска."
+    }
+  ],
+  "cons": [
+    {
+      "en": "There's an extra indirection layer between whoever triggers an action and whoever performs it, which adds a class or two even for trivial operations.",
+      "ru": "Между инициатором действия и его исполнителем появляется дополнительный уровень косвенности, что добавляет один-два класса даже для тривиальных операций."
+    },
+    {
+      "en": "A large application can accumulate a long tail of tiny, single-purpose command classes that are individually simple but collectively noisy.",
+      "ru": "В крупном приложении может накопиться длинный хвост мелких узкоспециализированных классов-команд — по отдельности простых, но в совокупности загромождающих проект."
+    },
+    {
+      "en": "Supporting undo properly often requires each command to capture enough prior state to reverse itself, which is extra bookkeeping beyond just running the action once.",
+      "ru": "Корректная поддержка отмены обычно требует, чтобы каждая команда сохраняла достаточно состояния для собственного отката, — это дополнительная работа сверх простого однократного выполнения действия."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Command when you want to hand an operation to something else — a button, a menu item, a scheduler — as a value, rather than hardcoding the call site.",
+      "ru": "Применяйте Команду, когда операцию нужно передать чему-то другому — кнопке, пункту меню, планировщику — как значение, а не жёстко прописывать место вызова."
+    },
+    {
+      "en": "It's a natural fit when requests need to be queued, delayed, retried, or dispatched to a worker rather than executed immediately in place.",
+      "ru": "Паттерн хорошо подходит, когда запросы нужно ставить в очередь, откладывать, повторять или отправлять исполнителю, а не выполнять немедленно на месте."
+    },
+    {
+      "en": "Use it whenever the application must support reversing actions the user has taken, since each command can carry its own undo logic.",
+      "ru": "Используйте его, когда приложению нужна отмена действий пользователя, — каждая команда может нести собственную логику отмены."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**`document.execCommand` and editor undo stacks** — rich-text editors represent formatting and edit operations as discrete command objects pushed onto a history stack for multi-level undo.",
+      "ru": "**`document.execCommand` и стеки отмены в редакторах** — текстовые редакторы представляют операции форматирования и правки как отдельные объекты-команды, помещаемые в стек истории для многоуровневой отмены."
+    },
+    {
+      "en": "**GUI toolkit actions** — frameworks like Qt and Swing model menu items, toolbar buttons, and shortcuts as `QAction`/`Action` objects so the same command can be triggered from multiple UI entry points.",
+      "ru": "**Actions в GUI-фреймворках** — библиотеки вроде Qt и Swing моделируют пункты меню, кнопки панели инструментов и горячие клавиши как объекты `QAction`/`Action`, чтобы одна и та же команда запускалась из разных мест интерфейса."
+    },
+    {
+      "en": "**Background job queues** — systems like Sidekiq, Celery, and Bull serialize a job's target method and arguments into a command-like payload that a worker process picks up and executes later.",
+      "ru": "**Очереди фоновых задач** — системы вроде Sidekiq, Celery и Bull сериализуют метод и аргументы задачи в похожую на команду полезную нагрузку, которую позже подхватывает и выполняет рабочий процесс."
+    }
+  ],
+  "related_patterns": [
+    "memento",
+    "strategy",
+    "observer",
+    "chain-of-responsibility"
+  ],
+  "visuals": [
+    {
+      "id": "command-concept",
+      "type": "flow",
+      "style": "command",
+      "category": "behavioral",
+      "title": {
+        "en": "How Command works",
+        "ru": "Как работает Команда"
+      },
+      "description": {
+        "en": "A client hands a command capsule to the invoker. The invoker never touches the receiver directly — it just triggers whatever capsule is currently plugged into its socket, and that capsule knows how to run and reverse itself.",
+        "ru": "Клиент передаёт инициатору капсулу-команду. Инициатор никогда не обращается к получателю напрямую — он лишь запускает ту капсулу, что сейчас вставлена в его гнездо, а капсула сама знает, как выполнить действие и как его отменить."
+      },
+      "caption": {
+        "en": "The invoker only ever holds a slot. Whatever capsule is plugged in decides what happens next.",
+        "ru": "Инициатор хранит лишь гнездо. Что произойдёт дальше — решает вставленная в него капсула."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиент" },
+          "subtitle": { "en": "assembles the command", "ru": "собирает команду" }
+        },
+        {
+          "id": "invoker",
+          "role": "invoker",
+          "kind": "class",
+          "icon": "spark",
+          "label": { "en": "Invoker", "ru": "Инициатор" },
+          "subtitle": { "en": "triggers, never inspects", "ru": "запускает, не заглядывая внутрь" }
+        },
+        {
+          "id": "command",
+          "role": "command",
+          "kind": "class",
+          "icon": "layers",
+          "label": { "en": "Command", "ru": "Команда" },
+          "subtitle": { "en": "execute() / undo()", "ru": "execute() / undo()" }
+        },
+        {
+          "id": "receiver",
+          "role": "receiver",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Receiver", "ru": "Получатель" },
+          "subtitle": { "en": "does the real work", "ru": "выполняет реальную работу" }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "invoker",
+          "relationship": "flow",
+          "label": { "en": "hands over command", "ru": "передаёт команду" }
+        },
+        {
+          "source": "invoker",
+          "target": "command",
+          "relationship": "command",
+          "label": { "en": "execute() / undo()", "ru": "execute() / undo()" }
+        },
+        {
+          "source": "command",
+          "target": "receiver",
+          "relationship": "flow",
+          "label": { "en": "delegates the work", "ru": "делегирует работу" }
+        }
+      ]
+    }
+  ]
+}

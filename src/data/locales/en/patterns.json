@@ -1,0 +1,99 @@
+{
+  "patterns": {
+    "title": "Design Patterns",
+    "subtitle": "23 classic Gang of Four patterns",
+    "page_subtitle": "All 23 classic Gang of Four patterns for object-oriented software design.",
+    "count": "{{count}} patterns",
+
+    "intro_trigger": "What are design patterns?",
+    "intro_p1": "A design pattern is a general, battle-tested solution to a problem that recurs often in software design. It isn't ready-made code — it's a reusable template you adapt to your own situation.",
+    "intro_authors": "All 23 patterns come from the book \"Design Patterns: Elements of Reusable Object-Oriented Software\" (1994) — its authors, Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides, became known as the \"Gang of Four\" (GoF), and the book is still the standard reference for object-oriented design vocabulary.",
+    "intro_p2": "The patterns fall into three groups: <a href=\"#/patterns/creational\" class=\"intro-category-link intro-category-link--creational\">creational</a> patterns handle object creation, <a href=\"#/patterns/structural\" class=\"intro-category-link intro-category-link--structural\">structural</a> patterns compose classes and objects into larger structures, and <a href=\"#/patterns/behavioral\" class=\"intro-category-link intro-category-link--behavioral\">behavioral</a> patterns manage responsibilities and communication between objects.",
+    "intro_p3": "Knowing these patterns helps developers speak a shared vocabulary, read unfamiliar code faster, and reach for proven solutions instead of reinventing the wheel.",
+
+    "categories": {
+      "creational": "Creational",
+      "structural": "Structural",
+      "behavioral": "Behavioral",
+      "all": "All Patterns"
+    },
+
+    "category_desc": {
+      "creational": "Deal with object creation mechanisms, aiming to create objects in a manner suitable to the situation.",
+      "structural": "Deal with object composition, creating relationships between objects to form larger structures.",
+      "behavioral": "Deal with communication between objects, defining how objects interact and distribute responsibility."
+    },
+
+    "complexity": {
+      "label": "Complexity",
+      "1": "Simple",
+      "2": "Medium",
+      "3": "Complex"
+    },
+
+    "popularity": {
+      "label": "Popularity",
+      "1": "Low",
+      "2": "Medium",
+      "3": "High"
+    },
+
+    "status": {
+      "available": "Available",
+      "coming_soon": "Coming soon"
+    },
+
+    "badge_soon": "Soon",
+    "category_label": "Category",
+
+    "sections": {
+      "intent": "Intent",
+      "problem": "Problem",
+      "solution": "Solution",
+      "structure": "Structure",
+      "participants": "Participants",
+      "implementation": "Implementation",
+      "pros": "Pros",
+      "cons": "Cons",
+      "pros_cons": "Pros & Cons",
+      "advantages": "Advantages",
+      "disadvantages": "Disadvantages",
+      "when_to_use": "When to Use",
+      "real_world": "Real-World Examples",
+      "related": "Related Patterns",
+      "also_known_as": "Also Known As"
+    },
+
+    "tabs_aria": "Pattern sections",
+    "related_patterns": "Related Patterns",
+    "select_language": "Select programming language",
+    "impl_coming_soon": "Implementation examples coming soon.",
+    "coming_soon_title": "Coming Soon",
+    "coming_soon_message": "We are working on the full content for this pattern. Check back soon.",
+    "no_patterns_filter": "No patterns found",
+    "no_patterns_filter_desc": "Try a different filter.",
+    "stat_aria": "{{label}}: {{n}} of 3",
+
+    "code": {
+      "example": "Code Example",
+      "copy": "Copy code",
+      "copied": "Copied!",
+      "language": "Language"
+    },
+
+    "filter": {
+      "label": "Filter by category",
+      "all": "All",
+      "clear": "Clear filters",
+      "sort_label": "Sort by",
+      "sort_name": "Name",
+      "sort_complexity": "Complexity",
+      "sort_popularity": "Popularity"
+    },
+
+    "related_label": "Related: {{name}}",
+    "view_pattern": "View pattern",
+    "back_to_catalog": "Back to catalog",
+    "back_to_category": "Back to {{category}}"
+  }
+}

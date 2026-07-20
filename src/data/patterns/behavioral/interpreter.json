@@ -1,0 +1,241 @@
+{
+  "slug": "interpreter",
+  "name": "Interpreter",
+  "category": "behavioral",
+  "complexity": 3,
+  "popularity": 1,
+  "also_known_as": [],
+  "tags": [
+    "behavioral",
+    "grammar",
+    "language",
+    "expression"
+  ],
+  "intent": {
+    "en": "Interpreter turns a sentence in a small language — say, the expression `x + 5 - 2` — into a tree of objects, one class per rule (number, variable, addition, subtraction). Getting the answer is just calling one method on the root: each object works out its own piece by asking its children for theirs, so the tree evaluates itself.",
+    "ru": "Интерпретатор — это поведенческий паттерн, который представляет грамматику языка деревом классов, по одному на каждое правило, благодаря чему вычисление любого предложения этого языка сводится к обходу этого дерева."
+  },
+  "problem": {
+    "en": "Imagine building a small calculator that evaluates arithmetic expressions typed in as text, like `x + 5 - 2`, where `x` is a variable that can hold any number. The rules are tiny — numbers, variables, addition, subtraction — but they combine in endless ways: `x + 5`, `(x + 5) - 2`, `2 - (x + 5)`, and so on.\n\nA quick fix is one big function that scans the string and handles each case with a pile of if/else. It works for a couple of examples, then falls apart as soon as expressions nest deeper or a new operator shows up, because parsing and evaluating are tangled together in one place with no reusable pieces.\n\nWhat's missing is a way to treat \"a number\", \"a variable\", \"a sum\", and \"a difference\" as separate, composable building blocks — instead of special cases buried inside one big block of code.",
+    "ru": "Представим простой калькулятор, который вычисляет арифметические выражения, введённые как текст, например `x + 5 - 2`, где `x` — переменная, способная хранить любое число. Правил совсем немного — числа, переменные, сложение, вычитание, — но комбинировать их можно бесконечным числом способов: `x + 5`, `(x + 5) - 2`, `2 - (x + 5)` и так далее.\n\nБыстрое решение — одна большая функция, которая разбирает строку и обрабатывает каждый случай кучей if/else. Оно сработает для пары примеров, но развалится, как только выражение станет вложенным глубже или появится новый оператор, — ведь разбор и вычисление перемешаны в одном месте без переиспользуемых частей.\n\nНе хватает способа рассматривать «число», «переменную», «сумму» и «разность» как отдельные компонуемые блоки, а не как частные случаи внутри одного большого куска кода."
+  },
+  "solution": {
+    "en": "Interpreter turns each grammar rule into its own class, all sharing one `interpret` method that produces a result when called. Simple pieces of the expression — a number, a variable — become **terminal** expression classes that know their value directly. Compound pieces — a sum, a difference — become **nonterminal** expression classes that hold their sub-expressions and combine whatever those return.\n\nThe expression `x + 5 - 2` is built once into a small tree: a subtraction node holding an addition node (variable `x` and number `5`) and a number node (`2`). Evaluating the whole expression is just calling `interpret` on the root — the recursion works its way down the tree and combines the results back up. Adding a new operator, like multiplication, means adding one new nonterminal class — the rest of the tree, and the rest of the grammar, doesn't change.",
+    "ru": "Интерпретатор превращает каждое правило грамматики в отдельный класс, и у всех них есть один общий метод — `interpret`, — который возвращает результат при вызове. Простые части выражения — число, переменная — становятся классами **терминальных** выражений, которые знают своё значение напрямую. Составные части — сумма, разность — становятся классами **нетерминальных** выражений, которые хранят свои подвыражения и объединяют то, что те возвращают.\n\nВыражение `x + 5 - 2` один раз собирается в небольшое дерево: узел вычитания, который содержит узел сложения (переменная `x` и число `5`) и узел числа (`2`). Вычислить всё выражение — значит просто вызвать `interpret` на корне: рекурсия спустится по дереву и соберёт результат обратно наверх. Чтобы добавить новый оператор, например умножение, достаточно добавить один новый класс нетерминального выражения — остальное дерево и остальная грамматика не меняются."
+  },
+  "structure": {
+    "description": {
+      "en": "Every node in the tree implements a shared `interpret` operation. On the diagram, Subtract (the root) and Add (its branch) are nonterminals that call `interpret` on their children before answering; the Number and Variable leaves (`2`, `x`, `5`) are terminals that answer right away. The Client builds this tree and calls `interpret` on the root; the `{ x: 10 }` values feeding the Variable leaf are the Context, threaded through every call but not drawn as a box of its own.",
+      "ru": "Каждый узел дерева реализует общую операцию `interpret`. На схеме Вычитание (корень) и Сложение (его ветка) — это нетерминальные узлы: они вызывают `interpret` у своих потомков, прежде чем ответить сами. Листья Число и Переменная (`2`, `x`, `5`) — терминальные узлы, которые отвечают сразу. Клиент строит это дерево и вызывает `interpret` на корне; значения вроде `{ x: 10 }`, откуда лист Переменная берёт своё значение, — это Контекст: он проносится через каждый вызов, но отдельным узлом на схеме не показан."
+    },
+    "participants": [
+      {
+        "name": "AbstractExpression (Expression)",
+        "role": {
+          "en": "The one method — `interpret` — that every node in the tree must implement. On the diagram, every box shares it: Subtract, Add, and the Number/Variable leaves all expose the same `interpret`, so the Client can call it on the root without caring which concrete class answers.",
+          "ru": "Единственный метод — `interpret`, — который обязан реализовать каждый узел дерева. На схеме им обладает каждый узел: Вычитание, Сложение и листья Число/Переменная предоставляют один и тот же `interpret`, поэтому Клиент вызывает его на корне, не заботясь о том, какой конкретный класс отвечает."
+        }
+      },
+      {
+        "name": "TerminalExpression (NumberExpression, VariableExpression)",
+        "role": {
+          "en": "A leaf of the tree with no children, which answers immediately. On the diagram, these are the Number and Variable boxes — `2`, `x`, `5` — each just returning its own value.",
+          "ru": "Лист дерева без потомков, который отвечает сразу же. На схеме это узлы Число и Переменная — `2`, `x`, `5`, — каждый из которых просто возвращает своё значение."
+        }
+      },
+      {
+        "name": "NonterminalExpression (AddExpression, SubtractExpression)",
+        "role": {
+          "en": "A node built from sub-expressions that must call `interpret` on its children before it can answer. On the diagram, these are Subtract (the root) and Add (its branch), which combine what their children return.",
+          "ru": "Узел, построенный из подвыражений, который сначала должен вызвать `interpret` у своих потомков — и только потом может ответить сам. На схеме это Вычитание (корень) и Сложение (его ветка): они объединяют то, что возвращают их потомки."
+        }
+      },
+      {
+        "name": "Context",
+        "role": {
+          "en": "The variable bindings threaded through every `interpret` call — here, `{ x: 10 }`. It has no box of its own on the diagram, since it's data carried alongside the tree, not part of its structure — it only surfaces where the Variable leaf reads `x`.",
+          "ru": "Значения переменных, которые передаются в каждый вызов `interpret`, — в этом примере `{ x: 10 }`. Отдельного узла на схеме у него нет, потому что это данные, которые несутся вместе с деревом, а не часть его структуры, — они проявляются только там, где лист Переменная читает `x`."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Builds the tree for `x + 5 - 2` and starts evaluation by calling `interpret` on the root. On the diagram, this is the Client box, and the value it gets back is the root's answer, `13`.",
+          "ru": "Строит дерево для `x + 5 - 2` и запускает вычисление, вызывая `interpret` на корне. На схеме это узел Клиент, а получаемое им в ответ значение — это результат корня, `13`."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// AbstractExpression: every node exposes interpret(context)\n\n// Terminal expression — a numeric literal\nclass NumberExpression {\n  constructor(value) { this.value = value; }\n  interpret(_context) { return this.value; }\n}\n\n// Terminal expression — a variable looked up in the context\nclass VariableExpression {\n  constructor(name) { this.name = name; }\n  interpret(context) {\n    if (!(this.name in context)) {\n      throw new Error(`Unknown variable: ${this.name}`);\n    }\n    return context[this.name];\n  }\n}\n\n// Nonterminal expressions — compose sub-expressions\nclass AddExpression {\n  constructor(left, right) { this.left = left; this.right = right; }\n  interpret(context) {\n    return this.left.interpret(context) + this.right.interpret(context);\n  }\n}\n\nclass SubtractExpression {\n  constructor(left, right) { this.left = left; this.right = right; }\n  interpret(context) {\n    return this.left.interpret(context) - this.right.interpret(context);\n  }\n}\n\n// Usage — represents: x + 5 - 2\nconst tree = new SubtractExpression(\n  new AddExpression(\n    new VariableExpression('x'),\n    new NumberExpression(5),\n  ),\n  new NumberExpression(2),\n);\n\nconst context = { x: 10 };\nconsole.log(tree.interpret(context)); // 13",
+    "typescript": "// AbstractExpression\ninterface Expression {\n  interpret(context: Record<string, number>): number;\n}\n\n// Terminal expression — a numeric literal\nclass NumberExpression implements Expression {\n  constructor(private readonly value: number) {}\n  interpret(_context: Record<string, number>): number {\n    return this.value;\n  }\n}\n\n// Terminal expression — a variable\nclass VariableExpression implements Expression {\n  constructor(private readonly name: string) {}\n  interpret(context: Record<string, number>): number {\n    if (!(this.name in context)) {\n      throw new Error(`Unknown variable: ${this.name}`);\n    }\n    return context[this.name];\n  }\n}\n\n// Nonterminal expressions\nclass AddExpression implements Expression {\n  constructor(\n    private readonly left: Expression,\n    private readonly right: Expression,\n  ) {}\n  interpret(context: Record<string, number>): number {\n    return this.left.interpret(context) + this.right.interpret(context);\n  }\n}\n\nclass SubtractExpression implements Expression {\n  constructor(\n    private readonly left: Expression,\n    private readonly right: Expression,\n  ) {}\n  interpret(context: Record<string, number>): number {\n    return this.left.interpret(context) - this.right.interpret(context);\n  }\n}\n\n// Usage — represents: x + 5 - 2\nconst tree: Expression = new SubtractExpression(\n  new AddExpression(\n    new VariableExpression('x'),\n    new NumberExpression(5),\n  ),\n  new NumberExpression(2),\n);\n\nconsole.log(tree.interpret({ x: 10 })); // 13",
+    "java": "import java.util.Map;\n\n// AbstractExpression\ninterface Expression {\n    int interpret(Map<String, Integer> context);\n}\n\n// Terminal — numeric literal\nclass NumberExpression implements Expression {\n    private final int value;\n    NumberExpression(int value) { this.value = value; }\n    public int interpret(Map<String, Integer> context) { return value; }\n}\n\n// Terminal — variable lookup\nclass VariableExpression implements Expression {\n    private final String name;\n    VariableExpression(String name) { this.name = name; }\n    public int interpret(Map<String, Integer> context) {\n        if (!context.containsKey(name))\n            throw new IllegalArgumentException(\"Unknown variable: \" + name);\n        return context.get(name);\n    }\n}\n\n// Nonterminal — addition\nclass AddExpression implements Expression {\n    private final Expression left, right;\n    AddExpression(Expression left, Expression right) { this.left = left; this.right = right; }\n    public int interpret(Map<String, Integer> context) {\n        return left.interpret(context) + right.interpret(context);\n    }\n}\n\n// Nonterminal — subtraction\nclass SubtractExpression implements Expression {\n    private final Expression left, right;\n    SubtractExpression(Expression left, Expression right) { this.left = left; this.right = right; }\n    public int interpret(Map<String, Integer> context) {\n        return left.interpret(context) - right.interpret(context);\n    }\n}\n\n// Usage — represents: x + 5 - 2\nExpression tree = new SubtractExpression(\n    new AddExpression(\n        new VariableExpression(\"x\"),\n        new NumberExpression(5)\n    ),\n    new NumberExpression(2)\n);\n\nSystem.out.println(tree.interpret(Map.of(\"x\", 10))); // 13",
+    "csharp": "// AbstractExpression\ninterface IExpression\n{\n    int Interpret(Dictionary<string, int> context);\n}\n\n// Terminal — numeric literal\nclass NumberExpression : IExpression\n{\n    private readonly int _value;\n    public NumberExpression(int value) => _value = value;\n    public int Interpret(Dictionary<string, int> context) => _value;\n}\n\n// Terminal — variable lookup\nclass VariableExpression : IExpression\n{\n    private readonly string _name;\n    public VariableExpression(string name) => _name = name;\n    public int Interpret(Dictionary<string, int> context)\n    {\n        if (!context.TryGetValue(_name, out int value))\n            throw new ArgumentException($\"Unknown variable: {_name}\");\n        return value;\n    }\n}\n\n// Nonterminal — addition\nclass AddExpression : IExpression\n{\n    private readonly IExpression _left, _right;\n    public AddExpression(IExpression l, IExpression r) { _left = l; _right = r; }\n    public int Interpret(Dictionary<string, int> ctx) =>\n        _left.Interpret(ctx) + _right.Interpret(ctx);\n}\n\n// Nonterminal — subtraction\nclass SubtractExpression : IExpression\n{\n    private readonly IExpression _left, _right;\n    public SubtractExpression(IExpression l, IExpression r) { _left = l; _right = r; }\n    public int Interpret(Dictionary<string, int> ctx) =>\n        _left.Interpret(ctx) - _right.Interpret(ctx);\n}\n\n// Usage — represents: x + 5 - 2\nIExpression tree = new SubtractExpression(\n    new AddExpression(\n        new VariableExpression(\"x\"),\n        new NumberExpression(5)\n    ),\n    new NumberExpression(2)\n);\n\nvar context = new Dictionary<string, int> { [\"x\"] = 10 };\nConsole.WriteLine(tree.Interpret(context)); // 13",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\nContext = dict[str, int]\n\n\nclass Expression(ABC):\n    \"\"\"AbstractExpression\"\"\"\n    @abstractmethod\n    def interpret(self, context: Context) -> int: ...\n\n\nclass NumberExpression(Expression):\n    \"\"\"Terminal expression — a numeric literal.\"\"\"\n    def __init__(self, value: int) -> None:\n        self.value = value\n\n    def interpret(self, context: Context) -> int:\n        return self.value\n\n\nclass VariableExpression(Expression):\n    \"\"\"Terminal expression — a variable.\"\"\"\n    def __init__(self, name: str) -> None:\n        self.name = name\n\n    def interpret(self, context: Context) -> int:\n        if self.name not in context:\n            raise ValueError(f'Unknown variable: {self.name}')\n        return context[self.name]\n\n\nclass AddExpression(Expression):\n    \"\"\"Nonterminal expression.\"\"\"\n    def __init__(self, left: Expression, right: Expression) -> None:\n        self.left, self.right = left, right\n\n    def interpret(self, context: Context) -> int:\n        return self.left.interpret(context) + self.right.interpret(context)\n\n\nclass SubtractExpression(Expression):\n    \"\"\"Nonterminal expression.\"\"\"\n    def __init__(self, left: Expression, right: Expression) -> None:\n        self.left, self.right = left, right\n\n    def interpret(self, context: Context) -> int:\n        return self.left.interpret(context) - self.right.interpret(context)\n\n\n# Usage — represents: x + 5 - 2\ntree = SubtractExpression(\n    AddExpression(VariableExpression('x'), NumberExpression(5)),\n    NumberExpression(2),\n)\n\nprint(tree.interpret({'x': 10}))  # 13"
+  },
+  "pros": [
+    {
+      "en": "The grammar lives in code as a set of classes, so adding a rule is as local as adding one more expression class rather than touching a central parser.",
+      "ru": "Грамматика существует в коде как набор классов, поэтому добавление правила сводится к добавлению ещё одного класса выражения, а не к правке центрального парсера."
+    },
+    {
+      "en": "Each rule is a small, self-contained class, which makes it easy to unit-test a single piece of grammar in isolation from the rest.",
+      "ru": "Каждое правило — маленький самодостаточный класс, что позволяет тестировать отдельный фрагмент грамматики в изоляции от остальных."
+    },
+    {
+      "en": "Because sub-expressions are ordinary objects, they nest and recombine naturally — a complex sentence is just a bigger tree built from the same small parts.",
+      "ru": "Поскольку подвыражения — обычные объекты, они естественным образом вкладываются друг в друга и комбинируются — сложное предложение оказывается просто большим деревом из тех же небольших частей."
+    }
+  ],
+  "cons": [
+    {
+      "en": "One class per grammar rule scales badly — a language with dozens of rules means dozens of small classes to navigate and keep straight.",
+      "ru": "Подход «один класс на правило» плохо масштабируется — язык с десятками правил означает десятки мелких классов, среди которых приходится ориентироваться."
+    },
+    {
+      "en": "Beyond a handful of rules, a hand-rolled interpreter is usually outclassed by a proper parser generator or parsing library, which handles ambiguity and error recovery far better.",
+      "ru": "Начиная с определённого числа правил, самодельный интерпретатор обычно уступает полноценному генератору парсеров или библиотеке разбора, которые куда лучше справляются с неоднозначностями и восстановлением после ошибок."
+    },
+    {
+      "en": "Interpreting the tree directly on every evaluation is slower than compiling the expression once into a more efficient form, and deep trees risk hitting recursion limits.",
+      "ru": "Прямая интерпретация дерева при каждом вычислении медленнее однократной компиляции выражения в более эффективную форму, а глубокие деревья рискуют упереться в предел рекурсии."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Interpreter when the language you need to evaluate is genuinely small and its sentences map cleanly onto a tree of a handful of rule types.",
+      "ru": "Применяйте Интерпретатор, когда язык, который нужно вычислять, действительно мал, а его предложения естественно ложатся на дерево из нескольких типов правил."
+    },
+    {
+      "en": "It pays off when the grammar is expected to stay stable; a rapidly growing rule set is a sign to switch to a parser generator instead.",
+      "ru": "Паттерн окупается, если ожидается, что грамматика останется стабильной; быстро растущий набор правил — сигнал переключиться на генератор парсеров."
+    },
+    {
+      "en": "It's a reasonable choice when raw evaluation speed matters less than having a clear, testable, one-rule-per-class model of the language.",
+      "ru": "Это разумный выбор, когда чистая скорость вычисления менее важна, чем понятная, тестируемая модель языка с одним классом на правило."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Regex engines** — a compiled pattern becomes a tree of matcher nodes (literal, concatenation, alternation, repetition) that walk an input string and report a match.",
+      "ru": "**Движки регулярных выражений** — скомпилированный шаблон превращается в дерево узлов-сопоставителей (литерал, конкатенация, альтернация, повторение), которые проходят по входной строке и сообщают о совпадении."
+    },
+    {
+      "en": "**ORM query builders** — libraries like SQLAlchemy or Django's ORM build a tree of filter and predicate objects from chained method calls, then interpret that tree into SQL at execution time.",
+      "ru": "**Построители запросов в ORM** — библиотеки вроде SQLAlchemy или Django ORM строят дерево объектов-фильтров и предикатов из цепочки вызовов методов, а затем интерпретируют это дерево в SQL на этапе выполнения."
+    },
+    {
+      "en": "**Spreadsheet formula engines** — an expression like `=A1 + B2 * 2` is parsed into a tree of cell references and operators that the spreadsheet interprets to produce the cell's displayed value.",
+      "ru": "**Движки формул в электронных таблицах** — выражение вроде `=A1 + B2 * 2` разбирается в дерево из ссылок на ячейки и операторов, которое таблица интерпретирует, чтобы получить отображаемое значение ячейки."
+    }
+  ],
+  "related_patterns": [
+    "composite",
+    "visitor",
+    "iterator",
+    "flyweight"
+  ],
+  "visuals": [
+    {
+      "id": "interpreter-concept",
+      "type": "flow",
+      "style": "expression",
+      "category": "behavioral",
+      "title": {
+        "en": "How Interpreter works",
+        "ru": "Как работает Интерпретатор"
+      },
+      "description": {
+        "en": "A client builds a small syntax tree for a sentence in the language, then calls interpret() on the root. Nonterminal nodes call interpret() on their own children before they can produce a result; terminal nodes have no children and return their value immediately. Results bubble back up the same tree, combining at every nonterminal, until the root's value returns to the client.",
+        "ru": "Клиент строит небольшое дерево разбора для предложения на языке и вызывает interpret() на корне. Нетерминальные узлы вызывают interpret() у своих потомков и только потом могут выдать результат; терминальные узлы не имеют потомков и возвращают значение сразу. Результаты поднимаются обратно по тому же дереву, объединяясь на каждом нетерминальном узле, пока значение корня не вернётся клиенту."
+      },
+      "caption": {
+        "en": "Terminals answer immediately. Nonterminals must wait for their children before they can answer.",
+        "ru": "Терминальные узлы отвечают сразу. Нетерминальные — только дождавшись ответа своих потомков."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиент" },
+          "subtitle": { "en": "builds the expression tree", "ru": "строит дерево выражения" },
+          "result": "13"
+        },
+        {
+          "id": "root",
+          "role": "root",
+          "kind": "class",
+          "icon": "layers",
+          "label": { "en": "−", "ru": "−" },
+          "subtitle": { "en": "Subtract", "ru": "Вычитание" }
+        },
+        {
+          "id": "sum",
+          "role": "branch",
+          "kind": "class",
+          "icon": "layers",
+          "label": { "en": "+", "ru": "+" },
+          "subtitle": { "en": "Add", "ru": "Сложение" }
+        },
+        {
+          "id": "two",
+          "role": "root-leaf",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "2", "ru": "2" },
+          "subtitle": { "en": "Number", "ru": "Число" }
+        },
+        {
+          "id": "varX",
+          "role": "branch-leaf",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "x", "ru": "x" },
+          "subtitle": { "en": "Variable", "ru": "Переменная" }
+        },
+        {
+          "id": "five",
+          "role": "branch-leaf",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "5", "ru": "5" },
+          "subtitle": { "en": "Number", "ru": "Число" }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "root",
+          "relationship": "message",
+          "label": { "en": "interpret(context)", "ru": "interpret(context)" }
+        },
+        {
+          "source": "root",
+          "target": "sum",
+          "relationship": "message",
+          "label": { "en": "interpret(context)", "ru": "interpret(context)" }
+        },
+        {
+          "source": "root",
+          "target": "two",
+          "relationship": "message",
+          "label": { "en": "interpret(context)", "ru": "interpret(context)" }
+        },
+        {
+          "source": "sum",
+          "target": "varX",
+          "relationship": "message",
+          "label": { "en": "interpret(context)", "ru": "interpret(context)" }
+        },
+        {
+          "source": "sum",
+          "target": "five",
+          "relationship": "message",
+          "label": { "en": "interpret(context)", "ru": "interpret(context)" }
+        }
+      ]
+    }
+  ]
+}

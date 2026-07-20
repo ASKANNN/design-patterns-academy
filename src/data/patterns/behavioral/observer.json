@@ -1,0 +1,124 @@
+{
+  "slug": "observer",
+  "name": "Observer",
+  "category": "behavioral",
+  "complexity": 2,
+  "popularity": 3,
+  "also_known_as": [
+    "Event-Subscriber",
+    "Listener",
+    "Pub-Sub"
+  ],
+  "tags": [
+    "behavioral",
+    "event",
+    "subscription",
+    "pub-sub"
+  ],
+  "intent": {
+    "en": "Observer is a behavioral pattern that lets any number of objects register interest in another object's changes and get notified automatically whenever those changes happen.",
+    "ru": "Наблюдатель — это поведенческий паттерн, позволяющий произвольному числу объектов подписаться на изменения другого объекта и автоматически получать уведомления при каждом таком изменении."
+  },
+  "problem": {
+    "en": "A weather station gathers new sensor readings every few minutes. A phone app, a desktop widget, and a logging service all need to know the instant fresh data lands, but none of them should have to ask the station directly on a timer.\n\nPolling is the naive fix — each consumer calls the station repeatedly and compares against the last value it saw. That wastes cycles when nothing has changed and adds lag between an update and the moment consumers see it. Hardcoding calls from the station to each specific consumer is worse: the station now has to know about the phone app, the widget, and the logger by name, and adding a fourth consumer means editing the station's code.",
+    "ru": "Метеостанция получает новые показания датчиков каждые несколько минут. Мобильное приложение, виджет на рабочем столе и сервис логирования — всем им нужно узнавать о свежих данных мгновенно, но ни один из них не должен постоянно опрашивать станцию по таймеру.\n\nНаивное решение — опрос: каждый потребитель периодически обращается к станции и сравнивает данные с последним увиденным значением. Это впустую расходует ресурсы, когда ничего не изменилось, и создаёт задержку между обновлением и моментом, когда потребитель его увидит. Жёстко прописанные вызовы от станции к каждому конкретному потребителю ещё хуже: станции пришлось бы поимённо знать о приложении, виджете и логгере, а добавление четвёртого потребителя означало бы правку кода самой станции."
+  },
+  "solution": {
+    "en": "Observer gives the object holding the interesting state — the **publisher** — a guest list it doesn't need to know the contents of in advance. Any object can join that list by **subscribing**, and any object can leave by **unsubscribing**; the publisher just keeps a generic collection of registered listeners.\n\nWhen the publisher's state changes, it walks that list and calls the same notification method on every entry, without caring what each subscriber actually does with the news — update a display, write a log line, trigger a recalculation. New subscriber types can be added at runtime with zero changes to the publisher, because the publisher only ever depends on a small notification interface, not on any concrete consumer.",
+    "ru": "Наблюдатель даёт объекту с интересующим состоянием — **издателю** — список получателей, содержимое которого ему заранее знать не нужно. Любой объект может войти в этот список через **подписку** и выйти через **отписку**; издатель просто хранит обобщённую коллекцию зарегистрированных слушателей.\n\nКогда состояние издателя меняется, он проходит по этому списку и вызывает один и тот же метод уведомления у каждой записи, не заботясь о том, что именно подписчик делает с новостью — обновляет экран, пишет строку в лог или запускает пересчёт. Новые типы подписчиков можно добавлять во время выполнения без единого изменения в издателе, поскольку издатель зависит лишь от небольшого интерфейса уведомления, а не от конкретных потребителей."
+  },
+  "structure": {
+    "description": {
+      "en": "The Publisher owns the state worth watching and a collection of subscriber references it notifies through a uniform interface. Subscribers implement that interface and register themselves with the publisher; each reacts to notifications in its own way once called.",
+      "ru": "Издатель владеет состоянием, за которым стоит наблюдать, и коллекцией ссылок на подписчиков, которых он оповещает через единый интерфейс. Подписчики реализуют этот интерфейс и регистрируются у издателя; каждый по-своему реагирует на уведомление, когда его вызывают."
+    },
+    "participants": [
+      {
+        "name": "Publisher (Subject)",
+        "role": {
+          "en": "Holds the observable state, keeps a registry of current subscribers, and walks that registry to notify everyone whenever the state changes.",
+          "ru": "Хранит наблюдаемое состояние, ведёт реестр текущих подписчиков и обходит его, оповещая всех при изменении состояния."
+        }
+      },
+      {
+        "name": "Subscriber (Observer)",
+        "role": {
+          "en": "A minimal contract — usually one notification method — that lets the publisher call any registered subscriber without knowing its concrete type.",
+          "ru": "Минимальный контракт — обычно один метод уведомления, — позволяющий издателю вызывать любого зарегистрированного подписчика, не зная его конкретного типа."
+        }
+      },
+      {
+        "name": "ConcreteSubscriber",
+        "role": {
+          "en": "Registers itself with a publisher and implements its own reaction to each notification, independent of what other subscribers do.",
+          "ru": "Регистрируется у издателя и реализует собственную реакцию на каждое уведомление, независимо от того, что делают другие подписчики."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "class EventEmitter {\n  #subscribers = new Map();\n\n  subscribe(event, listener) {\n    if (!this.#subscribers.has(event)) {\n      this.#subscribers.set(event, new Set());\n    }\n    this.#subscribers.get(event).add(listener);\n    return () => this.unsubscribe(event, listener); // returns unsubscribe fn\n  }\n\n  unsubscribe(event, listener) {\n    this.#subscribers.get(event)?.delete(listener);\n  }\n\n  emit(event, data) {\n    this.#subscribers.get(event)?.forEach(listener => listener(data));\n  }\n}\n\n// Subject\nclass Store extends EventEmitter {\n  #stock = {};\n\n  addProduct(name, quantity) {\n    this.#stock[name] = (this.#stock[name] ?? 0) + quantity;\n    this.emit('product:added', { name, quantity });\n  }\n}\n\n// Usage\nconst store = new Store();\n\nconst unsubscribe = store.subscribe('product:added', ({ name, quantity }) => {\n  console.log(`New stock: ${quantity}x ${name}`);\n});\n\nstore.addProduct('iPhone', 50); // New stock: 50x iPhone\nunsubscribe();                   // Stop listening",
+    "typescript": "type Listener<T = unknown> = (data: T) => void;\n\nclass EventEmitter {\n  private subscribers = new Map<string, Set<Listener>>();\n\n  subscribe<T>(event: string, listener: Listener<T>): () => void {\n    if (!this.subscribers.has(event)) {\n      this.subscribers.set(event, new Set());\n    }\n    this.subscribers.get(event)!.add(listener as Listener);\n    return () => this.unsubscribe(event, listener as Listener);\n  }\n\n  unsubscribe(event: string, listener: Listener): void {\n    this.subscribers.get(event)?.delete(listener);\n  }\n\n  emit<T>(event: string, data: T): void {\n    this.subscribers.get(event)?.forEach(listener => listener(data));\n  }\n}\n\ninterface ProductEvent { name: string; quantity: number; }\n\nclass Store extends EventEmitter {\n  private stock: Record<string, number> = {};\n\n  addProduct(name: string, quantity: number): void {\n    this.stock[name] = (this.stock[name] ?? 0) + quantity;\n    this.emit<ProductEvent>('product:added', { name, quantity });\n  }\n}",
+    "java": "import java.util.*;\nimport java.util.function.Consumer;\n\nclass EventEmitter {\n    private final Map<String, List<Consumer<Object>>> subscribers = new HashMap<>();\n\n    public Runnable subscribe(String event, Consumer<Object> listener) {\n        subscribers.computeIfAbsent(event, k -> new ArrayList<>()).add(listener);\n        return () -> {\n            List<Consumer<Object>> list = subscribers.get(event);\n            if (list != null) list.remove(listener);\n        };\n    }\n\n    public void emit(String event, Object data) {\n        List<Consumer<Object>> list = subscribers.getOrDefault(event, List.of());\n        new ArrayList<>(list).forEach(l -> l.accept(data));\n    }\n}\n\nclass Store extends EventEmitter {\n    private final Map<String, Integer> stock = new HashMap<>();\n\n    public void addProduct(String name, int quantity) {\n        stock.merge(name, quantity, Integer::sum);\n        emit(\"product:added\", Map.of(\"name\", name, \"quantity\", quantity));\n    }\n}\n\n// Usage\nStore store = new Store();\n\nRunnable unsubscribe = store.subscribe(\"product:added\", data -> {\n    Map<?, ?> d = (Map<?, ?>) data;\n    System.out.printf(\"New stock: %sx %s%n\", d.get(\"quantity\"), d.get(\"name\"));\n});\n\nstore.addProduct(\"iPhone\", 50); // New stock: 50x iPhone\nunsubscribe.run();               // Stop listening",
+    "csharp": "class EventEmitter\n{\n    private readonly Dictionary<string, List<Action<object?>>> _subs = new();\n\n    public Action Subscribe(string @event, Action<object?> listener)\n    {\n        if (!_subs.ContainsKey(@event)) _subs[@event] = new();\n        _subs[@event].Add(listener);\n        return () => _subs[@event].Remove(listener);\n    }\n\n    public void Emit(string @event, object? data = null)\n    {\n        if (_subs.TryGetValue(@event, out var list))\n            new List<Action<object?>>(list).ForEach(l => l(data));\n    }\n}\n\nclass Store : EventEmitter\n{\n    private readonly Dictionary<string, int> _stock = new();\n\n    public void AddProduct(string name, int quantity)\n    {\n        _stock[name] = _stock.GetValueOrDefault(name) + quantity;\n        Emit(\"product:added\", new { name, quantity });\n    }\n}\n\n// Usage\nvar store = new Store();\n\nvar unsubscribe = store.Subscribe(\"product:added\", data =>\n{\n    dynamic d = data!;\n    Console.WriteLine($\"New stock: {d.quantity}x {d.name}\");\n});\n\nstore.AddProduct(\"iPhone\", 50); // New stock: 50x iPhone\nunsubscribe();                  // Stop listening",
+    "python": "from __future__ import annotations\nfrom collections import defaultdict\nfrom typing import Callable, Any\n\nclass EventEmitter:\n    def __init__(self):\n        self._subscribers: dict[str, list[Callable]] = defaultdict(list)\n\n    def subscribe(self, event: str, listener: Callable) -> Callable:\n        self._subscribers[event].append(listener)\n        def unsubscribe():\n            self._subscribers[event].remove(listener)\n        return unsubscribe\n\n    def emit(self, event: str, data: Any = None) -> None:\n        for listener in list(self._subscribers[event]):\n            listener(data)\n\n\nclass Store(EventEmitter):\n    def __init__(self):\n        super().__init__()\n        self._stock: dict[str, int] = {}\n\n    def add_product(self, name: str, quantity: int) -> None:\n        self._stock[name] = self._stock.get(name, 0) + quantity\n        self.emit('product:added', {'name': name, 'quantity': quantity})\n\n\n# Usage\nstore = Store()\nunsubscribe = store.subscribe(\n    'product:added',\n    lambda e: print(f\"New stock: {e['quantity']}x {e['name']}\")\n)\n\nstore.add_product('iPhone', 50)  # New stock: 50x iPhone\nunsubscribe()                     # Stop listening"
+  },
+  "pros": [
+    {
+      "en": "New kinds of subscribers can be added at any time without touching the publisher's source at all.",
+      "ru": "Новые виды подписчиков можно добавлять в любой момент, вообще не трогая исходный код издателя."
+    },
+    {
+      "en": "Subscriptions form and dissolve while the program is running, so the set of listeners can grow or shrink based on live conditions.",
+      "ru": "Подписки создаются и снимаются прямо во время работы программы, поэтому набор слушателей может расти и сокращаться в зависимости от текущих условий."
+    },
+    {
+      "en": "The publisher depends only on a thin notification interface, never on any subscriber's concrete class, keeping the two sides loosely coupled.",
+      "ru": "Издатель зависит лишь от тонкого интерфейса уведомления, но никогда — от конкретного класса подписчика, что сохраняет слабую связанность сторон."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Nothing guarantees the order subscribers are notified in, which becomes a problem if one subscriber's reaction depends on another running first.",
+      "ru": "Ничто не гарантирует порядок оповещения подписчиков, что становится проблемой, если реакция одного подписчика зависит от того, что другой уже отработал."
+    },
+    {
+      "en": "A subscriber that forgets to unsubscribe keeps a live reference in the publisher's list, quietly leaking memory long after it should have been collected.",
+      "ru": "Подписчик, забывший отписаться, продолжает висеть в списке издателя, незаметно вызывая утечку памяти задолго после того, как должен был быть собран сборщиком мусора."
+    },
+    {
+      "en": "A chain of notifications triggering further state changes and further notifications can be hard to trace and debug.",
+      "ru": "Цепочку уведомлений, вызывающих новые изменения состояния и новые уведомления, бывает трудно отследить и отладить."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Observer when one object's state change needs to ripple out to a set of other objects that isn't fixed or fully known in advance.",
+      "ru": "Применяйте Наблюдатель, когда изменение состояния одного объекта должно затрагивать набор других объектов, который заранее не фиксирован или не полностью известен."
+    },
+    {
+      "en": "Use it when interested parties need to come and go dynamically — watching only during a specific screen, session, or operation.",
+      "ru": "Используйте его, когда заинтересованные стороны должны динамически появляться и исчезать — наблюдая только в течение конкретного экрана, сессии или операции."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**DOM events** — `element.addEventListener('click', handler)` subscribes a handler to notifications the element publishes.",
+      "ru": "**DOM-события** — `element.addEventListener('click', handler)` подписывает обработчик на уведомления, которые публикует элемент."
+    },
+    {
+      "en": "**RxJS Observables** — a stream publisher notifies every subscribed operator chain each time a new value is emitted.",
+      "ru": "**RxJS Observable** — издатель потока оповещает каждую подписанную цепочку операторов при появлении нового значения."
+    },
+    {
+      "en": "**Spreadsheet formulas** — changing one cell automatically recalculates and re-renders every cell whose formula references it.",
+      "ru": "**Формулы в электронных таблицах** — изменение одной ячейки автоматически пересчитывает и перерисовывает каждую ячейку, чья формула на неё ссылается."
+    }
+  ],
+  "related_patterns": [
+    "mediator",
+    "singleton",
+    "command",
+    "iterator"
+  ]
+}

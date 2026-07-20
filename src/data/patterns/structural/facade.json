@@ -1,0 +1,204 @@
+{
+  "slug": "facade",
+  "name": "Facade",
+  "category": "structural",
+  "complexity": 1,
+  "popularity": 3,
+  "also_known_as": [],
+  "tags": [
+    "structural",
+    "interface",
+    "simplification",
+    "subsystem"
+  ],
+  "intent": {
+    "en": "Facade hides a tangle of interacting classes behind one clean entry point, so client code issues a single high-level call instead of orchestrating the subsystem itself.",
+    "ru": "Фасад прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиентский код делает один высокоуровневый вызов вместо самостоятельной оркестровки подсистемы."
+  },
+  "problem": {
+    "en": "Suppose you're integrating a video-processing library into your app. To produce a single output file, you must instantiate a codec manager, configure a bitrate reader, wire up an audio mixer, set the container format, and call methods on each in the right sequence — miss a step and the export silently fails.\n\nIf that setup logic is scattered across your application wherever video export is needed, every call site becomes intimately familiar with the library's internals. Upgrade the library or swap it out, and you're hunting through the whole codebase for places that poke at its classes directly.",
+    "ru": "Допустим, вы подключаете к приложению библиотеку обработки видео. Чтобы получить один выходной файл, нужно создать менеджер кодеков, настроить читатель битрейта, собрать аудиомиксер, задать контейнерный формат и вызвать методы каждого объекта в нужном порядке — пропустишь шаг, и экспорт незаметно сломается.\n\nЕсли эта логика настройки размазана по всему приложению везде, где нужен экспорт видео, каждое место вызова оказывается тесно завязано на внутреннее устройство библиотеки. Стоит обновить библиотеку или заменить её другой — и придётся выискивать по всему коду места, которые напрямую трогают её классы."
+  },
+  "solution": {
+    "en": "Introduce one class — the facade — that sits in front of the subsystem and exposes only the operations clients actually need, such as `exportVideo(format)`. Internally, the facade owns the job of creating subsystem objects, wiring their dependencies, and calling them in the correct order.\n\nClients no longer see the codec manager, bitrate reader, or mixer at all — they see one method call. Direct access to the subsystem still exists for cases that need fine-grained control; the facade is an added convenience layer, not a wall.",
+    "ru": "Вводится один класс — фасад, — который стоит перед подсистемой и открывает наружу только те операции, что действительно нужны клиентам, например `exportVideo(format)`. Внутри себя фасад берёт на себя создание объектов подсистемы, связывание их зависимостей и вызов методов в нужной последовательности.\n\nКлиенты больше не видят ни менеджер кодеков, ни читатель битрейта, ни микшер — они видят один вызов метода. Прямой доступ к подсистеме при этом никуда не пропадает и остаётся для случаев, где нужен тонкий контроль — фасад лишь добавляет удобный слой, а не закрывает подсистему стеной."
+  },
+  "structure": {
+    "description": {
+      "en": "A single Facade class exposes a narrow, task-oriented API. Behind it sit the Complex Subsystem classes, which do the real work but require careful setup and sequencing. The Facade translates each simple client call into the right sequence of subsystem calls.",
+      "ru": "Единственный класс Фасада открывает узкий, ориентированный на конкретные задачи API. За ним находятся классы Сложной подсистемы, которые выполняют реальную работу, но требуют аккуратной настройки и последовательности вызовов. Фасад переводит каждый простой вызов клиента в нужную последовательность вызовов подсистемы."
+    },
+    "participants": [
+      {
+        "name": "Facade",
+        "role": {
+          "en": "Exposes a small set of high-level operations and holds the knowledge of which subsystem objects to create, configure, and call in what order to fulfill each one.",
+          "ru": "Открывает наружу небольшой набор высокоуровневых операций и знает, какие объекты подсистемы создавать, настраивать и вызывать — и в каком порядке — для выполнения каждой из них."
+        }
+      },
+      {
+        "name": "Complex Subsystem",
+        "role": {
+          "en": "The collection of classes doing the actual work — codecs, mixers, readers, and the like. These classes have no notion that a facade exists and can be used with or without it.",
+          "ru": "Набор классов, выполняющих реальную работу — кодеки, микшеры, читатели и подобное. Эти классы ничего не знают о существовании фасада и могут использоваться как с ним, так и без него."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Calls the facade's simplified methods instead of assembling subsystem objects itself, staying insulated from internal wiring and sequencing details.",
+          "ru": "Вызывает упрощённые методы фасада вместо самостоятельной сборки объектов подсистемы, оставаясь изолированным от деталей внутренней связки и последовательности вызовов."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Complex subsystem classes\nclass CPU {\n  freeze() { console.log('CPU: freezing...'); }\n  jump(position) { console.log(`CPU: jumping to position ${position}`); }\n  execute() { console.log('CPU: executing instructions'); }\n}\n\nclass Memory {\n  load(position, data) {\n    console.log(`Memory: loading \"${data}\" at position ${position}`);\n  }\n}\n\nclass HardDrive {\n  read(lba, size) {\n    return `OS boot sector (lba=${lba}, size=${size} bytes)`;\n  }\n}\n\n// Facade — simple interface to the complex subsystem\nclass ComputerFacade {\n  #cpu;\n  #memory;\n  #hardDrive;\n\n  constructor() {\n    this.#cpu = new CPU();\n    this.#memory = new Memory();\n    this.#hardDrive = new HardDrive();\n  }\n\n  start() {\n    this.#cpu.freeze();\n    const bootData = this.#hardDrive.read(0, 1024);\n    this.#memory.load(0, bootData);\n    this.#cpu.jump(0);\n    this.#cpu.execute();\n    console.log('Computer started successfully!');\n  }\n}\n\n// Client code — only interacts with the Facade\nconst computer = new ComputerFacade();\ncomputer.start();\n// CPU: freezing...\n// Memory: loading \"OS boot sector (lba=0, size=1024 bytes)\" at position 0\n// CPU: jumping to position 0\n// CPU: executing instructions\n// Computer started successfully!",
+    "typescript": "class CPU {\n  public freeze(): void { console.log('CPU: freezing...'); }\n  public jump(position: number): void { console.log(`CPU: jumping to position ${position}`); }\n  public execute(): void { console.log('CPU: executing instructions'); }\n}\n\nclass Memory {\n  public load(position: number, data: string): void {\n    console.log(`Memory: loading \"${data}\" at position ${position}`);\n  }\n}\n\nclass HardDrive {\n  public read(lba: number, size: number): string {\n    return `OS boot sector (lba=${lba}, size=${size} bytes)`;\n  }\n}\n\n// Facade\nclass ComputerFacade {\n  private cpu: CPU;\n  private memory: Memory;\n  private hardDrive: HardDrive;\n\n  constructor() {\n    this.cpu = new CPU();\n    this.memory = new Memory();\n    this.hardDrive = new HardDrive();\n  }\n\n  public start(): void {\n    this.cpu.freeze();\n    const bootData = this.hardDrive.read(0, 1024);\n    this.memory.load(0, bootData);\n    this.cpu.jump(0);\n    this.cpu.execute();\n    console.log('Computer started successfully!');\n  }\n}\n\n// Client code\nconst computer = new ComputerFacade();\ncomputer.start();\n// CPU: freezing...\n// Memory: loading \"OS boot sector (lba=0, size=1024 bytes)\" at position 0\n// CPU: jumping to position 0\n// CPU: executing instructions\n// Computer started successfully!",
+    "java": "// Complex subsystem classes\nclass CPU {\n    public void freeze() { System.out.println(\"CPU: freezing...\"); }\n    public void jump(int pos) { System.out.println(\"CPU: jumping to position \" + pos); }\n    public void execute()     { System.out.println(\"CPU: executing instructions\"); }\n}\n\nclass Memory {\n    public void load(int pos, String data) {\n        System.out.println(\"Memory: loading \\\"\" + data + \"\\\" at position \" + pos);\n    }\n}\n\nclass HardDrive {\n    public String read(int lba, int size) {\n        return \"OS boot sector (lba=\" + lba + \", size=\" + size + \" bytes)\";\n    }\n}\n\n// Facade — simple interface to the complex subsystem\nclass ComputerFacade {\n    private final CPU cpu           = new CPU();\n    private final Memory memory     = new Memory();\n    private final HardDrive drive   = new HardDrive();\n\n    public void start() {\n        cpu.freeze();\n        String boot = drive.read(0, 1024);\n        memory.load(0, boot);\n        cpu.jump(0);\n        cpu.execute();\n        System.out.println(\"Computer started successfully!\");\n    }\n}\n\n// Client code — only interacts with the Facade\nComputerFacade computer = new ComputerFacade();\ncomputer.start();\n// CPU: freezing...\n// Memory: loading \"OS boot sector (lba=0, size=1024 bytes)\" at position 0\n// CPU: jumping to position 0\n// CPU: executing instructions\n// Computer started successfully!",
+    "csharp": "// Complex subsystem classes\nclass CPU\n{\n    public void Freeze()        => Console.WriteLine(\"CPU: freezing...\");\n    public void Jump(int pos)   => Console.WriteLine($\"CPU: jumping to position {pos}\");\n    public void Execute()       => Console.WriteLine(\"CPU: executing instructions\");\n}\n\nclass Memory\n{\n    public void Load(int pos, string data) =>\n        Console.WriteLine($\"Memory: loading \\\"{data}\\\" at position {pos}\");\n}\n\nclass HardDrive\n{\n    public string Read(int lba, int size) =>\n        $\"OS boot sector (lba={lba}, size={size} bytes)\";\n}\n\n// Facade — simple interface to the complex subsystem\nclass ComputerFacade\n{\n    private readonly CPU       _cpu   = new();\n    private readonly Memory    _mem   = new();\n    private readonly HardDrive _drive = new();\n\n    public void Start()\n    {\n        _cpu.Freeze();\n        string boot = _drive.Read(0, 1024);\n        _mem.Load(0, boot);\n        _cpu.Jump(0);\n        _cpu.Execute();\n        Console.WriteLine(\"Computer started successfully!\");\n    }\n}\n\n// Client code — only interacts with the Facade\nvar computer = new ComputerFacade();\ncomputer.Start();\n// CPU: freezing...\n// Memory: loading \"OS boot sector (lba=0, size=1024 bytes)\" at position 0\n// CPU: jumping to position 0\n// CPU: executing instructions\n// Computer started successfully!",
+    "python": "class CPU:\n    def freeze(self) -> None:\n        print(\"CPU: freezing...\")\n\n    def jump(self, position: int) -> None:\n        print(f\"CPU: jumping to position {position}\")\n\n    def execute(self) -> None:\n        print(\"CPU: executing instructions\")\n\n\nclass Memory:\n    def load(self, position: int, data: str) -> None:\n        print(f'Memory: loading \"{data}\" at position {position}')\n\n\nclass HardDrive:\n    def read(self, lba: int, size: int) -> str:\n        return f\"OS boot sector (lba={lba}, size={size} bytes)\"\n\n\n# Facade — simple interface to the complex subsystem\nclass ComputerFacade:\n    def __init__(self) -> None:\n        self._cpu = CPU()\n        self._memory = Memory()\n        self._hard_drive = HardDrive()\n\n    def start(self) -> None:\n        self._cpu.freeze()\n        boot_data = self._hard_drive.read(0, 1024)\n        self._memory.load(0, boot_data)\n        self._cpu.jump(0)\n        self._cpu.execute()\n        print(\"Computer started successfully!\")\n\n\n# Client code — only interacts with the Facade\ncomputer = ComputerFacade()\ncomputer.start()\n# CPU: freezing...\n# Memory: loading \"OS boot sector (lba=0, size=1024 bytes)\" at position 0\n# CPU: jumping to position 0\n# CPU: executing instructions\n# Computer started successfully!"
+  },
+  "pros": [
+    {
+      "en": "Application code reads at the level of business intent (\"export the video\") instead of being cluttered with subsystem plumbing.",
+      "ru": "Код приложения читается на уровне бизнес-намерения («экспортировать видео»), а не захламлён внутренней механикой подсистемы."
+    },
+    {
+      "en": "The subsystem can be refactored, upgraded, or replaced with fewer ripple effects, since only the facade needs to track its API surface.",
+      "ru": "Подсистему можно рефакторить, обновлять или заменять с меньшими побочными эффектами, поскольку только фасаду нужно отслеживать её API."
+    },
+    {
+      "en": "Large subsystems can be split into layers, each fronted by its own facade, giving a clear entry point per layer instead of one tangled dependency graph.",
+      "ru": "Крупные подсистемы можно разбить на уровни, каждый со своим фасадом, — это даёт чёткую точку входа на каждый уровень вместо одного запутанного графа зависимостей."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Left unchecked, a facade tends to accumulate responsibilities for every subsystem in the app and turns into a god object that everything depends on.",
+      "ru": "Без должного контроля фасад склонен накапливать ответственность за все подсистемы приложения и превращается в «божественный объект», от которого зависит всё."
+    },
+    {
+      "en": "Advanced use cases that need fine-grained control over the subsystem may find the facade's simplified surface too restrictive and end up bypassing it anyway.",
+      "ru": "Для продвинутых сценариев, требующих тонкого контроля над подсистемой, упрощённый интерфейс фасада может оказаться слишком тесным, и его всё равно приходится обходить."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Your code only needs a handful of operations from a large, intricate library or subsystem, and you'd rather not learn or expose its full surface.",
+      "ru": "Когда коду нужна лишь горстка операций из большой и запутанной библиотеки или подсистемы, а изучать и раскрывать всю её поверхность не хочется."
+    },
+    {
+      "en": "You want a clear seam between architectural layers, with each layer talking to the next only through a defined entry point.",
+      "ru": "Когда нужна чёткая граница между архитектурными слоями, где каждый слой общается со следующим только через определённую точку входа."
+    },
+    {
+      "en": "You're integrating a third-party framework and want to keep its API from leaking into scattered parts of your application.",
+      "ru": "Когда вы подключаете сторонний фреймворк и хотите не дать его API просочиться в разрозненные части приложения."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**jQuery** — collapses inconsistent, verbose cross-browser DOM APIs into a handful of chainable calls like `$(el).hide()`, hiding browser-specific quirks entirely.",
+      "ru": "**jQuery** — сворачивает непоследовательные и многословные кросс-браузерные DOM API в несколько цепочечных вызовов вроде `$(el).hide()`, полностью скрывая особенности конкретных браузеров."
+    },
+    {
+      "en": "**Django's `Model.objects`** — a facade over SQL connection handling, query building, and row-to-object mapping, letting `User.objects.filter(...)` stand in for dozens of lower-level steps.",
+      "ru": "**`Model.objects` в Django** — фасад над установкой соединения с БД, построением запросов и преобразованием строк в объекты; `User.objects.filter(...)` заменяет собой десятки низкоуровневых шагов."
+    },
+    {
+      "en": "**Stripe's SDK `charge()` call** — hides HTTP request construction, authentication headers, retries, and error mapping behind a single method for the merchant's application.",
+      "ru": "**Вызов `charge()` в SDK Stripe** — прячет построение HTTP-запроса, заголовки аутентификации, повторные попытки и обработку ошибок за одним методом, доступным приложению продавца."
+    }
+  ],
+  "related_patterns": [
+    "adapter",
+    "singleton",
+    "mediator",
+    "abstract-factory"
+  ],
+  "visuals": [
+    {
+      "id": "facade-concept",
+      "type": "flow",
+      "style": "facade",
+      "category": "structural",
+      "width": 860,
+      "height": 470,
+      "title": {
+        "en": "How Facade works",
+        "ru": "Как работает Фасад"
+      },
+      "description": {
+        "en": "The Client makes a single watchMovie() call to the Home Theater Facade — and nothing else. The Facade is the one entry point across the boundary into the subsystem: only it reaches the Amplifier, Projector, DVD Player and Lights, coordinating them in the right order. The Client never touches any subsystem part directly.",
+        "ru": "Клиент делает единственный вызов watchMovie() к Фасаду домашнего кинотеатра — и больше ничего. Фасад — единственная точка входа через границу в подсистему: только он обращается к Усилителю, Проектору, DVD-плееру и Свету, координируя их в правильном порядке. Клиент никогда не обращается к частям подсистемы напрямую."
+      },
+      "caption": {
+        "en": "One call to the Facade. It coordinates the whole subsystem — the Client stays outside the complexity.",
+        "ru": "Один вызов к Фасаду. Он координирует всю подсистему — Клиент остаётся снаружи сложности."
+      },
+      "subsystemLabel": {
+        "en": "Home Theater subsystem",
+        "ru": "Подсистема кинотеатра"
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Client", "ru": "Клиент" },
+          "subtitle": { "en": "one call", "ru": "один вызов" }
+        },
+        {
+          "id": "facade",
+          "role": "facade",
+          "kind": "class",
+          "icon": "spark",
+          "label": { "en": "Facade", "ru": "Фасад" },
+          "subtitle": { "en": "watchMovie()", "ru": "watchMovie()" }
+        },
+        {
+          "id": "amplifier",
+          "role": "subsystem",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Amplifier", "ru": "Усилитель" },
+          "subtitle": { "en": "Audio", "ru": "Звук" }
+        },
+        {
+          "id": "projector",
+          "role": "subsystem",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Projector", "ru": "Проектор" },
+          "subtitle": { "en": "Video", "ru": "Видео" }
+        },
+        {
+          "id": "dvdPlayer",
+          "role": "subsystem",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "DVD Player", "ru": "DVD-плеер" },
+          "subtitle": { "en": "Media", "ru": "Медиа" }
+        },
+        {
+          "id": "lights",
+          "role": "subsystem",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Lights", "ru": "Свет" },
+          "subtitle": { "en": "Lighting", "ru": "Освещение" }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "facade",
+          "relationship": "flow",
+          "label": { "en": "watchMovie()", "ru": "watchMovie()" }
+        }
+      ]
+    }
+  ]
+}

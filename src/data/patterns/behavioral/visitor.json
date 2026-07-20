@@ -1,0 +1,289 @@
+{
+  "slug": "visitor",
+  "name": "Visitor",
+  "category": "behavioral",
+  "complexity": 3,
+  "popularity": 1,
+  "also_known_as": [],
+  "tags": [
+    "behavioral",
+    "double-dispatch",
+    "operations",
+    "traversal"
+  ],
+  "intent": {
+    "en": "Visitor moves an operation out of the classes it acts on and into its own class, so new operations can be added to a fixed set of element types without touching those types at all.",
+    "ru": "Посетитель выносит операцию из классов, над которыми она выполняется, в отдельный класс — благодаря этому новые операции можно добавлять к фиксированному набору типов элементов, вообще не изменяя сами эти типы."
+  },
+  "problem": {
+    "en": "Imagine you maintain an object structure representing a geometric scene: dots, circles, and rectangles. Now the team needs to export the whole scene to XML.\n\nYou could add an `exportToXml` method to every shape class. But XML export is only the beginning — next comes JSON export, area calculation, and bounding-box computation. Each new operation forces you to edit every shape class, mixing unrelated concerns into classes that should only model geometry.\n\nWorse, these operations often need behavior specific to each concrete type, so a single generic method on a common base class won't do. You need a way to add new type-specific operations to a class hierarchy without repeatedly cracking it open.",
+    "ru": "Представьте, что вы поддерживаете структуру объектов, представляющую геометрическую сцену: точки, круги и прямоугольники. Теперь команде нужно экспортировать всю сцену в XML.\n\nМожно добавить метод `exportToXml` в каждый класс фигуры. Но экспорт в XML — только начало: дальше будут экспорт в JSON, вычисление площади и расчёт ограничивающего прямоугольника. Каждая новая операция вынуждает править каждый класс фигуры, примешивая посторонние обязанности к классам, которые должны лишь моделировать геометрию.\n\nХуже того, эти операции часто требуют поведения, специфичного для каждого конкретного типа, поэтому единый универсальный метод в общем базовом классе не подойдёт. Нужен способ добавлять новые типозависимые операции к иерархии классов, не вскрывая её снова и снова."
+  },
+  "solution": {
+    "en": "The Visitor pattern suggests placing the new behavior into a separate class called a **visitor**, instead of trying to integrate it into existing classes. The object structure that originally had to perform the behavior is now passed to the visitor's methods so the behavior can access the data it needs.\n\nThe visitor declares a set of visiting methods — one per concrete element type (`visitCircle`, `visitRectangle`, and so on). To route a call to the correct method, each element class implements a single `accept(visitor)` method that calls back the visitor method matching its own type. This technique is called **double dispatch**: the operation executed depends on both the element type and the visitor type.\n\nAdding a new operation now means writing one new visitor class, without touching any element. The element hierarchy stays closed for modification while remaining open for new operations.",
+    "ru": "Паттерн Посетитель предлагает поместить новое поведение в отдельный класс, называемый **посетителем**, вместо попыток встроить его в существующие классы. Структура объектов, которая изначально должна была выполнять поведение, теперь передаётся в методы посетителя, чтобы поведение получило доступ к нужным данным.\n\nПосетитель объявляет набор методов посещения — по одному на каждый конкретный тип элемента (`visitCircle`, `visitRectangle` и так далее). Чтобы направить вызов в правильный метод, каждый класс элемента реализует единственный метод `accept(visitor)`, который вызывает метод посетителя, соответствующий его собственному типу. Эта техника называется **двойной диспетчеризацией**: выполняемая операция зависит и от типа элемента, и от типа посетителя.\n\nТеперь добавление новой операции означает написание одного нового класса-посетителя без изменения элементов. Иерархия элементов остаётся закрытой для изменения, оставаясь открытой для новых операций."
+  },
+  "structure": {
+    "description": {
+      "en": "The Visitor interface declares a visiting method for each concrete Element type. Each ConcreteVisitor implements those methods for a specific operation. The Element interface declares the `accept(visitor)` method; each ConcreteElement implements it by calling the visitor method that matches its type, passing itself as an argument. The Client traverses the object structure and calls `accept` on each element.",
+      "ru": "Интерфейс Посетителя объявляет метод посещения для каждого конкретного типа Элемента. Каждый Конкретный посетитель реализует эти методы для определённой операции. Интерфейс Элемента объявляет метод `accept(visitor)`; каждый Конкретный элемент реализует его, вызывая метод посетителя, соответствующий его типу, и передавая себя в качестве аргумента. Клиент обходит структуру объектов и вызывает `accept` на каждом элементе."
+    },
+    "participants": [
+      {
+        "name": "Visitor",
+        "role": {
+          "en": "Declares a visiting method for each class of ConcreteElement in the object structure. The method's parameter type identifies the element being visited.",
+          "ru": "Объявляет метод посещения для каждого класса Конкретного элемента в структуре объектов. Тип параметра метода определяет посещаемый элемент."
+        }
+      },
+      {
+        "name": "ConcreteVisitor",
+        "role": {
+          "en": "Implements every visiting method to carry out one specific operation, storing any state the operation accumulates while traversing the structure.",
+          "ru": "Реализует каждый метод посещения для выполнения одной конкретной операции, храня состояние, которое операция накапливает при обходе структуры."
+        }
+      },
+      {
+        "name": "Element",
+        "role": {
+          "en": "Declares the `accept(visitor)` method that takes a visitor as an argument.",
+          "ru": "Объявляет метод `accept(visitor)`, принимающий посетителя в качестве аргумента."
+        }
+      },
+      {
+        "name": "ConcreteElement",
+        "role": {
+          "en": "Implements `accept` by calling the visitor method that corresponds to its own class, passing itself as the argument (double dispatch).",
+          "ru": "Реализует `accept`, вызывая метод посетителя, соответствующий его собственному классу, и передавая себя в качестве аргумента (двойная диспетчеризация)."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Traverses the object structure and calls `accept` on its elements, handing each element the visitor it wants to apply.",
+          "ru": "Обходит структуру объектов и вызывает `accept` на её элементах, передавая каждому элементу посетителя, которого нужно применить."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "// Elements — each implements accept(visitor)\nclass Circle {\n  constructor(radius) { this.radius = radius; }\n  accept(visitor) { return visitor.visitCircle(this); }\n}\n\nclass Rectangle {\n  constructor(width, height) { this.width = width; this.height = height; }\n  accept(visitor) { return visitor.visitRectangle(this); }\n}\n\n// Concrete visitor — computes area\nclass AreaVisitor {\n  visitCircle(circle) {\n    return Math.PI * circle.radius ** 2;\n  }\n  visitRectangle(rect) {\n    return rect.width * rect.height;\n  }\n}\n\n// Concrete visitor — exports to XML\nclass XmlExportVisitor {\n  visitCircle(circle) {\n    return `<circle radius=\"${circle.radius}\"/>`;\n  }\n  visitRectangle(rect) {\n    return `<rect width=\"${rect.width}\" height=\"${rect.height}\"/>`;\n  }\n}\n\n// Usage\nconst shapes = [new Circle(2), new Rectangle(3, 4)];\n\nconst area = new AreaVisitor();\nconst xml = new XmlExportVisitor();\n\nfor (const shape of shapes) {\n  console.log(shape.accept(area).toFixed(2), '->', shape.accept(xml));\n}\n// 12.57 -> <circle radius=\"2\"/>\n// 12.00 -> <rect width=\"3\" height=\"4\"/>",
+    "typescript": "// Visitor interface — one method per concrete element\ninterface ShapeVisitor<T> {\n  visitCircle(circle: Circle): T;\n  visitRectangle(rect: Rectangle): T;\n}\n\n// Element interface\ninterface Shape {\n  accept<T>(visitor: ShapeVisitor<T>): T;\n}\n\nclass Circle implements Shape {\n  constructor(public readonly radius: number) {}\n  accept<T>(visitor: ShapeVisitor<T>): T {\n    return visitor.visitCircle(this);\n  }\n}\n\nclass Rectangle implements Shape {\n  constructor(\n    public readonly width: number,\n    public readonly height: number,\n  ) {}\n  accept<T>(visitor: ShapeVisitor<T>): T {\n    return visitor.visitRectangle(this);\n  }\n}\n\n// Concrete visitors\nclass AreaVisitor implements ShapeVisitor<number> {\n  visitCircle(circle: Circle): number {\n    return Math.PI * circle.radius ** 2;\n  }\n  visitRectangle(rect: Rectangle): number {\n    return rect.width * rect.height;\n  }\n}\n\nclass XmlExportVisitor implements ShapeVisitor<string> {\n  visitCircle(circle: Circle): string {\n    return `<circle radius=\"${circle.radius}\"/>`;\n  }\n  visitRectangle(rect: Rectangle): string {\n    return `<rect width=\"${rect.width}\" height=\"${rect.height}\"/>`;\n  }\n}\n\n// Usage\nconst shapes: Shape[] = [new Circle(2), new Rectangle(3, 4)];\nconst area = new AreaVisitor();\nconst xml = new XmlExportVisitor();\n\nfor (const shape of shapes) {\n  console.log(shape.accept(area).toFixed(2), '->', shape.accept(xml));\n}",
+    "java": "// Visitor interface — one visit method per concrete element\ninterface ShapeVisitor<T> {\n    T visitCircle(Circle circle);\n    T visitRectangle(Rectangle rect);\n}\n\n// Element interface\ninterface Shape {\n    <T> T accept(ShapeVisitor<T> visitor);\n}\n\nclass Circle implements Shape {\n    public final double radius;\n    Circle(double radius) { this.radius = radius; }\n    public <T> T accept(ShapeVisitor<T> v) { return v.visitCircle(this); }\n}\n\nclass Rectangle implements Shape {\n    public final double width, height;\n    Rectangle(double w, double h) { this.width = w; this.height = h; }\n    public <T> T accept(ShapeVisitor<T> v) { return v.visitRectangle(this); }\n}\n\n// Concrete visitor — computes area\nclass AreaVisitor implements ShapeVisitor<Double> {\n    public Double visitCircle(Circle c)    { return Math.PI * c.radius * c.radius; }\n    public Double visitRectangle(Rectangle r) { return r.width * r.height; }\n}\n\n// Concrete visitor — exports to XML\nclass XmlExportVisitor implements ShapeVisitor<String> {\n    public String visitCircle(Circle c)    { return \"<circle radius=\\\"\" + c.radius + \"\\\"/>\"; }\n    public String visitRectangle(Rectangle r) {\n        return \"<rect width=\\\"\" + r.width + \"\\\" height=\\\"\" + r.height + \"\\\"/>\"; }\n}\n\n// Usage\njava.util.List<Shape> shapes = java.util.List.of(new Circle(2), new Rectangle(3, 4));\nAreaVisitor area     = new AreaVisitor();\nXmlExportVisitor xml = new XmlExportVisitor();\n\nfor (Shape shape : shapes) {\n    System.out.printf(\"%.2f -> %s%n\", shape.accept(area), shape.accept(xml));\n}\n// 12.57 -> <circle radius=\"2.0\"/>\n// 12.00 -> <rect width=\"3.0\" height=\"4.0\"/>",
+    "csharp": "// Visitor interface — one method per concrete element type\ninterface IShapeVisitor<out T>\n{\n    T VisitCircle(Circle circle);\n    T VisitRectangle(Rectangle rect);\n}\n\n// Element interface\ninterface IShape { T Accept<T>(IShapeVisitor<T> visitor); }\n\nclass Circle : IShape\n{\n    public double Radius { get; }\n    public Circle(double radius) => Radius = radius;\n    public T Accept<T>(IShapeVisitor<T> v) => v.VisitCircle(this);\n}\n\nclass Rectangle : IShape\n{\n    public double Width { get; }\n    public double Height { get; }\n    public Rectangle(double w, double h) { Width = w; Height = h; }\n    public T Accept<T>(IShapeVisitor<T> v) => v.VisitRectangle(this);\n}\n\n// Concrete visitor — computes area\nclass AreaVisitor : IShapeVisitor<double>\n{\n    public double VisitCircle(Circle c)       => Math.PI * c.Radius * c.Radius;\n    public double VisitRectangle(Rectangle r) => r.Width * r.Height;\n}\n\n// Concrete visitor — exports to XML\nclass XmlExportVisitor : IShapeVisitor<string>\n{\n    public string VisitCircle(Circle c)       => $\"<circle radius=\\\"{c.Radius}\\\"/>\";\n    public string VisitRectangle(Rectangle r) => $\"<rect width=\\\"{r.Width}\\\" height=\\\"{r.Height}\\\"/>\";\n}\n\n// Usage\nvar shapes = new IShape[] { new Circle(2), new Rectangle(3, 4) };\nvar area   = new AreaVisitor();\nvar xml    = new XmlExportVisitor();\n\nforeach (var shape in shapes)\n    Console.WriteLine($\"{shape.Accept(area):F2} -> {shape.Accept(xml)}\");\n// 12.57 -> <circle radius=\"2\"/>\n// 12.00 -> <rect width=\"3\" height=\"4\"/>",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\nimport math\n\n\nclass ShapeVisitor(ABC):\n    \"\"\"Visitor — one method per concrete element.\"\"\"\n    @abstractmethod\n    def visit_circle(self, circle: 'Circle'): ...\n\n    @abstractmethod\n    def visit_rectangle(self, rect: 'Rectangle'): ...\n\n\nclass Shape(ABC):\n    \"\"\"Element\"\"\"\n    @abstractmethod\n    def accept(self, visitor: ShapeVisitor): ...\n\n\nclass Circle(Shape):\n    def __init__(self, radius: float) -> None:\n        self.radius = radius\n\n    def accept(self, visitor: ShapeVisitor):\n        return visitor.visit_circle(self)\n\n\nclass Rectangle(Shape):\n    def __init__(self, width: float, height: float) -> None:\n        self.width, self.height = width, height\n\n    def accept(self, visitor: ShapeVisitor):\n        return visitor.visit_rectangle(self)\n\n\nclass AreaVisitor(ShapeVisitor):\n    def visit_circle(self, circle: Circle) -> float:\n        return math.pi * circle.radius ** 2\n\n    def visit_rectangle(self, rect: Rectangle) -> float:\n        return rect.width * rect.height\n\n\nclass XmlExportVisitor(ShapeVisitor):\n    def visit_circle(self, circle: Circle) -> str:\n        return f'<circle radius=\"{circle.radius}\"/>'\n\n    def visit_rectangle(self, rect: Rectangle) -> str:\n        return f'<rect width=\"{rect.width}\" height=\"{rect.height}\"/>'\n\n\n# Usage\nshapes: list[Shape] = [Circle(2), Rectangle(3, 4)]\narea = AreaVisitor()\nxml = XmlExportVisitor()\n\nfor shape in shapes:\n    print(f'{shape.accept(area):.2f}', '->', shape.accept(xml))\n# 12.57 -> <circle radius=\"2\"/>\n# 12.00 -> <rect width=\"3\" height=\"4\"/>"
+  },
+  "pros": [
+    {
+      "en": "New behavior arrives as a new visitor class, so the element hierarchy it operates on is never touched or recompiled.",
+      "ru": "Новое поведение оформляется в виде нового класса-посетителя — иерархия элементов, над которой оно выполняется, при этом не меняется и не пересобирается."
+    },
+    {
+      "en": "Related logic that would otherwise be scattered across many element classes ends up grouped together in one visitor, which is easier to read and change as a unit.",
+      "ru": "Связанная логика, которая иначе была бы разбросана по множеству классов элементов, собирается в одном посетителе — так её проще читать и менять как единое целое."
+    },
+    {
+      "en": "Because a visitor is handed every element it touches, it can build up state — totals, counts, a rendered document — across an entire traversal.",
+      "ru": "Поскольку посетителю передаётся каждый элемент, с которым он работает, он может накапливать состояние — суммы, счётчики, собираемый документ — на протяжении всего обхода."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Adding a new element type means adding a matching method to every existing visitor, so the element hierarchy and the visitor set are tightly coupled to each other.",
+      "ru": "Добавление нового типа элемента требует добавления соответствующего метода в каждый существующий посетитель — иерархия элементов и набор посетителей оказываются тесно связаны друг с другом."
+    },
+    {
+      "en": "A visitor only sees what an element exposes publicly, so elements sometimes end up widening their interface just to give visitors enough to work with.",
+      "ru": "Посетитель видит только то, что элемент раскрывает публично, поэтому иногда элементам приходится расширять свой интерфейс, только чтобы дать посетителю достаточно данных для работы."
+    },
+    {
+      "en": "The accept/visit call routing is one extra hop compared to a plain method call, which can be confusing the first time someone reads the code.",
+      "ru": "Маршрутизация через accept/visit — это один лишний переход по сравнению с обычным вызовом метода, что может сбить с толку при первом чтении кода."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Visitor when you need to run several unrelated operations over every node of a stable object structure, such as a tree.",
+      "ru": "Применяйте Посетителя, когда нужно выполнять несколько не связанных друг с другом операций над всеми узлами стабильной структуры объектов, например дерева."
+    },
+    {
+      "en": "It also helps pull occasional, auxiliary behavior — export, validation, reporting — out of core domain classes so those classes can stay focused on their main responsibility.",
+      "ru": "Паттерн также помогает вынести редко используемое вспомогательное поведение — экспорт, валидацию, отчётность — из основных доменных классов, чтобы те оставались сосредоточены на своей главной задаче."
+    },
+    {
+      "en": "Use it when an operation is only meaningful for some of the classes in a hierarchy, since a visitor can implement just the visit methods that apply.",
+      "ru": "Используйте паттерн, когда операция имеет смысл лишь для части классов иерархии, — посетитель может реализовать только те методы посещения, которые действительно нужны."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Compilers** — a visitor walks the abstract syntax tree to perform type checking, optimization, and code generation as separate passes over the same node types.",
+      "ru": "**Компиляторы** — посетитель обходит абстрактное синтаксическое дерево, выполняя проверку типов, оптимизацию и генерацию кода как отдельные проходы над одними и теми же типами узлов."
+    },
+    {
+      "en": "**Document exporters** — a rich document model is traversed by different visitors to render it to HTML, PDF, or plain text without changing the document classes.",
+      "ru": "**Экспортёры документов** — насыщенная модель документа обходится разными посетителями для отрисовки в HTML, PDF или обычный текст без изменения классов документа."
+    },
+    {
+      "en": "**Shopping cart pricing** — visitors compute totals, taxes, and discounts across a mix of item types (books, electronics, groceries) each with its own rules.",
+      "ru": "**Расчёт стоимости корзины** — посетители вычисляют итоги, налоги и скидки для набора типов товаров (книги, электроника, продукты), каждый со своими правилами."
+    }
+  ],
+  "related_patterns": [
+    "composite",
+    "iterator",
+    "interpreter",
+    "command"
+  ],
+  "visuals": [
+    {
+      "id": "visitor-concept",
+      "type": "flow",
+      "style": "concept",
+      "category": "behavioral",
+      "width": 960,
+      "height": 420,
+      "title": {
+        "en": "How Visitor works",
+        "ru": "Как работает Посетитель"
+      },
+      "description": {
+        "en": "The Client calls accept(visitor) on each element. Circle routes the call back via visitCircle(this); Rectangle routes it via visitRect(this). This double dispatch lets the Visitor carry the export logic while the elements route to the right method — shapes never change.",
+        "ru": "Клиент вызывает accept(visitor) на каждом элементе. Circle перенаправляет вызов через visitCircle(this); Rectangle — через visitRect(this). Эта двойная диспетчеризация позволяет Посетителю хранить логику экспорта, пока элементы лишь маршрутизируют вызов к нужному методу — сами фигуры не меняются."
+      },
+      "caption": {
+        "en": "Elements route to the right Visitor method. New operations: add a Visitor, touch nothing else.",
+        "ru": "Элементы маршрутизируют к нужному методу Посетителя. Новые операции: добавить Посетителя, больше ничего не трогать."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "calls accept()",
+            "ru": "вызывает accept()"
+          },
+          "position": {
+            "x": 60,
+            "y": 165,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "circle",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Circle Node",
+            "ru": "Узел Круг"
+          },
+          "subtitle": {
+            "en": "element A",
+            "ru": "элемент A"
+          },
+          "position": {
+            "x": 340,
+            "y": 60,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "rect",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Rectangle Node",
+            "ru": "Узел Квадр"
+          },
+          "subtitle": {
+            "en": "element B",
+            "ru": "элемент B"
+          },
+          "position": {
+            "x": 340,
+            "y": 270,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        },
+        {
+          "id": "visitor",
+          "kind": "class",
+          "icon": "layers",
+          "emphasis": true,
+          "label": {
+            "en": "XMLExporter",
+            "ru": "ЭкспортВXML"
+          },
+          "subtitle": {
+            "en": "traveling inspector",
+            "ru": "выездной инспектор"
+          },
+          "position": {
+            "x": 680,
+            "y": 165,
+            "w": 200,
+            "h": 90
+          },
+          "shape": "card"
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "circle",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "border",
+          "label": {
+            "en": "① accept(v)",
+            "ru": "① accept(v)"
+          }
+        },
+        {
+          "source": "client",
+          "target": "rect",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "border",
+          "label": {
+            "en": "③ accept(v)",
+            "ru": "③ accept(v)"
+          }
+        },
+        {
+          "source": "circle",
+          "target": "visitor",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "border",
+          "label": {
+            "en": "② visitCircle(c)",
+            "ru": "② visitCircle(c)"
+          }
+        },
+        {
+          "source": "rect",
+          "target": "visitor",
+          "relationship": "flow",
+          "variant": "create",
+          "routing": "border",
+          "label": {
+            "en": "④ visitRect(r)",
+            "ru": "④ visitRect(r)"
+          }
+        }
+      ]
+    }
+  ]
+}
