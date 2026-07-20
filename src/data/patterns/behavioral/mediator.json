@@ -131,10 +131,10 @@
     {
       "id": "mediator-concept",
       "type": "flow",
-      "style": "concept",
+      "style": "hub",
       "category": "behavioral",
-      "width": 960,
-      "height": 420,
+      "width": 920,
+      "height": 640,
       "title": {
         "en": "How Mediator works",
         "ru": "Как работает Посредник"
@@ -150,9 +150,9 @@
       "nodes": [
         {
           "id": "mediator",
+          "role": "mediator",
           "kind": "class",
           "icon": "layers",
-          "emphasis": true,
           "label": {
             "en": "Chat Room",
             "ru": "Чат"
@@ -160,16 +160,11 @@
           "subtitle": {
             "en": "routes messages",
             "ru": "маршрутизирует сообщения"
-          },
-          "position": {
-            "x": 380,
-            "y": 160,
-            "w": 200,
-            "h": 100
           }
         },
         {
           "id": "userA",
+          "role": "colleague",
           "kind": "class",
           "icon": "user",
           "label": {
@@ -179,16 +174,11 @@
           "subtitle": {
             "en": "sends & receives",
             "ru": "отправляет и получает"
-          },
-          "position": {
-            "x": 20,
-            "y": 20,
-            "w": 180,
-            "h": 100
           }
         },
         {
           "id": "userB",
+          "role": "colleague",
           "kind": "class",
           "icon": "user",
           "label": {
@@ -198,16 +188,11 @@
           "subtitle": {
             "en": "sends & receives",
             "ru": "отправляет и получает"
-          },
-          "position": {
-            "x": 750,
-            "y": 20,
-            "w": 180,
-            "h": 100
           }
         },
         {
           "id": "userC",
+          "role": "colleague",
           "kind": "class",
           "icon": "user",
           "label": {
@@ -217,16 +202,11 @@
           "subtitle": {
             "en": "sends & receives",
             "ru": "отправляет и получает"
-          },
-          "position": {
-            "x": 20,
-            "y": 300,
-            "w": 180,
-            "h": 100
           }
         },
         {
           "id": "userD",
+          "role": "colleague",
           "kind": "class",
           "icon": "user",
           "label": {
@@ -236,12 +216,6 @@
           "subtitle": {
             "en": "sends & receives",
             "ru": "отправляет и получает"
-          },
-          "position": {
-            "x": 750,
-            "y": 300,
-            "w": 180,
-            "h": 100
           }
         }
       ],

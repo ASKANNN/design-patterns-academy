@@ -69,7 +69,7 @@ export async function reloadRoute() {
   }
   applyTranslations(_outlet);
   _markActiveLinks(path);
-  _setPageMeta(path, params);
+  setPageMeta(path, params);
   refreshAnimations(_outlet);
 }
 

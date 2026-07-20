@@ -34,6 +34,8 @@ export function Diagram(model = {}) {
 
   if (style === 'cursor') return _cursorDiagram(model);
 
+  if (style === 'hub') return _hubDiagram(model);
+
   const concept = style === 'concept';
   const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
   const titleId = `${safeId}-title`;
@@ -1235,4 +1237,135 @@ function _cellNode(node, g, index) {
 function _cursorFlow(p, safeId) {
   return `
       <path class="diagram__flow diagram__flow--cursor" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _hubDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 640,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const mediator = nodes.find((n) => n && n.role === 'mediator');
+  const colleagues = nodes.filter((n) => n && n.role === 'colleague');
+  if (!mediator || colleagues.length < 2) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 640;
+
+  const PAD = 24;
+  const cx = W / 2, cy = H / 2;
+
+  const MED_W = 200, MED_H = 110;
+  const mediatorG = { x: cx - MED_W / 2, y: cy - MED_H / 2, w: MED_W, h: MED_H };
+
+  const COL_W = 160, COL_H = 96;
+  const n = colleagues.length;
+  const R = Math.min(cx - PAD - COL_W / 2, cy - PAD - COL_H / 2);
+
+  const colleagueGeom = colleagues.map((_, i) => {
+    const angle = (-90 + (360 / n) * i) * (Math.PI / 180);
+    const ccx = cx + R * Math.cos(angle);
+    const ccy = cy + R * Math.sin(angle);
+    return { x: ccx - COL_W / 2, y: ccy - COL_H / 2, w: COL_W, h: COL_H, cx: ccx, cy: ccy };
+  });
+
+  const mediatorSvg = DiagramNode({ ...mediator, ...mediatorG, emphasis: true }, { concept: true, prefix: safeId });
+  const colleagueSvg = colleagues
+    .map((n2, i) => DiagramNode({ ...n2, ...colleagueGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  // Spoke 0 is the sender -> mediator (the request that kicks the interaction off);
+  // spokes 1..n-1 are mediator -> every other colleague (the mediator's routed replies).
+  const spokesSvg = colleagueGeom.map((g, i) => {
+    const dx = g.cx - cx, dy = g.cy - cy;
+    const medEdge = _hubBoxEdge(mediatorG, dx, dy);
+    const colEdge = _hubBoxEdge(g, -dx, -dy);
+    return i === 0
+      ? _hubFlow({ x1: colEdge.x, y1: colEdge.y, x2: medEdge.x, y2: medEdge.y }, safeId)
+      : _hubFlow({ x1: medEdge.x, y1: medEdge.y, x2: colEdge.x, y2: colEdge.y }, safeId);
+  }).join('');
+
+  const blockedSvg = colleagueGeom.map((g, i) => {
+    const next = colleagueGeom[(i + 1) % n];
+    return _hubBlocked(g, next, cx, cy);
+  }).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--hub',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${blockedSvg}${spokesSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${mediatorSvg}${colleagueSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+// Point where the ray from a box's center toward (dx, dy) crosses the box border.
+function _hubBoxEdge(box, dx, dy) {
+  const hw = box.w / 2, hh = box.h / 2;
+  const bcx = box.x + hw, bcy = box.y + hh;
+  if (dx === 0 && dy === 0) return { x: bcx, y: bcy };
+  const t = Math.min(
+    dx !== 0 ? hw / Math.abs(dx) : Infinity,
+    dy !== 0 ? hh / Math.abs(dy) : Infinity,
+  );
+  return { x: bcx + dx * t, y: bcy + dy * t };
+}
+
+function _hubFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--hub" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+// The ring of direct colleague-to-colleague paths that Mediator forbids: drawn
+// bowing away from the hub so it reads as a broken ring wrapped around the spokes,
+// each one struck through with an "x" badge at its outer apex.
+function _hubBlocked(a, b, cx, cy) {
+  const dx = b.cx - a.cx, dy = b.cy - a.cy;
+  const edgeA = _hubBoxEdge(a, dx, dy);
+  const edgeB = _hubBoxEdge(b, -dx, -dy);
+  const midX = (edgeA.x + edgeB.x) / 2, midY = (edgeA.y + edgeB.y) / 2;
+  const odx = midX - cx, ody = midY - cy;
+  const len = Math.hypot(odx, ody) || 1;
+  const BOW = 34;
+  const peakX = midX + (odx / len) * BOW;
+  const peakY = midY + (ody / len) * BOW;
+  const bx = 0.25 * edgeA.x + 0.5 * peakX + 0.25 * edgeB.x;
+  const by = 0.25 * edgeA.y + 0.5 * peakY + 0.25 * edgeB.y;
+
+  return `
+      <path class="diagram__hub-blocked-path" d="M ${r2(edgeA.x)} ${r2(edgeA.y)} Q ${r2(peakX)} ${r2(peakY)} ${r2(edgeB.x)} ${r2(edgeB.y)}" fill="none" aria-hidden="true" />
+      <g class="diagram__hub-blocked-badge" aria-hidden="true">
+        <circle cx="${r2(bx)}" cy="${r2(by)}" r="12" />
+        <line x1="${r2(bx - 6.5)}" y1="${r2(by + 6.5)}" x2="${r2(bx + 6.5)}" y2="${r2(by - 6.5)}" />
+      </g>`;
 }

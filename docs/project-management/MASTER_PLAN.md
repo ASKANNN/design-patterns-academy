@@ -91,7 +91,15 @@ Iterator                 BESPOKE (`cursor`) — committed
                          silently broke the dim/active/passed states —
                          same class of bug as the gateway fix, now
                          also patched for `.diagram--cursor`)
-Mediator                 GENERIC
+Mediator                 BESPOKE (`hub`) — committed
+                         (hub-and-spoke: mediator card centered, N
+                         colleague cards ringed around it, spokes
+                         computed via rectangle-edge intersection so
+                         it works for any colleague count; a dashed
+                         "blocked ring" with no-entry badges between
+                         adjacent colleagues makes the forbidden
+                         direct-communication path visible — reuses
+                         the Proxy gateway's no-entry visual grammar)
 Memento                  MISSING
 Observer                 MISSING
 State                    MISSING
@@ -102,10 +110,10 @@ Visitor                  GENERIC
 
 TOTALS
 
-BESPOKE (truly done):  8 / 23  (Decorator, Facade, Flyweight, Proxy,
-                        Chain, Command, Interpreter, Iterator — all
-                        committed and pushed)
-GENERIC (needs rework): 11 / 23
+BESPOKE (truly done):  9 / 23  (Decorator, Facade, Flyweight, Proxy,
+                        Chain, Command, Interpreter, Iterator,
+                        Mediator — all committed and pushed)
+GENERIC (needs rework): 10 / 23
 MISSING (needs data):    3 / 23
 
 
@@ -117,13 +125,14 @@ Proxy       → QA → commit → push      DONE
 Command     → QA → commit → push      DONE
 Interpreter → QA → commit → push      DONE
 Iterator    → QA → commit → push      DONE
+Mediator    → QA → commit → push      DONE
 
 ONLY THEN, in this exact order (unchanged from the original plan):
 
-Mediator → Memento → Observer
+Memento → Observer
 → State → Strategy → Template Method → Visitor
 
-(Mediator, Strategy, Template Method and Visitor already render a
+(Strategy, Template Method and Visitor already render a
 GENERIC placeholder today — when their turn comes, treat them the
 same as a MISSING pattern: design a real bespoke composition, do not
 consider them pre-done just because a `visuals` block exists.)
@@ -986,6 +995,21 @@ same bug class already fixed for `.diagram--gateway` (Proxy) via
 `getComputedStyle(...).opacity` mid-timeline via Playwright — the
 static end-state screenshots alone did not reveal it.
 
+Mediator QA: verified the `dim` → `active` transition on the mediator
+card itself via mid-timeline `getComputedStyle(...).opacity` samples
+(0.32 at `scene`, transitioning through ~0.79–0.98 during `connect`,
+settling at 1 by `alice-sends`) in both themes — no stuck-opacity
+regression. Also verified both themes × both locales (EN/RU) render
+without clipping or overlap; RU labels (Алиса/Боб/Чарли/Диана/Чат)
+fit the existing card width unchanged.
+
+Unrelated bug found and fixed along the way: `reloadRoute()` in
+`src/scripts/router.js` called `_setPageMeta(...)` (undefined) instead
+of the exported `setPageMeta`, throwing an uncaught ReferenceError on
+every language toggle site-wide and silently skipping the
+`refreshAnimations()` call after it. Fixed the typo; unrelated to the
+Mediator diagram itself but was blocking RU-locale QA.
+
 ============================================================
 BEHAVIORAL IMPLEMENTATION PLAN
 ============================================================
@@ -998,7 +1022,7 @@ Order:
 2. Command — DONE
 3. Interpreter — DONE
 4. Iterator — DONE
-5. Mediator
+5. Mediator — DONE
 6. Memento
 7. Observer
 8. State

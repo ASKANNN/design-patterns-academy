@@ -831,6 +831,12 @@ const _MEDIATOR_STEPS = [
       { do: 'request',   index: 1 },
       { do: 'request',   index: 2 },
       { do: 'request',   index: 3 },
+      { do: 'highlight', node: 'userB' },
+      { do: 'highlight', node: 'userC' },
+      { do: 'highlight', node: 'userD' },
+      { glow: 'userB' },
+      { glow: 'userC' },
+      { glow: 'userD' },
     ] },
   { id: 'final',       duration: 3200,
     actions: [
