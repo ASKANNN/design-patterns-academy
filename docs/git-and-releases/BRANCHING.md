@@ -18,8 +18,7 @@ As the project grows, the branching strategy can evolve without changing the dev
 
 Current Team Size:
 
-* One Product Owner
-* AI-assisted development
+* One Product Owner / maintainer
 
 Current Branch Strategy:
 

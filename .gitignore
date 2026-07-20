@@ -32,3 +32,8 @@ yarn-error.log*
 # Cache
 .cache/
 .eslintcache
+
+# Internal-only working docs (not published)
+/prompts/
+/docs/project-management/ENGINEERING_GUIDE.md
+/docs/project-management/OWNER_GUIDE.md

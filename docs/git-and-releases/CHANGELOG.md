@@ -20,7 +20,7 @@ All notable changes to Design Patterns Academy are documented in this file.
 
 ### Fixed
 
-- Rewrote English pattern content to remove third-party copyrighted material
+- Rewrote English pattern content in original wording
 - Fixed Russian-language calques (literal English-to-Russian translations)
   across all 23 pattern JSON files
 - Fixed packet/impulse occlusion and row-centering issues in Command,

@@ -10,7 +10,6 @@
 - [x] `README.md`
 - [x] `ROADMAP.md`
 - [x] Documentation stubs (`docs/`)
-- [x] Prompt stubs (`prompts/`)
 
 ---
 
