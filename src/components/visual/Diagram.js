@@ -1259,7 +1259,7 @@ function _hubDiagram(model) {
   const PAD = 24;
   const cx = W / 2, cy = H / 2;
 
-  const MED_W = 200, MED_H = 110;
+  const MED_W = 200, MED_H = 172;
   const mediatorG = { x: cx - MED_W / 2, y: cy - MED_H / 2, w: MED_W, h: MED_H };
 
   const COL_W = 160, COL_H = 96;
