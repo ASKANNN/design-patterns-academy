@@ -1278,8 +1278,6 @@ function _hubDiagram(model) {
     .map((n2, i) => DiagramNode({ ...n2, ...colleagueGeom[i] }, { concept: true, prefix: safeId }))
     .join('');
 
-  // Spoke 0 is the sender -> mediator (the request that kicks the interaction off);
-  // spokes 1..n-1 are mediator -> every other colleague (the mediator's routed replies).
   const spokesSvg = colleagueGeom.map((g, i) => {
     const dx = g.cx - cx, dy = g.cy - cy;
     const medEdge = _hubBoxEdge(mediatorG, dx, dy);
@@ -1329,7 +1327,6 @@ function _hubDiagram(model) {
   </figure>`;
 }
 
-// Point where the ray from a box's center toward (dx, dy) crosses the box border.
 function _hubBoxEdge(box, dx, dy) {
   const hw = box.w / 2, hh = box.h / 2;
   const bcx = box.x + hw, bcy = box.y + hh;
@@ -1346,9 +1343,6 @@ function _hubFlow(p, safeId) {
       <path class="diagram__flow diagram__flow--hub" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
 }
 
-// The ring of direct colleague-to-colleague paths that Mediator forbids: drawn
-// bowing away from the hub so it reads as a broken ring wrapped around the spokes,
-// each one struck through with an "x" badge at its outer apex.
 function _hubBlocked(a, b, cx, cy) {
   const dx = b.cx - a.cx, dy = b.cy - a.cy;
   const edgeA = _hubBoxEdge(a, dx, dy);

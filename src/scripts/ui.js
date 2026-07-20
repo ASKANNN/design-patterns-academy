@@ -5,6 +5,7 @@ import { EmptyState }              from '../components/ui/EmptyState.js';
 import { BreadcrumbItems }         from '../components/ui/Breadcrumb.js';
 import { patternsBreadcrumbItems } from '../pages/PatternsCatalogPage.js';
 import { setPageMeta }             from './router.js';
+import { animateFilterIn }         from './animations.js';
 import { t }                       from '../utils/i18n.js';
 
 export function initUI() {
@@ -281,12 +282,17 @@ function handleFilter(chip) {
   });
 
   let visibleCount = 0;
+  const enteringItems = [];
   target.querySelectorAll('[data-filter-item]').forEach(item => {
     const matches = filter === 'all' || item.dataset.filterCategory === filter;
     item.classList.toggle('is-filtered-out', !matches);
     item.toggleAttribute('aria-hidden', !matches);
-    if (matches) visibleCount++;
+    if (matches) {
+      visibleCount++;
+      enteringItems.push(item);
+    }
   });
+  animateFilterIn(enteringItems);
 
   const countEl = container.querySelector('[data-filter-count]');
   if (countEl) countEl.textContent = filter === 'all' ? '' : t('patterns.count', { count: visibleCount });
