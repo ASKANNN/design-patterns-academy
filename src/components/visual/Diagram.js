@@ -42,6 +42,8 @@ export function Diagram(model = {}) {
 
   if (style === 'memento') return _mementoDiagram(model);
 
+  if (style === 'singleton') return _singletonDiagram(model);
+
   const concept = style === 'concept';
   const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
   const titleId = `${safeId}-title`;
@@ -1618,6 +1620,103 @@ function _mementoReturnFlow(from, to, bowY, safeId) {
   const d = `M ${r2(from.x)} ${r2(from.y)} C ${r2(from.x)} ${r2(bowY)}, ${r2(to.x)} ${r2(bowY)}, ${r2(to.x)} ${r2(to.y)}`;
   return `
       <path class="diagram__flow diagram__flow--memento-return" d="${d}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _singletonDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 880, height = 560,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const clients = nodes.filter((n) => n && n.role === 'client');
+  const instance = nodes.find((n) => n && n.role === 'instance');
+  if (clients.length === 0 || !instance) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 880;
+  const H = Number(height) || 560;
+
+  const PAD = 28;
+  const n = clients.length;
+
+  const CLIENT_W = 196, CLIENT_H = 92, GAP = 26;
+  const stackH = CLIENT_H * n + GAP * (n - 1);
+  const stackY0 = (H - stackH) / 2;
+  const clientGeom = clients.map((_, i) => ({
+    x: PAD, y: stackY0 + i * (CLIENT_H + GAP), w: CLIENT_W, h: CLIENT_H,
+  }));
+
+  const INST_W = 240, INST_H = 208;
+  const instanceG = { x: W - PAD - INST_W, y: (H - INST_H) / 2, w: INST_W, h: INST_H };
+
+  const ghostG = { x: instanceG.x - 20, y: instanceG.y - 20, w: INST_W - 40, h: INST_H - 40 };
+
+  const clientsSvg = clients
+    .map((c, i) => DiagramNode({ ...c, ...clientGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+  const instanceSvg = DiagramNode({ ...instance, ...instanceG, emphasis: true }, { concept: true, prefix: safeId });
+  const ghostSvg = _singletonGhost(ghostG);
+
+  const entryY0 = instanceG.y + (n > 1 ? 28 : instanceG.h / 2);
+  const entryStep = n > 1 ? (instanceG.h - 56) / (n - 1) : 0;
+  const flowsSvg = clientGeom.map((g, i) => {
+    const p = {
+      x1: g.x + g.w, y1: g.y + g.h / 2,
+      x2: instanceG.x, y2: entryY0 + i * entryStep,
+    };
+    return _singletonFlow(p, safeId, i === 0 ? 'create' : 'reuse');
+  }).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--singleton',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${ghostSvg}${flowsSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientsSvg}${instanceSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _singletonFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--singleton-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _singletonGhost(g) {
+  return `
+      <rect class="diagram__singleton-ghost" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="16" ry="16" aria-hidden="true" />
+      <g class="diagram__singleton-ghost-badge" aria-hidden="true">
+        <circle cx="${r2(g.x)}" cy="${r2(g.y)}" r="13" />
+        <line x1="${r2(g.x - 7)}" y1="${r2(g.y + 7)}" x2="${r2(g.x + 7)}" y2="${r2(g.y - 7)}" />
+      </g>`;
 }
 
 function _hubBoxEdge(box, dx, dy) {

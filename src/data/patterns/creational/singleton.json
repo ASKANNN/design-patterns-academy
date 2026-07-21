@@ -121,10 +121,10 @@
     {
       "id": "singleton-concept",
       "type": "flow",
-      "style": "concept",
+      "style": "singleton",
       "category": "creational",
-      "width": 720,
-      "height": 440,
+      "width": 880,
+      "height": 560,
       "title": {
         "en": "How Singleton works",
         "ru": "Как работает Одиночка"
@@ -141,36 +141,36 @@
         {
           "id": "clientA",
           "kind": "actor",
+          "role": "client",
           "icon": "user",
           "label": { "en": "Client A", "ru": "Клиент A" },
-          "subtitle": { "en": "getInstance()", "ru": "getInstance()" },
-          "position": { "x": 40, "y": 36, "w": 200, "h": 92 }
+          "subtitle": { "en": "getInstance()", "ru": "getInstance()" }
         },
         {
           "id": "clientB",
           "kind": "actor",
+          "role": "client",
           "icon": "user",
           "label": { "en": "Client B", "ru": "Клиент B" },
-          "subtitle": { "en": "getInstance()", "ru": "getInstance()" },
-          "position": { "x": 40, "y": 174, "w": 200, "h": 92 }
+          "subtitle": { "en": "getInstance()", "ru": "getInstance()" }
         },
         {
           "id": "clientC",
           "kind": "actor",
+          "role": "client",
           "icon": "user",
           "label": { "en": "Client C", "ru": "Клиент C" },
-          "subtitle": { "en": "getInstance()", "ru": "getInstance()" },
-          "position": { "x": 40, "y": 312, "w": 200, "h": 92 }
+          "subtitle": { "en": "getInstance()", "ru": "getInstance()" }
         },
         {
           "id": "instance",
           "kind": "class",
+          "role": "instance",
           "icon": "cube",
           "emphasis": true,
           "badge": "1",
           "label": { "en": "Singleton", "ru": "Одиночка" },
-          "subtitle": { "en": "one shared instance", "ru": "один общий экземпляр" },
-          "position": { "x": 456, "y": 148, "w": 232, "h": 148 }
+          "subtitle": { "en": "one shared instance", "ru": "один общий экземпляр" }
         }
       ],
       "edges": [
