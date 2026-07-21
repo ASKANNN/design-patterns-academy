@@ -131,7 +131,7 @@
 
 [data-theme="light"] .diagram--concept .diagram__viewport {
   background:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-border-strong) 85%, transparent) 1px, transparent 0) 0 0 / 22px 22px,
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-border-strong) 55%, transparent) 1px, transparent 0) 0 0 / 26px 26px,
     radial-gradient(120% 120% at 50% 50%, transparent 42%, color-mix(in srgb, var(--palette-gray-500) 32%, transparent) 100%),
     radial-gradient(58% 68% at 86% 12%, color-mix(in srgb, var(--diagram-accent) 36%, transparent), transparent 68%),
     radial-gradient(64% 78% at 8% 94%, color-mix(in srgb, var(--diagram-accent) 28%, transparent), transparent 70%),
@@ -1397,14 +1397,3 @@
 }
 
 .diagram--singleton .diagram__flow-dash { display: none; }
-
-.diagram--singleton .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
-}
-[data-theme="dark"] .diagram--singleton .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
-}
