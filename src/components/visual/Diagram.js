@@ -1652,13 +1652,10 @@ function _singletonDiagram(model) {
   const INST_W = 240, INST_H = 208;
   const instanceG = { x: W - PAD - INST_W, y: (H - INST_H) / 2, w: INST_W, h: INST_H };
 
-  const ghostG = { x: instanceG.x - 20, y: instanceG.y - 20, w: INST_W - 40, h: INST_H - 40 };
-
   const clientsSvg = clients
     .map((c, i) => DiagramNode({ ...c, ...clientGeom[i] }, { concept: true, prefix: safeId }))
     .join('');
   const instanceSvg = DiagramNode({ ...instance, ...instanceG, emphasis: true }, { concept: true, prefix: safeId });
-  const ghostSvg = _singletonGhost(ghostG);
 
   const entryY0 = instanceG.y + (n > 1 ? 28 : instanceG.h / 2);
   const entryStep = n > 1 ? (instanceG.h - 56) / (n - 1) : 0;
@@ -1696,7 +1693,7 @@ function _singletonDiagram(model) {
       : ''
   }
         ${_conceptDefs(safeId)}
-        <g class="diagram__edges" aria-hidden="true">${ghostSvg}${flowsSvg}
+        <g class="diagram__edges" aria-hidden="true">${flowsSvg}
         </g>
         <g class="diagram__nodes" role="list">${clientsSvg}${instanceSvg}
         </g>
@@ -1708,15 +1705,6 @@ function _singletonDiagram(model) {
 function _singletonFlow(p, safeId, variant) {
   return `
       <path class="diagram__flow diagram__flow--singleton-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
-}
-
-function _singletonGhost(g) {
-  return `
-      <rect class="diagram__singleton-ghost" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="16" ry="16" aria-hidden="true" />
-      <g class="diagram__singleton-ghost-badge" aria-hidden="true">
-        <circle cx="${r2(g.x)}" cy="${r2(g.y)}" r="13" />
-        <line x1="${r2(g.x - 7)}" y1="${r2(g.y + 7)}" x2="${r2(g.x + 7)}" y2="${r2(g.y - 7)}" />
-      </g>`;
 }
 
 function _hubBoxEdge(box, dx, dy) {
