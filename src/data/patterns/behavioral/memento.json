@@ -119,5 +119,76 @@
     "iterator",
     "prototype",
     "state"
+  ],
+  "visuals": [
+    {
+      "id": "memento-concept",
+      "type": "flow",
+      "style": "memento",
+      "category": "behavioral",
+      "width": 920,
+      "height": 640,
+      "title": {
+        "en": "How Memento works",
+        "ru": "Как работает Снимок"
+      },
+      "description": {
+        "en": "The Editor builds its own Memento and is the only party that can read one back. The History archives whatever memento it's handed as an opaque object, and later hands the same one back for the Editor to restore from — without ever looking inside it.",
+        "ru": "Редактор сам формирует свой снимок и является единственной стороной, способной прочитать его обратно. История архивирует переданный ей снимок как непрозрачный объект, а позже возвращает тот же снимок редактору для восстановления — ни разу не заглянув внутрь."
+      },
+      "caption": {
+        "en": "The Editor is the only one who ever reads or writes a memento — the History just archives opaque handles.",
+        "ru": "Только редактор когда-либо читает и пишет содержимое снимка — история лишь архивирует непрозрачные дескрипторы."
+      },
+      "nodes": [
+        {
+          "id": "originator",
+          "role": "originator",
+          "kind": "class",
+          "icon": "cube",
+          "label": { "en": "Editor", "ru": "Редактор" },
+          "subtitle": { "en": "owns the content", "ru": "владеет содержимым" }
+        },
+        {
+          "id": "memento",
+          "role": "memento",
+          "kind": "class",
+          "icon": "spark",
+          "label": { "en": "Editor Memento", "ru": "Снимок редактора" },
+          "subtitle": { "en": "sealed snapshot", "ru": "запечатанный снимок" }
+        },
+        {
+          "id": "caretaker",
+          "role": "caretaker",
+          "kind": "class",
+          "icon": "layers",
+          "label": { "en": "History", "ru": "История" },
+          "subtitle": { "en": "undo stack", "ru": "стек отмены" }
+        }
+      ],
+      "edges": [
+        {
+          "source": "originator",
+          "target": "memento",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "save()", "ru": "save()" }
+        },
+        {
+          "source": "memento",
+          "target": "caretaker",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "push()", "ru": "push()" }
+        },
+        {
+          "source": "caretaker",
+          "target": "originator",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "restore()", "ru": "restore()" }
+        }
+      ]
+    }
   ]
 }

@@ -150,10 +150,6 @@ export const PATTERN_GLYPHS = {
     <path class="pattern-icon__accent" d="M18 9.5 20 7.6M18 9.5 15.8 8.2" />`,
 };
 
-export function hasPatternIcon(slug) {
-  return Object.prototype.hasOwnProperty.call(PATTERN_GLYPHS, String(slug));
-}
-
 const CATEGORIES = new Set(['creational', 'structural', 'behavioral']);
 
 function _esc(value) {

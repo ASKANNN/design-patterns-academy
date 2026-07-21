@@ -30,13 +30,14 @@ function _conceptCard(node, opts) {
     icon = '',
     badge = '',
     emphasis = false,
+    accent = '',
     ariaLabel = '',
     focusable = true,
   } = node;
 
   const g = rect(node);
   const prefix = opts.prefix || 'dia';
-  const cls = `diagram__card${emphasis ? ' diagram__card--emphasis' : ''}`;
+  const cls = `diagram__card${emphasis ? ' diagram__card--emphasis' : ''}${accent ? ` diagram__card--accent-${escapeText(accent)}` : ''}`;
 
   const a11yLabel =
     ariaLabel || (subtitle ? `${label} — ${subtitle}` : label);

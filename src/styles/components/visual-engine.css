@@ -7,6 +7,10 @@
 .diagram--structural { --viz-accent: var(--palette-category-structural); }
 .diagram--behavioral { --viz-accent: var(--palette-category-behavioral); }
 
+.diagram__card--accent-error   { --viz-accent: var(--color-error); }
+.diagram__card--accent-warning { --viz-accent: var(--color-warning); }
+.diagram__card--accent-success { --viz-accent: var(--color-success); }
+
 .viz-overlay {
   pointer-events: none;
 }

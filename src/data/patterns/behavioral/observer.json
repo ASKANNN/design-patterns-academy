@@ -120,5 +120,108 @@
     "singleton",
     "command",
     "iterator"
+  ],
+  "visuals": [
+    {
+      "id": "observer-concept",
+      "type": "flow",
+      "style": "broadcast",
+      "category": "behavioral",
+      "width": 920,
+      "height": 640,
+      "title": {
+        "en": "How Observer works",
+        "ru": "Как работает Наблюдатель"
+      },
+      "description": {
+        "en": "The Weather Station holds no fixed list of consumers. When fresh readings land, it walks its subscriber registry and notifies the Phone App, Desktop Widget, and Logging Service at once — all through the same notification method, none of them known by name in advance.",
+        "ru": "Метеостанция не хранит фиксированный список потребителей. Когда приходят новые показания, она обходит реестр подписчиков и одновременно уведомляет мобильное приложение, виджет и сервис логирования — через один и тот же метод уведомления, не зная заранее ни одного из них по имени."
+      },
+      "caption": {
+        "en": "One state change fans out to every current subscriber at once.",
+        "ru": "Одно изменение состояния веером расходится сразу по всем текущим подписчикам."
+      },
+      "nodes": [
+        {
+          "id": "publisher",
+          "role": "publisher",
+          "kind": "class",
+          "icon": "spark",
+          "label": {
+            "en": "Weather Station",
+            "ru": "Метеостанция"
+          },
+          "subtitle": {
+            "en": "notifies subscribers",
+            "ru": "оповещает подписчиков"
+          }
+        },
+        {
+          "id": "subA",
+          "role": "subscriber",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Phone App",
+            "ru": "Мобильное приложение"
+          },
+          "subtitle": {
+            "en": "update()",
+            "ru": "update()"
+          }
+        },
+        {
+          "id": "subB",
+          "role": "subscriber",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Desktop Widget",
+            "ru": "Виджет"
+          },
+          "subtitle": {
+            "en": "update()",
+            "ru": "update()"
+          }
+        },
+        {
+          "id": "subC",
+          "role": "subscriber",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Logging Service",
+            "ru": "Сервис логирования"
+          },
+          "subtitle": {
+            "en": "update()",
+            "ru": "update()"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "publisher",
+          "target": "subA",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "notify()", "ru": "notify()" }
+        },
+        {
+          "source": "publisher",
+          "target": "subB",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "notify()", "ru": "notify()" }
+        },
+        {
+          "source": "publisher",
+          "target": "subC",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "notify()", "ru": "notify()" }
+        }
+      ]
+    }
   ]
 }

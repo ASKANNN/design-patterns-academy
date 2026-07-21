@@ -118,5 +118,109 @@
     "singleton",
     "flyweight",
     "observer"
+  ],
+  "visuals": [
+    {
+      "id": "state-concept",
+      "type": "flow",
+      "style": "state",
+      "category": "behavioral",
+      "width": 920,
+      "height": 640,
+      "title": {
+        "en": "How State works",
+        "ru": "Как работает Состояние"
+      },
+      "description": {
+        "en": "A traffic light's Context never checks its own status field. It just forwards every tick to whichever ConcreteState object it currently holds, and that state object decides what happens next — including which state the context should hold afterward.",
+        "ru": "Контекст светофора никогда не проверяет собственное поле статуса. Он просто перенаправляет каждый тик тому объекту-состоянию, который держит в данный момент, а этот объект сам решает, что делать дальше — включая то, какое состояние контекст будет держать после этого."
+      },
+      "caption": {
+        "en": "Each tick delegates to whichever state is active now — Red, then Yellow, then Green — and the cycle loops back to Red once Green's tick has passed.",
+        "ru": "Каждый тик делегируется текущему активному состоянию — Красный, затем Жёлтый, затем Зелёный, — а после Зелёного цикл возвращается к Красному."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": { "en": "Timer", "ru": "Таймер" },
+          "subtitle": { "en": "triggers tick()", "ru": "запускает tick()" }
+        },
+        {
+          "id": "context",
+          "role": "context",
+          "kind": "class",
+          "icon": "spark",
+          "label": { "en": "Traffic Light", "ru": "Светофор" },
+          "subtitle": { "en": "delegates to current state", "ru": "делегирует текущему состоянию" }
+        },
+        {
+          "id": "stateRed",
+          "role": "state",
+          "kind": "class",
+          "icon": "cube",
+          "accent": "error",
+          "label": { "en": "Red State", "ru": "Состояние «Красный»" },
+          "subtitle": { "en": "stop", "ru": "стоп" }
+        },
+        {
+          "id": "stateYellow",
+          "role": "state",
+          "kind": "class",
+          "icon": "cube",
+          "accent": "warning",
+          "label": { "en": "Yellow State", "ru": "Состояние «Жёлтый»" },
+          "subtitle": { "en": "caution", "ru": "внимание" }
+        },
+        {
+          "id": "stateGreen",
+          "role": "state",
+          "kind": "class",
+          "icon": "cube",
+          "accent": "success",
+          "label": { "en": "Green State", "ru": "Состояние «Зелёный»" },
+          "subtitle": { "en": "go", "ru": "движение" }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "context",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "tick()", "ru": "tick()" }
+        },
+        {
+          "source": "context",
+          "target": "stateRed",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "handle()", "ru": "handle()" }
+        },
+        {
+          "source": "context",
+          "target": "stateYellow",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "handle()", "ru": "handle()" }
+        },
+        {
+          "source": "context",
+          "target": "stateGreen",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "handle()", "ru": "handle()" }
+        },
+        {
+          "source": "stateGreen",
+          "target": "stateRed",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "cycle repeats", "ru": "цикл повторяется" }
+        }
+      ]
+    }
   ]
 }

@@ -1310,3 +1310,61 @@
   .diagram--hub .diagram__hub-blocked-path,
   .diagram--hub .diagram__hub-blocked-badge { animation: none; }
 }
+
+.diagram__flow--broadcast {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--broadcast {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram--broadcast .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram__flow--state {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--state {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram--state .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram__flow--state-return {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 6 6;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--state-return {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram__flow--memento,
+.diagram__flow--memento-return {
+  stroke: color-mix(in srgb, var(--diagram-accent) 32%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+.diagram__flow--memento-return {
+  stroke-dasharray: 6 6;
+}
+[data-theme="dark"] .diagram__flow--memento,
+[data-theme="dark"] .diagram__flow--memento-return {
+  stroke: color-mix(in srgb, var(--diagram-accent) 44%, transparent);
+}
+
+.diagram--memento .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}

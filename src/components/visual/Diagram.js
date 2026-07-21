@@ -36,6 +36,12 @@ export function Diagram(model = {}) {
 
   if (style === 'hub') return _hubDiagram(model);
 
+  if (style === 'broadcast') return _broadcastDiagram(model);
+
+  if (style === 'state') return _stateDiagram(model);
+
+  if (style === 'memento') return _mementoDiagram(model);
+
   const concept = style === 'concept';
   const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
   const titleId = `${safeId}-title`;
@@ -1325,6 +1331,293 @@ function _hubDiagram(model) {
       </svg>
     </div>${captionBlock}
   </figure>`;
+}
+
+function _broadcastDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 640,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const publisher = nodes.find((n) => n && n.role === 'publisher');
+  const subscribers = nodes.filter((n) => n && n.role === 'subscriber');
+  if (!publisher || subscribers.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 640;
+
+  const PAD = 24;
+  const cx = W / 2, cy = H / 2;
+
+  const PUB_W = 200, PUB_H = 172;
+  const pubG = { x: cx - PUB_W / 2, y: cy - PUB_H / 2, w: PUB_W, h: PUB_H };
+
+  const SUB_W = 160, SUB_H = 96;
+  const n = subscribers.length;
+  const R = Math.min(cx - PAD - SUB_W / 2, cy - PAD - SUB_H / 2);
+
+  const subGeom = subscribers.map((_, i) => {
+    const angle = (-90 + (360 / n) * i) * (Math.PI / 180);
+    const scx = cx + R * Math.cos(angle);
+    const scy = cy + R * Math.sin(angle);
+    return { x: scx - SUB_W / 2, y: scy - SUB_H / 2, w: SUB_W, h: SUB_H, cx: scx, cy: scy };
+  });
+
+  const pubSvg = DiagramNode({ ...publisher, ...pubG, emphasis: true }, { concept: true, prefix: safeId });
+  const subSvg = subscribers
+    .map((s, i) => DiagramNode({ ...s, ...subGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const flowsSvg = subGeom.map((g) => {
+    const dx = g.cx - cx, dy = g.cy - cy;
+    const pubEdge = _hubBoxEdge(pubG, dx, dy);
+    const subEdge = _hubBoxEdge(g, -dx, -dy);
+    return _broadcastFlow({ x1: pubEdge.x, y1: pubEdge.y, x2: subEdge.x, y2: subEdge.y }, safeId);
+  }).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--broadcast',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${flowsSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${pubSvg}${subSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _broadcastFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--broadcast" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _stateDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 640,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const context = nodes.find((n) => n && n.role === 'context');
+  const states = nodes.filter((n) => n && n.role === 'state');
+  if (!client || !context || states.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 640;
+
+  const PAD = 24;
+  const cy = H / 2;
+
+  const CLIENT_W = 160, CLIENT_H = 96;
+  const clientG = { x: PAD, y: cy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const CTX_W = 200, CTX_H = 172;
+  const ctxCx = W * 0.46;
+  const contextG = { x: ctxCx - CTX_W / 2, y: cy - CTX_H / 2, w: CTX_W, h: CTX_H };
+
+  const STATE_W = 180, STATE_H = 88;
+  const n = states.length;
+  const LOOP = n > 1 ? 70 : 0;
+  const stateX = W - PAD - LOOP - STATE_W;
+  const span = H - 2 * PAD - STATE_H;
+  const stateGeom = states.map((_, i) => {
+    const scy = n > 1 ? PAD + STATE_H / 2 + (span * i) / (n - 1) : cy;
+    return { x: stateX, y: scy - STATE_H / 2, w: STATE_W, h: STATE_H, cx: stateX + STATE_W / 2, cy: scy };
+  });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const contextSvg = DiagramNode({ ...context, ...contextG, emphasis: true }, { concept: true, prefix: safeId });
+  const stateSvg = states
+    .map((s, i) => DiagramNode({ ...s, ...stateGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const clientEdge = _hubBoxEdge(clientG, ctxCx - (clientG.x + CLIENT_W / 2), 0);
+  const ctxEdgeForClient = _hubBoxEdge(contextG, -(ctxCx - (clientG.x + CLIENT_W / 2)), 0);
+  const clientFlowSvg = _stateFlow(
+    { x1: clientEdge.x, y1: clientEdge.y, x2: ctxEdgeForClient.x, y2: ctxEdgeForClient.y },
+    safeId,
+  );
+
+  const stateFlowsSvg = stateGeom.map((g) => {
+    const dx = g.cx - ctxCx, dy = g.cy - cy;
+    const ctxEdge = _hubBoxEdge(contextG, dx, dy);
+    const stEdge = _hubBoxEdge(g, -dx, -dy);
+    return _stateFlow({ x1: ctxEdge.x, y1: ctxEdge.y, x2: stEdge.x, y2: stEdge.y }, safeId);
+  }).join('');
+
+  const cycleFlowSvg = n > 1
+    ? _stateCycleFlow(stateGeom[n - 1], stateGeom[0], stateX + STATE_W + LOOP - 10, safeId)
+    : '';
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--state',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${clientFlowSvg}${stateFlowsSvg}${cycleFlowSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${contextSvg}${stateSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _stateFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--state" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _stateCycleFlow(lastG, firstG, bowX, safeId) {
+  const from = { x: lastG.x + lastG.w, y: lastG.cy };
+  const to = { x: firstG.x + firstG.w, y: firstG.cy };
+  const d = `M ${r2(from.x)} ${r2(from.y)} C ${r2(bowX)} ${r2(from.y)}, ${r2(bowX)} ${r2(to.y)}, ${r2(to.x)} ${r2(to.y)}`;
+  return `
+      <path class="diagram__flow diagram__flow--state-return" d="${d}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _mementoDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 640,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const originator = nodes.find((n) => n && n.role === 'originator');
+  const memento = nodes.find((n) => n && n.role === 'memento');
+  const caretaker = nodes.find((n) => n && n.role === 'caretaker');
+  if (!originator || !memento || !caretaker) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 640;
+
+  const PAD = 24;
+  const NODE_W = 200, NODE_H = 140;
+  const ROW_Y = H * 0.22;
+
+  const originatorG = { x: PAD, y: ROW_Y, w: NODE_W, h: NODE_H };
+  const mementoG = { x: (W - NODE_W) / 2, y: ROW_Y, w: NODE_W, h: NODE_H };
+  const caretakerG = { x: W - PAD - NODE_W, y: ROW_Y, w: NODE_W, h: NODE_H };
+
+  const originatorSvg = DiagramNode({ ...originator, ...originatorG }, { concept: true, prefix: safeId });
+  const mementoSvg = DiagramNode({ ...memento, ...mementoG, emphasis: true }, { concept: true, prefix: safeId });
+  const caretakerSvg = DiagramNode({ ...caretaker, ...caretakerG }, { concept: true, prefix: safeId });
+
+  const saveFlow = _mementoFlow(
+    { x1: originatorG.x + NODE_W, y1: originatorG.y + NODE_H / 2, x2: mementoG.x, y2: mementoG.y + NODE_H / 2 },
+    safeId,
+  );
+  const pushFlow = _mementoFlow(
+    { x1: mementoG.x + NODE_W, y1: mementoG.y + NODE_H / 2, x2: caretakerG.x, y2: caretakerG.y + NODE_H / 2 },
+    safeId,
+  );
+  const restoreFlow = _mementoReturnFlow(
+    { x: caretakerG.x + NODE_W / 2, y: caretakerG.y + NODE_H },
+    { x: originatorG.x + NODE_W / 2, y: originatorG.y + NODE_H },
+    ROW_Y + NODE_H + 220,
+    safeId,
+  );
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--memento',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${saveFlow}${pushFlow}${restoreFlow}
+        </g>
+        <g class="diagram__nodes" role="list">${originatorSvg}${mementoSvg}${caretakerSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _mementoFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--memento" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _mementoReturnFlow(from, to, bowY, safeId) {
+  const d = `M ${r2(from.x)} ${r2(from.y)} C ${r2(from.x)} ${r2(bowY)}, ${r2(to.x)} ${r2(bowY)}, ${r2(to.x)} ${r2(to.y)}`;
+  return `
+      <path class="diagram__flow diagram__flow--memento-return" d="${d}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
 }
 
 function _hubBoxEdge(box, dx, dy) {
