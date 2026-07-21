@@ -460,20 +460,13 @@
 }
 
 .diagram--nested .diagram__grad-end { stop-opacity: 0.92; }
-.diagram--nested .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.22))
-    drop-shadow(0 0 26px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
-}
 
 .diagram--nested .diagram__nodes > .diagram__card--emphasis {
   animation: fade-in-up 460ms var(--ease-out) both,
              core-breathe 3.4s var(--ease-in-out) 520ms infinite;
 }
-[data-theme="dark"] .diagram--nested .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 75%, transparent));
+.diagram--nested .diagram__nodes > .diagram__card--emphasis[data-viz-glow='true'] {
+  animation: fade-in-up 460ms var(--ease-out) both;
 }
 
 .diagram--nested .diagram__card--emphasis .diagram__card-bg {
@@ -718,17 +711,6 @@
   animation-delay: 140ms;
 }
 
-.diagram--facade .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
-}
-[data-theme="dark"] .diagram--facade .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
-}
-
 @media (prefers-reduced-motion: reduce) {
   .diagram--facade .diagram__region-bg,
   .diagram--facade .diagram__region-wall,
@@ -835,17 +817,6 @@
 .diagram--pool .diagram__pool-item[data-pool-index='2'] { animation-delay: 380ms; }
 .diagram--pool .diagram__pool-item[data-pool-index='3'] { animation-delay: 460ms; }
 
-.diagram--pool .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
-}
-[data-theme="dark"] .diagram--pool .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
-}
-
 @media (prefers-reduced-motion: reduce) {
   .diagram--pool .diagram__pool-bg,
   .diagram--pool .diagram__pool-title,
@@ -917,17 +888,6 @@
 .diagram--gateway .diagram__gateway-blocked-label {
   animation: fade-in 700ms var(--ease-out) both;
   animation-delay: 140ms;
-}
-
-.diagram--gateway .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
-}
-[data-theme="dark"] .diagram--gateway .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1040,17 +1000,6 @@
   animation-delay: 260ms;
 }
 
-.diagram--command .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
-}
-[data-theme="dark"] .diagram--command .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
-}
-
 @media (prefers-reduced-motion: reduce) {
   .diagram--command .diagram__command-socket,
   .diagram--command .diagram__capsule { animation: none; }
@@ -1079,17 +1028,6 @@
 
 .diagram--expression .diagram__nodes > .diagram__card:nth-child(5) { animation-delay: 380ms; }
 .diagram--expression .diagram__nodes > .diagram__card:nth-child(6) { animation-delay: 460ms; }
-
-.diagram--expression .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
-}
-[data-theme="dark"] .diagram--expression .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
-}
 
 .diagram__cursor-bg {
   fill: color-mix(in srgb, var(--diagram-accent) 6%, transparent);
@@ -1217,17 +1155,6 @@
   animation-fill-mode: none;
 }
 
-.diagram--cursor .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
-}
-[data-theme="dark"] .diagram--cursor .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
-}
-
 @media (prefers-reduced-motion: reduce) {
   .diagram--cursor .diagram__cursor-bg,
   .diagram--cursor .diagram__cursor-title,
@@ -1297,17 +1224,6 @@
 .diagram--hub .diagram__nodes > .diagram__card:nth-child(3) { animation-delay: 240ms; }
 .diagram--hub .diagram__nodes > .diagram__card:nth-child(4) { animation-delay: 320ms; }
 .diagram--hub .diagram__nodes > .diagram__card:nth-child(5) { animation-delay: 400ms; }
-
-.diagram--hub .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(17, 24, 39, 0.18))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--diagram-accent) 42%, transparent));
-}
-[data-theme="dark"] .diagram--hub .diagram__card--emphasis {
-  filter:
-    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--diagram-accent) 60%, transparent));
-}
 
 @media (prefers-reduced-motion: reduce) {
   .diagram--hub .diagram__hub-blocked-path,
