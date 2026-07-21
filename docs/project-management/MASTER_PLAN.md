@@ -27,7 +27,7 @@ The visualization must teach the pattern.
 It must NOT merely display its class structure.
 
 ============================================================
-CURRENT PROJECT STATUS  (re-audited directly against the code, 2026-07-19 —
+CURRENT PROJECT STATUS  (re-audited directly against the code, 2026-07-21 —
 the previous version of this section was stale/inaccurate; see note below)
 ============================================================
 
@@ -48,11 +48,15 @@ MISSING   = no `visuals` block in the JSON at all. PatternDetailPage.js
             to the "one pattern at a time" rule below — already done,
             not worth discarding, but do not repeat this pattern).
 
-CREATIONAL — 0 BESPOKE / 5 GENERIC
+CREATIONAL — 1 BESPOKE / 4 GENERIC
 
-Singleton           GENERIC  (page content is the approved Gold Standard
-                     from Phase 10, but that predates the Diagram Engine —
-                     its diagram itself is still the generic fallback)
+Singleton            BESPOKE (`singleton`) — committed (client stack ->
+                     shared instance card; ghost-duplicate visual was
+                     tried and removed after review; light-theme
+                     viewport background strengthened; a CSS
+                     specificity bug that silently blocked the
+                     glow-on-pulse animation was found and fixed here
+                     first, 2026-07-21)
 Factory Method       GENERIC
 Abstract Factory     GENERIC
 Builder              GENERIC
@@ -65,26 +69,28 @@ Adapter              GENERIC
 Bridge               GENERIC
 Composite            GENERIC
 Decorator            BESPOKE (`nested`) — quality reference, committed
-                     (core-rail packet-occlusion fix applied this
-                     session, see below)
+                     (core-rail packet-occlusion fix applied earlier;
+                     2026-07-21: its continuous "core-breathe" idle
+                     animation was found to block the glow-on-pulse
+                     animation independent of CSS specificity — now
+                     paused while the pulse is active)
 
 Facade               BESPOKE (`facade`) — committed
 Flyweight            BESPOKE (`pool`) — committed
 Proxy                BESPOKE (`gateway`) — committed
-                     (row-centering fix applied this session)
+                     (row-centering fix applied earlier)
 
 
-BEHAVIORAL — 4 BESPOKE / 4 GENERIC / 3 MISSING
+BEHAVIORAL — 7 BESPOKE / 1 GENERIC
 
 Chain of Responsibility  BESPOKE (`chain`) — committed
 Command                  BESPOKE (`command`) — committed
                          (row-centering + socket packet-occlusion
-                         fixes applied this session)
+                         fixes applied earlier)
 Interpreter              BESPOKE (`expression`) — committed
                          (entry-edge label + final "= 13" result
                          badge on the Client card, intent copy
-                         rewritten to lead with the worked example —
-                         fixes applied 2026-07-19)
+                         rewritten to lead with the worked example)
 Iterator                 BESPOKE (`cursor`) — committed
                          (fixed an entrance-animation `fill-mode: both`
                          bug that pinned cell/card opacity at 1 and
@@ -100,24 +106,46 @@ Mediator                 BESPOKE (`hub`) — committed
                          adjacent colleagues makes the forbidden
                          direct-communication path visible — reuses
                          the Proxy gateway's no-entry visual grammar)
-Memento                  MISSING
-Observer                 MISSING
-State                    MISSING
+Memento                  BESPOKE (`memento`) — committed
+Observer                 BESPOKE (`broadcast`) — committed
+State                    BESPOKE (`state`) — committed
 Strategy                 GENERIC
 Template Method          GENERIC
 Visitor                  GENERIC
 
 
+> **2026-07-21 systemic fix:** every BESPOKE diagram whose emphasis
+> card used a two-class `.diagram--X .diagram__card--emphasis { filter }`
+> override had a CSS specificity bug — that override always beat
+> `[data-viz-glow='true']` (lower specificity), so the animated
+> "pulse glow" action never visibly rendered on the emphasis card no
+> matter which timeline triggered it. Found via a user bug report on
+> Singleton, confirmed systemic across nested/facade/pool/gateway/
+> command/expression/cursor/hub, and fixed in all of them (Decorator's
+> continuous `core-breathe` idle animation needed a separate fix — it
+> overrides `filter` regardless of specificity while it's running, so
+> it's now paused specifically while `data-viz-glow='true'`). Keep this
+> in mind when designing new bespoke diagrams: never give an
+> `.diagram--X .diagram__card--emphasis` rule higher specificity than
+> a single class/attribute selector, and never run a continuous
+> filter-animation on a node that VisualEngine's `glow()` action can
+> also target.
+
+
 TOTALS
 
-BESPOKE (truly done):  9 / 23  (Decorator, Facade, Flyweight, Proxy,
-                        Chain, Command, Interpreter, Iterator,
-                        Mediator — all committed and pushed)
-GENERIC (needs rework): 10 / 23
-MISSING (needs data):    3 / 23
+BESPOKE (truly done):  13 / 23  (Singleton, Decorator, Facade,
+                        Flyweight, Proxy, Chain, Command, Interpreter,
+                        Iterator, Mediator, Memento, Observer, State —
+                        all committed; push status not tracked here,
+                        confirm with `git log` / `git status`)
+GENERIC (needs rework): 10 / 23  (Factory Method, Abstract Factory,
+                        Builder, Prototype, Adapter, Bridge, Composite,
+                        Strategy, Template Method, Visitor)
+MISSING (needs data):    0 / 23
 
 
-STRICT IMPLEMENTATION ORDER (updated):
+STRICT IMPLEMENTATION ORDER (updated 2026-07-21):
 
 Facade      → QA → commit → push      DONE
 Flyweight   → QA → commit → push      DONE
@@ -126,29 +154,33 @@ Command     → QA → commit → push      DONE
 Interpreter → QA → commit → push      DONE
 Iterator    → QA → commit → push      DONE
 Mediator    → QA → commit → push      DONE
+Memento     → QA → commit                DONE
+Observer    → QA → commit                DONE
+State       → QA → commit                DONE
+Singleton   → QA → commit                DONE (upgraded from the
+                                          Gold Standard's GENERIC
+                                          diagram to `singleton`)
 
-ONLY THEN, in this exact order (unchanged from the original plan):
+NEXT, in this exact order (unchanged from the original plan):
 
-Memento → Observer
-→ State → Strategy → Template Method → Visitor
+Strategy → Template Method → Visitor
 
-(Strategy, Template Method and Visitor already render a
-GENERIC placeholder today — when their turn comes, treat them the
-same as a MISSING pattern: design a real bespoke composition, do not
-consider them pre-done just because a `visuals` block exists.)
+(These three still render the GENERIC placeholder today — when their
+turn comes, treat them the same as a MISSING pattern used to be
+treated: design a real bespoke composition, do not consider them
+pre-done just because a `visuals` block exists.)
 
 OPEN DECISION — not yet resolved, ask before starting:
 
-Once Structural + Behavioral reach 23/23 BESPOKE, five Creational
-patterns (Singleton, Factory Method, Abstract Factory, Builder,
-Prototype) and three Structural ones already counted above (Adapter,
-Bridge, Composite) still only have the GENERIC placeholder. The
-original version of this plan called Creational "COMPLETE", which is
-true for their written content but not for their diagrams under this
-plan's own VISUAL UNIQUENESS RULE. Decide then whether upgrading
-those 8 to bespoke layouts is in scope before the project is called
-visually finished, or whether GENERIC is an accepted permanent state
-for them.
+Once Strategy, Template Method and Visitor are done, Behavioral
+reaches 11/11 BESPOKE, but Structural (Adapter, Bridge, Composite)
+and Creational (Factory Method, Abstract Factory, Builder, Prototype)
+will still have 7 GENERIC diagrams between them. The original version
+of this plan called Creational "COMPLETE", which is true for their
+written content but not for their diagrams under this plan's own
+VISUAL UNIQUENESS RULE. Decide then whether upgrading those 7 to
+bespoke layouts is in scope before the project is called visually
+finished, or whether GENERIC is an accepted permanent state for them.
 
 Never implement multiple unfinished patterns in one batch.
 
