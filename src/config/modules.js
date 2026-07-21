@@ -113,6 +113,3 @@ export const MODULES = [
     categories: [],
   },
 ];
-
-export const getModule        = (id) => MODULES.find(m => m.id === id) ?? null;
-export const getActiveModules = ()   => MODULES.filter(m => m.status === 'active');

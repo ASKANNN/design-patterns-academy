@@ -29,8 +29,7 @@ export function t(key, params = {}) {
   return value.replace(/\{\{(\w+)\}\}/g, (_, k) => String(params[k] ?? `{{${k}}}`));
 }
 
-export const getLang      = ()  => _lang;
-export const isSupported  = (l) => SUPPORTED_LANGS.includes(l);
+export const getLang = () => _lang;
 
 async function _load(lang) {
   const [ui, patterns] = await Promise.all([

@@ -47,7 +47,3 @@ async function _cached(key, loader) {
   cache.set(key, data);
   return data;
 }
-
-export function clearCache() {
-  cache.clear();
-}

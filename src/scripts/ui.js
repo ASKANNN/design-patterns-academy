@@ -3,7 +3,7 @@ import { loadPatternIndex }        from '../utils/data-loader.js';
 import { PatternCard }             from '../components/patterns/PatternCard.js';
 import { EmptyState }              from '../components/ui/EmptyState.js';
 import { BreadcrumbItems }         from '../components/ui/Breadcrumb.js';
-import { patternsBreadcrumbItems } from '../pages/PatternsCatalogPage.js';
+import { patternsBreadcrumbItems } from '../config/pattern-categories.js';
 import { setPageMeta }             from './router.js';
 import { animateFilterIn }         from './animations.js';
 import { t }                       from '../utils/i18n.js';

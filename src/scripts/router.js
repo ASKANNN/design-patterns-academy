@@ -9,10 +9,6 @@ export function defineRoute(pattern, handler) {
   _routes.push({ pattern, handler });
 }
 
-export function navigate(path) {
-  window.location.hash = path.startsWith('#') ? path : `#${path}`;
-}
-
 export function getCurrentPath() {
   const hash = window.location.hash.slice(1) || '/';
   return hash.split('?')[0] || '/';
