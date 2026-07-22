@@ -9,7 +9,7 @@ export const EDGE_TYPES = {
 };
 
 export function DiagramEdge(edge = {}, pts, defsPrefix = 'dia', opts = {}) {
-  const { type = 'association', label = '', variant = '' } = edge;
+  const { type = 'association', label = '', variant = '', labelDx = 0, labelDy = 0 } = edge;
 
   if (opts.concept) {
     const vc = variant ? ` diagram__flow--${escapeText(variant)}` : '';
@@ -18,7 +18,7 @@ export function DiagramEdge(edge = {}, pts, defsPrefix = 'dia', opts = {}) {
     const path = `
       <path class="diagram__flow${vc}" d="${d}" marker-end="url(#${defsPrefix}-flow)" fill="none" aria-hidden="true" />
       <path class="diagram__flow-dash${vcDash}" d="${d}" fill="none" aria-hidden="true" />`;
-    const labelBlock = label ? _flowLabel(label, pts) : '';
+    const labelBlock = label ? _flowLabel(label, pts, labelDx, labelDy) : '';
     return `${path}${labelBlock}`;
   }
 
@@ -37,13 +37,13 @@ export function DiagramEdge(edge = {}, pts, defsPrefix = 'dia', opts = {}) {
   return `${line}${labelBlock}`;
 }
 
-function _flowLabel(label, pts) {
+function _flowLabel(label, pts, labelDx = 0, labelDy = 0) {
   const gap    = Math.abs(pts.x2 - pts.x1);
   const PAD    = 12;
   const CHAR_W = 7.5;
   const maxW   = Math.max(gap - 2 * PAD, 32);
-  const x      = r2(pts.mx);
-  const y      = r2(pts.my - 20);
+  const x      = r2(pts.mx + labelDx);
+  const y      = r2(pts.my - 20 + labelDy);
   const base   = `class="diagram__flow-label" text-anchor="middle" aria-hidden="true"`;
 
   const tl = label.length * CHAR_W > maxW

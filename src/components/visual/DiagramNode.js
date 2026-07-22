@@ -30,6 +30,7 @@ function _conceptCard(node, opts) {
     icon = '',
     badge = '',
     emphasis = false,
+    centered = false,
     accent = '',
     ariaLabel = '',
     focusable = true,
@@ -49,7 +50,12 @@ function _conceptCard(node, opts) {
   const bgFill = emphasis ? ` style="fill:url(#${prefix}-grad)"` : '';
 
   let inner;
-  if (emphasis) {
+  if (emphasis || centered) {
+    const onAccent    = emphasis ? ' diagram__card-chip--on-accent' : '';
+    const iconAccent  = emphasis ? ' diagram__card-icon--on-accent' : '';
+    const titleAccent = emphasis ? ' diagram__card-title--on-accent' : '';
+    const subAccent   = emphasis ? ' diagram__card-sub--on-accent' : '';
+
     const cx = g.cx;
     const maxW = g.w - 24;
 
@@ -71,10 +77,10 @@ function _conceptCard(node, opts) {
     const subTL   = subtitle.length * 7.5 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
 
     inner = `
-      ${icon ? `<rect class="diagram__card-chip diagram__card-chip--on-accent" x="${r2(cx - 28)}" y="${chipY}" width="56" height="56" rx="16" ry="16" aria-hidden="true" />` : ''}
-      ${icon ? _icon(icon, cx - 15, chipY + 13, 30, 'diagram__card-icon diagram__card-icon--on-accent') : ''}
-      <text class="diagram__card-title diagram__card-title--on-accent" x="${r2(cx)}" y="${titleBaselineY}" text-anchor="middle"${titleTL}>${escapeText(label)}</text>
-      ${subtitle ? `<text class="diagram__card-sub diagram__card-sub--on-accent" x="${r2(cx)}" y="${subBaselineY}" text-anchor="middle"${subTL}>${escapeText(subtitle)}</text>` : ''}
+      ${icon ? `<rect class="diagram__card-chip${onAccent}" x="${r2(cx - 28)}" y="${chipY}" width="56" height="56" rx="16" ry="16" aria-hidden="true" />` : ''}
+      ${icon ? _icon(icon, cx - 15, chipY + 13, 30, `diagram__card-icon${iconAccent}`) : ''}
+      <text class="diagram__card-title${titleAccent}" x="${r2(cx)}" y="${titleBaselineY}" text-anchor="middle"${titleTL}>${escapeText(label)}</text>
+      ${subtitle ? `<text class="diagram__card-sub${subAccent}" x="${r2(cx)}" y="${subBaselineY}" text-anchor="middle"${subTL}>${escapeText(subtitle)}</text>` : ''}
       ${badge ? `
       <g class="diagram__badge" aria-hidden="true">
         <circle cx="${r2(g.x + g.w - 28)}" cy="${r2(g.y + 28)}" r="17"/>

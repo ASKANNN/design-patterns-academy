@@ -44,6 +44,8 @@ export function Diagram(model = {}) {
 
   if (style === 'singleton') return _singletonDiagram(model);
 
+  if (style === 'slot') return _slotDiagram(model);
+
   const concept = style === 'concept';
   const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
   const titleId = `${safeId}-title`;
@@ -59,7 +61,7 @@ export function Diagram(model = {}) {
       const from = geometry.get(String(edge.from));
       const to = geometry.get(String(edge.to));
       if (!from || !to) return '';
-      const pts = concept ? sideConnect(from, to) : connect(from, to);
+      const pts = concept ? sideConnect(from, to, edge.bend || 0, edge.bendSpan || null) : connect(from, to);
       return DiagramEdge(edge, pts, safeId, { concept });
     })
     .join('');
@@ -1742,4 +1744,132 @@ function _hubBlocked(a, b, cx, cy) {
         <circle cx="${r2(bx)}" cy="${r2(by)}" r="12" />
         <line x1="${r2(bx - 6.5)}" y1="${r2(by + 6.5)}" x2="${r2(bx + 6.5)}" y2="${r2(by - 6.5)}" />
       </g>`;
+}
+
+function _slotDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 820, height = 420,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const context = nodes.find((n) => n && n.role === 'context');
+  const iface = nodes.find((n) => n && n.role === 'interface');
+  const concretes = nodes.filter((n) => n && n.role === 'concrete');
+  if (!client || !context || !iface || concretes.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 820;
+  const H = Number(height) || 420;
+
+  const CLIENT_W = 160, CLIENT_H = 92;
+  const CONTEXT_W = 200, CONTEXT_H = 104;
+  const GAP1 = 54;
+  const rowCenterY = 110;
+
+  const clientG = { x: 0, y: rowCenterY - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  const contextG = {
+    x: clientG.x + CLIENT_W + GAP1, y: rowCenterY - CONTEXT_H / 2, w: CONTEXT_W, h: CONTEXT_H,
+  };
+
+  const IFACE_W = 200, IFACE_H = 148, GAP_VERT = 38;
+  const ifaceG = {
+    x: contextG.x, y: contextG.y + CONTEXT_H + GAP_VERT, w: IFACE_W, h: IFACE_H,
+  };
+
+  const CONCRETE_W = 190, CONCRETE_H = 82, INNER_GAP = 20;
+  const SIDE_PAD = 20, HEADER = 34, BOTTOM_PAD = 20, GAP2 = 60;
+  const ifaceCx = ifaceG.x + IFACE_W, ifaceCy = ifaceG.y + IFACE_H / 2;
+  const n = concretes.length;
+  const rackH = HEADER + CONCRETE_H * n + INNER_GAP * (n - 1) + BOTTOM_PAD;
+  const rackW = SIDE_PAD * 2 + CONCRETE_W;
+  const rackG = {
+    x: ifaceCx + GAP2, y: ifaceCy - rackH / 2, w: rackW, h: rackH,
+  };
+  const concreteGeom = concretes.map((_, i) => ({
+    x: rackG.x + SIDE_PAD, y: rackG.y + HEADER + i * (CONCRETE_H + INNER_GAP), w: CONCRETE_W, h: CONCRETE_H,
+  }));
+
+  const left = 0;
+  const right = rackG.x + rackG.w;
+  const top = Math.min(clientG.y, contextG.y);
+  const bottom = rackG.y + rackG.h;
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, contextG, ifaceG, rackG, ...concreteGeom].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const contextSvg = DiagramNode({ ...context, ...contextG }, { concept: true, prefix: safeId });
+  const ifaceSvg = DiagramNode({ ...iface, ...ifaceG, emphasis: true }, { concept: true, prefix: safeId });
+  const concreteSvg = concretes
+    .map((c, i) => DiagramNode({ ...c, ...concreteGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const rackLabel = typeof model.rackLabel === 'string' ? model.rackLabel : '';
+  const regionSvg = _slotRegion(rackG, rackLabel);
+
+  const entrySvg = _slotFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: contextG.x,            y2: contextG.y + contextG.h / 2 }, safeId, false);
+  const callSvg = _slotFlow(
+    { x1: contextG.x + contextG.w / 2, y1: contextG.y + contextG.h,
+      x2: ifaceG.x + ifaceG.w / 2,     y2: ifaceG.y }, safeId, false);
+  const ifaceRightX = ifaceG.x + IFACE_W;
+  const ifaceMidY = ifaceG.y + IFACE_H / 2;
+  const branchSvg = concreteGeom
+    .map((g) => _slotFlow(
+      { x1: ifaceRightX, y1: ifaceMidY, x2: g.x, y2: g.y + g.h / 2 }, safeId, true))
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--slot',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${regionSvg}${entrySvg}${callSvg}${branchSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${contextSvg}${ifaceSvg}${concreteSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _slotRegion(g, label) {
+  const labelEl = label
+    ? `
+      <text class="diagram__slot-title" x="${r2(g.x + g.w / 2)}" y="${r2(g.y + 22)}" text-anchor="middle">${escapeText(label)}</text>`
+    : '';
+  return `
+      <rect class="diagram__slot-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="20" ry="20" />${labelEl}`;
+}
+
+function _slotFlow(p, safeId, dashed) {
+  const cls = dashed ? 'diagram__flow diagram__flow--slot-candidate' : 'diagram__flow diagram__flow--slot';
+  return `
+      <path class="${cls}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
 }

@@ -27,7 +27,7 @@ The visualization must teach the pattern.
 It must NOT merely display its class structure.
 
 ============================================================
-CURRENT PROJECT STATUS  (re-audited directly against the code, 2026-07-21 —
+CURRENT PROJECT STATUS  (re-audited directly against the code, 2026-07-22 —
 the previous version of this section was stale/inaccurate; see note below)
 ============================================================
 
@@ -59,15 +59,20 @@ Singleton            BESPOKE (`singleton`) — committed (client stack ->
                      first, 2026-07-21)
 Factory Method       GENERIC
 Abstract Factory     GENERIC
-Builder              GENERIC
+Builder              GENERIC (Director node + optional-invokes edge
+                     added so the diagram matches the real pattern's
+                     roles; oversized "Product" card text centered,
+                     2026-07-22 — still GENERIC layout, not bespoke)
 Prototype            GENERIC
 
 
 STRUCTURAL — 4 BESPOKE / 3 GENERIC
 
 Adapter              GENERIC
-Bridge               GENERIC
-Composite            GENERIC
+Bridge               GENERIC (oversized "Implementation" card text
+                     centered, 2026-07-22 — still GENERIC layout)
+Composite            GENERIC (oversized "Composite" card text
+                     centered, 2026-07-22 — still GENERIC layout)
 Decorator            BESPOKE (`nested`) — quality reference, committed
                      (core-rail packet-occlusion fix applied earlier;
                      2026-07-21: its continuous "core-breathe" idle
@@ -107,9 +112,15 @@ Mediator                 BESPOKE (`hub`) — committed
                          direct-communication path visible — reuses
                          the Proxy gateway's no-entry visual grammar)
 Memento                  BESPOKE (`memento`) — committed
+                         (Editor/History card text centered, 2026-07-22)
 Observer                 BESPOKE (`broadcast`) — committed
 State                    BESPOKE (`state`) — committed
-Strategy                 GENERIC
+Strategy                 BESPOKE (`slot`) — committed (client -> context
+                         -> interface card -> vertically-racked concrete
+                         strategy cards inside a labeled dashed region;
+                         2026-07-22: fixed a missing `glow` action that
+                         left the selected strategy card lit but not
+                         glowing)
 Template Method          GENERIC
 Visitor                  GENERIC
 
@@ -134,14 +145,15 @@ Visitor                  GENERIC
 
 TOTALS
 
-BESPOKE (truly done):  13 / 23  (Singleton, Decorator, Facade,
+BESPOKE (truly done):  14 / 23  (Singleton, Decorator, Facade,
                         Flyweight, Proxy, Chain, Command, Interpreter,
-                        Iterator, Mediator, Memento, Observer, State —
-                        all committed; push status not tracked here,
-                        confirm with `git log` / `git status`)
-GENERIC (needs rework): 10 / 23  (Factory Method, Abstract Factory,
+                        Iterator, Mediator, Memento, Observer, State,
+                        Strategy — all committed; push status not
+                        tracked here, confirm with `git log` /
+                        `git status`)
+GENERIC (needs rework):  9 / 23  (Factory Method, Abstract Factory,
                         Builder, Prototype, Adapter, Bridge, Composite,
-                        Strategy, Template Method, Visitor)
+                        Template Method, Visitor)
 MISSING (needs data):    0 / 23
 
 
@@ -160,27 +172,28 @@ State       → QA → commit                DONE
 Singleton   → QA → commit                DONE (upgraded from the
                                           Gold Standard's GENERIC
                                           diagram to `singleton`)
+Strategy    → QA → commit                DONE (upgraded to `slot`)
 
 NEXT, in this exact order (unchanged from the original plan):
 
-Strategy → Template Method → Visitor
+Template Method → Visitor
 
-(These three still render the GENERIC placeholder today — when their
+(These two still render the GENERIC placeholder today — when their
 turn comes, treat them the same as a MISSING pattern used to be
 treated: design a real bespoke composition, do not consider them
 pre-done just because a `visuals` block exists.)
 
 OPEN DECISION — not yet resolved, ask before starting:
 
-Once Strategy, Template Method and Visitor are done, Behavioral
-reaches 11/11 BESPOKE, but Structural (Adapter, Bridge, Composite)
-and Creational (Factory Method, Abstract Factory, Builder, Prototype)
-will still have 7 GENERIC diagrams between them. The original version
-of this plan called Creational "COMPLETE", which is true for their
-written content but not for their diagrams under this plan's own
-VISUAL UNIQUENESS RULE. Decide then whether upgrading those 7 to
-bespoke layouts is in scope before the project is called visually
-finished, or whether GENERIC is an accepted permanent state for them.
+Once Template Method and Visitor are done, Behavioral reaches 11/11
+BESPOKE, but Structural (Adapter, Bridge, Composite) and Creational
+(Factory Method, Abstract Factory, Builder, Prototype) will still have
+7 GENERIC diagrams between them. The original version of this plan
+called Creational "COMPLETE", which is true for their written content
+but not for their diagrams under this plan's own VISUAL UNIQUENESS
+RULE. Decide then whether upgrading those 7 to bespoke layouts is in
+scope before the project is called visually finished, or whether
+GENERIC is an accepted permanent state for them.
 
 Never implement multiple unfinished patterns in one batch.
 

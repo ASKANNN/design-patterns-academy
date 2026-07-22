@@ -168,6 +168,7 @@
           "id": "composite",
           "kind": "class",
           "icon": "layers",
+          "centered": true,
           "label": { "en": "Composite", "ru": "Составной" },
           "subtitle": { "en": "holds children[]", "ru": "хранит children[]" },
           "position": { "x": 525, "y": 116, "w": 200, "h": 128 }

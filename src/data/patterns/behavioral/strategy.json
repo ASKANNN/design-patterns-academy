@@ -137,25 +137,30 @@
     {
       "id": "strategy-concept",
       "type": "flow",
-      "style": "concept",
+      "style": "slot",
       "category": "behavioral",
-      "width": 960,
+      "width": 820,
       "height": 420,
       "title": {
         "en": "How Strategy works",
         "ru": "Как работает Стратегия"
       },
       "description": {
-        "en": "The Context holds a reference to a Strategy interface. The Client swaps the concrete strategy at runtime without touching the Context. The same calculate() call produces different results depending on which concrete strategy — Ground or Air — is currently set.",
-        "ru": "Контекст хранит ссылку на интерфейс Стратегии. Клиент меняет конкретную стратегию во время выполнения, не затрагивая Контекст. Один и тот же вызов calculate() даёт разные результаты в зависимости от того, какая конкретная стратегия — Ground или Air — установлена в данный момент."
+        "en": "The Context always calls the same calculate() method on whatever object currently occupies its RouteStrategy slot. Only the Client is allowed to change what sits in that slot — swapping the Walking route for the Road route changes the result without touching a single line of the Context.",
+        "ru": "Контекст всегда вызывает один и тот же метод calculate() у того объекта, что сейчас занимает его слот RouteStrategy. Только Клиент может изменить содержимое этого слота — замена Пешего маршрута на Авто меняет результат, не трогая ни строки в самом Контексте."
       },
       "caption": {
-        "en": "Same context. Different strategy. Different result. Swapped at runtime.",
-        "ru": "Тот же контекст. Другая стратегия. Другой результат. Изменено во время выполнения."
+        "en": "Same call, same slot — a different object plugged in changes the result.",
+        "ru": "Тот же вызов, тот же слот — другой объект внутри меняет результат."
+      },
+      "rackLabel": {
+        "en": "Strategy slot",
+        "ru": "Слот стратегии"
       },
       "nodes": [
         {
           "id": "client",
+          "role": "client",
           "kind": "actor",
           "icon": "user",
           "label": {
@@ -163,19 +168,13 @@
             "ru": "Клиент"
           },
           "subtitle": {
-            "en": "chooses route",
-            "ru": "выбирает маршрут"
-          },
-          "position": {
-            "x": 60,
-            "y": 165,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+            "en": "picks the strategy",
+            "ru": "выбирает стратегию"
+          }
         },
         {
           "id": "context",
+          "role": "context",
           "kind": "class",
           "icon": "layers",
           "label": {
@@ -183,19 +182,13 @@
             "ru": "Навигатор"
           },
           "subtitle": {
-            "en": "context",
-            "ru": "контекст"
-          },
-          "position": {
-            "x": 340,
-            "y": 165,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+            "en": "always calls calculate()",
+            "ru": "всегда вызывает calculate()"
+          }
         },
         {
           "id": "strategy",
+          "role": "interface",
           "kind": "interface",
           "icon": "spark",
           "emphasis": true,
@@ -204,56 +197,37 @@
             "ru": "СтратегияПути"
           },
           "subtitle": {
-            "en": "changeable gear",
-            "ru": "сменная шестеренка"
-          },
-          "position": {
-            "x": 340,
-            "y": 290,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+            "en": "current strategy slot",
+            "ru": "текущий слот стратегии"
+          }
         },
         {
           "id": "ground",
+          "role": "concrete",
           "kind": "class",
           "icon": "cube",
           "label": {
             "en": "WalkingRoute",
-            "ru": "Пеший Маршрут"
+            "ru": "ПешийМаршрут"
           },
           "subtitle": {
-            "en": "strategy A",
-            "ru": "стратегия A"
-          },
-          "position": {
-            "x": 680,
-            "y": 60,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+            "en": "on foot",
+            "ru": "пешком"
+          }
         },
         {
           "id": "air",
+          "role": "concrete",
           "kind": "class",
           "icon": "cube",
           "label": {
             "en": "RoadRoute",
-            "ru": "Авто Маршрут"
+            "ru": "АвтоМаршрут"
           },
           "subtitle": {
-            "en": "strategy B",
-            "ru": "стратегия B"
-          },
-          "position": {
-            "x": 680,
-            "y": 240,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+            "en": "by car",
+            "ru": "на машине"
+          }
         }
       ],
       "edges": [
@@ -261,44 +235,36 @@
           "source": "client",
           "target": "context",
           "relationship": "flow",
-          "variant": "create",
-          "routing": "side",
           "label": {
-            "en": "① setStrategy()",
-            "ru": "① выбратьСтратегию()"
+            "en": "setStrategy()",
+            "ru": "выбратьСтратегию()"
           }
         },
         {
           "source": "context",
           "target": "strategy",
           "relationship": "flow",
-          "variant": "create",
-          "routing": "vertical",
           "label": {
-            "en": "② calculate()",
-            "ru": "② рассчитать()"
+            "en": "calculate()",
+            "ru": "рассчитать()"
           }
         },
         {
           "source": "strategy",
           "target": "ground",
           "relationship": "flow",
-          "variant": "reuse",
-          "routing": "border",
           "label": {
-            "en": "③ run",
-            "ru": "③ запуск"
+            "en": "run",
+            "ru": "запуск"
           }
         },
         {
           "source": "strategy",
           "target": "air",
           "relationship": "flow",
-          "variant": "reuse",
-          "routing": "border",
           "label": {
-            "en": "④ run",
-            "ru": "④ запуск"
+            "en": "run",
+            "ru": "запуск"
           }
         }
       ]

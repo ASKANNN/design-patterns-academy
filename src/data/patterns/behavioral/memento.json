@@ -146,6 +146,7 @@
           "role": "originator",
           "kind": "class",
           "icon": "cube",
+          "centered": true,
           "label": { "en": "Editor", "ru": "Редактор" },
           "subtitle": { "en": "owns the content", "ru": "владеет содержимым" }
         },
@@ -162,6 +163,7 @@
           "role": "caretaker",
           "kind": "class",
           "icon": "layers",
+          "centered": true,
           "label": { "en": "History", "ru": "История" },
           "subtitle": { "en": "undo stack", "ru": "стек отмены" }
         }

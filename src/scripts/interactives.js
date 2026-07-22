@@ -160,10 +160,11 @@ const _ABSTRACT_FACTORY_STEPS = [
 const _BUILDER_STEPS = [
   { id: 'scene',          duration: 500,
     actions: [
-      { set: { id: 'partA',   state: 'dim' } },
-      { set: { id: 'partB',   state: 'dim' } },
-      { set: { id: 'partC',   state: 'dim' } },
-      { set: { id: 'product', state: 'dim' } },
+      { set: { id: 'partA',    state: 'dim' } },
+      { set: { id: 'partB',    state: 'dim' } },
+      { set: { id: 'partC',    state: 'dim' } },
+      { set: { id: 'product',  state: 'dim' } },
+      { set: { id: 'director', state: 'dim' } },
     ] },
 
   { id: 'request',        duration: 1400,
@@ -618,13 +619,14 @@ const _COMMAND_STEPS = [
       { set: { id: 'invoker', state: 'active' } },
       { set: { id: 'command', state: 'active' } },
       { glow: 'invoker' },
+      { glow: 'command' },
       { do: 'request',  index: 1 },
       { do: 'creation', node: 'command' },
     ] },
   { id: 'run',         duration: 1400,
     actions: [
       { set: { id: 'receiver', state: 'active' } },
-      { glow: 'command' },
+      { glow: 'receiver' },
       { do: 'request',  index: 2 },
       { do: 'creation', node: 'receiver' },
     ] },
@@ -641,8 +643,8 @@ const _COMMAND_STEPS = [
       { set: { id: 'invoker',  state: 'active' } },
       { set: { id: 'command',  state: 'active' } },
       { set: { id: 'receiver', state: 'active' } },
-      { glow: 'command' },
-      { do: 'pulse', node: 'command' },
+      { glow: 'receiver' },
+      { do: 'pulse', node: 'receiver' },
     ] },
 ];
 
@@ -921,6 +923,9 @@ const _OBSERVER_STEPS = [
       { do: 'creation', node: 'subA' },
       { do: 'creation', node: 'subB' },
       { do: 'creation', node: 'subC' },
+      { glow: 'subA' },
+      { glow: 'subB' },
+      { glow: 'subC' },
     ] },
   { id: 'change-2',    duration: 800,
     actions: [
@@ -943,6 +948,9 @@ const _OBSERVER_STEPS = [
       { set: { id: 'subB',      state: 'active' } },
       { set: { id: 'subC',      state: 'active' } },
       { glow: 'publisher' },
+      { glow: 'subA' },
+      { glow: 'subB' },
+      { glow: 'subC' },
       { do: 'pulse', node: 'publisher' },
     ] },
 ];
@@ -1032,6 +1040,7 @@ const _STRATEGY_STEPS = [
     actions: [
       { set: { id: 'ground', state: 'active' } },
       { glow: 'strategy' },
+      { glow: 'ground' },
       { do: 'request',  index: 2 },
       { do: 'creation', node: 'ground' },
     ] },
@@ -1041,8 +1050,9 @@ const _STRATEGY_STEPS = [
       { set: { id: 'ground', state: 'dim'    } },
       { set: { id: 'air',    state: 'active' } },
       { glow: 'strategy' },
+      { glow: 'air' },
       { do: 'request',  index: 3 },
-      { do: 'creation', node: 'air' },
+      { do: 'swap', node: 'air' },
     ] },
   { id: 'final',       duration: 3200,
     actions: [
@@ -1052,6 +1062,7 @@ const _STRATEGY_STEPS = [
       { set: { id: 'ground',   state: 'active' } },
       { set: { id: 'air',      state: 'active' } },
       { glow: 'strategy' },
+      { glow: 'air' },
       { do: 'pulse', node: 'strategy' },
     ] },
 ];

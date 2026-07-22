@@ -139,7 +139,7 @@
       "style": "concept",
       "category": "creational",
       "width": 1246,
-      "height": 340,
+      "height": 440,
       "title": {
         "en": "How Builder works",
         "ru": "Как работает Строитель"
@@ -154,12 +154,20 @@
       },
       "nodes": [
         {
+          "id": "director",
+          "kind": "class",
+          "icon": "layers",
+          "label": { "en": "Director", "ru": "Директор" },
+          "subtitle": { "en": "optional: fixed recipes", "ru": "опционально: фиксированные рецепты" },
+          "position": { "x": 20, "y": 20, "w": 190, "h": 80 }
+        },
+        {
           "id": "client",
           "kind": "actor",
           "icon": "user",
           "label": { "en": "Client", "ru": "Клиент" },
           "subtitle": { "en": "build request", "ru": "запрос сборки" },
-          "position": { "x": 20, "y": 130, "w": 190, "h": 80 }
+          "position": { "x": 20, "y": 230, "w": 190, "h": 80 }
         },
         {
           "id": "builder",
@@ -168,7 +176,7 @@
           "emphasis": true,
           "label": "Builder",
           "subtitle": { "en": "assembles step by step", "ru": "собирает пошагово" },
-          "position": { "x": 280, "y": 40, "w": 200, "h": 260 }
+          "position": { "x": 280, "y": 140, "w": 200, "h": 260 }
         },
         {
           "id": "partA",
@@ -176,7 +184,7 @@
           "icon": "cube",
           "label": { "en": "Part A", "ru": "Часть A" },
           "subtitle": { "en": "buildPartA()", "ru": "buildPartA()" },
-          "position": { "x": 580, "y": 20, "w": 190, "h": 80 }
+          "position": { "x": 580, "y": 120, "w": 190, "h": 80 }
         },
         {
           "id": "partB",
@@ -184,7 +192,7 @@
           "icon": "cube",
           "label": { "en": "Part B", "ru": "Часть B" },
           "subtitle": { "en": "buildPartB()", "ru": "buildPartB()" },
-          "position": { "x": 580, "y": 130, "w": 190, "h": 80 }
+          "position": { "x": 580, "y": 230, "w": 190, "h": 80 }
         },
         {
           "id": "partC",
@@ -192,15 +200,16 @@
           "icon": "cube",
           "label": { "en": "Part C", "ru": "Часть C" },
           "subtitle": { "en": "buildPartC()", "ru": "buildPartC()" },
-          "position": { "x": 580, "y": 240, "w": 190, "h": 80 }
+          "position": { "x": 580, "y": 340, "w": 190, "h": 80 }
         },
         {
           "id": "product",
           "kind": "class",
           "icon": "spark",
+          "centered": true,
           "label": { "en": "Product", "ru": "Продукт" },
           "subtitle": { "en": "getResult()", "ru": "getResult()" },
-          "position": { "x": 950, "y": 110, "w": 210, "h": 120 }
+          "position": { "x": 950, "y": 210, "w": 210, "h": 120 }
         }
       ],
       "edges": [
@@ -236,7 +245,18 @@
           "target": "product",
           "relationship": "flow",
           "variant": "create",
+          "bend": -160,
+          "bendSpan": [560, 790],
+          "labelDx": 145,
+          "labelDy": 45,
           "label": { "en": "⑤ getResult()", "ru": "⑤ getResult()" }
+        },
+        {
+          "source": "director",
+          "target": "builder",
+          "relationship": "dependency",
+          "variant": "optional",
+          "label": { "en": "invokes steps", "ru": "вызывает шаги" }
         }
       ]
     }

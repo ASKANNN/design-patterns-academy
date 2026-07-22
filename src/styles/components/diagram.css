@@ -265,6 +265,11 @@
   opacity: 0.55;
   stroke-dasharray: 7 6;
 }
+
+.diagram__flow--optional {
+  opacity: 0.55;
+  stroke-dasharray: 7 6;
+}
 .diagram__marker--flow path {
   fill: var(--diagram-accent);
   stroke: none;
@@ -288,8 +293,9 @@
   stroke-dasharray: 0.1 16;
   animation: diagram-flow-pulse 2.6s var(--ease-in-out) infinite;
 }
-.diagram__flow-dash--create { animation-delay: 0ms; }
-.diagram__flow-dash--reuse  { animation-delay: 900ms; }
+.diagram__flow-dash--create   { animation-delay: 0ms; }
+.diagram__flow-dash--reuse    { animation-delay: 900ms; }
+.diagram__flow-dash--optional { animation-delay: 1400ms; }
 
 @keyframes diagram-flow-pulse {
   0%   { stroke-dashoffset: 16; opacity: 0; }
@@ -298,8 +304,18 @@
   100% { stroke-dashoffset: 0;  opacity: 0; }
 }
 
+@keyframes diagram-rise-in {
+  from { transform: translateY(20px); }
+  to   { transform: translateY(0); }
+}
+@keyframes diagram-pop-in {
+  from { transform: scale(0.96); }
+  to   { transform: scale(1); }
+}
+
 .diagram--concept .diagram__nodes > .diagram__card {
-  animation: fade-in-up 460ms var(--ease-out) both;
+  animation: diagram-rise-in 460ms var(--ease-out) both;
+  animation-fill-mode: none;
 }
 .diagram--concept .diagram__nodes > .diagram__card:nth-child(1) { animation-delay:  60ms; }
 .diagram--concept .diagram__nodes > .diagram__card:nth-child(2) { animation-delay: 130ms; }
@@ -368,20 +384,19 @@
 }
 
 .diagram__shell-badge rect {
-  fill: color-mix(in srgb, var(--diagram-accent) 14%, transparent);
-  stroke: color-mix(in srgb, var(--diagram-accent) 45%, transparent);
-  stroke-width: 1.25;
+  fill: var(--diagram-accent);
+  stroke: none;
   transition: fill var(--duration-normal) var(--ease-out);
 }
 .diagram__shell-badge text {
-  fill: var(--diagram-accent);
+  fill: #FFFFFF;
   font-family: var(--font-sans);
   font-weight: var(--font-weight-bold);
   font-size: 13px;
 }
 .diagram__shell[data-viz-state='active'] .diagram__shell-badge rect,
 .diagram__shell[data-viz-highlight='true'] .diagram__shell-badge rect {
-  fill: color-mix(in srgb, var(--diagram-accent) 24%, transparent);
+  fill: color-mix(in srgb, var(--diagram-accent) 88%, black 6%);
 }
 
 .diagram__flow--guide {
@@ -409,7 +424,8 @@
 }
 
 .diagram--nested .diagram__shell {
-  animation: fade-in 600ms var(--ease-out) both;
+  animation: diagram-pop-in 600ms var(--ease-out) both;
+  animation-fill-mode: none;
 }
 .diagram--nested .diagram__shell[data-shell-index='0'] { animation-delay: 120ms; }
 .diagram--nested .diagram__shell[data-shell-index='1'] { animation-delay: 200ms; }
@@ -462,11 +478,13 @@
 .diagram--nested .diagram__grad-end { stop-opacity: 0.92; }
 
 .diagram--nested .diagram__nodes > .diagram__card--emphasis {
-  animation: fade-in-up 460ms var(--ease-out) both,
+  animation: diagram-rise-in 460ms var(--ease-out) both,
              core-breathe 3.4s var(--ease-in-out) 520ms infinite;
+  animation-fill-mode: none, none;
 }
 .diagram--nested .diagram__nodes > .diagram__card--emphasis[data-viz-glow='true'] {
-  animation: fade-in-up 460ms var(--ease-out) both;
+  animation: diagram-rise-in 460ms var(--ease-out) both;
+  animation-fill-mode: none;
 }
 
 .diagram--nested .diagram__card--emphasis .diagram__card-bg {
@@ -648,7 +666,8 @@
 }
 
 .diagram--chain .diagram__station {
-  animation: fade-in-up 460ms var(--ease-out) both;
+  animation: diagram-rise-in 460ms var(--ease-out) both;
+  animation-fill-mode: none;
 }
 .diagram--chain .diagram__station[data-station-index='0'] { animation-delay: 160ms; }
 .diagram--chain .diagram__station[data-station-index='1'] { animation-delay: 240ms; }
@@ -810,7 +829,8 @@
   animation-delay: 140ms;
 }
 .diagram--pool .diagram__pool-item {
-  animation: fade-in-up 460ms var(--ease-out) both;
+  animation: diagram-rise-in 460ms var(--ease-out) both;
+  animation-fill-mode: none;
 }
 .diagram--pool .diagram__pool-item[data-pool-index='0'] { animation-delay: 220ms; }
 .diagram--pool .diagram__pool-item[data-pool-index='1'] { animation-delay: 300ms; }
@@ -996,7 +1016,8 @@
   animation-delay: 140ms;
 }
 .diagram--command .diagram__capsule {
-  animation: fade-in-up 460ms var(--ease-out) both;
+  animation: diagram-rise-in 460ms var(--ease-out) both;
+  animation-fill-mode: none;
   animation-delay: 260ms;
 }
 
@@ -1143,7 +1164,7 @@
   animation-delay: 140ms;
 }
 .diagram--cursor .diagram__cell {
-  animation: fade-in-up 460ms var(--ease-out) both;
+  animation: diagram-rise-in 460ms var(--ease-out) both;
 }
 .diagram--cursor .diagram__cell[data-cell-index='0'] { animation-delay: 220ms; }
 .diagram--cursor .diagram__cell[data-cell-index='1'] { animation-delay: 300ms; }
@@ -1313,3 +1334,73 @@
 }
 
 .diagram--singleton .diagram__flow-dash { display: none; }
+
+.diagram__flow--slot {
+  stroke: color-mix(in srgb, var(--diagram-accent) 40%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+.diagram__flow--slot-candidate {
+  stroke: color-mix(in srgb, var(--diagram-accent) 26%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 7 6;
+  transition: stroke var(--duration-normal) var(--ease-out);
+}
+[data-theme="dark"] .diagram__flow--slot {
+  stroke: color-mix(in srgb, var(--diagram-accent) 54%, transparent);
+}
+[data-theme="dark"] .diagram__flow--slot-candidate {
+  stroke: color-mix(in srgb, var(--diagram-accent) 36%, transparent);
+}
+
+.diagram__slot-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 6%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 26%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+[data-theme="dark"] .diagram__slot-bg {
+  fill: color-mix(in srgb, var(--diagram-accent) 11%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 36%, transparent);
+}
+
+.diagram__slot-title {
+  fill: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.diagram--slot .viz-packet {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--diagram-accent) 70%, transparent));
+}
+
+.diagram--slot .diagram__flow-dash { display: none; }
+
+.diagram--slot .diagram__slot-bg,
+.diagram--slot .diagram__slot-title {
+  animation: fade-in 700ms var(--ease-out) both;
+  animation-delay: 140ms;
+}
+.diagram--slot .diagram__nodes > .diagram__card {
+  animation-fill-mode: none;
+}
+.diagram--slot .diagram__nodes > .diagram__card:nth-child(1) { animation-delay:  60ms; }
+.diagram--slot .diagram__nodes > .diagram__card:nth-child(2) { animation-delay: 130ms; }
+.diagram--slot .diagram__nodes > .diagram__card:nth-child(3) { animation-delay: 200ms; }
+.diagram--slot .diagram__nodes > .diagram__card:nth-child(4) { animation-delay: 280ms; }
+.diagram--slot .diagram__nodes > .diagram__card:nth-child(5) { animation-delay: 340ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram--slot .diagram__slot-bg,
+  .diagram--slot .diagram__slot-title,
+  .diagram--slot .diagram__nodes > .diagram__card { animation: none; }
+}
+
+@media (max-width: 768px) {
+  .diagram__slot-title { font-size: 11.5px; }
+}
