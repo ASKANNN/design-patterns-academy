@@ -113,27 +113,28 @@
   ],
   "visuals": [
     {
-      "id": "template-method-concept",
+      "id": "template-method-skeleton",
       "type": "flow",
-      "style": "concept",
+      "style": "skeleton",
       "category": "behavioral",
-      "width": 960,
+      "width": 900,
       "height": 420,
       "title": {
         "en": "How Template Method works",
         "ru": "Как работает Шаблонный метод"
       },
       "description": {
-        "en": "The AbstractClass defines the algorithm skeleton in parse(): open → extract → analyze → close. Steps open, analyze, and close are fixed. The extract() step is a hook that subclasses override. CSVParser parses comma-separated rows; XMLParser walks the DOM tree. The skeleton never changes.",
-        "ru": "Абстрактный класс определяет скелет алгоритма в parse(): открыть → извлечь → проанализировать → закрыть. Шаги открытия, анализа и закрытия фиксированы. Шаг extract() является хуком, который переопределяют подклассы. CSVParser разбирает строки, разделённые запятыми; XMLParser обходит дерево DOM. Скелет никогда не меняется."
+        "en": "ReportGenerator's generate() is the template method — it always calls header(), body(), and footer() in that exact order. header() and footer() are hooks with an empty default; body() is the one step every subclass must fill in. HtmlReport and MarkdownReport each plug their own step bodies into the same skeleton — the call order itself never changes.",
+        "ru": "generate() класса ReportGenerator — это шаблонный метод: он всегда вызывает header(), body() и footer() в строго заданном порядке. header() и footer() — хуки с пустой реализацией по умолчанию; body() — единственный шаг, который обязан реализовать каждый подкласс. HtmlReport и MarkdownReport подставляют в один и тот же скелет свои шаги, но сам порядок вызовов не меняется никогда."
       },
       "caption": {
-        "en": "Fixed skeleton. Variable steps. The algorithm is always the same shape.",
-        "ru": "Фиксированный скелет. Переменные шаги. Алгоритм всегда имеет одну форму."
+        "en": "Same order every call. Only the plugged-in steps change.",
+        "ru": "Порядок вызовов всегда один. Меняются только подставленные шаги."
       },
       "nodes": [
         {
           "id": "client",
+          "role": "client",
           "kind": "actor",
           "icon": "user",
           "label": {
@@ -141,77 +142,56 @@
             "ru": "Клиент"
           },
           "subtitle": {
-            "en": "runs parser",
-            "ru": "запускает парсер"
-          },
-          "position": {
-            "x": 60,
-            "y": 165,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+            "en": "runs the report",
+            "ru": "запускает отчёт"
+          }
         },
         {
           "id": "abstract",
-          "kind": "class",
+          "role": "skeleton",
+          "kind": "abstract",
           "icon": "layers",
-          "emphasis": true,
           "label": {
-            "en": "DataParser",
-            "ru": "ПарсерДанных"
+            "en": "ReportGenerator",
+            "ru": "ReportGenerator"
           },
           "subtitle": {
-            "en": "skeleton algorithm",
-            "ru": "каркас алгоритма"
+            "en": "generate()",
+            "ru": "generate()"
           },
-          "position": {
-            "x": 340,
-            "y": 165,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+          "steps": [
+            { "id": "header", "label": "header()" },
+            { "id": "body", "label": "body()", "variant": "abstract" },
+            { "id": "footer", "label": "footer()" }
+          ]
         },
         {
           "id": "concreteA",
+          "role": "concrete",
           "kind": "class",
           "icon": "cube",
           "label": {
-            "en": "CSVParser",
-            "ru": "CSVПарсер"
+            "en": "HtmlReport",
+            "ru": "HtmlReport"
           },
           "subtitle": {
-            "en": "fills hook step",
-            "ru": "заполняет пропуск"
-          },
-          "position": {
-            "x": 680,
-            "y": 60,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+            "en": "fills the steps",
+            "ru": "заполняет шаги"
+          }
         },
         {
           "id": "concreteB",
+          "role": "concrete",
           "kind": "class",
           "icon": "cube",
           "label": {
-            "en": "XMLParser",
-            "ru": "XMLПарсер"
+            "en": "MarkdownReport",
+            "ru": "MarkdownReport"
           },
           "subtitle": {
-            "en": "fills hook step",
-            "ru": "заполняет пропуск"
-          },
-          "position": {
-            "x": 680,
-            "y": 270,
-            "w": 200,
-            "h": 90
-          },
-          "shape": "card"
+            "en": "fills the steps",
+            "ru": "заполняет шаги"
+          }
         }
       ],
       "edges": [
@@ -219,33 +199,27 @@
           "source": "client",
           "target": "abstract",
           "relationship": "flow",
-          "variant": "create",
-          "routing": "side",
           "label": {
-            "en": "① parse()",
-            "ru": "① разобрать()"
+            "en": "generate()",
+            "ru": "generate()"
           }
         },
         {
           "source": "abstract",
           "target": "concreteA",
           "relationship": "flow",
-          "variant": "create",
-          "routing": "border",
           "label": {
-            "en": "② extractData()",
-            "ru": "② извлечьДанные()"
+            "en": "plugs in",
+            "ru": "подставляется"
           }
         },
         {
           "source": "abstract",
           "target": "concreteB",
           "relationship": "flow",
-          "variant": "create",
-          "routing": "border",
           "label": {
-            "en": "③ extractData()",
-            "ru": "③ извлечьДанные()"
+            "en": "plugs in",
+            "ru": "подставляется"
           }
         }
       ]

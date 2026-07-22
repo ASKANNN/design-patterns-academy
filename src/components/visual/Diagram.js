@@ -46,6 +46,8 @@ export function Diagram(model = {}) {
 
   if (style === 'slot') return _slotDiagram(model);
 
+  if (style === 'skeleton') return _skeletonDiagram(model);
+
   const concept = style === 'concept';
   const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
   const titleId = `${safeId}-title`;
@@ -1872,4 +1874,153 @@ function _slotFlow(p, safeId, dashed) {
   const cls = dashed ? 'diagram__flow diagram__flow--slot-candidate' : 'diagram__flow diagram__flow--slot';
   return `
       <path class="${cls}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _skeletonDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 900, height = 420,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const skeleton = nodes.find((n) => n && n.role === 'skeleton');
+  const concretes = nodes.filter((n) => n && n.role === 'concrete');
+  if (!client || !skeleton || concretes.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 900;
+  const H = Number(height) || 420;
+
+  const steps = Array.isArray(skeleton.steps) ? skeleton.steps : [];
+  const HEAD_H = 62, ROW_H = 48, ROW_GAP = 10, ROWS_PAD = 16;
+  const rowsH = steps.length ? steps.length * ROW_H + (steps.length - 1) * ROW_GAP : 0;
+
+  const CLIENT_W = 160, CLIENT_H = 92;
+  const SPINE_W = 254;
+  const SPINE_H = HEAD_H + ROWS_PAD * 2 + rowsH;
+
+  const GAP1 = 64, GAP2 = 60;
+  const CARD_W = 214, CARD_H = 92, CARD_GAP = 18;
+
+  const spineCy = SPINE_H / 2;
+  const clientG = { x: 0, y: spineCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  const spineG = { x: clientG.x + CLIENT_W + GAP1, y: 0, w: SPINE_W, h: SPINE_H };
+
+  const n = concretes.length;
+  const stackX = spineG.x + SPINE_W + GAP2;
+  const stackH = n * CARD_H + (n - 1) * CARD_GAP;
+  const stackTop = spineG.y + HEAD_H + ROWS_PAD + rowsH / 2 - stackH / 2;
+  const concreteGeom = concretes.map((_, i) => ({
+    x: stackX, y: stackTop + i * (CARD_H + CARD_GAP), w: CARD_W, h: CARD_H,
+  }));
+
+  const left = clientG.x;
+  const right = Math.max(spineG.x + SPINE_W, ...concreteGeom.map((g) => g.x + g.w));
+  const top = Math.min(clientG.y, spineG.y, ...concreteGeom.map((g) => g.y));
+  const bottom = Math.max(clientG.y + CLIENT_H, spineG.y + SPINE_H, ...concreteGeom.map((g) => g.y + g.h));
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, spineG, ...concreteGeom].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const spineSvg = _skeletonSpine(skeleton, spineG, steps, { HEAD_H, ROW_H, ROW_GAP, ROWS_PAD, rowsH });
+  const concreteSvg = concretes
+    .map((c, i) => DiagramNode({ ...c, ...concreteGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const portX = spineG.x + SPINE_W;
+  const portY = spineG.y + HEAD_H + ROWS_PAD + rowsH / 2;
+
+  const entrySvg = _skeletonFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: spineG.x,             y2: spineG.y + HEAD_H / 2 }, safeId, 'call');
+  const plugSvg = concreteGeom
+    .map((g) => _skeletonFlow({ x1: portX, y1: portY, x2: g.x, y2: g.y + g.h / 2 }, safeId, 'plug'))
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--skeleton',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${plugSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${spineSvg}${concreteSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _skeletonSpine(node, g, steps, dims) {
+  const { id, label = '', subtitle = '', icon = 'layers' } = node;
+  const { HEAD_H, ROW_H, ROW_GAP, ROWS_PAD, rowsH } = dims;
+
+  const CHIP = 36;
+  const chipX = g.x + 16, chipY = g.y + 13;
+  const iconEl = icon ? renderIcon(icon, chipX + 5, chipY + 5, 26, 'diagram__spine-icon') : '';
+  const titleX = chipX + CHIP + 12;
+  const maxW = g.w - (titleX - g.x) - 16;
+  const titleTL = label.length * 8 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.5 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const headSvg = `
+      <rect class="diagram__spine-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="10" ry="10" aria-hidden="true" />${iconEl}
+      <text class="diagram__spine-title" x="${r2(titleX)}" y="${r2(g.y + 26)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__spine-sub" x="${r2(titleX)}" y="${r2(g.y + 44)}"${subTL}>${escapeText(subtitle)}</text>
+      <line class="diagram__spine-divider" x1="${r2(g.x + 14)}" y1="${r2(g.y + HEAD_H)}" x2="${r2(g.x + g.w - 14)}" y2="${r2(g.y + HEAD_H)}" />`;
+
+  const rowsSvg = steps.map((step, i) => {
+    const ry = g.y + HEAD_H + ROWS_PAD + i * (ROW_H + ROW_GAP);
+    const rx = g.x + 14;
+    const rw = g.w - 28;
+    const required = step.variant === 'abstract';
+    const cls = `diagram__step${required ? ' diagram__step--required' : ' diagram__step--hook'}`;
+    const stepLabel = String(step.label ?? '');
+    return `
+      <g class="${cls}" aria-hidden="true">
+        <rect class="diagram__step-bg" x="${r2(rx)}" y="${r2(ry)}" width="${r2(rw)}" height="${ROW_H}" rx="10" ry="10" />
+        <text class="diagram__step-label" x="${r2(rx + rw / 2)}" y="${r2(ry + ROW_H / 2 + 4)}" text-anchor="middle">${escapeText(stepLabel)}</text>
+      </g>`;
+  }).join('');
+
+  const portCy = g.y + HEAD_H + ROWS_PAD + rowsH / 2;
+  const portSvg = `
+      <circle class="diagram__spine-port" cx="${r2(g.x + g.w)}" cy="${r2(portCy)}" r="7" aria-hidden="true" />`;
+
+  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+
+  return `
+    <g class="diagram__spine" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__spine-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" />${headSvg}${rowsSvg}${portSvg}
+    </g>`;
+}
+
+function _skeletonFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--skeleton-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
 }

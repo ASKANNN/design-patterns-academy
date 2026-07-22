@@ -1098,7 +1098,7 @@ const _TEMPLATE_METHOD_STEPS = [
       { set: { id: 'concreteB', state: 'active' } },
       { glow: 'abstract' },
       { do: 'request',  index: 2 },
-      { do: 'creation', node: 'concreteB' },
+      { do: 'swap', node: 'concreteB' },
     ] },
   { id: 'final',     duration: 3200,
     actions: [

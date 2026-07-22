@@ -86,7 +86,7 @@ Proxy                BESPOKE (`gateway`) — committed
                      (row-centering fix applied earlier)
 
 
-BEHAVIORAL — 7 BESPOKE / 1 GENERIC
+BEHAVIORAL — 8 BESPOKE / 1 GENERIC
 
 Chain of Responsibility  BESPOKE (`chain`) — committed
 Command                  BESPOKE (`command`) — committed
@@ -121,7 +121,21 @@ Strategy                 BESPOKE (`slot`) — committed (client -> context
                          2026-07-22: fixed a missing `glow` action that
                          left the selected strategy card lit but not
                          glowing)
-Template Method          GENERIC
+Template Method          BESPOKE (`skeleton`) — implemented (client ->
+                         fixed-order ReportGenerator spine with
+                         header()/body()/footer() rows, body() marked
+                         required — fans out to a vertically-stacked,
+                         non-overlapping pair of concrete report cards
+                         off a single hook "port"; 2026-07-22: first
+                         layout attempt stacked the concrete cards as
+                         an overlapping "deck" for a same-slot-swap
+                         metaphor, but that collided with the shared
+                         `[data-viz-state='dim'] { opacity: 0.32 }`
+                         rule — dimmed opaque card backgrounds turned
+                         translucent and let the covered card's text
+                         bleed through; replaced with a plain
+                         non-overlapping stack, which reads fine with
+                         the `swap` primitive's fade/slide transition)
 Visitor                  GENERIC
 
 
@@ -145,15 +159,15 @@ Visitor                  GENERIC
 
 TOTALS
 
-BESPOKE (truly done):  14 / 23  (Singleton, Decorator, Facade,
+BESPOKE (truly done):  15 / 23  (Singleton, Decorator, Facade,
                         Flyweight, Proxy, Chain, Command, Interpreter,
                         Iterator, Mediator, Memento, Observer, State,
-                        Strategy — all committed; push status not
+                        Strategy, Template Method — push status not
                         tracked here, confirm with `git log` /
                         `git status`)
-GENERIC (needs rework):  9 / 23  (Factory Method, Abstract Factory,
+GENERIC (needs rework):  8 / 23  (Factory Method, Abstract Factory,
                         Builder, Prototype, Adapter, Bridge, Composite,
-                        Template Method, Visitor)
+                        Visitor)
 MISSING (needs data):    0 / 23
 
 
@@ -173,14 +187,19 @@ Singleton   → QA → commit                DONE (upgraded from the
                                           Gold Standard's GENERIC
                                           diagram to `singleton`)
 Strategy    → QA → commit                DONE (upgraded to `slot`)
+Template Method → QA                     DONE (upgraded to `skeleton`;
+                                          implemented + visually QA'd
+                                          light/dark x EN/RU + full
+                                          animation timeline, not yet
+                                          committed)
 
 NEXT, in this exact order (unchanged from the original plan):
 
-Template Method → Visitor →
+Visitor →
 Factory Method → Abstract Factory → Builder → Prototype →
 Adapter → Bridge → Composite
 
-(All 9 of these still render the GENERIC placeholder today — when
+(All 8 of these still render the GENERIC placeholder today — when
 each one's turn comes, treat it the same as a MISSING pattern used to
 be treated: design a real bespoke composition, do not consider it
 pre-done just because a `visuals` block exists. One pattern at a time,
