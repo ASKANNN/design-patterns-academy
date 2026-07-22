@@ -176,24 +176,25 @@ Strategy    → QA → commit                DONE (upgraded to `slot`)
 
 NEXT, in this exact order (unchanged from the original plan):
 
-Template Method → Visitor
+Template Method → Visitor →
+Factory Method → Abstract Factory → Builder → Prototype →
+Adapter → Bridge → Composite
 
-(These two still render the GENERIC placeholder today — when their
-turn comes, treat them the same as a MISSING pattern used to be
-treated: design a real bespoke composition, do not consider them
-pre-done just because a `visuals` block exists.)
+(All 9 of these still render the GENERIC placeholder today — when
+each one's turn comes, treat it the same as a MISSING pattern used to
+be treated: design a real bespoke composition, do not consider it
+pre-done just because a `visuals` block exists. One pattern at a time,
+never a batch.)
 
-OPEN DECISION — not yet resolved, ask before starting:
-
-Once Template Method and Visitor are done, Behavioral reaches 11/11
-BESPOKE, but Structural (Adapter, Bridge, Composite) and Creational
-(Factory Method, Abstract Factory, Builder, Prototype) will still have
-7 GENERIC diagrams between them. The original version of this plan
-called Creational "COMPLETE", which is true for their written content
-but not for their diagrams under this plan's own VISUAL UNIQUENESS
-RULE. Decide then whether upgrading those 7 to bespoke layouts is in
-scope before the project is called visually finished, or whether
-GENERIC is an accepted permanent state for them.
+DECISION (resolved 2026-07-22): upgrade ALL remaining GENERIC diagrams
+to bespoke layouts. GENERIC is not an accepted permanent state for any
+pattern — every one of the 23 must get its own `style` and its own
+Diagram.js layout function, matching the VISUAL UNIQUENESS RULE. The
+project is not considered visually finished at 11/11 Behavioral
+BESPOKE; it is finished at 23/23. Builder/Bridge/Composite's 2026-07-22
+touch-ups (Director node, centered card text) were minimal fixes to
+their current GENERIC layout only — they still need a full bespoke
+redesign like Strategy/Memento got, not just patched.
 
 Never implement multiple unfinished patterns in one batch.
 
