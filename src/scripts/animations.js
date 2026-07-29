@@ -164,9 +164,10 @@ function _animateCounters(statsEl) {
 export function animateFilterIn(items) {
   if (_reducedMotion) return;
 
+  items.forEach(item => item.classList.remove('filter-entering'));
+  void items[0]?.offsetWidth;
+
   items.forEach((item, i) => {
-    item.classList.remove('filter-entering');
-    void item.offsetWidth;
     item.classList.add('filter-entering');
     item.style.animationDelay = `${i * 28}ms`;
 

@@ -239,9 +239,9 @@ body.is-loaded #router-outlet.is-transitioning {
 }
 
 [data-theme-transitioning],
-[data-theme-transitioning] *,
-[data-theme-transitioning] *::before,
-[data-theme-transitioning] *::after {
+[data-theme-transitioning] *:not(.diagram *),
+[data-theme-transitioning] *:not(.diagram *)::before,
+[data-theme-transitioning] *:not(.diagram *)::after {
   transition:
     background-color 320ms var(--ease-in-out),
     color            320ms var(--ease-in-out),
