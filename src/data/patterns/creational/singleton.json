@@ -1,0 +1,289 @@
+{
+  "slug": "singleton",
+  "name": "Singleton",
+  "category": "creational",
+  "complexity": 1,
+  "popularity": 2,
+  "also_known_as": [],
+  "tags": ["creational", "instance", "global-state", "lazy-initialization"],
+
+  "intent": {
+    "en": "Singleton restricts a class to exactly one instance for its entire lifetime and gives every part of the program the same well-known way to reach that instance.",
+    "ru": "Одиночка ограничивает класс ровно одним экземпляром на всё время жизни программы и даёт всем её частям единый известный способ обратиться к этому экземпляру."
+  },
+
+  "problem": {
+    "en": "A logging module writes to one file on disk. If any part of the codebase can freely do `new Logger()`, nothing stops two different modules from opening independent file handles to the same log file — one write can silently clobber another, and buffered output can end up interleaved or lost.\n\nWhat's needed is a guarantee, enforced by the class itself rather than by convention, that only one `Logger` will ever exist — plus a predictable way for distant, unrelated parts of the code to reach that one instance without threading a reference through every constructor and function signature between them.",
+    "ru": "Модуль логирования пишет в один файл на диске. Если любая часть кодовой базы может свободно вызвать `new Logger()`, ничто не помешает двум разным модулям открыть независимые файловые дескрипторы на один и тот же лог-файл — одна запись может незаметно затереть другую, а буферизованный вывод может перемешаться или потеряться.\n\nНужна гарантия, обеспечиваемая самим классом, а не соглашением между разработчиками, что `Logger` будет существовать в единственном экземпляре, — а также предсказуемый способ для далёких друг от друга частей кода дотянуться до этого единственного экземпляра, не протаскивая ссылку на него через каждый конструктор и сигнатуру функции между ними."
+  },
+
+  "solution": {
+    "en": "Hide the constructor so nothing outside the class can call `new` on it directly, then add one static access method that the class itself controls. The first time that method runs, it builds the one permitted instance and stashes it in a static field; every call after that just hands back the same stashed reference instead of building anything new.\n\nBecause creation is funneled through a single method the class owns, the class can enforce \"exactly one instance\" as an invariant of its own code rather than relying on every caller to behave — and any part of the program can reach that instance by calling the same static method, with no reference-passing required.",
+    "ru": "Конструктор скрывается так, чтобы ничто снаружи класса не могло вызвать на нём `new` напрямую, и добавляется единственный статический метод доступа, которым управляет сам класс. При первом вызове этот метод создаёт единственный разрешённый экземпляр и сохраняет его в статическом поле; каждый последующий вызов просто возвращает ту же сохранённую ссылку, ничего не создавая заново.\n\nПоскольку создание проходит через единственный метод, принадлежащий классу, класс может сам обеспечивать инвариант «ровно один экземпляр», не полагаясь на дисциплину вызывающего кода, — а любая часть программы может дотянуться до этого экземпляра, вызвав тот же статический метод, без необходимости передавать ссылку вручную."
+  },
+
+  "structure": {
+    "description": {
+      "en": "A single class owns both the hidden constructor and a static field holding its own one-and-only instance. A public static access method is the sole gateway to that field: it lazily builds the instance on first use and returns the cached reference on every call afterward.",
+      "ru": "Один класс владеет и скрытым конструктором, и статическим полем, хранящим его единственный экземпляр. Публичный статический метод доступа — единственная точка входа к этому полю: он лениво создаёт экземпляр при первом обращении и возвращает закэшированную ссылку при всех последующих."
+    },
+    "participants": [
+      {
+        "name": "Singleton",
+        "role": {
+          "en": "Owns the private constructor, the static instance field, and the public static access method — combining state, creation, and access control in one class.",
+          "ru": "Владеет приватным конструктором, статическим полем экземпляра и публичным статическим методом доступа, объединяя состояние, создание и контроль доступа в одном классе."
+        }
+      }
+    ]
+  },
+
+  "implementation": {
+    "javascript": "class Singleton {\n  static #instance = null;\n\n  constructor() {\n    if (Singleton.#instance) {\n      throw new Error('Use Singleton.getInstance()');\n    }\n    Singleton.#instance = this;\n  }\n\n  static getInstance() {\n    if (!Singleton.#instance) {\n      new Singleton();\n    }\n    return Singleton.#instance;\n  }\n\n  doSomething() {\n    console.log('Singleton: doing something...');\n  }\n}\n\nconst s1 = Singleton.getInstance();\nconst s2 = Singleton.getInstance();\n\nconsole.log(s1 === s2);",
+
+    "typescript": "class Singleton {\n  private static instance: Singleton;\n\n  private constructor() {}\n\n  public static getInstance(): Singleton {\n    if (!Singleton.instance) {\n      Singleton.instance = new Singleton();\n    }\n    return Singleton.instance;\n  }\n\n  public doSomething(): void {\n    console.log('Singleton: doing something...');\n  }\n}\n\nconst s1 = Singleton.getInstance();\nconst s2 = Singleton.getInstance();\n\nconsole.log(s1 === s2);",
+
+    "java": "public final class Singleton {\n    private static volatile Singleton instance;\n\n    private Singleton() {}\n\n    public static Singleton getInstance() {\n        if (instance == null) {\n            synchronized (Singleton.class) {\n                if (instance == null) {\n                    instance = new Singleton();\n                }\n            }\n        }\n        return instance;\n    }\n\n    public void doSomething() {\n        System.out.println(\"Singleton: doing something...\");\n    }\n}\n\nSingleton s1 = Singleton.getInstance();\nSingleton s2 = Singleton.getInstance();\n\nSystem.out.println(s1 == s2);",
+
+    "csharp": "public sealed class Singleton\n{\n    private static readonly Lazy<Singleton> lazy =\n        new Lazy<Singleton>(() => new Singleton());\n\n    private Singleton() { }\n\n    public static Singleton Instance => lazy.Value;\n\n    public void DoSomething()\n    {\n        Console.WriteLine(\"Singleton: doing something...\");\n    }\n}\n\nSingleton s1 = Singleton.Instance;\nSingleton s2 = Singleton.Instance;\n\nConsole.WriteLine(s1 == s2);",
+
+    "python": "from threading import Lock\n\nclass SingletonMeta(type):\n    _instances = {}\n    _lock: Lock = Lock()\n\n    def __call__(cls, *args, **kwargs):\n        with cls._lock:\n            if cls not in cls._instances:\n                instance = super().__call__(*args, **kwargs)\n                cls._instances[cls] = instance\n        return cls._instances[cls]\n\n\nclass Singleton(metaclass=SingletonMeta):\n    def do_something(self) -> None:\n        print('Singleton: doing something...')\n\n\ns1 = Singleton()\ns2 = Singleton()\nprint(s1 is s2)"
+  },
+
+  "pros": [
+    {
+      "en": "The single-instance guarantee is enforced by the class itself, not by every caller remembering to reuse an existing object.",
+      "ru": "Гарантия единственности экземпляра обеспечивается самим классом, а не тем, что каждый вызывающий код не забудет переиспользовать существующий объект."
+    },
+    {
+      "en": "Any part of the codebase reaches the same instance through one predictable method call, without passing a reference through layers of unrelated code.",
+      "ru": "Любая часть кодовой базы дотягивается до одного и того же экземпляра через один предсказуемый вызов метода, без передачи ссылки через слои не связанного с ней кода."
+    },
+    {
+      "en": "The instance is built only on first actual use, so its setup cost isn't paid at all if that part of the program never runs.",
+      "ru": "Экземпляр создаётся только при первом реальном обращении, поэтому затраты на его настройку вообще не возникают, если эта часть программы не выполняется."
+    }
+  ],
+
+  "cons": [
+    {
+      "en": "Anything using the singleton becomes implicitly coupled to it — that dependency doesn't show up in constructor or function signatures, making it easy to miss when reading the code.",
+      "ru": "Всё, что использует одиночку, оказывается неявно связано с ним — эта зависимость не отражается в сигнатурах конструктора или функции, из-за чего её легко упустить при чтении кода."
+    },
+    {
+      "en": "Swapping in a fake or mock version for tests is awkward, since consumers typically ask the class for its instance directly instead of receiving it as an injected dependency.",
+      "ru": "Подмена фиктивной или мок-версией для тестов затруднена, поскольку потребители обычно сами запрашивают экземпляр у класса, а не получают его как внедрённую зависимость."
+    },
+    {
+      "en": "In a multithreaded environment, naive lazy initialization can race and create two instances unless the creation path is explicitly synchronized.",
+      "ru": "В многопоточной среде наивная ленивая инициализация может привести к состоянию гонки и созданию двух экземпляров, если путь создания явно не синхронизирован."
+    },
+    {
+      "en": "Global mutable state introduced by a singleton can make execution order matter in ways that are hard to reason about as the codebase grows.",
+      "ru": "Глобальное изменяемое состояние, вносимое одиночкой, может сделать результат работы программы зависимым от порядка выполнения — и разобраться в этой зависимости становится всё труднее по мере роста кодовой базы."
+    }
+  ],
+
+  "when_to_use": [
+    {
+      "en": "Reach for it when a resource is inherently singular — a hardware handle, a single log file, a connection pool — and more than one instance would cause real conflicts, not just redundancy.",
+      "ru": "Применяйте паттерн, когда ресурс по своей природе единственен — доступ к оборудованию, один лог-файл, пул соединений — и появление более одного экземпляра вызовет реальные конфликты, а не просто избыточность."
+    },
+    {
+      "en": "Reach for it when many unrelated parts of the codebase need the same shared object and threading it through every layer as an explicit parameter would be impractical.",
+      "ru": "Применяйте паттерн, когда множеству не связанных друг с другом частей кодовой базы нужен один и тот же общий объект, а протаскивать его через каждый слой как явный параметр непрактично."
+    }
+  ],
+
+  "real_world_examples": [
+    {
+      "en": "**Node.js module caching** — `require()`/`import` returns the same module instance on every import within a process, effectively making top-level module state a singleton.",
+      "ru": "**Кеширование модулей в Node.js** — `require()`/`import` возвращает один и тот же экземпляр модуля при каждом импорте в рамках процесса, фактически превращая состояние модуля верхнего уровня в одиночку."
+    },
+    {
+      "en": "**`java.lang.Runtime.getRuntime()`** — the JVM exposes exactly one Runtime object per process through a static access method, mirroring the classic Singleton shape.",
+      "ru": "**`java.lang.Runtime.getRuntime()`** — JVM предоставляет ровно один объект Runtime на процесс через статический метод доступа, в точности повторяя классическую схему Одиночки."
+    },
+    {
+      "en": "**Redux/Vuex application store** — a single global store instance holds the entire application's state tree, and components reach it through one shared access point rather than creating their own copies.",
+      "ru": "**Store приложения в Redux/Vuex** — единственный глобальный экземпляр store хранит всё дерево состояния приложения, а компоненты обращаются к нему через одну общую точку доступа, а не создают собственные копии."
+    }
+  ],
+
+  "related_patterns": [
+    "abstract-factory",
+    "builder",
+    "prototype",
+    "facade"
+  ],
+
+  "quiz": [
+    {
+      "question": {
+        "en": "What does Singleton guarantee about a class?",
+        "ru": "Что гарантирует Одиночка в отношении класса?"
+      },
+      "options": [
+        { "en": "That the class can never be subclassed", "ru": "Что класс никогда нельзя будет унаследовать" },
+        { "en": "That exactly one instance of the class exists, reachable through a shared access point", "ru": "Что существует ровно один экземпляр класса, доступный через общую точку входа" },
+        { "en": "That the class's methods all run on separate threads", "ru": "Что все методы класса выполняются в отдельных потоках" },
+        { "en": "That the class cannot hold any state", "ru": "Что класс не может хранить состояние" }
+      ],
+      "correct": 1,
+      "explanation": {
+        "en": "The constructor is hidden and a static access method is the only way to obtain the instance, so only one instance ever exists.",
+        "ru": "Конструктор скрыт, и единственный способ получить экземпляр — статический метод доступа, поэтому существует только один экземпляр."
+      }
+    },
+    {
+      "question": {
+        "en": "Why is the constructor made private (or hidden) in a Singleton?",
+        "ru": "Почему в Одиночке конструктор делают приватным (или скрытым)?"
+      },
+      "options": [
+        { "en": "To improve runtime performance", "ru": "Чтобы повысить производительность во время выполнения" },
+        { "en": "To prevent code outside the class from creating additional instances with `new`", "ru": "Чтобы код снаружи класса не мог создавать дополнительные экземпляры через `new`" },
+        { "en": "To allow the class to be serialized", "ru": "Чтобы класс можно было сериализовать" },
+        { "en": "Because static methods require a private constructor", "ru": "Потому что статическим методам требуется приватный конструктор" }
+      ],
+      "correct": 1,
+      "explanation": {
+        "en": "If the constructor stayed public, any caller could bypass the access method and create a second instance, breaking the single-instance guarantee.",
+        "ru": "Если бы конструктор остался публичным, любой вызывающий код мог бы обойти метод доступа и создать второй экземпляр, нарушив гарантию единственности."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a common drawback of using Singleton?",
+        "ru": "В чём типичный недостаток использования Одиночки?"
+      },
+      "options": [
+        { "en": "It makes object creation slower in every case", "ru": "Он всегда замедляет создание объектов" },
+        { "en": "It introduces implicit coupling that's hard to see in constructor or function signatures, and complicates testing", "ru": "Он вносит неявную связанность, незаметную в сигнатурах конструктора или функции, и усложняет тестирование" },
+        { "en": "It requires every class in the codebase to be static", "ru": "Он требует, чтобы все классы в кодовой базе были статическими" },
+        { "en": "It prevents the class from having any methods", "ru": "Он не позволяет классу иметь методы" }
+      ],
+      "correct": 1,
+      "explanation": {
+        "en": "Code that reaches for the singleton directly hides that dependency from its signature, and swapping in a mock for tests is awkward as a result.",
+        "ru": "Код, напрямую обращающийся к одиночке, скрывает эту зависимость от своей сигнатуры, из-за чего подмена мок-объектом для тестов оказывается затруднена."
+      }
+    },
+    {
+      "question": {
+        "en": "In the lazy-initialization version of Singleton, when is the one instance actually created?",
+        "ru": "В версии Одиночки с ленивой инициализацией — когда фактически создаётся единственный экземпляр?"
+      },
+      "options": [
+        { "en": "As soon as the program starts, before anything else runs", "ru": "Как только запускается программа, до выполнения всего остального" },
+        { "en": "The first time the static access method is called", "ru": "При первом вызове статического метода доступа" },
+        { "en": "Every time the static access method is called", "ru": "При каждом вызове статического метода доступа" },
+        { "en": "Only when the program is about to exit", "ru": "Только когда программа вот-вот завершится" }
+      ],
+      "correct": 1,
+      "explanation": {
+        "en": "The access method checks the static field, builds the instance only on the first call, and simply returns the cached reference on every call after that.",
+        "ru": "Метод доступа проверяет статическое поле, создаёт экземпляр только при первом вызове, а при всех последующих просто возвращает закэшированную ссылку."
+      }
+    },
+    {
+      "question": {
+        "en": "Why can naive lazy initialization be unsafe in a multithreaded environment?",
+        "ru": "Почему наивная ленивая инициализация может быть небезопасна в многопоточной среде?"
+      },
+      "options": [
+        { "en": "Two threads can both see no instance yet and each create their own, producing two instances", "ru": "Оба потока могут одновременно увидеть, что экземпляра ещё нет, и каждый создаст свой — получится два экземпляра" },
+        { "en": "Threads are not allowed to call static methods", "ru": "Потокам запрещено вызывать статические методы" },
+        { "en": "The class keyword `static` only works on a single thread", "ru": "Ключевое слово `static` работает только в одном потоке" },
+        { "en": "Multithreading disables the private constructor", "ru": "Многопоточность отключает приватный конструктор" }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Without synchronization, two threads can race through the same null-check before either one finishes creating the instance, so the single-instance guarantee breaks unless the creation path is explicitly synchronized.",
+        "ru": "Без синхронизации два потока могут одновременно пройти одну и ту же проверку на null, прежде чем кто-то из них завершит создание экземпляра, — и гарантия единственности нарушается, если путь создания явно не синхронизирован."
+      }
+    }
+  ],
+
+  "visuals": [
+    {
+      "id": "singleton-concept",
+      "type": "flow",
+      "style": "singleton",
+      "category": "creational",
+      "width": 880,
+      "height": 560,
+      "title": {
+        "en": "How Singleton works",
+        "ru": "Как работает Одиночка"
+      },
+      "description": {
+        "en": "Three clients each call getInstance(). The first call creates the single Singleton object; every later call returns that same stored object. There is only ever one instance, shared by all clients.",
+        "ru": "Три клиента вызывают getInstance(). Первый вызов создаёт единственный объект Одиночки; каждый следующий вызов возвращает тот же сохранённый объект. Существует лишь один экземпляр, общий для всех клиентов."
+      },
+      "caption": {
+        "en": "One object is created once — and shared by every client.",
+        "ru": "Один объект создаётся один раз — и используется всеми клиентами."
+      },
+      "nodes": [
+        {
+          "id": "clientA",
+          "kind": "actor",
+          "role": "client",
+          "icon": "user",
+          "label": { "en": "Client A", "ru": "Клиент A" },
+          "subtitle": { "en": "getInstance()", "ru": "getInstance()" }
+        },
+        {
+          "id": "clientB",
+          "kind": "actor",
+          "role": "client",
+          "icon": "user",
+          "label": { "en": "Client B", "ru": "Клиент B" },
+          "subtitle": { "en": "getInstance()", "ru": "getInstance()" }
+        },
+        {
+          "id": "clientC",
+          "kind": "actor",
+          "role": "client",
+          "icon": "user",
+          "label": { "en": "Client C", "ru": "Клиент C" },
+          "subtitle": { "en": "getInstance()", "ru": "getInstance()" }
+        },
+        {
+          "id": "instance",
+          "kind": "class",
+          "role": "instance",
+          "icon": "cube",
+          "emphasis": true,
+          "badge": "1",
+          "label": { "en": "Singleton", "ru": "Одиночка" },
+          "subtitle": { "en": "one shared instance", "ru": "один общий экземпляр" }
+        }
+      ],
+      "edges": [
+        {
+          "source": "clientA",
+          "target": "instance",
+          "relationship": "flow",
+          "variant": "create",
+          "label": { "en": "① creates", "ru": "① создаёт" }
+        },
+        {
+          "source": "clientB",
+          "target": "instance",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "② same object", "ru": "② тот же объект" }
+        },
+        {
+          "source": "clientC",
+          "target": "instance",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": { "en": "③ same object", "ru": "③ тот же объект" }
+        }
+      ]
+    }
+  ]
+}

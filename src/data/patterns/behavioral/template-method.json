@@ -1,0 +1,385 @@
+{
+  "slug": "template-method",
+  "name": "Template Method",
+  "category": "behavioral",
+  "complexity": 1,
+  "popularity": 2,
+  "also_known_as": [
+    "Hook Method"
+  ],
+  "tags": [
+    "behavioral",
+    "skeleton",
+    "inheritance"
+  ],
+  "intent": {
+    "en": "Template Method fixes the overall shape of an algorithm in a base class while leaving individual steps for subclasses to fill in, so the sequence of operations never changes even though its details do.",
+    "ru": "Шаблонный метод закрепляет общую последовательность алгоритма в базовом классе, оставляя отдельные шаги на усмотрение подклассов, — порядок операций всегда один и тот же, даже если детали каждого шага меняются."
+  },
+  "problem": {
+    "en": "Imagine you're building a reporting tool that generates documents in different formats: HTML and Markdown. Both formats follow the same overall structure — a title header, a list of content rows, and a footer — but the exact markup for each step differs.\n\nYou could copy the entire algorithm into each report class. But then changing the overall flow (say, adding a timestamp section) requires modifying every class individually.\n\nAlternatively, you could pack all the logic into one class and use conditionals to choose the output format — but that violates the Open/Closed Principle every time a new format is added.",
+    "ru": "Представьте, что вы создаёте инструмент для генерации отчётов в разных форматах: HTML и Markdown. Оба формата следуют одной и той же общей структуре — заголовок с названием, список строк с содержимым и нижний колонтитул — но конкретная разметка для каждого шага различается.\n\nМожно скопировать весь алгоритм в каждый класс отчёта. Но тогда изменение общего потока (например, добавление секции с временной меткой) потребует изменения каждого класса отдельно.\n\nКак вариант, можно поместить всю логику в один класс и использовать условные операторы для выбора формата вывода — но это нарушает принцип открытости/закрытости при добавлении каждого нового формата."
+  },
+  "solution": {
+    "en": "The Template Method pattern suggests breaking the algorithm into steps, turning each step into a method, and putting a series of calls to those methods inside a single **template method** in the abstract class.\n\nThe steps may either be `abstract` (forcing subclasses to provide an implementation) or have a default implementation that subclasses can optionally override (**hooks**).\n\nSubclasses can override specific steps without touching the template method itself. This guarantees that the overall algorithm structure stays the same while individual steps remain customizable.",
+    "ru": "Паттерн Шаблонный метод предлагает разбить алгоритм на шаги, оформить каждый шаг как метод и поместить серию вызовов этих методов в единственный **шаблонный метод** абстрактного класса.\n\nШаги могут быть `abstract` (принуждая подклассы предоставлять реализацию) или иметь реализацию по умолчанию, которую подклассы могут опционально переопределить (**хуки**).\n\nПодклассы могут переопределять конкретные шаги, не трогая шаблонный метод. Это гарантирует неизменность общей структуры алгоритма при свободной настройке отдельных шагов."
+  },
+  "structure": {
+    "description": {
+      "en": "The AbstractClass declares the template method and all algorithm steps. Some steps are abstract; others are hooks with empty default implementations. ConcreteClass overrides the steps it needs to customize.",
+      "ru": "Абстрактный класс объявляет шаблонный метод и все шаги алгоритма. Одни шаги являются абстрактными, другие — хуками с пустой реализацией по умолчанию. Конкретный класс переопределяет нужные шаги."
+    },
+    "participants": [
+      {
+        "name": "AbstractClass",
+        "role": {
+          "en": "Declares the template method that defines the algorithm skeleton. Also declares abstract primitive operations that subclasses must implement, and optional hook methods with empty or default implementations.",
+          "ru": "Объявляет шаблонный метод, определяющий скелет алгоритма. Также объявляет абстрактные примитивные операции, которые подклассы должны реализовать, и опциональные методы-хуки с пустой или стандартной реализацией."
+        }
+      },
+      {
+        "name": "ConcreteClass",
+        "role": {
+          "en": "Implements the abstract primitive operations to carry out the subclass-specific steps of the algorithm. Does not override the template method itself.",
+          "ru": "Реализует абстрактные примитивные операции для выполнения специфичных для подкласса шагов алгоритма. Не переопределяет сам шаблонный метод."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "class ReportGenerator {\n  generate(title, rows) {\n    const parts = [\n      this.header(title),\n      this.body(rows),\n      this.footer(),\n    ];\n    return parts.filter(Boolean).join('\\n');\n  }\n\n  header(title) { return ''; }\n  footer()      { return ''; }\n\n  body(rows) {\n    throw new Error('body() must be implemented');\n  }\n}\n\nclass HtmlReport extends ReportGenerator {\n  header(title) { return `<h1>${title}</h1><ul>`; }\n  body(rows)    { return rows.map(r => `  <li>${r}</li>`).join('\\n'); }\n  footer()      { return '</ul>'; }\n}\n\nclass MarkdownReport extends ReportGenerator {\n  header(title) { return `# ${title}\\n`; }\n  body(rows)    { return rows.map(r => `- ${r}`).join('\\n'); }\n}\n\nconst rows = ['Design Patterns', 'Clean Code', 'SOLID'];\n\nconst html = new HtmlReport();\nconsole.log(html.generate('Books', rows));\n\nconst md = new MarkdownReport();\nconsole.log(md.generate('Books', rows));",
+    "typescript": "abstract class ReportGenerator {\n  generate(title: string, rows: string[]): string {\n    const parts = [\n      this.header(title),\n      this.body(rows),\n      this.footer(),\n    ];\n    return parts.filter(Boolean).join('\\n');\n  }\n\n  protected header(_title: string): string { return ''; }\n  protected footer(): string               { return ''; }\n\n  protected abstract body(rows: string[]): string;\n}\n\nclass HtmlReport extends ReportGenerator {\n  protected header(title: string): string {\n    return `<h1>${title}</h1><ul>`;\n  }\n  protected body(rows: string[]): string {\n    return rows.map(r => `  <li>${r}</li>`).join('\\n');\n  }\n  protected footer(): string { return '</ul>'; }\n}\n\nclass MarkdownReport extends ReportGenerator {\n  protected header(title: string): string { return `# ${title}\\n`; }\n  protected body(rows: string[]): string {\n    return rows.map(r => `- ${r}`).join('\\n');\n  }\n}\n\nconst rows = ['Design Patterns', 'Clean Code', 'SOLID'];\n\nconst html = new HtmlReport();\nconsole.log(html.generate('Books', rows));\n\nconst md = new MarkdownReport();\nconsole.log(md.generate('Books', rows));",
+    "java": "abstract class ReportGenerator {\n    public final String generate(String title, String[] rows) {\n        StringBuilder sb = new StringBuilder();\n        String h = header(title);\n        if (!h.isEmpty()) sb.append(h).append('\\n');\n        sb.append(body(rows));\n        String f = footer();\n        if (!f.isEmpty()) sb.append('\\n').append(f);\n        return sb.toString();\n    }\n\n    protected String header(String title) { return \"\"; }\n    protected String footer()             { return \"\"; }\n\n    protected abstract String body(String[] rows);\n}\n\nclass HtmlReport extends ReportGenerator {\n    protected String header(String title) { return \"<h1>\" + title + \"</h1><ul>\"; }\n    protected String body(String[] rows) {\n        StringBuilder sb = new StringBuilder();\n        for (String r : rows) sb.append(\"  <li>\").append(r).append(\"</li>\\n\");\n        return sb.toString().stripTrailing();\n    }\n    protected String footer() { return \"</ul>\"; }\n}\n\nclass MarkdownReport extends ReportGenerator {\n    protected String header(String title) { return \"# \" + title + \"\\n\"; }\n    protected String body(String[] rows) {\n        StringBuilder sb = new StringBuilder();\n        for (String r : rows) sb.append(\"- \").append(r).append('\\n');\n        return sb.toString().stripTrailing();\n    }\n}\n\nString[] rows = {\"Design Patterns\", \"Clean Code\", \"SOLID\"};\n\nSystem.out.println(new HtmlReport().generate(\"Books\", rows));\n\nSystem.out.println(new MarkdownReport().generate(\"Books\", rows));",
+    "csharp": "abstract class ReportGenerator\n{\n    public string Generate(string title, string[] rows)\n    {\n        var parts = new[] { Header(title), Body(rows), Footer() };\n        return string.Join(\"\\n\", parts.Where(p => !string.IsNullOrEmpty(p)));\n    }\n\n    protected virtual string Header(string title) => \"\";\n    protected virtual string Footer()             => \"\";\n\n    protected abstract string Body(string[] rows);\n}\n\nclass HtmlReport : ReportGenerator\n{\n    protected override string Header(string title) => $\"<h1>{title}</h1><ul>\";\n    protected override string Body(string[] rows)  =>\n        string.Join(\"\\n\", rows.Select(r => $\"  <li>{r}</li>\"));\n    protected override string Footer() => \"</ul>\";\n}\n\nclass MarkdownReport : ReportGenerator\n{\n    protected override string Header(string title) => $\"# {title}\\n\";\n    protected override string Body(string[] rows)  =>\n        string.Join(\"\\n\", rows.Select(r => $\"- {r}\"));\n}\n\nstring[] rows = { \"Design Patterns\", \"Clean Code\", \"SOLID\" };\n\nConsole.WriteLine(new HtmlReport().Generate(\"Books\", rows));\n\nConsole.WriteLine(new MarkdownReport().Generate(\"Books\", rows));",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass ReportGenerator(ABC):\n    def generate(self, title: str, rows: list[str]) -> str:\n        parts = [self.header(title), self.body(rows), self.footer()]\n        return '\\n'.join(p for p in parts if p)\n\n    def header(self, title: str) -> str: return ''\n    def footer(self) -> str:             return ''\n\n    @abstractmethod\n    def body(self, rows: list[str]) -> str: ...\n\n\nclass HtmlReport(ReportGenerator):\n    def header(self, title: str) -> str:\n        return f'<h1>{title}</h1><ul>'\n\n    def body(self, rows: list[str]) -> str:\n        return '\\n'.join(f'  <li>{r}</li>' for r in rows)\n\n    def footer(self) -> str:\n        return '</ul>'\n\n\nclass MarkdownReport(ReportGenerator):\n    def header(self, title: str) -> str:\n        return f'# {title}\\n'\n\n    def body(self, rows: list[str]) -> str:\n        return '\\n'.join(f'- {r}' for r in rows)\n\n\nrows = ['Design Patterns', 'Clean Code', 'SOLID']\n\nhtml = HtmlReport()\nprint(html.generate('Books', rows))\n\nmd = MarkdownReport()\nprint(md.generate('Books', rows))"
+  },
+  "pros": [
+    {
+      "en": "Subclasses only need to fill in the steps that actually vary, instead of re-implementing the whole algorithm.",
+      "ru": "Подклассам нужно реализовать только те шаги, которые действительно отличаются, а не весь алгоритм заново."
+    },
+    {
+      "en": "The parts of the algorithm that never change live in one place, in the base class, instead of being copy-pasted across every subclass.",
+      "ru": "Неизменные части алгоритма находятся в одном месте — в базовом классе, а не копируются в каждый подкласс."
+    },
+    {
+      "en": "Because the sequence of steps is fixed by the base class, subclasses cannot accidentally reorder or skip a stage of the algorithm.",
+      "ru": "Поскольку порядок шагов задан базовым классом, подклассы не могут случайно поменять их местами или пропустить один из этапов."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Every new step added to the skeleton means another method every existing subclass may need to review or override.",
+      "ru": "Каждый новый шаг, добавленный в каркас, — это ещё один метод, который может потребовать внимания или переопределения во всех существующих подклассах."
+    },
+    {
+      "en": "A subclass that overrides a hook carelessly can break an assumption the base algorithm relies on, since the base class can't enforce what the override actually does.",
+      "ru": "Подкласс, небрежно переопределивший хук, может нарушить предположение, на которое опирается базовый алгоритм, — ведь базовый класс не может проконтролировать, что именно делает переопределение."
+    },
+    {
+      "en": "Because the algorithm's shape is fixed through inheritance, adding a genuinely different variant usually means a new subclass rather than a runtime choice — Strategy is a better fit when that flexibility matters.",
+      "ru": "Поскольку форма алгоритма закреплена через наследование, для действительно нового варианта обычно нужен новый подкласс, а не выбор во время выполнения — если такая гибкость важна, лучше подойдёт Стратегия."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Template Method when subclasses should be free to customize a few specific steps of an algorithm, but must not be able to change its overall sequence.",
+      "ru": "Применяйте Шаблонный метод, когда подклассам нужно разрешить настраивать отдельные шаги алгоритма, но нельзя позволять менять его общую последовательность."
+    },
+    {
+      "en": "It also fits when you notice several classes implementing almost the same algorithm with small variations, which today forces you to update every copy whenever the shared logic changes.",
+      "ru": "Паттерн также уместен, если несколько классов реализуют почти одинаковый алгоритм с небольшими отличиями, из-за чего сейчас при изменении общей логики приходится обновлять каждую копию."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Data parsers** — a document parser follows the same steps (open, parse, close) for CSV, JSON, and XML files, but each format requires different parsing logic.",
+      "ru": "**Парсеры данных** — парсер документов следует одним и тем же шагам (открыть, разобрать, закрыть) для файлов CSV, JSON и XML, но каждый формат требует своей логики разбора."
+    },
+    {
+      "en": "**Web frameworks** — request handling pipelines (authenticate, authorize, handle, respond) define a skeleton that controllers override with specific handler logic.",
+      "ru": "**Веб-фреймворки** — конвейеры обработки запросов (аутентификация, авторизация, обработка, ответ) определяют скелет, который контроллеры переопределяют собственной логикой."
+    },
+    {
+      "en": "**Game AI** — a turn-based AI defines a fixed turn structure (collect resources, build, attack) while different difficulty levels override each step with varying strategies.",
+      "ru": "**ИИ игры** — пошаговый ИИ определяет фиксированную структуру хода (сбор ресурсов, строительство, атака), а разные уровни сложности переопределяют каждый шаг различными стратегиями."
+    }
+  ],
+  "related_patterns": [
+    "strategy",
+    "factory-method",
+    "decorator",
+    "observer"
+  ],
+  "quiz": [
+    {
+      "question": {
+        "en": "What does Template Method fix in the base class, while leaving to subclasses?",
+        "ru": "Что Шаблонный метод закрепляет в базовом классе, оставляя подклассам?"
+      },
+      "options": [
+        {
+          "en": "The overall shape/sequence of an algorithm, leaving individual steps for subclasses to fill in",
+          "ru": "Общую последовательность/форму алгоритма, оставляя отдельные шаги на усмотрение подклассов"
+        },
+        {
+          "en": "The entire algorithm including every step, leaving nothing for subclasses",
+          "ru": "Весь алгоритм целиком, включая каждый шаг, не оставляя ничего подклассам"
+        },
+        {
+          "en": "Only error handling, leaving the main logic to subclasses",
+          "ru": "Только обработку ошибок, оставляя основную логику подклассам"
+        },
+        {
+          "en": "Nothing — subclasses define both the sequence and the steps",
+          "ru": "Ничего — подклассы сами определяют и последовательность, и шаги"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Template Method fixes the overall shape of an algorithm in a base class while leaving individual steps for subclasses to fill in, so the sequence of operations never changes even though its details do.",
+        "ru": "Шаблонный метод закрепляет общую последовательность алгоритма в базовом классе, оставляя отдельные шаги на усмотрение подклассов, — порядок операций всегда один и тот же, даже если детали каждого шага меняются."
+      }
+    },
+    {
+      "question": {
+        "en": "What goes wrong if the report-generation algorithm is copied entirely into each format's class (HTML, Markdown)?",
+        "ru": "Что идёт не так, если алгоритм генерации отчёта полностью копируется в класс каждого формата (HTML, Markdown)?"
+      },
+      "options": [
+        {
+          "en": "Changing the overall flow, like adding a timestamp section, requires modifying every class individually",
+          "ru": "Изменение общего потока, например добавление секции с временной меткой, требует изменения каждого класса отдельно"
+        },
+        {
+          "en": "HTML and Markdown reports become impossible to generate at all",
+          "ru": "Генерация отчётов в HTML и Markdown становится вообще невозможной"
+        },
+        {
+          "en": "The title header and footer stop working in every format",
+          "ru": "Заголовок и нижний колонтитул перестают работать во всех форматах"
+        },
+        {
+          "en": "It automatically satisfies the Open/Closed Principle",
+          "ru": "Это автоматически удовлетворяет принципу открытости/закрытости"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Copying the entire algorithm into each report class means changing the overall flow, like adding a timestamp section, requires modifying every class individually.",
+        "ru": "Копирование всего алгоритма в каждый класс отчёта означает, что изменение общего потока, например добавление секции с временной меткой, требует изменения каждого класса отдельно."
+      }
+    },
+    {
+      "question": {
+        "en": "What is the difference between an abstract step and a hook in Template Method?",
+        "ru": "В чём разница между абстрактным шагом и хуком в Шаблонном методе?"
+      },
+      "options": [
+        {
+          "en": "Abstract steps force subclasses to provide an implementation; hooks have a default implementation subclasses can optionally override",
+          "ru": "Абстрактные шаги принуждают подклассы предоставлять реализацию; хуки имеют реализацию по умолчанию, которую подклассы могут опционально переопределить"
+        },
+        {
+          "en": "There is no difference — both terms describe the exact same thing",
+          "ru": "Разницы нет — оба термина описывают одно и то же"
+        },
+        {
+          "en": "Hooks must always be overridden, while abstract steps never can be",
+          "ru": "Хуки всегда обязаны быть переопределены, а абстрактные шаги — никогда"
+        },
+        {
+          "en": "Abstract steps live outside the template method entirely",
+          "ru": "Абстрактные шаги вообще не входят в шаблонный метод"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Steps may either be abstract (forcing subclasses to provide an implementation) or have a default implementation that subclasses can optionally override (hooks).",
+        "ru": "Шаги могут быть abstract (принуждая подклассы предоставлять реализацию) или иметь реализацию по умолчанию, которую подклассы могут опционально переопределить (хуки)."
+      }
+    },
+    {
+      "question": {
+        "en": "What does Template Method guarantee about the algorithm's structure?",
+        "ru": "Что Шаблонный метод гарантирует в отношении структуры алгоритма?"
+      },
+      "options": [
+        {
+          "en": "It stays the same while individual steps remain customizable",
+          "ru": "Она остаётся неизменной, в то время как отдельные шаги можно свободно настраивать"
+        },
+        {
+          "en": "It changes completely with every new subclass",
+          "ru": "Она полностью меняется с каждым новым подклассом"
+        },
+        {
+          "en": "It must be rewritten every time a step is overridden",
+          "ru": "Её приходится переписывать каждый раз при переопределении шага"
+        },
+        {
+          "en": "It is decided at runtime by the client, not the base class",
+          "ru": "Она определяется клиентом во время выполнения, а не базовым классом"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Subclasses can override specific steps without touching the template method itself, which guarantees the overall algorithm structure stays the same while individual steps remain customizable.",
+        "ru": "Подклассы могут переопределять конкретные шаги, не трогая шаблонный метод, что гарантирует неизменность общей структуры алгоритма при свободной настройке отдельных шагов."
+      }
+    },
+    {
+      "question": {
+        "en": "When is Strategy said to be a better fit than Template Method?",
+        "ru": "Когда, согласно паттерну, Стратегия подходит лучше, чем Шаблонный метод?"
+      },
+      "options": [
+        {
+          "en": "When a genuinely different variant needs to be chosen at runtime rather than through a new subclass",
+          "ru": "Когда действительно новый вариант нужно выбирать во время выполнения, а не через новый подкласс"
+        },
+        {
+          "en": "Never — Template Method is always strictly superior",
+          "ru": "Никогда — Шаблонный метод всегда строго превосходит Стратегию"
+        },
+        {
+          "en": "Only when there is exactly one report format",
+          "ru": "Только когда существует ровно один формат отчёта"
+        },
+        {
+          "en": "Only in languages without inheritance support",
+          "ru": "Только в языках без поддержки наследования"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Because the algorithm's shape is fixed through inheritance, adding a genuinely different variant usually means a new subclass rather than a runtime choice — Strategy is a better fit when that flexibility matters.",
+        "ru": "Поскольку форма алгоритма закреплена через наследование, для действительно нового варианта обычно нужен новый подкласс, а не выбор во время выполнения — если такая гибкость важна, лучше подойдёт Стратегия."
+      }
+    }
+  ],
+  "visuals": [
+    {
+      "id": "template-method-skeleton",
+      "type": "flow",
+      "style": "skeleton",
+      "category": "behavioral",
+      "width": 900,
+      "height": 420,
+      "title": {
+        "en": "How Template Method works",
+        "ru": "Как работает Шаблонный метод"
+      },
+      "description": {
+        "en": "ReportGenerator's generate() is the template method — it always calls header(), body(), and footer() in that exact order. header() and footer() are hooks with an empty default; body() is the one step every subclass must fill in. HtmlReport and MarkdownReport each plug their own step bodies into the same skeleton — the call order itself never changes.",
+        "ru": "generate() класса ReportGenerator — это шаблонный метод: он всегда вызывает header(), body() и footer() в строго заданном порядке. header() и footer() — хуки с пустой реализацией по умолчанию; body() — единственный шаг, который обязан реализовать каждый подкласс. HtmlReport и MarkdownReport подставляют в один и тот же скелет свои шаги, но сам порядок вызовов не меняется никогда."
+      },
+      "caption": {
+        "en": "Same order every call. Only the plugged-in steps change.",
+        "ru": "Порядок вызовов всегда один. Меняются только подставленные шаги."
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "runs the report",
+            "ru": "запускает отчёт"
+          }
+        },
+        {
+          "id": "abstract",
+          "role": "skeleton",
+          "kind": "abstract",
+          "icon": "layers",
+          "label": {
+            "en": "ReportGenerator",
+            "ru": "ReportGenerator"
+          },
+          "subtitle": {
+            "en": "generate()",
+            "ru": "generate()"
+          },
+          "steps": [
+            {
+              "id": "header",
+              "label": "header()"
+            },
+            {
+              "id": "body",
+              "label": "body()",
+              "variant": "abstract"
+            },
+            {
+              "id": "footer",
+              "label": "footer()"
+            }
+          ]
+        },
+        {
+          "id": "concreteA",
+          "role": "concrete",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "HtmlReport",
+            "ru": "HtmlReport"
+          },
+          "subtitle": {
+            "en": "fills the steps",
+            "ru": "заполняет шаги"
+          }
+        },
+        {
+          "id": "concreteB",
+          "role": "concrete",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "MarkdownReport",
+            "ru": "MarkdownReport"
+          },
+          "subtitle": {
+            "en": "fills the steps",
+            "ru": "заполняет шаги"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "abstract",
+          "relationship": "flow",
+          "label": {
+            "en": "generate()",
+            "ru": "generate()"
+          }
+        },
+        {
+          "source": "abstract",
+          "target": "concreteA",
+          "relationship": "flow",
+          "label": {
+            "en": "plugs in",
+            "ru": "подставляется"
+          }
+        },
+        {
+          "source": "abstract",
+          "target": "concreteB",
+          "relationship": "flow",
+          "label": {
+            "en": "plugs in",
+            "ru": "подставляется"
+          }
+        }
+      ]
+    }
+  ]
+}

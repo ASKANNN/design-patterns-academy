@@ -1,0 +1,383 @@
+{
+  "slug": "observer",
+  "name": "Observer",
+  "category": "behavioral",
+  "complexity": 2,
+  "popularity": 3,
+  "also_known_as": [
+    "Event-Subscriber",
+    "Listener",
+    "Pub-Sub"
+  ],
+  "tags": [
+    "behavioral",
+    "event",
+    "subscription",
+    "pub-sub"
+  ],
+  "intent": {
+    "en": "Observer is a behavioral pattern that lets any number of objects register interest in another object's changes and get notified automatically whenever those changes happen.",
+    "ru": "Наблюдатель — это поведенческий паттерн, позволяющий произвольному числу объектов подписаться на изменения другого объекта и автоматически получать уведомления при каждом таком изменении."
+  },
+  "problem": {
+    "en": "A weather station gathers new sensor readings every few minutes. A phone app, a desktop widget, and a logging service all need to know the instant fresh data lands, but none of them should have to ask the station directly on a timer.\n\nPolling is the naive fix — each consumer calls the station repeatedly and compares against the last value it saw. That wastes cycles when nothing has changed and adds lag between an update and the moment consumers see it. Hardcoding calls from the station to each specific consumer is worse: the station now has to know about the phone app, the widget, and the logger by name, and adding a fourth consumer means editing the station's code.",
+    "ru": "Метеостанция получает новые показания датчиков каждые несколько минут. Мобильное приложение, виджет на рабочем столе и сервис логирования — всем им нужно узнавать о свежих данных мгновенно, но ни один из них не должен постоянно опрашивать станцию по таймеру.\n\nНаивное решение — опрос: каждый потребитель периодически обращается к станции и сравнивает данные с последним увиденным значением. Это впустую расходует ресурсы, когда ничего не изменилось, и создаёт задержку между обновлением и моментом, когда потребитель его увидит. Жёстко прописанные вызовы от станции к каждому конкретному потребителю ещё хуже: станции пришлось бы поимённо знать о приложении, виджете и логгере, а добавление четвёртого потребителя означало бы правку кода самой станции."
+  },
+  "solution": {
+    "en": "Observer gives the object holding the interesting state — the **publisher** — a guest list it doesn't need to know the contents of in advance. Any object can join that list by **subscribing**, and any object can leave by **unsubscribing**; the publisher just keeps a generic collection of registered listeners.\n\nWhen the publisher's state changes, it walks that list and calls the same notification method on every entry, without caring what each subscriber actually does with the news — update a display, write a log line, trigger a recalculation. New subscriber types can be added at runtime with zero changes to the publisher, because the publisher only ever depends on a small notification interface, not on any concrete consumer.",
+    "ru": "Наблюдатель даёт объекту с интересующим состоянием — **издателю** — список получателей, содержимое которого ему заранее знать не нужно. Любой объект может войти в этот список через **подписку** и выйти через **отписку**; издатель просто хранит обобщённую коллекцию зарегистрированных слушателей.\n\nКогда состояние издателя меняется, он проходит по этому списку и вызывает один и тот же метод уведомления у каждой записи, не заботясь о том, что именно подписчик делает с новостью — обновляет экран, пишет строку в лог или запускает пересчёт. Новые типы подписчиков можно добавлять во время выполнения без единого изменения в издателе, поскольку издатель зависит лишь от небольшого интерфейса уведомления, а не от конкретных потребителей."
+  },
+  "structure": {
+    "description": {
+      "en": "The Publisher owns the state worth watching and a collection of subscriber references it notifies through a uniform interface. Subscribers implement that interface and register themselves with the publisher; each reacts to notifications in its own way once called.",
+      "ru": "Издатель владеет состоянием, за которым стоит наблюдать, и коллекцией ссылок на подписчиков, которых он оповещает через единый интерфейс. Подписчики реализуют этот интерфейс и регистрируются у издателя; каждый по-своему реагирует на уведомление, когда его вызывают."
+    },
+    "participants": [
+      {
+        "name": "Publisher (Subject)",
+        "role": {
+          "en": "Holds the observable state, keeps a registry of current subscribers, and walks that registry to notify everyone whenever the state changes.",
+          "ru": "Хранит наблюдаемое состояние, ведёт реестр текущих подписчиков и обходит его, оповещая всех при изменении состояния."
+        }
+      },
+      {
+        "name": "Subscriber (Observer)",
+        "role": {
+          "en": "A minimal contract — usually one notification method — that lets the publisher call any registered subscriber without knowing its concrete type.",
+          "ru": "Минимальный контракт — обычно один метод уведомления, — позволяющий издателю вызывать любого зарегистрированного подписчика, не зная его конкретного типа."
+        }
+      },
+      {
+        "name": "ConcreteSubscriber",
+        "role": {
+          "en": "Registers itself with a publisher and implements its own reaction to each notification, independent of what other subscribers do.",
+          "ru": "Регистрируется у издателя и реализует собственную реакцию на каждое уведомление, независимо от того, что делают другие подписчики."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "class Subscriber {\n  update(temperature) { throw new Error('update() must be implemented'); }\n}\n\nclass WeatherStation {\n  #subscribers = new Set();\n\n  subscribe(subscriber) {\n    this.#subscribers.add(subscriber);\n  }\n\n  unsubscribe(subscriber) {\n    this.#subscribers.delete(subscriber);\n  }\n\n  setReading(temperature) {\n    this.#subscribers.forEach(subscriber => subscriber.update(temperature));\n  }\n}\n\nclass PhoneApp extends Subscriber {\n  update(temperature) {\n    console.log(`Phone app: new reading ${temperature}°C`);\n  }\n}\n\nclass DesktopWidget extends Subscriber {\n  update(temperature) {\n    console.log(`Desktop widget: new reading ${temperature}°C`);\n  }\n}\n\nclass LoggingService extends Subscriber {\n  update(temperature) {\n    console.log(`Logged reading: ${temperature}°C`);\n  }\n}\n\nconst station = new WeatherStation();\nstation.subscribe(new PhoneApp());\nstation.subscribe(new DesktopWidget());\nstation.subscribe(new LoggingService());\n\nstation.setReading(21.5);",
+    "typescript": "interface Subscriber {\n  update(temperature: number): void;\n}\n\nclass WeatherStation {\n  private subscribers = new Set<Subscriber>();\n\n  subscribe(subscriber: Subscriber): void {\n    this.subscribers.add(subscriber);\n  }\n\n  unsubscribe(subscriber: Subscriber): void {\n    this.subscribers.delete(subscriber);\n  }\n\n  setReading(temperature: number): void {\n    this.subscribers.forEach(subscriber => subscriber.update(temperature));\n  }\n}\n\nclass PhoneApp implements Subscriber {\n  update(temperature: number): void {\n    console.log(`Phone app: new reading ${temperature}°C`);\n  }\n}\n\nclass DesktopWidget implements Subscriber {\n  update(temperature: number): void {\n    console.log(`Desktop widget: new reading ${temperature}°C`);\n  }\n}\n\nclass LoggingService implements Subscriber {\n  update(temperature: number): void {\n    console.log(`Logged reading: ${temperature}°C`);\n  }\n}\n\nconst station = new WeatherStation();\nstation.subscribe(new PhoneApp());\nstation.subscribe(new DesktopWidget());\nstation.subscribe(new LoggingService());\n\nstation.setReading(21.5);",
+    "java": "interface Subscriber {\n    void update(double temperature);\n}\n\nclass WeatherStation {\n    private final Set<Subscriber> subscribers = new HashSet<>();\n\n    void subscribe(Subscriber subscriber) {\n        subscribers.add(subscriber);\n    }\n\n    void unsubscribe(Subscriber subscriber) {\n        subscribers.remove(subscriber);\n    }\n\n    void setReading(double temperature) {\n        for (Subscriber subscriber : subscribers) subscriber.update(temperature);\n    }\n}\n\nclass PhoneApp implements Subscriber {\n    public void update(double temperature) {\n        System.out.println(\"Phone app: new reading \" + temperature + \"°C\");\n    }\n}\n\nclass DesktopWidget implements Subscriber {\n    public void update(double temperature) {\n        System.out.println(\"Desktop widget: new reading \" + temperature + \"°C\");\n    }\n}\n\nclass LoggingService implements Subscriber {\n    public void update(double temperature) {\n        System.out.println(\"Logged reading: \" + temperature + \"°C\");\n    }\n}\n\nWeatherStation station = new WeatherStation();\nstation.subscribe(new PhoneApp());\nstation.subscribe(new DesktopWidget());\nstation.subscribe(new LoggingService());\n\nstation.setReading(21.5);",
+    "csharp": "interface ISubscriber\n{\n    void Update(double temperature);\n}\n\nclass WeatherStation\n{\n    private readonly HashSet<ISubscriber> subscribers = new();\n\n    public void Subscribe(ISubscriber subscriber) => subscribers.Add(subscriber);\n\n    public void Unsubscribe(ISubscriber subscriber) => subscribers.Remove(subscriber);\n\n    public void SetReading(double temperature)\n    {\n        foreach (var subscriber in subscribers) subscriber.Update(temperature);\n    }\n}\n\nclass PhoneApp : ISubscriber\n{\n    public void Update(double temperature) => Console.WriteLine($\"Phone app: new reading {temperature}°C\");\n}\n\nclass DesktopWidget : ISubscriber\n{\n    public void Update(double temperature) => Console.WriteLine($\"Desktop widget: new reading {temperature}°C\");\n}\n\nclass LoggingService : ISubscriber\n{\n    public void Update(double temperature) => Console.WriteLine($\"Logged reading: {temperature}°C\");\n}\n\nvar station = new WeatherStation();\nstation.Subscribe(new PhoneApp());\nstation.Subscribe(new DesktopWidget());\nstation.Subscribe(new LoggingService());\n\nstation.SetReading(21.5);",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass Subscriber(ABC):\n    @abstractmethod\n    def update(self, temperature: float) -> None: ...\n\n\nclass WeatherStation:\n    def __init__(self) -> None:\n        self._subscribers: set[Subscriber] = set()\n\n    def subscribe(self, subscriber: Subscriber) -> None:\n        self._subscribers.add(subscriber)\n\n    def unsubscribe(self, subscriber: Subscriber) -> None:\n        self._subscribers.discard(subscriber)\n\n    def set_reading(self, temperature: float) -> None:\n        for subscriber in self._subscribers:\n            subscriber.update(temperature)\n\n\nclass PhoneApp(Subscriber):\n    def update(self, temperature: float) -> None:\n        print(f'Phone app: new reading {temperature}°C')\n\n\nclass DesktopWidget(Subscriber):\n    def update(self, temperature: float) -> None:\n        print(f'Desktop widget: new reading {temperature}°C')\n\n\nclass LoggingService(Subscriber):\n    def update(self, temperature: float) -> None:\n        print(f'Logged reading: {temperature}°C')\n\n\nstation = WeatherStation()\nstation.subscribe(PhoneApp())\nstation.subscribe(DesktopWidget())\nstation.subscribe(LoggingService())\n\nstation.set_reading(21.5)"
+  },
+  "pros": [
+    {
+      "en": "New kinds of subscribers can be added at any time without touching the publisher's source at all.",
+      "ru": "Новые виды подписчиков можно добавлять в любой момент, вообще не трогая исходный код издателя."
+    },
+    {
+      "en": "Subscriptions form and dissolve while the program is running, so the set of listeners can grow or shrink based on live conditions.",
+      "ru": "Подписки создаются и снимаются прямо во время работы программы, поэтому набор слушателей может расти и сокращаться в зависимости от текущих условий."
+    },
+    {
+      "en": "The publisher depends only on a thin notification interface, never on any subscriber's concrete class, keeping the two sides loosely coupled.",
+      "ru": "Издатель зависит лишь от тонкого интерфейса уведомления, но никогда — от конкретного класса подписчика, что сохраняет слабую связанность сторон."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Nothing guarantees the order subscribers are notified in, which becomes a problem if one subscriber's reaction depends on another running first.",
+      "ru": "Ничто не гарантирует порядок оповещения подписчиков, что становится проблемой, если реакция одного подписчика зависит от того, что другой уже отработал."
+    },
+    {
+      "en": "A subscriber that forgets to unsubscribe keeps a live reference in the publisher's list, quietly leaking memory long after it should have been collected.",
+      "ru": "Подписчик, забывший отписаться, продолжает висеть в списке издателя, незаметно вызывая утечку памяти задолго после того, как должен был быть собран сборщиком мусора."
+    },
+    {
+      "en": "A chain of notifications triggering further state changes and further notifications can be hard to trace and debug.",
+      "ru": "Цепочку уведомлений, вызывающих новые изменения состояния и новые уведомления, бывает трудно отследить и отладить."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Observer when one object's state change needs to ripple out to a set of other objects that isn't fixed or fully known in advance.",
+      "ru": "Применяйте Наблюдатель, когда изменение состояния одного объекта должно затрагивать набор других объектов, который заранее не фиксирован или не полностью известен."
+    },
+    {
+      "en": "Use it when interested parties need to come and go dynamically — watching only during a specific screen, session, or operation.",
+      "ru": "Используйте его, когда заинтересованные стороны должны динамически появляться и исчезать — наблюдая только в течение конкретного экрана, сессии или операции."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**DOM events** — `element.addEventListener('click', handler)` subscribes a handler to notifications the element publishes.",
+      "ru": "**DOM-события** — `element.addEventListener('click', handler)` подписывает обработчик на уведомления, которые публикует элемент."
+    },
+    {
+      "en": "**RxJS Observables** — a stream publisher notifies every subscribed operator chain each time a new value is emitted.",
+      "ru": "**RxJS Observable** — издатель потока оповещает каждую подписанную цепочку операторов при появлении нового значения."
+    },
+    {
+      "en": "**Spreadsheet formulas** — changing one cell automatically recalculates and re-renders every cell whose formula references it.",
+      "ru": "**Формулы в электронных таблицах** — изменение одной ячейки автоматически пересчитывает и перерисовывает каждую ячейку, чья формула на неё ссылается."
+    }
+  ],
+  "related_patterns": [
+    "mediator",
+    "singleton",
+    "command",
+    "iterator"
+  ],
+  "quiz": [
+    {
+      "question": {
+        "en": "What does Observer let objects do?",
+        "ru": "Что Наблюдатель позволяет делать объектам?"
+      },
+      "options": [
+        {
+          "en": "Any number of objects register interest in another object's changes and get notified automatically when those changes happen",
+          "ru": "Произвольное число объектов подписаться на изменения другого объекта и автоматически получать уведомления при каждом таком изменении"
+        },
+        {
+          "en": "Wrap a mismatched interface behind a translator",
+          "ru": "Обернуть несовместимый интерфейс переходником-транслятором"
+        },
+        {
+          "en": "Switch between interchangeable algorithms at runtime",
+          "ru": "Переключаться между взаимозаменяемыми алгоритмами во время выполнения"
+        },
+        {
+          "en": "Fix the overall shape of an algorithm while leaving steps to subclasses",
+          "ru": "Закрепить общую последовательность алгоритма, оставив шаги подклассам"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Observer lets any number of objects register interest in another object's changes and get notified automatically whenever those changes happen.",
+        "ru": "Наблюдатель позволяет произвольному числу объектов подписаться на изменения другого объекта и автоматически получать уведомления при каждом таком изменении."
+      }
+    },
+    {
+      "question": {
+        "en": "What is wrong with polling as a fix for the weather-station problem?",
+        "ru": "В чём недостаток опроса как решения проблемы метеостанции?"
+      },
+      "options": [
+        {
+          "en": "It wastes cycles when nothing has changed and adds lag between an update and the moment consumers see it",
+          "ru": "Он впустую расходует ресурсы, когда ничего не изменилось, и создаёт задержку между обновлением и моментом, когда потребитель его увидит"
+        },
+        {
+          "en": "It makes the phone app, widget, and logger receive updates instantly with zero cost",
+          "ru": "Он позволяет приложению, виджету и логгеру мгновенно получать обновления без всяких затрат"
+        },
+        {
+          "en": "It requires the weather station to know about the phone app by name",
+          "ru": "Он требует, чтобы метеостанция знала о мобильном приложении по имени"
+        },
+        {
+          "en": "It eliminates the need for any consumer to check the data at all",
+          "ru": "Он полностью устраняет необходимость проверять данные хоть каким-то потребителем"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Polling wastes cycles when nothing has changed and adds lag between an update and the moment consumers see it.",
+        "ru": "Опрос впустую расходует ресурсы, когда ничего не изменилось, и создаёт задержку между обновлением и моментом, когда потребитель его увидит."
+      }
+    },
+    {
+      "question": {
+        "en": "What does the publisher need to know about its subscribers in advance?",
+        "ru": "Что издателю нужно заранее знать о своих подписчиках?"
+      },
+      "options": [
+        {
+          "en": "Nothing — it keeps a generic collection of registered listeners it doesn't need to know the contents of in advance",
+          "ru": "Ничего — он хранит обобщённую коллекцию зарегистрированных слушателей, содержимое которой ему заранее знать не нужно"
+        },
+        {
+          "en": "The exact concrete class of every subscriber that will ever join",
+          "ru": "Точный конкретный класс каждого подписчика, который когда-либо присоединится"
+        },
+        {
+          "en": "How many subscribers will exist at compile time",
+          "ru": "Сколько подписчиков будет существовать на этапе компиляции"
+        },
+        {
+          "en": "Which specific actions each subscriber will take upon notification",
+          "ru": "Какие именно действия предпримет каждый подписчик после уведомления"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Observer gives the publisher a guest list it doesn't need to know the contents of in advance — it just keeps a generic collection of registered listeners.",
+        "ru": "Наблюдатель даёт издателю список получателей, содержимое которого ему заранее знать не нужно; он просто хранит обобщённую коллекцию зарегистрированных слушателей."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a stated benefit of Observer for adding new subscriber types?",
+        "ru": "Какое преимущество Наблюдателя указано для добавления новых типов подписчиков?"
+      },
+      "options": [
+        {
+          "en": "New subscriber types can be added at runtime with zero changes to the publisher",
+          "ru": "Новые типы подписчиков можно добавлять во время выполнения без единого изменения в издателе"
+        },
+        {
+          "en": "Adding a new subscriber type requires rewriting the publisher class",
+          "ru": "Добавление нового типа подписчика требует переписать класс издателя"
+        },
+        {
+          "en": "Only one subscriber type can ever exist per publisher",
+          "ru": "На издателя может существовать лишь один тип подписчика"
+        },
+        {
+          "en": "New subscriber types must be compiled together with the publisher",
+          "ru": "Новые типы подписчиков обязательно компилируются вместе с издателем"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "New subscriber types can be added at runtime with zero changes to the publisher, because the publisher only depends on a small notification interface.",
+        "ru": "Новые типы подписчиков можно добавлять во время выполнения без единого изменения в издателе, поскольку издатель зависит лишь от небольшого интерфейса уведомления."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a stated risk of a subscriber that forgets to unsubscribe?",
+        "ru": "Какой риск указан для подписчика, забывшего отписаться?"
+      },
+      "options": [
+        {
+          "en": "It keeps a live reference in the publisher's list, quietly leaking memory long after it should have been collected",
+          "ru": "Он продолжает висеть в списке издателя, незаметно вызывая утечку памяти задолго после того, как должен был быть собран сборщиком мусора"
+        },
+        {
+          "en": "It automatically gets removed by the publisher after one notification",
+          "ru": "Он автоматически удаляется издателем после первого уведомления"
+        },
+        {
+          "en": "It causes the publisher to stop notifying every other subscriber",
+          "ru": "Он заставляет издателя перестать оповещать всех остальных подписчиков"
+        },
+        {
+          "en": "It has no effect since publishers never retain references",
+          "ru": "Это не имеет никакого эффекта, поскольку издатели никогда не хранят ссылки"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A subscriber that forgets to unsubscribe keeps a live reference in the publisher's list, quietly leaking memory long after it should have been collected.",
+        "ru": "Подписчик, забывший отписаться, продолжает висеть в списке издателя, незаметно вызывая утечку памяти задолго после того, как должен был быть собран сборщиком мусора."
+      }
+    }
+  ],
+  "visuals": [
+    {
+      "id": "observer-concept",
+      "type": "flow",
+      "style": "broadcast",
+      "category": "behavioral",
+      "width": 920,
+      "height": 640,
+      "title": {
+        "en": "How Observer works",
+        "ru": "Как работает Наблюдатель"
+      },
+      "description": {
+        "en": "The Weather Station holds no fixed list of consumers. When fresh readings land, it walks its subscriber registry and notifies the Phone App, Desktop Widget, and Logging Service at once — all through the same notification method, none of them known by name in advance.",
+        "ru": "Метеостанция не хранит фиксированный список потребителей. Когда приходят новые показания, она обходит реестр подписчиков и одновременно уведомляет мобильное приложение, виджет и сервис логирования — через один и тот же метод уведомления, не зная заранее ни одного из них по имени."
+      },
+      "caption": {
+        "en": "One state change fans out to every current subscriber at once.",
+        "ru": "Одно изменение состояния веером расходится сразу по всем текущим подписчикам."
+      },
+      "nodes": [
+        {
+          "id": "publisher",
+          "role": "publisher",
+          "kind": "class",
+          "icon": "spark",
+          "label": {
+            "en": "Weather Station",
+            "ru": "Метеостанция"
+          },
+          "subtitle": {
+            "en": "notifies subscribers",
+            "ru": "оповещает подписчиков"
+          }
+        },
+        {
+          "id": "subA",
+          "role": "subscriber",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Phone App",
+            "ru": "Мобильное приложение"
+          },
+          "subtitle": {
+            "en": "update()",
+            "ru": "update()"
+          }
+        },
+        {
+          "id": "subB",
+          "role": "subscriber",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Desktop Widget",
+            "ru": "Виджет"
+          },
+          "subtitle": {
+            "en": "update()",
+            "ru": "update()"
+          }
+        },
+        {
+          "id": "subC",
+          "role": "subscriber",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Logging Service",
+            "ru": "Сервис логирования"
+          },
+          "subtitle": {
+            "en": "update()",
+            "ru": "update()"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "publisher",
+          "target": "subA",
+          "relationship": "flow",
+          "variant": "create",
+          "label": {
+            "en": "notify()",
+            "ru": "notify()"
+          }
+        },
+        {
+          "source": "publisher",
+          "target": "subB",
+          "relationship": "flow",
+          "variant": "create",
+          "label": {
+            "en": "notify()",
+            "ru": "notify()"
+          }
+        },
+        {
+          "source": "publisher",
+          "target": "subC",
+          "relationship": "flow",
+          "variant": "create",
+          "label": {
+            "en": "notify()",
+            "ru": "notify()"
+          }
+        }
+      ]
+    }
+  ]
+}

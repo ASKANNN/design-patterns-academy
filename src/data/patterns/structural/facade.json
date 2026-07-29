@@ -1,0 +1,390 @@
+{
+  "slug": "facade",
+  "name": "Facade",
+  "category": "structural",
+  "complexity": 1,
+  "popularity": 3,
+  "also_known_as": [],
+  "tags": [
+    "structural",
+    "interface",
+    "simplification",
+    "subsystem"
+  ],
+  "intent": {
+    "en": "Facade hides a tangle of interacting classes behind one clean entry point, so client code issues a single high-level call instead of orchestrating the subsystem itself.",
+    "ru": "Фасад прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиентский код делает один высокоуровневый вызов вместо самостоятельной оркестровки подсистемы."
+  },
+  "problem": {
+    "en": "Suppose your app lets users watch a movie at the press of a button. Behind the scenes, that means dimming the lights, powering on the projector and switching it to widescreen mode, powering on the amplifier and setting its volume, and powering on the DVD player before telling it to play — five objects, each with its own methods, called in a specific order that the client code has to get exactly right.\n\nIf that setup logic lives directly in the client, every place that wants to watch a movie duplicates the same multi-step sequence — and stopping a movie needs its own mirrored sequence to power everything down in the right order. Miss a step or get the order wrong, and the amplifier blasts at full volume into a bright room, or the DVD player tries to play before the projector is even on.",
+    "ru": "Допустим, приложение позволяет пользователю посмотреть фильм одним нажатием кнопки. За кулисами это означает: приглушить свет, включить проектор и переключить его в широкоэкранный режим, включить усилитель и настроить громкость, включить DVD-плеер и запустить воспроизведение — пять объектов, у каждого свои методы, и вызывать их нужно в строго определённом порядке, который клиентский код обязан соблюдать в точности.\n\nЕсли эта логика настройки живёт прямо в клиентском коде, каждое место, где нужно посмотреть фильм, дублирует одну и ту же многошаговую последовательность — а остановка фильма требует своей зеркальной последовательности, чтобы выключить всё в правильном порядке. Пропустишь шаг или перепутаешь порядок — и усилитель врубится на полную громкость в светлой комнате, или DVD-плеер попытается начать воспроизведение раньше, чем включится проектор."
+  },
+  "solution": {
+    "en": "Introduce one class — the facade — that sits in front of the subsystem and exposes only the operations clients actually need, such as `exportVideo(format)`. Internally, the facade owns the job of creating subsystem objects, wiring their dependencies, and calling them in the correct order.\n\nClients no longer see the codec manager, bitrate reader, or mixer at all — they see one method call. Direct access to the subsystem still exists for cases that need fine-grained control; the facade is an added convenience layer, not a wall.",
+    "ru": "Вводится один класс — фасад, — который стоит перед подсистемой и открывает наружу только те операции, что действительно нужны клиентам, например `exportVideo(format)`. Внутри себя фасад берёт на себя создание объектов подсистемы, связывание их зависимостей и вызов методов в нужной последовательности.\n\nКлиенты больше не видят ни менеджер кодеков, ни читатель битрейта, ни микшер — они видят один вызов метода. Прямой доступ к подсистеме при этом никуда не пропадает и остаётся для случаев, где нужен тонкий контроль — фасад лишь добавляет удобный слой, а не закрывает подсистему стеной."
+  },
+  "structure": {
+    "description": {
+      "en": "A single Facade class exposes a narrow, task-oriented API. Behind it sit the Complex Subsystem classes, which do the real work but require careful setup and sequencing. The Facade translates each simple client call into the right sequence of subsystem calls.",
+      "ru": "Единственный класс Фасада открывает узкий, ориентированный на конкретные задачи API. За ним находятся классы Сложной подсистемы, которые выполняют реальную работу, но требуют аккуратной настройки и последовательности вызовов. Фасад переводит каждый простой вызов клиента в нужную последовательность вызовов подсистемы."
+    },
+    "participants": [
+      {
+        "name": "Facade",
+        "role": {
+          "en": "Exposes a small set of high-level operations and holds the knowledge of which subsystem objects to create, configure, and call in what order to fulfill each one.",
+          "ru": "Открывает наружу небольшой набор высокоуровневых операций и знает, какие объекты подсистемы создавать, настраивать и вызывать — и в каком порядке — для выполнения каждой из них."
+        }
+      },
+      {
+        "name": "Complex Subsystem",
+        "role": {
+          "en": "The collection of classes doing the actual work — codecs, mixers, readers, and the like. These classes have no notion that a facade exists and can be used with or without it.",
+          "ru": "Набор классов, выполняющих реальную работу — кодеки, микшеры, читатели и подобное. Эти классы ничего не знают о существовании фасада и могут использоваться как с ним, так и без него."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Calls the facade's simplified methods instead of assembling subsystem objects itself, staying insulated from internal wiring and sequencing details.",
+          "ru": "Вызывает упрощённые методы фасада вместо самостоятельной сборки объектов подсистемы, оставаясь изолированным от деталей внутренней связки и последовательности вызовов."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "class Amplifier {\n  on() { console.log('Amplifier: powering on'); }\n  setVolume(level) { console.log(`Amplifier: setting volume to ${level}`); }\n  off() { console.log('Amplifier: powering off'); }\n}\n\nclass Projector {\n  on() { console.log('Projector: powering on'); }\n  wideScreenMode() { console.log('Projector: switching to widescreen mode'); }\n  off() { console.log('Projector: powering off'); }\n}\n\nclass DVDPlayer {\n  on() { console.log('DVD Player: powering on'); }\n  play(movie) { console.log(`DVD Player: playing \"${movie}\"`); }\n  off() { console.log('DVD Player: powering off'); }\n}\n\nclass Lights {\n  dim(level) { console.log(`Lights: dimming to ${level}%`); }\n  on() { console.log('Lights: turning on'); }\n}\n\nclass HomeTheaterFacade {\n  #amplifier;\n  #projector;\n  #dvdPlayer;\n  #lights;\n\n  constructor() {\n    this.#amplifier = new Amplifier();\n    this.#projector = new Projector();\n    this.#dvdPlayer = new DVDPlayer();\n    this.#lights = new Lights();\n  }\n\n  watchMovie(movie) {\n    this.#lights.dim(10);\n    this.#projector.on();\n    this.#projector.wideScreenMode();\n    this.#amplifier.on();\n    this.#amplifier.setVolume(5);\n    this.#dvdPlayer.on();\n    this.#dvdPlayer.play(movie);\n    console.log('Enjoy the movie!');\n  }\n\n  endMovie() {\n    this.#dvdPlayer.off();\n    this.#amplifier.off();\n    this.#projector.off();\n    this.#lights.on();\n    console.log('Home theater shut down.');\n  }\n}\n\nconst homeTheater = new HomeTheaterFacade();\nhomeTheater.watchMovie('Interstellar');",
+    "typescript": "class Amplifier {\n  public on(): void { console.log('Amplifier: powering on'); }\n  public setVolume(level: number): void { console.log(`Amplifier: setting volume to ${level}`); }\n  public off(): void { console.log('Amplifier: powering off'); }\n}\n\nclass Projector {\n  public on(): void { console.log('Projector: powering on'); }\n  public wideScreenMode(): void { console.log('Projector: switching to widescreen mode'); }\n  public off(): void { console.log('Projector: powering off'); }\n}\n\nclass DVDPlayer {\n  public on(): void { console.log('DVD Player: powering on'); }\n  public play(movie: string): void { console.log(`DVD Player: playing \"${movie}\"`); }\n  public off(): void { console.log('DVD Player: powering off'); }\n}\n\nclass Lights {\n  public dim(level: number): void { console.log(`Lights: dimming to ${level}%`); }\n  public on(): void { console.log('Lights: turning on'); }\n}\n\nclass HomeTheaterFacade {\n  private amplifier: Amplifier;\n  private projector: Projector;\n  private dvdPlayer: DVDPlayer;\n  private lights: Lights;\n\n  constructor() {\n    this.amplifier = new Amplifier();\n    this.projector = new Projector();\n    this.dvdPlayer = new DVDPlayer();\n    this.lights = new Lights();\n  }\n\n  public watchMovie(movie: string): void {\n    this.lights.dim(10);\n    this.projector.on();\n    this.projector.wideScreenMode();\n    this.amplifier.on();\n    this.amplifier.setVolume(5);\n    this.dvdPlayer.on();\n    this.dvdPlayer.play(movie);\n    console.log('Enjoy the movie!');\n  }\n\n  public endMovie(): void {\n    this.dvdPlayer.off();\n    this.amplifier.off();\n    this.projector.off();\n    this.lights.on();\n    console.log('Home theater shut down.');\n  }\n}\n\nconst homeTheater = new HomeTheaterFacade();\nhomeTheater.watchMovie('Interstellar');",
+    "java": "class Amplifier {\n    public void on()                 { System.out.println(\"Amplifier: powering on\"); }\n    public void setVolume(int level) { System.out.println(\"Amplifier: setting volume to \" + level); }\n    public void off()                { System.out.println(\"Amplifier: powering off\"); }\n}\n\nclass Projector {\n    public void on()             { System.out.println(\"Projector: powering on\"); }\n    public void wideScreenMode() { System.out.println(\"Projector: switching to widescreen mode\"); }\n    public void off()            { System.out.println(\"Projector: powering off\"); }\n}\n\nclass DVDPlayer {\n    public void on()               { System.out.println(\"DVD Player: powering on\"); }\n    public void play(String movie) { System.out.println(\"DVD Player: playing \\\"\" + movie + \"\\\"\"); }\n    public void off()              { System.out.println(\"DVD Player: powering off\"); }\n}\n\nclass Lights {\n    public void dim(int level) { System.out.println(\"Lights: dimming to \" + level + \"%\"); }\n    public void on()           { System.out.println(\"Lights: turning on\"); }\n}\n\nclass HomeTheaterFacade {\n    private final Amplifier amplifier = new Amplifier();\n    private final Projector projector = new Projector();\n    private final DVDPlayer dvdPlayer = new DVDPlayer();\n    private final Lights lights       = new Lights();\n\n    public void watchMovie(String movie) {\n        lights.dim(10);\n        projector.on();\n        projector.wideScreenMode();\n        amplifier.on();\n        amplifier.setVolume(5);\n        dvdPlayer.on();\n        dvdPlayer.play(movie);\n        System.out.println(\"Enjoy the movie!\");\n    }\n\n    public void endMovie() {\n        dvdPlayer.off();\n        amplifier.off();\n        projector.off();\n        lights.on();\n        System.out.println(\"Home theater shut down.\");\n    }\n}\n\nHomeTheaterFacade homeTheater = new HomeTheaterFacade();\nhomeTheater.watchMovie(\"Interstellar\");",
+    "csharp": "class Amplifier\n{\n    public void On()                => Console.WriteLine(\"Amplifier: powering on\");\n    public void SetVolume(int level) => Console.WriteLine($\"Amplifier: setting volume to {level}\");\n    public void Off()               => Console.WriteLine(\"Amplifier: powering off\");\n}\n\nclass Projector\n{\n    public void On()             => Console.WriteLine(\"Projector: powering on\");\n    public void WideScreenMode() => Console.WriteLine(\"Projector: switching to widescreen mode\");\n    public void Off()            => Console.WriteLine(\"Projector: powering off\");\n}\n\nclass DVDPlayer\n{\n    public void On()               => Console.WriteLine(\"DVD Player: powering on\");\n    public void Play(string movie) => Console.WriteLine($\"DVD Player: playing \\\"{movie}\\\"\");\n    public void Off()              => Console.WriteLine(\"DVD Player: powering off\");\n}\n\nclass Lights\n{\n    public void Dim(int level) => Console.WriteLine($\"Lights: dimming to {level}%\");\n    public void On()            => Console.WriteLine(\"Lights: turning on\");\n}\n\nclass HomeTheaterFacade\n{\n    private readonly Amplifier _amplifier = new();\n    private readonly Projector _projector = new();\n    private readonly DVDPlayer _dvdPlayer = new();\n    private readonly Lights    _lights    = new();\n\n    public void WatchMovie(string movie)\n    {\n        _lights.Dim(10);\n        _projector.On();\n        _projector.WideScreenMode();\n        _amplifier.On();\n        _amplifier.SetVolume(5);\n        _dvdPlayer.On();\n        _dvdPlayer.Play(movie);\n        Console.WriteLine(\"Enjoy the movie!\");\n    }\n\n    public void EndMovie()\n    {\n        _dvdPlayer.Off();\n        _amplifier.Off();\n        _projector.Off();\n        _lights.On();\n        Console.WriteLine(\"Home theater shut down.\");\n    }\n}\n\nvar homeTheater = new HomeTheaterFacade();\nhomeTheater.WatchMovie(\"Interstellar\");",
+    "python": "class Amplifier:\n    def on(self) -> None:\n        print(\"Amplifier: powering on\")\n\n    def set_volume(self, level: int) -> None:\n        print(f\"Amplifier: setting volume to {level}\")\n\n    def off(self) -> None:\n        print(\"Amplifier: powering off\")\n\n\nclass Projector:\n    def on(self) -> None:\n        print(\"Projector: powering on\")\n\n    def wide_screen_mode(self) -> None:\n        print(\"Projector: switching to widescreen mode\")\n\n    def off(self) -> None:\n        print(\"Projector: powering off\")\n\n\nclass DVDPlayer:\n    def on(self) -> None:\n        print(\"DVD Player: powering on\")\n\n    def play(self, movie: str) -> None:\n        print(f'DVD Player: playing \"{movie}\"')\n\n    def off(self) -> None:\n        print(\"DVD Player: powering off\")\n\n\nclass Lights:\n    def dim(self, level: int) -> None:\n        print(f\"Lights: dimming to {level}%\")\n\n    def on(self) -> None:\n        print(\"Lights: turning on\")\n\n\nclass HomeTheaterFacade:\n    def __init__(self) -> None:\n        self._amplifier = Amplifier()\n        self._projector = Projector()\n        self._dvd_player = DVDPlayer()\n        self._lights = Lights()\n\n    def watch_movie(self, movie: str) -> None:\n        self._lights.dim(10)\n        self._projector.on()\n        self._projector.wide_screen_mode()\n        self._amplifier.on()\n        self._amplifier.set_volume(5)\n        self._dvd_player.on()\n        self._dvd_player.play(movie)\n        print(\"Enjoy the movie!\")\n\n    def end_movie(self) -> None:\n        self._dvd_player.off()\n        self._amplifier.off()\n        self._projector.off()\n        self._lights.on()\n        print(\"Home theater shut down.\")\n\n\nhome_theater = HomeTheaterFacade()\nhome_theater.watch_movie(\"Interstellar\")"
+  },
+  "pros": [
+    {
+      "en": "Application code reads at the level of business intent (\"export the video\") instead of being cluttered with subsystem plumbing.",
+      "ru": "Код приложения читается на уровне бизнес-намерения («экспортировать видео»), а не захламлён внутренней механикой подсистемы."
+    },
+    {
+      "en": "The subsystem can be refactored, upgraded, or replaced with fewer ripple effects, since only the facade needs to track its API surface.",
+      "ru": "Подсистему можно рефакторить, обновлять или заменять с меньшими побочными эффектами, поскольку только фасаду нужно отслеживать её API."
+    },
+    {
+      "en": "Large subsystems can be split into layers, each fronted by its own facade, giving a clear entry point per layer instead of one tangled dependency graph.",
+      "ru": "Крупные подсистемы можно разбить на уровни, каждый со своим фасадом, — это даёт чёткую точку входа на каждый уровень вместо одного запутанного графа зависимостей."
+    }
+  ],
+  "cons": [
+    {
+      "en": "Left unchecked, a facade tends to accumulate responsibilities for every subsystem in the app and turns into a god object that everything depends on.",
+      "ru": "Без должного контроля фасад склонен накапливать ответственность за все подсистемы приложения и превращается в «божественный объект», от которого зависит всё."
+    },
+    {
+      "en": "Advanced use cases that need fine-grained control over the subsystem may find the facade's simplified surface too restrictive and end up bypassing it anyway.",
+      "ru": "Для продвинутых сценариев, требующих тонкого контроля над подсистемой, упрощённый интерфейс фасада может оказаться слишком тесным, и его всё равно приходится обходить."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Your code only needs a handful of operations from a large, intricate library or subsystem, and you'd rather not learn or expose its full surface.",
+      "ru": "Когда коду нужна лишь горстка операций из большой и запутанной библиотеки или подсистемы, а изучать и раскрывать всю её поверхность не хочется."
+    },
+    {
+      "en": "You want a clear seam between architectural layers, with each layer talking to the next only through a defined entry point.",
+      "ru": "Когда нужна чёткая граница между архитектурными слоями, где каждый слой общается со следующим только через определённую точку входа."
+    },
+    {
+      "en": "You're integrating a third-party framework and want to keep its API from leaking into scattered parts of your application.",
+      "ru": "Когда вы подключаете сторонний фреймворк и хотите не дать его API просочиться в разрозненные части приложения."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**jQuery** — collapses inconsistent, verbose cross-browser DOM APIs into a handful of chainable calls like `$(el).hide()`, hiding browser-specific quirks entirely.",
+      "ru": "**jQuery** — сворачивает непоследовательные и многословные кросс-браузерные DOM API в несколько цепочечных вызовов вроде `$(el).hide()`, полностью скрывая особенности конкретных браузеров."
+    },
+    {
+      "en": "**Django's `Model.objects`** — a facade over SQL connection handling, query building, and row-to-object mapping, letting `User.objects.filter(...)` stand in for dozens of lower-level steps.",
+      "ru": "**`Model.objects` в Django** — фасад над установкой соединения с БД, построением запросов и преобразованием строк в объекты; `User.objects.filter(...)` заменяет собой десятки низкоуровневых шагов."
+    },
+    {
+      "en": "**Stripe's SDK `charge()` call** — hides HTTP request construction, authentication headers, retries, and error mapping behind a single method for the merchant's application.",
+      "ru": "**Вызов `charge()` в SDK Stripe** — прячет построение HTTP-запроса, заголовки аутентификации, повторные попытки и обработку ошибок за одним методом, доступным приложению продавца."
+    }
+  ],
+  "related_patterns": [
+    "adapter",
+    "singleton",
+    "mediator",
+    "abstract-factory"
+  ],
+  "quiz": [
+    {
+      "question": {
+        "en": "What does Facade do for client code?",
+        "ru": "Что Фасад делает для клиентского кода?"
+      },
+      "options": [
+        {
+          "en": "Hides a tangle of interacting classes behind one clean entry point, so the client issues one high-level call instead of orchestrating the subsystem",
+          "ru": "Прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиент делает один высокоуровневый вызов вместо самостоятельной оркестровки подсистемы"
+        },
+        {
+          "en": "Duplicates the subsystem's classes for redundancy",
+          "ru": "Дублирует классы подсистемы для избыточности"
+        },
+        {
+          "en": "Adds new behavior to each subsystem object individually",
+          "ru": "Добавляет новое поведение каждому объекту подсистемы по отдельности"
+        },
+        {
+          "en": "Guarantees only one instance of the subsystem exists",
+          "ru": "Гарантирует, что существует только один экземпляр подсистемы"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Facade hides a tangle of interacting classes behind one clean entry point, so client code issues a single high-level call instead of orchestrating the subsystem itself.",
+        "ru": "Фасад прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиентский код делает один высокоуровневый вызов вместо самостоятельной оркестровки подсистемы."
+      }
+    },
+    {
+      "question": {
+        "en": "In the home-theater example, what goes wrong if the multi-step setup logic lives directly in client code?",
+        "ru": "В примере с домашним кинотеатром — что идёт не так, если многошаговая логика настройки живёт прямо в клиентском коде?"
+      },
+      "options": [
+        {
+          "en": "Every place that wants to watch a movie duplicates the sequence, and getting a step or order wrong causes real problems (e.g. full volume in a bright room)",
+          "ru": "Каждое место, где нужно посмотреть фильм, дублирует последовательность, а ошибка в шаге или порядке приводит к реальным проблемам (например, полная громкость в светлой комнате)"
+        },
+        {
+          "en": "The projector permanently stops working",
+          "ru": "Проектор навсегда перестаёт работать"
+        },
+        {
+          "en": "The DVD player's interface changes automatically",
+          "ru": "Интерфейс DVD-плеера меняется автоматически"
+        },
+        {
+          "en": "The amplifier and projector merge into a single class",
+          "ru": "Усилитель и проектор объединяются в единый класс"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Every place that wants to watch a movie duplicates the same multi-step sequence, and missing a step or getting the order wrong causes real malfunctions.",
+        "ru": "Каждое место, где нужно посмотреть фильм, дублирует одну и ту же многошаговую последовательность, а пропуск шага или неверный порядок приводят к реальным сбоям."
+      }
+    },
+    {
+      "question": {
+        "en": "Does the Facade pattern remove direct access to the subsystem entirely?",
+        "ru": "Полностью ли паттерн Фасад устраняет прямой доступ к подсистеме?"
+      },
+      "options": [
+        {
+          "en": "No — direct access still exists for cases needing fine-grained control; the facade is an added convenience layer, not a wall",
+          "ru": "Нет — прямой доступ по-прежнему остаётся для случаев, где нужен тонкий контроль; фасад лишь добавляет удобный слой, а не закрывает подсистему стеной"
+        },
+        {
+          "en": "Yes — after adding a facade, the subsystem classes can no longer be called directly",
+          "ru": "Да — после добавления фасада классы подсистемы больше нельзя вызывать напрямую"
+        },
+        {
+          "en": "Yes, but only for the codec manager class",
+          "ru": "Да, но только для класса менеджера кодеков"
+        },
+        {
+          "en": "It depends on whether TypeScript is used",
+          "ru": "Это зависит от того, используется ли TypeScript"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Direct access to the subsystem still exists for cases that need fine-grained control; the facade is an added convenience layer, not a wall.",
+        "ru": "Прямой доступ к подсистеме при этом никуда не пропадает и остаётся для случаев, где нужен тонкий контроль — фасад лишь добавляет удобный слой, а не закрывает подсистему стеной."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a stated benefit of Facade regarding refactoring the subsystem?",
+        "ru": "Какое преимущество Фасада указано в отношении рефакторинга подсистемы?"
+      },
+      "options": [
+        {
+          "en": "The subsystem can be refactored, upgraded, or replaced with fewer ripple effects, since only the facade needs to track its API surface",
+          "ru": "Подсистему можно рефакторить, обновлять или заменять с меньшими побочными эффектами, поскольку только фасаду нужно отслеживать её API"
+        },
+        {
+          "en": "The subsystem can never be changed once a facade is introduced",
+          "ru": "Подсистему больше никогда нельзя менять после введения фасада"
+        },
+        {
+          "en": "Refactoring the subsystem automatically rewrites the facade",
+          "ru": "Рефакторинг подсистемы автоматически переписывает фасад"
+        },
+        {
+          "en": "It eliminates the need for the subsystem's internal classes entirely",
+          "ru": "Он полностью устраняет необходимость во внутренних классах подсистемы"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The subsystem can be refactored, upgraded, or replaced with fewer ripple effects, since only the facade needs to track its API surface.",
+        "ru": "Подсистему можно рефакторить, обновлять или заменять с меньшими побочными эффектами, поскольку только фасаду нужно отслеживать её API."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a stated risk of a facade left unchecked?",
+        "ru": "Какой риск указан для фасада, оставленного без контроля?"
+      },
+      "options": [
+        {
+          "en": "It tends to accumulate responsibilities for every subsystem and turns into a god object that everything depends on",
+          "ru": "Он склонен накапливать ответственность за все подсистемы и превращается в «божественный объект», от которого зависит всё"
+        },
+        {
+          "en": "It automatically deletes unused subsystem classes",
+          "ru": "Он автоматически удаляет неиспользуемые классы подсистемы"
+        },
+        {
+          "en": "It prevents the subsystem from being tested at all",
+          "ru": "Он полностью не даёт тестировать подсистему"
+        },
+        {
+          "en": "It forces every client call to go through the network",
+          "ru": "Он заставляет каждый клиентский вызов идти через сеть"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Left unchecked, a facade tends to accumulate responsibilities for every subsystem in the app and turns into a god object that everything depends on.",
+        "ru": "Без должного контроля фасад склонен накапливать ответственность за все подсистемы приложения и превращается в «божественный объект», от которого зависит всё."
+      }
+    }
+  ],
+  "visuals": [
+    {
+      "id": "facade-concept",
+      "type": "flow",
+      "style": "facade",
+      "category": "structural",
+      "width": 860,
+      "height": 470,
+      "title": {
+        "en": "How Facade works",
+        "ru": "Как работает Фасад"
+      },
+      "description": {
+        "en": "The Client makes a single watchMovie() call to the Home Theater Facade — and nothing else. The Facade is the one entry point across the boundary into the subsystem: only it reaches the Amplifier, Projector, DVD Player and Lights, coordinating them in the right order. The Client never touches any subsystem part directly.",
+        "ru": "Клиент делает единственный вызов watchMovie() к Фасаду домашнего кинотеатра — и больше ничего. Фасад — единственная точка входа через границу в подсистему: только он обращается к Усилителю, Проектору, DVD-плееру и Свету, координируя их в правильном порядке. Клиент никогда не обращается к частям подсистемы напрямую."
+      },
+      "caption": {
+        "en": "One call to the Facade. It coordinates the whole subsystem — the Client stays outside the complexity.",
+        "ru": "Один вызов к Фасаду. Он координирует всю подсистему — Клиент остаётся снаружи сложности."
+      },
+      "subsystemLabel": {
+        "en": "Home Theater subsystem",
+        "ru": "Подсистема кинотеатра"
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "one call",
+            "ru": "один вызов"
+          }
+        },
+        {
+          "id": "facade",
+          "role": "facade",
+          "kind": "class",
+          "icon": "spark",
+          "label": {
+            "en": "Facade",
+            "ru": "Фасад"
+          },
+          "subtitle": {
+            "en": "watchMovie()",
+            "ru": "watchMovie()"
+          }
+        },
+        {
+          "id": "amplifier",
+          "role": "subsystem",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Amplifier",
+            "ru": "Усилитель"
+          },
+          "subtitle": {
+            "en": "Audio",
+            "ru": "Звук"
+          }
+        },
+        {
+          "id": "projector",
+          "role": "subsystem",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Projector",
+            "ru": "Проектор"
+          },
+          "subtitle": {
+            "en": "Video",
+            "ru": "Видео"
+          }
+        },
+        {
+          "id": "dvdPlayer",
+          "role": "subsystem",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "DVD Player",
+            "ru": "DVD-плеер"
+          },
+          "subtitle": {
+            "en": "Media",
+            "ru": "Медиа"
+          }
+        },
+        {
+          "id": "lights",
+          "role": "subsystem",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "Lights",
+            "ru": "Свет"
+          },
+          "subtitle": {
+            "en": "Lighting",
+            "ru": "Освещение"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "facade",
+          "relationship": "flow",
+          "label": {
+            "en": "watchMovie()",
+            "ru": "watchMovie()"
+          }
+        }
+      ]
+    }
+  ]
+}

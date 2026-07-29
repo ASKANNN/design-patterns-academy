@@ -1,0 +1,3327 @@
+import { escapeText, rect, connect, sideConnect, r2, curvePath } from './svg-utils.js';
+import { DiagramNode, renderIcon } from './DiagramNode.js';
+import { DiagramEdge, DiagramMarkers } from './DiagramEdge.js';
+
+export function Diagram(model = {}) {
+  const {
+    id = 'diagram',
+    style = '',
+    title = '',
+    description = '',
+    category = '',
+    width = 640,
+    height = 400,
+    nodes = [],
+    edges = [],
+    caption = '',
+  } = model;
+
+  if (!Array.isArray(nodes) || nodes.length === 0) return '';
+
+  if (style === 'nested') return _nestedDiagram(model);
+
+  if (style === 'chain') return _chainDiagram(model);
+
+  if (style === 'facade') return _facadeDiagram(model);
+
+  if (style === 'pool') return _poolDiagram(model);
+
+  if (style === 'gateway') return _gatewayDiagram(model);
+
+  if (style === 'command') return _commandDiagram(model);
+
+  if (style === 'expression') return _expressionDiagram(model);
+
+  if (style === 'cursor') return _cursorDiagram(model);
+
+  if (style === 'hub') return _hubDiagram(model);
+
+  if (style === 'broadcast') return _broadcastDiagram(model);
+
+  if (style === 'state') return _stateDiagram(model);
+
+  if (style === 'memento') return _mementoDiagram(model);
+
+  if (style === 'singleton') return _singletonDiagram(model);
+
+  if (style === 'slot') return _slotDiagram(model);
+
+  if (style === 'skeleton') return _skeletonDiagram(model);
+
+  if (style === 'dispatch') return _dispatchDiagram(model);
+
+  if (style === 'override') return _overrideDiagram(model);
+
+  if (style === 'family') return _familyDiagram(model);
+
+  if (style === 'assembly') return _assemblyDiagram(model);
+
+  if (style === 'mirror') return _mirrorDiagram(model);
+
+  if (style === 'translate') return _translateDiagram(model);
+
+  if (style === 'span') return _spanDiagram(model);
+
+  if (style === 'tree') return _treeDiagram(model);
+
+  const concept = style === 'concept';
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+
+  const geometry = new Map();
+  nodes.forEach((n) => {
+    if (n && n.id != null) geometry.set(String(n.id), rect(n));
+  });
+
+  const edgesSvg = (Array.isArray(edges) ? edges : [])
+    .map((edge) => {
+      const from = geometry.get(String(edge.from));
+      const to = geometry.get(String(edge.to));
+      if (!from || !to) return '';
+      const pts = concept ? sideConnect(from, to, edge.bend || 0, edge.bendSpan || null) : connect(from, to);
+      return DiagramEdge(edge, pts, safeId, { concept });
+    })
+    .join('');
+
+  const nodeOpts = { concept, prefix: safeId };
+  const nodesSvg = nodes.map((n) => DiagramNode(n, nodeOpts)).join('');
+
+  const defs = concept ? _conceptDefs(safeId) : DiagramMarkers(safeId);
+
+  const rootCls = [
+    'diagram',
+    concept ? 'diagram--concept' : '',
+    category ? `diagram--${escapeText(category)}` : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${Number(width) || 640} ${Number(height) || 400}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${defs}
+        <g class="diagram__edges" aria-hidden="true">${edgesSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${nodesSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _conceptDefs(prefix) {
+  return `
+    <defs>
+      <linearGradient id="${prefix}-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" class="diagram__grad-start" />
+        <stop offset="1" class="diagram__grad-end" />
+      </linearGradient>
+      <marker id="${prefix}-flow" class="diagram__marker diagram__marker--flow" markerWidth="15" markerHeight="15" refX="10" refY="7.5" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M2,2 L12.5,7.5 L2,13 Z" />
+      </marker>
+    </defs>`;
+}
+
+function _nestedDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 960, height = 470,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const shells = nodes.filter((n) => n && n.role === 'shell');
+  const core   = nodes.find((n) => n && n.role === 'core');
+  if (!core || shells.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 960;
+  const H = Number(height) || 470;
+
+  const PAD = 24;
+  const CLIENT_W = 156, CLIENT_H = 104;
+  const GAP = 92;
+  const HEADER = 56;
+  const SHELL_SCALE = 0.82;
+  const TOP_BIAS = 0.72;
+
+  const clientG = { x: PAD, y: H / 2 - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const sx0 = clientG.x + CLIENT_W + GAP;
+  const sx1 = W - PAD;
+  const sy0 = PAD;
+  const sy1 = H - PAD;
+  const W0 = sx1 - sx0;
+  const H0 = sy1 - sy0;
+  const cx0 = (sx0 + sx1) / 2;
+
+  const shellGeom = shells.map((_, i) => {
+    const s = Math.pow(SHELL_SCALE, i);
+    const w = W0 * s;
+    const h = H0 * s;
+    return { x: cx0 - w / 2, y: sy0 + (H0 - h) * TOP_BIAS, w, h };
+  });
+
+  const inner = shellGeom[shellGeom.length - 1];
+  const coreW = Math.min(360, W0 * 0.55);
+  const coreH = Math.min(150, H0 * 0.42);
+  const innerContentTop = inner.y + HEADER;
+  const innerContentBottom = inner.y + inner.h - 20;
+  const coreG = {
+    x: cx0 - coreW / 2,
+    y: (innerContentTop + innerContentBottom) / 2 - coreH / 2,
+    w: coreW, h: coreH,
+  };
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+
+  const shellsSvg = shells
+    .map((n, i) => _shellNode(n, shellGeom[i], i))
+    .join('');
+
+  const coreSvg = DiagramNode({ ...core, ...coreG, emphasis: true }, { concept: true, prefix: safeId });
+
+  const entry = (Array.isArray(model.edges) ? model.edges : [])[0];
+  let entrySvg = '';
+  if (entry) {
+    const outer = shellGeom[0];
+    const ey = clientG.y + clientG.h / 2;
+    const pts = {
+      x1: clientG.x + clientG.w, y1: ey,
+      x2: outer.x,               y2: outer.y + outer.h / 2,
+      mx: (clientG.x + clientG.w + outer.x) / 2, my: ey,
+    };
+    entrySvg = DiagramEdge(entry, pts, safeId, { concept: true });
+  }
+
+  const leftMid = (g) => ({ x: g.x, y: g.y + g.h / 2 });
+  const rails = [];
+  for (let i = 1; i < shellGeom.length; i += 1) {
+    const a = leftMid(shellGeom[i - 1]);
+    const b = leftMid(shellGeom[i]);
+    rails.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y });
+  }
+  const lastShell = shellGeom[shellGeom.length - 1];
+  rails.push({
+    x1: lastShell.x, y1: lastShell.y + lastShell.h / 2,
+    x2: coreG.x, y2: coreG.y + coreG.h / 2,
+  });
+  const railsSvg = rails
+    .map((p) => `
+        <path class="diagram__flow diagram__flow--guide" d="${curvePath(p)}" fill="none" aria-hidden="true" />`)
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--nested',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${railsSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${shellsSvg}${coreSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _shellNode(node, g, index) {
+  const { id, label = '', badge = '', action = '', icon = 'layers' } = node;
+  const aria = action ? `${label} — ${action}` : label;
+
+  const CHIP = 38;
+  const chipX = g.x + 16, chipY = g.y + 13;
+  const titleX = chipX + CHIP + 12;
+  const titleY = g.y + 38;
+
+  const iconEl = icon ? renderIcon(icon, chipX + 7, chipY + 7, 24, 'diagram__shell-icon') : '';
+
+  let badgeEl = '';
+  if (badge) {
+    const badgeW = Math.max(54, badge.length * 7.4 + 24);
+    const badgeX = g.x + g.w - 16 - badgeW;
+    const badgeY = g.y + 12;
+    badgeEl = `
+      <g class="diagram__shell-badge" aria-hidden="true">
+        <rect x="${r2(badgeX)}" y="${r2(badgeY)}" width="${r2(badgeW)}" height="26" rx="13" ry="13" />
+        <text x="${r2(badgeX + badgeW / 2)}" y="${r2(badgeY + 18)}" text-anchor="middle">${escapeText(badge)}</text>
+      </g>`;
+  }
+
+  let toastEl = '';
+  if (action) {
+    const toastText = `✓ ${action}`;
+    const shellCx = g.x + g.w / 2;
+    const tW = Math.max(96, toastText.length * 7 + 30);
+    const tX = shellCx - tW / 2;
+    const tY = g.y + 13;
+    toastEl = `
+      <g class="diagram__shell-toast" aria-hidden="true">
+        <rect x="${r2(tX)}" y="${r2(tY)}" width="${r2(tW)}" height="24" rx="12" ry="12" />
+        <text x="${r2(shellCx)}" y="${r2(tY + 16.5)}" text-anchor="middle">${escapeText(toastText)}</text>
+      </g>`;
+  }
+
+  return `
+    <g class="diagram__shell" data-node-id="${escapeText(id)}" data-shell-index="${index}" tabindex="0" role="listitem" aria-label="${escapeText(aria)}">
+      <rect class="diagram__shell-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="20" ry="20" />
+      <rect class="diagram__shell-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="11" ry="11" aria-hidden="true" />${iconEl}
+      <text class="diagram__shell-title" x="${r2(titleX)}" y="${r2(titleY)}">${escapeText(label)}</text>${badgeEl}${toastEl}
+    </g>`;
+}
+
+function _chainDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 1000, height = 300,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const handlers = nodes.filter((n) => n && n.role === 'handler');
+  if (!client || handlers.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 1000;
+  const H = Number(height) || 300;
+
+  const PAD = 24;
+  const CLIENT_W = 150, CLIENT_H = 104;
+  const GAP = 60;
+  const STATION_H = 132;
+  const STATION_MIN = 138, STATION_MAX = 200;
+  const CELL_GAP = 30;
+
+  const stationCy = PAD + 14 + STATION_H / 2;
+  const clientG = { x: PAD, y: stationCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const sx0 = clientG.x + CLIENT_W + GAP;
+  const sx1 = W - PAD;
+  const cell = (sx1 - sx0) / handlers.length;
+
+  const need = handlers.reduce((m, n) => {
+    const t  = String(n.label ?? '').length * 8.4 + 28;
+    const gw = String(n.guard ?? '').length * 7 + 24;
+    return Math.max(m, t, gw);
+  }, 0);
+  const sw = Math.min(STATION_MAX, Math.max(STATION_MIN, Math.min(cell - CELL_GAP, need)));
+
+  const stationGeom = handlers.map((_, i) => ({
+    x: sx0 + cell * (i + 0.5) - sw / 2,
+    y: stationCy - STATION_H / 2,
+    w: sw, h: STATION_H,
+  }));
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const stationsSvg = handlers.map((n, i) => _stationNode(n, stationGeom[i], i)).join('');
+
+  const railY = stationCy;
+  const baseX1 = clientG.x + clientG.w;
+  const baseX2 = stationGeom[stationGeom.length - 1].x + sw;
+  const baseRail = `
+        <line class="diagram__rail-base" x1="${r2(baseX1)}" y1="${r2(railY)}" x2="${r2(baseX2)}" y2="${r2(railY)}" aria-hidden="true" />`;
+
+  const segs = [{ x1: baseX1, x2: stationGeom[0].x }];
+  for (let i = 1; i < stationGeom.length; i += 1) {
+    segs.push({ x1: stationGeom[i - 1].x + sw, x2: stationGeom[i].x });
+  }
+  const segsSvg = segs
+    .map((s) => `
+        <path class="diagram__flow diagram__flow--rail" d="${curvePath({ x1: s.x1, y1: railY, x2: s.x2, y2: railY })}" fill="none" marker-end="url(#${safeId}-chev)" aria-hidden="true" />`)
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--chain',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_chainDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${baseRail}${segsSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${stationsSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _chainDefs(prefix) {
+  return `
+    <defs>
+      <linearGradient id="${prefix}-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" class="diagram__grad-start" />
+        <stop offset="1" class="diagram__grad-end" />
+      </linearGradient>
+      <marker id="${prefix}-chev" class="diagram__chev" markerWidth="12" markerHeight="12" refX="7" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M2 2 L8 6 L2 10" fill="none" />
+      </marker>
+    </defs>`;
+}
+
+function _stationNode(node, g, index) {
+  const { id, label = '', guard = '', decision = '', verdict = '', icon = 'cube' } = node;
+  const title = String(label);
+  const guardText = String(guard ?? '');
+  const decisionText = String(decision ?? '');
+  const aria = guardText ? `${title} — ${guardText}` : title;
+
+  const cx = g.x + g.w / 2;
+
+  const CHIP = 34;
+  const chipX = cx - CHIP / 2, chipY = g.y + 20;
+  const iconEl = icon ? renderIcon(icon, chipX + 5, chipY + 5, 24, 'diagram__station-icon') : '';
+  const titleY = chipY + CHIP + 24;
+  const guardY = titleY + 22;
+
+  const maxW = g.w - 20;
+  const titleTL = title.length * 8 > maxW
+    ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"`
+    : '';
+
+  const orderEl = `
+      <g class="diagram__station-order" aria-hidden="true">
+        <circle cx="${r2(g.x + 20)}" cy="${r2(g.y + 20)}" r="12" />
+        <text x="${r2(g.x + 20)}" y="${r2(g.y + 24.5)}" text-anchor="middle">${index + 1}</text>
+      </g>`;
+
+  const stampEl = verdict === 'handle'
+    ? `
+      <g class="diagram__station-stamp" aria-hidden="true">
+        <circle cx="${r2(g.x + g.w - 20)}" cy="${r2(g.y + 20)}" r="12" />
+        <path d="M${r2(g.x + g.w - 25)} ${r2(g.y + 20)} l3.4 3.4 l6 -7" fill="none" />
+      </g>`
+    : '';
+
+  let decisionEl = '';
+  if (decisionText) {
+    const dW = Math.max(72, decisionText.length * 7.4 + 26);
+    const dX = cx - dW / 2;
+    const dY = g.y + g.h + 12;
+    decisionEl = `
+      <g class="diagram__station-decision" aria-hidden="true">
+        <rect x="${r2(dX)}" y="${r2(dY)}" width="${r2(dW)}" height="26" rx="13" ry="13" />
+        <text x="${r2(cx)}" y="${r2(dY + 17.5)}" text-anchor="middle">${escapeText(decisionText)}</text>
+      </g>`;
+  }
+
+  const clsVerdict = verdict ? ` diagram__station--${escapeText(verdict)}` : '';
+
+  return `
+    <g class="diagram__station${clsVerdict}" data-node-id="${escapeText(id)}" data-station-index="${index}" tabindex="0" role="listitem" aria-label="${escapeText(aria)}">
+      <rect class="diagram__station-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" />
+      <rect class="diagram__station-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="10" ry="10" aria-hidden="true" />${iconEl}
+      <text class="diagram__station-title" x="${r2(cx)}" y="${r2(titleY)}" text-anchor="middle"${titleTL}>${escapeText(title)}</text>${guardText ? `
+      <text class="diagram__station-guard" x="${r2(cx)}" y="${r2(guardY)}" text-anchor="middle">${escapeText(guardText)}</text>` : ''}${orderEl}${stampEl}${decisionEl}
+    </g>`;
+}
+
+function _facadeDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 860, height = 470,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const facade = nodes.find((n) => n && n.role === 'facade');
+  const parts  = nodes.filter((n) => n && n.role === 'subsystem');
+  if (!client || !facade || parts.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 860;
+  const H = Number(height) || 470;
+
+  const PAD = 24;
+  const midY = H / 2;
+
+  const CLIENT_W = 150, CLIENT_H = 96;
+  const clientG = { x: PAD, y: midY - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const FACADE_W = 158, FACADE_H = 300;
+  const GAP1 = 60;
+  const facadeG = {
+    x: clientG.x + CLIENT_W + GAP1, y: midY - FACADE_H / 2, w: FACADE_W, h: FACADE_H,
+  };
+
+  const GAP2 = 62;
+  const regionX = facadeG.x + FACADE_W + GAP2;
+  const region = { x: regionX, y: PAD, w: (W - PAD) - regionX, h: H - PAD * 2 };
+
+  const RPAD = 22;
+  const HEADER = 54;
+  const partX = region.x + RPAD;
+  const partW = region.w - RPAD * 2;
+  const stackTop = region.y + HEADER;
+  const stackBottom = region.y + region.h - RPAD;
+  const PART_GAP = 18;
+  const n = parts.length;
+  const partH = Math.min(84, (stackBottom - stackTop - PART_GAP * (n - 1)) / n);
+  const stackH = partH * n + PART_GAP * (n - 1);
+  const stackY0 = stackTop + ((stackBottom - stackTop) - stackH) / 2;
+  const partGeom = parts.map((_, i) => ({
+    x: partX, y: stackY0 + i * (partH + PART_GAP), w: partW, h: partH,
+  }));
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const facadeSvg = DiagramNode({ ...facade, ...facadeG, emphasis: true }, { concept: true, prefix: safeId });
+  const partsSvg = parts
+    .map((p, i) => DiagramNode({ ...p, ...partGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const regionLabel = typeof model.subsystemLabel === 'string' ? model.subsystemLabel : '';
+  const regionSvg = _facadeRegion(region, regionLabel);
+
+  const entrySvg = _facadeFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: facadeG.x,            y2: facadeG.y + facadeG.h / 2 }, safeId);
+  const facadeRightX = facadeG.x + facadeG.w;
+  const facadeMidY = facadeG.y + facadeG.h / 2;
+  const fanSvg = partGeom
+    .map((g) => _facadeFlow(
+      { x1: facadeRightX, y1: facadeMidY, x2: g.x, y2: g.y + g.h / 2 }, safeId))
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--facade',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${regionSvg}${entrySvg}${fanSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${facadeSvg}${partsSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _facadeRegion(g, label) {
+  const labelEl = label
+    ? `
+      <text class="diagram__region-title" x="${r2(g.x + 22)}" y="${r2(g.y + 34)}">${escapeText(label)}</text>`
+    : '';
+  return `
+      <rect class="diagram__region-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="22" ry="22" />
+      <line class="diagram__region-wall" x1="${r2(g.x)}" y1="${r2(g.y + 18)}" x2="${r2(g.x)}" y2="${r2(g.y + g.h - 18)}" />${labelEl}`;
+}
+
+function _facadeFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--facade" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _poolDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 900, height = 440,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const factory = nodes.find((n) => n && n.role === 'factory');
+  const items = nodes.filter((n) => n && n.role === 'flyweight');
+  if (!client || !factory || items.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 900;
+  const H = Number(height) || 440;
+
+  const PAD = 24;
+  const midY = H / 2;
+
+  const CLIENT_W = 150, CLIENT_H = 96;
+  const clientG = { x: PAD, y: midY - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const FACTORY_W = 176, FACTORY_H = 220;
+  const GAP1 = 60;
+  const factoryG = {
+    x: clientG.x + CLIENT_W + GAP1, y: midY - FACTORY_H / 2, w: FACTORY_W, h: FACTORY_H,
+  };
+
+  const GAP2 = 64;
+  const regionX = factoryG.x + FACTORY_W + GAP2;
+  const region = { x: regionX, y: PAD, w: (W - PAD) - regionX, h: H - PAD * 2 };
+
+  const RPAD = 22;
+  const HEADER = 54;
+  const BADGE_GAP = 28;
+  const BADGE_MAX = 150;
+  const n = items.length;
+  const slot = (region.w - RPAD * 2) / n;
+  const bd = Math.min(BADGE_MAX, slot - BADGE_GAP);
+  const contentTop = region.y + HEADER;
+  const contentBottom = region.y + region.h - RPAD;
+  const cy = (contentTop + contentBottom) / 2;
+  const bx0 = region.x + RPAD;
+  const itemGeom = items.map((_, i) => {
+    const cx = bx0 + slot * (i + 0.5);
+    return { x: cx - bd / 2, y: cy - bd / 2, w: bd, h: bd, cx, cy };
+  });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const factorySvg = DiagramNode({ ...factory, ...factoryG, emphasis: true }, { concept: true, prefix: safeId });
+  const itemsSvg = items.map((n2, i) => _poolBadge(n2, itemGeom[i], i)).join('');
+
+  const poolLabel = typeof model.poolLabel === 'string' ? model.poolLabel : '';
+  const regionSvg = _poolRegion(region, poolLabel);
+
+  const entrySvg = _poolFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: factoryG.x,            y2: factoryG.y + factoryG.h / 2 }, safeId);
+  const factoryRightX = factoryG.x + factoryG.w;
+  const factoryMidY = factoryG.y + factoryG.h / 2;
+  const fanSpread = Math.min(factoryG.h * 0.7, 60 * (n - 1));
+  const fanSvg = itemGeom
+    .map((g, i) => {
+      const t = n > 1 ? i / (n - 1) - 0.5 : 0;
+      return _poolFlow(
+        { x1: factoryRightX, y1: factoryMidY + t * fanSpread, x2: g.x, y2: g.cy }, safeId);
+    })
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--pool',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${regionSvg}${entrySvg}${fanSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${factorySvg}${itemsSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _poolRegion(g, label) {
+  const labelEl = label
+    ? `
+      <text class="diagram__pool-title" x="${r2(g.x + g.w / 2)}" y="${r2(g.y + 34)}" text-anchor="middle">${escapeText(label)}</text>`
+    : '';
+  return `
+      <rect class="diagram__pool-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="22" ry="22" />${labelEl}`;
+}
+
+function _poolBadge(node, g, index) {
+  const { id, label = '', icon = 'cube' } = node;
+  const r = g.w / 2;
+  const iconSize = Math.max(20, Math.min(28, r * 0.4));
+  const iconEl = icon
+    ? renderIcon(icon, g.cx - iconSize / 2, g.cy - r * 0.52, iconSize, 'diagram__pool-icon')
+    : '';
+  const labelY = g.cy + r * 0.42;
+
+  return `
+    <g class="diagram__pool-item" data-node-id="${escapeText(id)}" data-pool-index="${index}" tabindex="0" role="listitem" aria-label="${escapeText(label)}">
+      <circle class="diagram__pool-token" cx="${r2(g.cx)}" cy="${r2(g.cy)}" r="${r2(r)}" />${iconEl}
+      <text class="diagram__pool-label" x="${r2(g.cx)}" y="${r2(labelY)}" text-anchor="middle">${escapeText(label)}</text>
+    </g>`;
+}
+
+function _poolFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--pool" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _gatewayDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 820, height = 460,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const proxy = nodes.find((n) => n && n.role === 'proxy');
+  const service = nodes.find((n) => n && n.role === 'service');
+  if (!client || !proxy || !service) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 820;
+  const H = Number(height) || 460;
+
+  const PAD = 24;
+  const rowY = H * 0.65;
+
+  const CLIENT_W = 150, CLIENT_H = 96;
+  const clientG = { x: PAD, y: rowY - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const PROXY_W = 210, PROXY_H = 180;
+  const GAP1 = 64;
+  const proxyG = {
+    x: clientG.x + CLIENT_W + GAP1, y: rowY - PROXY_H / 2, w: PROXY_W, h: PROXY_H,
+  };
+
+  const SERVICE_W = 170, SERVICE_H = 110;
+  const GAP2 = 64;
+  const serviceG = {
+    x: proxyG.x + PROXY_W + GAP2, y: rowY - SERVICE_H / 2, w: SERVICE_W, h: SERVICE_H,
+  };
+
+  const contentRight = serviceG.x + SERVICE_W;
+  const shiftX = (W - PAD - contentRight) / 2;
+  clientG.x += shiftX;
+  proxyG.x += shiftX;
+  serviceG.x += shiftX;
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const proxySvg = DiagramNode({ ...proxy, ...proxyG, emphasis: true }, { concept: true, prefix: safeId });
+  const serviceSvg = DiagramNode({ ...service, ...serviceG }, { concept: true, prefix: safeId });
+
+  const entrySvg = _gatewayFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: proxyG.x,             y2: proxyG.y + proxyG.h / 2 }, safeId);
+  const delegateSvg = _gatewayFlow(
+    { x1: proxyG.x + proxyG.w, y1: proxyG.y + proxyG.h / 2,
+      x2: serviceG.x,          y2: serviceG.y + serviceG.h / 2 }, safeId);
+
+  const blockedLabel = typeof model.blockedLabel === 'string' ? model.blockedLabel : '';
+  const blockedSvg = _gatewayBlocked(clientG, serviceG, PAD, blockedLabel);
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--gateway',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${blockedSvg}${entrySvg}${delegateSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${proxySvg}${serviceSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _gatewayBlocked(clientG, serviceG, pad, label) {
+  const x1 = clientG.x + clientG.w / 2, y1 = clientG.y;
+  const x2 = serviceG.x + serviceG.w / 2, y2 = serviceG.y;
+  const peakY = pad + 36;
+  const midX = (x1 + x2) / 2;
+  const bx = 0.25 * x1 + 0.5 * midX + 0.25 * x2;
+  const by = 0.25 * y1 + 0.5 * peakY + 0.25 * y2;
+
+  const labelEl = label
+    ? `
+      <text class="diagram__gateway-blocked-label" x="${r2(bx)}" y="${r2(by + 32)}" text-anchor="middle">${escapeText(label)}</text>`
+    : '';
+
+  return `
+      <path class="diagram__gateway-blocked-path" d="M ${r2(x1)} ${r2(y1)} Q ${r2(midX)} ${r2(peakY)} ${r2(x2)} ${r2(y2)}" fill="none" aria-hidden="true" />
+      <g class="diagram__gateway-blocked-badge" aria-hidden="true">
+        <circle cx="${r2(bx)}" cy="${r2(by)}" r="15" />
+        <line x1="${r2(bx - 8)}" y1="${r2(by + 8)}" x2="${r2(bx + 8)}" y2="${r2(by - 8)}" />
+      </g>${labelEl}`;
+}
+
+function _gatewayFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--gateway" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _commandDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 860, height = 420,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const invoker = nodes.find((n) => n && n.role === 'invoker');
+  const command = nodes.find((n) => n && n.role === 'command');
+  const receiver = nodes.find((n) => n && n.role === 'receiver');
+  if (!client || !invoker || !command || !receiver) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 860;
+  const H = Number(height) || 420;
+
+  const PAD = 24;
+  const rowY = H / 2;
+
+  const CLIENT_W = 150, CLIENT_H = 96;
+  const clientG = { x: PAD, y: rowY - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const INVOKER_W = 196, INVOKER_H = 172;
+  const GAP1 = 60;
+  const invokerG = {
+    x: clientG.x + CLIENT_W + GAP1, y: rowY - INVOKER_H / 2, w: INVOKER_W, h: INVOKER_H,
+  };
+
+  const CAPSULE_W = 168, CAPSULE_H = 72;
+  const OVERLAP = 42;
+  const commandG = {
+    x: invokerG.x + invokerG.w - OVERLAP, y: rowY - CAPSULE_H / 2, w: CAPSULE_W, h: CAPSULE_H,
+  };
+
+  const RECEIVER_W = 150, RECEIVER_H = 96;
+  const GAP2 = 56;
+  const receiverG = {
+    x: commandG.x + CAPSULE_W + GAP2, y: rowY - RECEIVER_H / 2, w: RECEIVER_W, h: RECEIVER_H,
+  };
+
+  const contentRight = receiverG.x + RECEIVER_W;
+  const shiftX = (W - PAD - contentRight) / 2;
+  clientG.x += shiftX;
+  invokerG.x += shiftX;
+  commandG.x += shiftX;
+  receiverG.x += shiftX;
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const invokerSvg = DiagramNode({ ...invoker, ...invokerG, emphasis: true }, { concept: true, prefix: safeId });
+  const receiverSvg = DiagramNode({ ...receiver, ...receiverG }, { concept: true, prefix: safeId });
+
+  const socketG = {
+    x: invokerG.x + invokerG.w - OVERLAP - 12, y: commandG.y - 8,
+    w: OVERLAP + 20, h: CAPSULE_H + 16,
+  };
+  const socketSvg = `
+      <rect class="diagram__command-socket" x="${r2(socketG.x)}" y="${r2(socketG.y)}" width="${r2(socketG.w)}" height="${r2(socketG.h)}" rx="${r2(socketG.h / 2)}" ry="${r2(socketG.h / 2)}" aria-hidden="true" />`;
+
+  const commandSvg = _capsuleNode(command, commandG);
+
+  const entrySvg = _commandFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: invokerG.x,            y2: invokerG.y + invokerG.h / 2 }, safeId);
+  const socketFlowSvg = _commandFlow(
+    { x1: invokerG.x + invokerG.w - OVERLAP, y1: rowY,
+      x2: commandG.x,                        y2: rowY }, safeId);
+  const executeSvg = _commandFlow(
+    { x1: commandG.x + CAPSULE_W, y1: rowY,
+      x2: receiverG.x,            y2: receiverG.y + receiverG.h / 2 }, safeId);
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--command',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${socketSvg}${entrySvg}${socketFlowSvg}${executeSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${invokerSvg}${commandSvg}${receiverSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _capsuleNode(node, g) {
+  const { id, label = '', icon = 'layers' } = node;
+  const cy = g.y + g.h / 2;
+
+  const CHIP = 40;
+  const chipX = g.x + 16, chipY = cy - CHIP / 2;
+  const iconEl = icon ? renderIcon(icon, chipX + 7, chipY + 7, 26, 'diagram__capsule-icon') : '';
+  const titleX = chipX + CHIP + 12;
+  const maxW = g.w - (titleX - g.x) - 30;
+  const titleTL = label.length * 8 > maxW
+    ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"`
+    : '';
+
+  return `
+    <g class="diagram__capsule" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(label)}">
+      <rect class="diagram__capsule-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="${r2(g.h / 2)}" ry="${r2(g.h / 2)}" />
+      <rect class="diagram__capsule-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="${r2(CHIP / 2)}" ry="${r2(CHIP / 2)}" aria-hidden="true" />${iconEl}
+      <text class="diagram__capsule-title" x="${r2(titleX)}" y="${r2(cy + 5)}"${titleTL}>${escapeText(label)}</text>
+      <g class="diagram__capsule-undo" aria-hidden="true">
+        <circle cx="${r2(g.x + g.w - 18)}" cy="${r2(g.y)}" r="15" />
+        <text x="${r2(g.x + g.w - 18)}" y="${r2(g.y + 5)}" text-anchor="middle">↺</text>
+      </g>
+    </g>`;
+}
+
+function _commandFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--command" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _expressionDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 940, height = 560,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const root = nodes.find((n) => n && n.role === 'root');
+  const branch = nodes.find((n) => n && n.role === 'branch');
+  const rootLeaf = nodes.find((n) => n && n.role === 'root-leaf');
+  const branchLeaves = nodes.filter((n) => n && n.role === 'branch-leaf');
+  if (!client || !root || !branch || !rootLeaf || branchLeaves.length < 2) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 940;
+  const H = Number(height) || 560;
+
+  const PAD = 24;
+  const CLIENT_W = 150, CLIENT_H = 104;
+  const NONTERM_W = 160, NONTERM_H = 128;
+  const TERM_W = 124, TERM_H = 84;
+  const GAP = 70;
+
+  const ROW1_CY = 104;
+  const ROW2_CY = 302;
+  const ROW3_CY = 478;
+
+  const treeX0 = PAD + CLIENT_W + GAP;
+  const treeX1 = W - PAD;
+  const treeW = treeX1 - treeX0;
+  const slotW = treeW / 3;
+  const slotCx = (i) => treeX0 + slotW * (i + 0.5);
+
+  const leafAX = slotCx(0);
+  const leafBX = slotCx(1);
+  const rootLeafX = slotCx(2);
+  const branchX = (leafAX + leafBX) / 2;
+  const rootX = (branchX + rootLeafX) / 2;
+
+  const box = (cx, cy, w, h) => ({ x: cx - w / 2, y: cy - h / 2, w, h, cx, cy });
+
+  let clientG = box(PAD + CLIENT_W / 2, ROW2_CY, CLIENT_W, CLIENT_H);
+  let rootG = box(rootX, ROW1_CY, NONTERM_W, NONTERM_H);
+  let branchG = box(branchX, ROW2_CY, NONTERM_W, NONTERM_H);
+  let rootLeafG = box(rootLeafX, ROW2_CY, TERM_W, TERM_H);
+  let leafAG = box(leafAX, ROW3_CY, TERM_W, TERM_H);
+  let leafBG = box(leafBX, ROW3_CY, TERM_W, TERM_H);
+
+  const contentRight = Math.max(
+    rootG.x + rootG.w, rootLeafG.x + rootLeafG.w,
+    leafAG.x + leafAG.w, leafBG.x + leafBG.w,
+  );
+  const shiftX = (W - PAD - contentRight) / 2;
+  [clientG, rootG, branchG, rootLeafG, leafAG, leafBG].forEach((g) => {
+    g.x += shiftX; g.cx += shiftX;
+  });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const resultSvg = client.result ? (() => {
+    const text = String(client.result);
+    const rW = Math.max(64, text.length * 9 + 34);
+    const rH = 30;
+    const rX = clientG.x + clientG.w - rW / 2;
+    const rY = clientG.y + clientG.h - rH / 2;
+    return `
+      <g class="diagram__result-badge" data-node-id="result" aria-hidden="true">
+        <rect x="${r2(rX)}" y="${r2(rY)}" width="${r2(rW)}" height="${r2(rH)}" rx="15" ry="15" />
+        <text x="${r2(rX + rW / 2)}" y="${r2(rY + rH / 2 + 4.5)}" text-anchor="middle">= ${escapeText(text)}</text>
+      </g>`;
+  })() : '';
+  const rootSvg = DiagramNode({ ...root, ...rootG, emphasis: true }, { concept: true, prefix: safeId });
+  const branchSvg = DiagramNode({ ...branch, ...branchG, emphasis: true }, { concept: true, prefix: safeId });
+  const rootLeafSvg = DiagramNode({ ...rootLeaf, ...rootLeafG }, { concept: true, prefix: safeId });
+  const leafASvg = DiagramNode({ ...branchLeaves[0], ...leafAG }, { concept: true, prefix: safeId });
+  const leafBSvg = DiagramNode({ ...branchLeaves[1], ...leafBG }, { concept: true, prefix: safeId });
+
+  const edgesById = new Map();
+  (Array.isArray(model.edges) ? model.edges : []).forEach((e) => {
+    if (e) edgesById.set(`${e.from}->${e.to}`, e);
+  });
+  const edgeFlow = (sourceId, targetId, parentG, childG, pts) => {
+    const edge = edgesById.get(`${sourceId}->${targetId}`);
+    return edge
+      ? DiagramEdge(edge, {
+        ...pts,
+        mx: (pts.x1 + pts.x2) / 2,
+        my: (pts.y1 + pts.y2) / 2,
+      }, safeId, { concept: true })
+      : _expressionFlow(pts, safeId);
+  };
+
+  const entryPts = { x1: clientG.x + clientG.w, y1: clientG.cy, x2: rootG.x, y2: rootG.cy };
+  const entrySvg = edgeFlow(client.id, root.id, clientG, rootG, entryPts);
+  const toBranchSvg = edgeFlow(root.id, branch.id, rootG, branchG,
+    { x1: rootG.cx, y1: rootG.y + rootG.h, x2: branchG.cx, y2: branchG.y });
+  const toRootLeafSvg = edgeFlow(root.id, rootLeaf.id, rootG, rootLeafG,
+    { x1: rootG.cx, y1: rootG.y + rootG.h, x2: rootLeafG.cx, y2: rootLeafG.y });
+  const toLeafASvg = edgeFlow(branch.id, branchLeaves[0].id, branchG, leafAG,
+    { x1: branchG.cx, y1: branchG.y + branchG.h, x2: leafAG.cx, y2: leafAG.y });
+  const toLeafBSvg = edgeFlow(branch.id, branchLeaves[1].id, branchG, leafBG,
+    { x1: branchG.cx, y1: branchG.y + branchG.h, x2: leafBG.cx, y2: leafBG.y });
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--expression',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${toBranchSvg}${toRootLeafSvg}${toLeafASvg}${toLeafBSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${resultSvg}${rootSvg}${branchSvg}${rootLeafSvg}${leafASvg}${leafBSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _expressionFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--expression" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _cursorDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 940, height = 420,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const iterator = nodes.find((n) => n && n.role === 'iterator');
+  const elements = nodes.filter((n) => n && n.role === 'element');
+  if (!client || !iterator || elements.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 940;
+  const H = Number(height) || 420;
+
+  const PAD = 24;
+  const midY = H / 2;
+
+  const CLIENT_W = 150, CLIENT_H = 96;
+  const clientG = { x: PAD, y: midY - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const ITER_W = 190, ITER_H = 176;
+  const GAP1 = 56;
+  const iteratorG = {
+    x: clientG.x + CLIENT_W + GAP1, y: midY - ITER_H / 2, w: ITER_W, h: ITER_H,
+  };
+
+  const GAP2 = 60;
+  const regionX = iteratorG.x + ITER_W + GAP2;
+  const region = { x: regionX, y: PAD, w: (W - PAD) - regionX, h: H - PAD * 2 };
+
+  const RPAD = 22;
+  const HEADER = 52;
+  const CARET_ZONE = 24;
+  const CELL_GAP = 16;
+  const CELL_MAX = 96;
+  const n = elements.length;
+  const available = region.w - RPAD * 2;
+  const cell = Math.min(CELL_MAX, (available - CELL_GAP * (n - 1)) / n);
+  const rowW = cell * n + CELL_GAP * (n - 1);
+  const rowX0 = region.x + (region.w - rowW) / 2;
+  const contentTop = region.y + HEADER;
+  const contentBottom = region.y + region.h - RPAD - CARET_ZONE;
+  const cy = (contentTop + contentBottom) / 2;
+  const elemGeom = elements.map((_, i) => {
+    const x = rowX0 + i * (cell + CELL_GAP);
+    return { x, y: cy - cell / 2, w: cell, h: cell, cx: x + cell / 2, cy };
+  });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const iteratorSvg = DiagramNode({ ...iterator, ...iteratorG, emphasis: true }, { concept: true, prefix: safeId });
+  const elemsSvg = elements.map((n2, i) => _cellNode(n2, elemGeom[i], i)).join('');
+
+  const collectionLabel = typeof model.collectionLabel === 'string' ? model.collectionLabel : '';
+  const regionSvg = _cursorRegion(region, collectionLabel);
+
+  const entrySvg = _cursorFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: iteratorG.x,           y2: iteratorG.y + iteratorG.h / 2 }, safeId);
+  const iterRightX = iteratorG.x + iteratorG.w;
+  const iterMidY = iteratorG.y + iteratorG.h / 2;
+  const spokesSvg = elemGeom
+    .map((g) => _cursorFlow({ x1: iterRightX, y1: iterMidY, x2: g.cx, y2: g.y }, safeId))
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--cursor',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${regionSvg}${entrySvg}${spokesSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${iteratorSvg}${elemsSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _cursorRegion(g, label) {
+  const labelEl = label
+    ? `
+      <text class="diagram__cursor-title" x="${r2(g.x + g.w / 2)}" y="${r2(g.y + 34)}" text-anchor="middle">${escapeText(label)}</text>`
+    : '';
+  return `
+      <rect class="diagram__cursor-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="22" ry="22" />${labelEl}`;
+}
+
+function _cellNode(node, g, index) {
+  const { id, label = '', icon = 'cube' } = node;
+  const iconSize = Math.max(18, Math.min(24, g.w * 0.26));
+  const iconEl = icon
+    ? renderIcon(icon, g.cx - iconSize / 2, g.y + g.h * 0.22, iconSize, 'diagram__cell-icon')
+    : '';
+  const labelY = g.cy + g.h * 0.32;
+  const maxW = g.w - 12;
+  const labelTL = label.length * 6.6 > maxW
+    ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"`
+    : '';
+  const caretBaseY = g.y + g.h + 15;
+  const caretTipY = g.y + g.h + 3;
+
+  return `
+    <g class="diagram__cell" data-node-id="${escapeText(id)}" data-cell-index="${index}" tabindex="0" role="listitem" aria-label="${escapeText(label)}">
+      <rect class="diagram__cell-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="14" ry="14" />${iconEl}
+      <text class="diagram__cell-label" x="${r2(g.cx)}" y="${r2(labelY)}" text-anchor="middle"${labelTL}>${escapeText(label)}</text>
+      <path class="diagram__cell-cursor" d="M ${r2(g.cx - 7)} ${r2(caretBaseY)} L ${r2(g.cx + 7)} ${r2(caretBaseY)} L ${r2(g.cx)} ${r2(caretTipY)} Z" aria-hidden="true" />
+    </g>`;
+}
+
+function _cursorFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--cursor" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _hubDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 640,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const mediator = nodes.find((n) => n && n.role === 'mediator');
+  const colleagues = nodes.filter((n) => n && n.role === 'colleague');
+  if (!mediator || colleagues.length < 2) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 640;
+
+  const PAD = 24;
+  const cx = W / 2, cy = H / 2;
+
+  const MED_W = 200, MED_H = 172;
+  const mediatorG = { x: cx - MED_W / 2, y: cy - MED_H / 2, w: MED_W, h: MED_H };
+
+  const COL_W = 160, COL_H = 96;
+  const n = colleagues.length;
+  const R = Math.min(cx - PAD - COL_W / 2, cy - PAD - COL_H / 2);
+
+  const colleagueGeom = colleagues.map((_, i) => {
+    const angle = (-90 + (360 / n) * i) * (Math.PI / 180);
+    const ccx = cx + R * Math.cos(angle);
+    const ccy = cy + R * Math.sin(angle);
+    return { x: ccx - COL_W / 2, y: ccy - COL_H / 2, w: COL_W, h: COL_H, cx: ccx, cy: ccy };
+  });
+
+  const mediatorSvg = DiagramNode({ ...mediator, ...mediatorG, emphasis: true }, { concept: true, prefix: safeId });
+  const colleagueSvg = colleagues
+    .map((n2, i) => DiagramNode({ ...n2, ...colleagueGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const spokesSvg = colleagueGeom.map((g, i) => {
+    const dx = g.cx - cx, dy = g.cy - cy;
+    const medEdge = _hubBoxEdge(mediatorG, dx, dy);
+    const colEdge = _hubBoxEdge(g, -dx, -dy);
+    return i === 0
+      ? _hubFlow({ x1: colEdge.x, y1: colEdge.y, x2: medEdge.x, y2: medEdge.y }, safeId)
+      : _hubFlow({ x1: medEdge.x, y1: medEdge.y, x2: colEdge.x, y2: colEdge.y }, safeId);
+  }).join('');
+
+  const blockedSvg = colleagueGeom.map((g, i) => {
+    const next = colleagueGeom[(i + 1) % n];
+    return _hubBlocked(g, next, cx, cy);
+  }).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--hub',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${blockedSvg}${spokesSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${mediatorSvg}${colleagueSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _broadcastDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 640,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const publisher = nodes.find((n) => n && n.role === 'publisher');
+  const subscribers = nodes.filter((n) => n && n.role === 'subscriber');
+  if (!publisher || subscribers.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 640;
+
+  const PAD = 24;
+  const cx = W / 2, cy = H / 2;
+
+  const PUB_W = 200, PUB_H = 172;
+  const pubG = { x: cx - PUB_W / 2, y: cy - PUB_H / 2, w: PUB_W, h: PUB_H };
+
+  const SUB_W = 160, SUB_H = 96;
+  const n = subscribers.length;
+  const R = Math.min(cx - PAD - SUB_W / 2, cy - PAD - SUB_H / 2);
+
+  const subGeom = subscribers.map((_, i) => {
+    const angle = (-90 + (360 / n) * i) * (Math.PI / 180);
+    const scx = cx + R * Math.cos(angle);
+    const scy = cy + R * Math.sin(angle);
+    return { x: scx - SUB_W / 2, y: scy - SUB_H / 2, w: SUB_W, h: SUB_H, cx: scx, cy: scy };
+  });
+
+  const pubSvg = DiagramNode({ ...publisher, ...pubG, emphasis: true }, { concept: true, prefix: safeId });
+  const subSvg = subscribers
+    .map((s, i) => DiagramNode({ ...s, ...subGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const flowsSvg = subGeom.map((g) => {
+    const dx = g.cx - cx, dy = g.cy - cy;
+    const pubEdge = _hubBoxEdge(pubG, dx, dy);
+    const subEdge = _hubBoxEdge(g, -dx, -dy);
+    return _broadcastFlow({ x1: pubEdge.x, y1: pubEdge.y, x2: subEdge.x, y2: subEdge.y }, safeId);
+  }).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--broadcast',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${flowsSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${pubSvg}${subSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _broadcastFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--broadcast" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _stateDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 640,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const context = nodes.find((n) => n && n.role === 'context');
+  const states = nodes.filter((n) => n && n.role === 'state');
+  if (!client || !context || states.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 640;
+
+  const PAD = 24;
+  const cy = H / 2;
+
+  const CLIENT_W = 160, CLIENT_H = 96;
+  const clientG = { x: PAD, y: cy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const CTX_W = 200, CTX_H = 172;
+  const ctxCx = W * 0.46;
+  const contextG = { x: ctxCx - CTX_W / 2, y: cy - CTX_H / 2, w: CTX_W, h: CTX_H };
+
+  const STATE_W = 180, STATE_H = 88;
+  const n = states.length;
+  const LOOP = n > 1 ? 70 : 0;
+  const stateX = W - PAD - LOOP - STATE_W;
+  const span = H - 2 * PAD - STATE_H;
+  const stateGeom = states.map((_, i) => {
+    const scy = n > 1 ? PAD + STATE_H / 2 + (span * i) / (n - 1) : cy;
+    return { x: stateX, y: scy - STATE_H / 2, w: STATE_W, h: STATE_H, cx: stateX + STATE_W / 2, cy: scy };
+  });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const contextSvg = DiagramNode({ ...context, ...contextG, emphasis: true }, { concept: true, prefix: safeId });
+  const stateSvg = states
+    .map((s, i) => DiagramNode({ ...s, ...stateGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const clientEdge = _hubBoxEdge(clientG, ctxCx - (clientG.x + CLIENT_W / 2), 0);
+  const ctxEdgeForClient = _hubBoxEdge(contextG, -(ctxCx - (clientG.x + CLIENT_W / 2)), 0);
+  const clientFlowSvg = _stateFlow(
+    { x1: clientEdge.x, y1: clientEdge.y, x2: ctxEdgeForClient.x, y2: ctxEdgeForClient.y },
+    safeId,
+  );
+
+  const stateFlowsSvg = stateGeom.map((g) => {
+    const dx = g.cx - ctxCx, dy = g.cy - cy;
+    const ctxEdge = _hubBoxEdge(contextG, dx, dy);
+    const stEdge = _hubBoxEdge(g, -dx, -dy);
+    return _stateFlow({ x1: ctxEdge.x, y1: ctxEdge.y, x2: stEdge.x, y2: stEdge.y }, safeId);
+  }).join('');
+
+  const cycleFlowSvg = n > 1
+    ? _stateCycleFlow(stateGeom[n - 1], stateGeom[0], stateX + STATE_W + LOOP - 10, safeId)
+    : '';
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--state',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${clientFlowSvg}${stateFlowsSvg}${cycleFlowSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${contextSvg}${stateSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _stateFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--state" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _stateCycleFlow(lastG, firstG, bowX, safeId) {
+  const from = { x: lastG.x + lastG.w, y: lastG.cy };
+  const to = { x: firstG.x + firstG.w, y: firstG.cy };
+  const d = `M ${r2(from.x)} ${r2(from.y)} C ${r2(bowX)} ${r2(from.y)}, ${r2(bowX)} ${r2(to.y)}, ${r2(to.x)} ${r2(to.y)}`;
+  return `
+      <path class="diagram__flow diagram__flow--state-return" d="${d}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _mementoDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 640,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const originator = nodes.find((n) => n && n.role === 'originator');
+  const memento = nodes.find((n) => n && n.role === 'memento');
+  const caretaker = nodes.find((n) => n && n.role === 'caretaker');
+  if (!originator || !memento || !caretaker) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 640;
+
+  const PAD = 24;
+  const NODE_W = 200, NODE_H = 140;
+  const ROW_Y = H * 0.22;
+
+  const originatorG = { x: PAD, y: ROW_Y, w: NODE_W, h: NODE_H };
+  const mementoG = { x: (W - NODE_W) / 2, y: ROW_Y, w: NODE_W, h: NODE_H };
+  const caretakerG = { x: W - PAD - NODE_W, y: ROW_Y, w: NODE_W, h: NODE_H };
+
+  const originatorSvg = DiagramNode({ ...originator, ...originatorG }, { concept: true, prefix: safeId });
+  const mementoSvg = DiagramNode({ ...memento, ...mementoG, emphasis: true }, { concept: true, prefix: safeId });
+  const caretakerSvg = DiagramNode({ ...caretaker, ...caretakerG }, { concept: true, prefix: safeId });
+
+  const saveFlow = _mementoFlow(
+    { x1: originatorG.x + NODE_W, y1: originatorG.y + NODE_H / 2, x2: mementoG.x, y2: mementoG.y + NODE_H / 2 },
+    safeId,
+  );
+  const pushFlow = _mementoFlow(
+    { x1: mementoG.x + NODE_W, y1: mementoG.y + NODE_H / 2, x2: caretakerG.x, y2: caretakerG.y + NODE_H / 2 },
+    safeId,
+  );
+  const restoreFlow = _mementoReturnFlow(
+    { x: caretakerG.x + NODE_W / 2, y: caretakerG.y + NODE_H },
+    { x: originatorG.x + NODE_W / 2, y: originatorG.y + NODE_H },
+    ROW_Y + NODE_H + 220,
+    safeId,
+  );
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--memento',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${saveFlow}${pushFlow}${restoreFlow}
+        </g>
+        <g class="diagram__nodes" role="list">${originatorSvg}${mementoSvg}${caretakerSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _mementoFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--memento" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _mementoReturnFlow(from, to, bowY, safeId) {
+  const d = `M ${r2(from.x)} ${r2(from.y)} C ${r2(from.x)} ${r2(bowY)}, ${r2(to.x)} ${r2(bowY)}, ${r2(to.x)} ${r2(to.y)}`;
+  return `
+      <path class="diagram__flow diagram__flow--memento-return" d="${d}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _singletonDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 880, height = 560,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const clients = nodes.filter((n) => n && n.role === 'client');
+  const instance = nodes.find((n) => n && n.role === 'instance');
+  if (clients.length === 0 || !instance) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 880;
+  const H = Number(height) || 560;
+
+  const PAD = 28;
+  const n = clients.length;
+
+  const CLIENT_W = 196, CLIENT_H = 92, GAP = 26;
+  const stackH = CLIENT_H * n + GAP * (n - 1);
+  const stackY0 = (H - stackH) / 2;
+  const clientGeom = clients.map((_, i) => ({
+    x: PAD, y: stackY0 + i * (CLIENT_H + GAP), w: CLIENT_W, h: CLIENT_H,
+  }));
+
+  const INST_W = 240, INST_H = 208;
+  const instanceG = { x: W - PAD - INST_W, y: (H - INST_H) / 2, w: INST_W, h: INST_H };
+
+  const clientsSvg = clients
+    .map((c, i) => DiagramNode({ ...c, ...clientGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+  const instanceSvg = DiagramNode({ ...instance, ...instanceG, emphasis: true }, { concept: true, prefix: safeId });
+
+  const entryY0 = instanceG.y + (n > 1 ? 28 : instanceG.h / 2);
+  const entryStep = n > 1 ? (instanceG.h - 56) / (n - 1) : 0;
+  const flowsSvg = clientGeom.map((g, i) => {
+    const p = {
+      x1: g.x + g.w, y1: g.y + g.h / 2,
+      x2: instanceG.x, y2: entryY0 + i * entryStep,
+    };
+    return _singletonFlow(p, safeId, i === 0 ? 'create' : 'reuse');
+  }).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--singleton',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${flowsSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientsSvg}${instanceSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _singletonFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--singleton-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _hubBoxEdge(box, dx, dy) {
+  const hw = box.w / 2, hh = box.h / 2;
+  const bcx = box.x + hw, bcy = box.y + hh;
+  if (dx === 0 && dy === 0) return { x: bcx, y: bcy };
+  const t = Math.min(
+    dx !== 0 ? hw / Math.abs(dx) : Infinity,
+    dy !== 0 ? hh / Math.abs(dy) : Infinity,
+  );
+  return { x: bcx + dx * t, y: bcy + dy * t };
+}
+
+function _hubFlow(p, safeId) {
+  return `
+      <path class="diagram__flow diagram__flow--hub" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _hubBlocked(a, b, cx, cy) {
+  const dx = b.cx - a.cx, dy = b.cy - a.cy;
+  const edgeA = _hubBoxEdge(a, dx, dy);
+  const edgeB = _hubBoxEdge(b, -dx, -dy);
+  const midX = (edgeA.x + edgeB.x) / 2, midY = (edgeA.y + edgeB.y) / 2;
+  const odx = midX - cx, ody = midY - cy;
+  const len = Math.hypot(odx, ody) || 1;
+  const BOW = 34;
+  const peakX = midX + (odx / len) * BOW;
+  const peakY = midY + (ody / len) * BOW;
+  const bx = 0.25 * edgeA.x + 0.5 * peakX + 0.25 * edgeB.x;
+  const by = 0.25 * edgeA.y + 0.5 * peakY + 0.25 * edgeB.y;
+
+  return `
+      <path class="diagram__hub-blocked-path" d="M ${r2(edgeA.x)} ${r2(edgeA.y)} Q ${r2(peakX)} ${r2(peakY)} ${r2(edgeB.x)} ${r2(edgeB.y)}" fill="none" aria-hidden="true" />
+      <g class="diagram__hub-blocked-badge" aria-hidden="true">
+        <circle cx="${r2(bx)}" cy="${r2(by)}" r="12" />
+        <line x1="${r2(bx - 6.5)}" y1="${r2(by + 6.5)}" x2="${r2(bx + 6.5)}" y2="${r2(by - 6.5)}" />
+      </g>`;
+}
+
+function _slotDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 820, height = 420,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const context = nodes.find((n) => n && n.role === 'context');
+  const iface = nodes.find((n) => n && n.role === 'interface');
+  const concretes = nodes.filter((n) => n && n.role === 'concrete');
+  if (!client || !context || !iface || concretes.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 820;
+  const H = Number(height) || 420;
+
+  const CLIENT_W = 160, CLIENT_H = 92;
+  const CONTEXT_W = 200, CONTEXT_H = 104;
+  const GAP1 = 54;
+  const rowCenterY = 110;
+
+  const clientG = { x: 0, y: rowCenterY - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  const contextG = {
+    x: clientG.x + CLIENT_W + GAP1, y: rowCenterY - CONTEXT_H / 2, w: CONTEXT_W, h: CONTEXT_H,
+  };
+
+  const IFACE_W = 200, IFACE_H = 148, GAP_VERT = 38;
+  const ifaceG = {
+    x: contextG.x, y: contextG.y + CONTEXT_H + GAP_VERT, w: IFACE_W, h: IFACE_H,
+  };
+
+  const CONCRETE_W = 190, CONCRETE_H = 82, INNER_GAP = 20;
+  const SIDE_PAD = 20, HEADER = 34, BOTTOM_PAD = 20, GAP2 = 60;
+  const ifaceCx = ifaceG.x + IFACE_W, ifaceCy = ifaceG.y + IFACE_H / 2;
+  const n = concretes.length;
+  const rackH = HEADER + CONCRETE_H * n + INNER_GAP * (n - 1) + BOTTOM_PAD;
+  const rackW = SIDE_PAD * 2 + CONCRETE_W;
+  const rackG = {
+    x: ifaceCx + GAP2, y: ifaceCy - rackH / 2, w: rackW, h: rackH,
+  };
+  const concreteGeom = concretes.map((_, i) => ({
+    x: rackG.x + SIDE_PAD, y: rackG.y + HEADER + i * (CONCRETE_H + INNER_GAP), w: CONCRETE_W, h: CONCRETE_H,
+  }));
+
+  const left = 0;
+  const right = rackG.x + rackG.w;
+  const top = Math.min(clientG.y, contextG.y);
+  const bottom = rackG.y + rackG.h;
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, contextG, ifaceG, rackG, ...concreteGeom].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const contextSvg = DiagramNode({ ...context, ...contextG }, { concept: true, prefix: safeId });
+  const ifaceSvg = DiagramNode({ ...iface, ...ifaceG, emphasis: true }, { concept: true, prefix: safeId });
+  const concreteSvg = concretes
+    .map((c, i) => DiagramNode({ ...c, ...concreteGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const rackLabel = typeof model.rackLabel === 'string' ? model.rackLabel : '';
+  const regionSvg = _slotRegion(rackG, rackLabel);
+
+  const entrySvg = _slotFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: contextG.x,            y2: contextG.y + contextG.h / 2 }, safeId, false);
+  const callSvg = _slotFlow(
+    { x1: contextG.x + contextG.w / 2, y1: contextG.y + contextG.h,
+      x2: ifaceG.x + ifaceG.w / 2,     y2: ifaceG.y }, safeId, false);
+  const ifaceRightX = ifaceG.x + IFACE_W;
+  const ifaceMidY = ifaceG.y + IFACE_H / 2;
+  const branchSvg = concreteGeom
+    .map((g) => _slotFlow(
+      { x1: ifaceRightX, y1: ifaceMidY, x2: g.x, y2: g.y + g.h / 2 }, safeId, true))
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--slot',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${regionSvg}${entrySvg}${callSvg}${branchSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${contextSvg}${ifaceSvg}${concreteSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _slotRegion(g, label) {
+  const labelEl = label
+    ? `
+      <text class="diagram__slot-title" x="${r2(g.x + g.w / 2)}" y="${r2(g.y + 22)}" text-anchor="middle">${escapeText(label)}</text>`
+    : '';
+  return `
+      <rect class="diagram__slot-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="20" ry="20" />${labelEl}`;
+}
+
+function _slotFlow(p, safeId, dashed) {
+  const cls = dashed ? 'diagram__flow diagram__flow--slot-candidate' : 'diagram__flow diagram__flow--slot';
+  return `
+      <path class="${cls}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _skeletonDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 900, height = 420,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const skeleton = nodes.find((n) => n && n.role === 'skeleton');
+  const concretes = nodes.filter((n) => n && n.role === 'concrete');
+  if (!client || !skeleton || concretes.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 900;
+  const H = Number(height) || 420;
+
+  const steps = Array.isArray(skeleton.steps) ? skeleton.steps : [];
+  const HEAD_H = 62, ROW_H = 48, ROW_GAP = 10, ROWS_PAD = 16;
+  const rowsH = steps.length ? steps.length * ROW_H + (steps.length - 1) * ROW_GAP : 0;
+
+  const CLIENT_W = 160, CLIENT_H = 92;
+  const SPINE_W = 254;
+  const SPINE_H = HEAD_H + ROWS_PAD * 2 + rowsH;
+
+  const GAP1 = 64, GAP2 = 60;
+  const CARD_W = 214, CARD_H = 92, CARD_GAP = 18;
+
+  const spineCy = SPINE_H / 2;
+  const clientG = { x: 0, y: spineCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  const spineG = { x: clientG.x + CLIENT_W + GAP1, y: 0, w: SPINE_W, h: SPINE_H };
+
+  const n = concretes.length;
+  const stackX = spineG.x + SPINE_W + GAP2;
+  const stackH = n * CARD_H + (n - 1) * CARD_GAP;
+  const stackTop = spineG.y + HEAD_H + ROWS_PAD + rowsH / 2 - stackH / 2;
+  const concreteGeom = concretes.map((_, i) => ({
+    x: stackX, y: stackTop + i * (CARD_H + CARD_GAP), w: CARD_W, h: CARD_H,
+  }));
+
+  const left = clientG.x;
+  const right = Math.max(spineG.x + SPINE_W, ...concreteGeom.map((g) => g.x + g.w));
+  const top = Math.min(clientG.y, spineG.y, ...concreteGeom.map((g) => g.y));
+  const bottom = Math.max(clientG.y + CLIENT_H, spineG.y + SPINE_H, ...concreteGeom.map((g) => g.y + g.h));
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, spineG, ...concreteGeom].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const spineSvg = _skeletonSpine(skeleton, spineG, steps, { HEAD_H, ROW_H, ROW_GAP, ROWS_PAD, rowsH });
+  const concreteSvg = concretes
+    .map((c, i) => DiagramNode({ ...c, ...concreteGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const portX = spineG.x + SPINE_W;
+  const portY = spineG.y + HEAD_H + ROWS_PAD + rowsH / 2;
+
+  const entrySvg = _skeletonFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: spineG.x,             y2: spineG.y + HEAD_H / 2 }, safeId, 'call');
+  const plugSvg = concreteGeom
+    .map((g) => _skeletonFlow({ x1: portX, y1: portY, x2: g.x, y2: g.y + g.h / 2 }, safeId, 'plug'))
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--skeleton',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${plugSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${spineSvg}${concreteSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _skeletonSpine(node, g, steps, dims) {
+  const { id, label = '', subtitle = '', icon = 'layers' } = node;
+  const { HEAD_H, ROW_H, ROW_GAP, ROWS_PAD, rowsH } = dims;
+
+  const CHIP = 36;
+  const chipX = g.x + 16, chipY = g.y + 13;
+  const iconEl = icon ? renderIcon(icon, chipX + 5, chipY + 5, 26, 'diagram__spine-icon') : '';
+  const titleX = chipX + CHIP + 12;
+  const maxW = g.w - (titleX - g.x) - 16;
+  const titleTL = label.length * 8 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.5 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const headSvg = `
+      <rect class="diagram__spine-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="10" ry="10" aria-hidden="true" />${iconEl}
+      <text class="diagram__spine-title" x="${r2(titleX)}" y="${r2(g.y + 26)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__spine-sub" x="${r2(titleX)}" y="${r2(g.y + 44)}"${subTL}>${escapeText(subtitle)}</text>
+      <line class="diagram__spine-divider" x1="${r2(g.x + 14)}" y1="${r2(g.y + HEAD_H)}" x2="${r2(g.x + g.w - 14)}" y2="${r2(g.y + HEAD_H)}" />`;
+
+  const rowsSvg = steps.map((step, i) => {
+    const ry = g.y + HEAD_H + ROWS_PAD + i * (ROW_H + ROW_GAP);
+    const rx = g.x + 14;
+    const rw = g.w - 28;
+    const required = step.variant === 'abstract';
+    const cls = `diagram__step${required ? ' diagram__step--required' : ' diagram__step--hook'}`;
+    const stepLabel = String(step.label ?? '');
+    return `
+      <g class="${cls}" aria-hidden="true">
+        <rect class="diagram__step-bg" x="${r2(rx)}" y="${r2(ry)}" width="${r2(rw)}" height="${ROW_H}" rx="10" ry="10" />
+        <text class="diagram__step-label" x="${r2(rx + rw / 2)}" y="${r2(ry + ROW_H / 2 + 4)}" text-anchor="middle">${escapeText(stepLabel)}</text>
+      </g>`;
+  }).join('');
+
+  const portCy = g.y + HEAD_H + ROWS_PAD + rowsH / 2;
+  const portSvg = `
+      <circle class="diagram__spine-port" cx="${r2(g.x + g.w)}" cy="${r2(portCy)}" r="7" aria-hidden="true" />`;
+
+  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+
+  return `
+    <g class="diagram__spine" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__spine-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" />${headSvg}${rowsSvg}${portSvg}
+    </g>`;
+}
+
+function _skeletonFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--skeleton-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _dispatchDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 940, height = 460,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const elements = nodes.filter((n) => n && n.role === 'element');
+  const visitor = nodes.find((n) => n && n.role === 'visitor');
+  if (!client || !visitor || elements.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 940;
+  const H = Number(height) || 460;
+
+  const CLIENT_W = 172, CLIENT_H = 96;
+  const ELEM_W = 208, ELEM_H = 92, ELEM_GAP = 66;
+  const GAP1 = 76, GAP2 = 92;
+  const VISITOR_W = 260;
+  const HEAD_H = 114, ROW_H = 50, ROW_BOTTOM_PAD = 22;
+
+  const n = elements.length;
+  const stackH = n * ELEM_H + (n - 1) * ELEM_GAP;
+  const stackTop = -stackH / 2;
+  const elementGeom = elements.map((_, i) => ({
+    x: CLIENT_W + GAP1, y: stackTop + i * (ELEM_H + ELEM_GAP), w: ELEM_W, h: ELEM_H,
+  }));
+
+  const clientG = { x: 0, y: -CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+
+  const rowCenters = elementGeom.map((g) => g.y + g.h / 2);
+  const visitorX = clientG.x + CLIENT_W + GAP1 + ELEM_W + GAP2;
+  const visitorTop = rowCenters[0] - HEAD_H - ROW_H / 2;
+  const visitorBottom = rowCenters[n - 1] + ROW_H / 2 + ROW_BOTTOM_PAD;
+  const visitorG = { x: visitorX, y: visitorTop, w: VISITOR_W, h: visitorBottom - visitorTop };
+
+  const geoms = [clientG, ...elementGeom, visitorG];
+  const left = Math.min(...geoms.map((g) => g.x));
+  const right = Math.max(...geoms.map((g) => g.x + g.w));
+  const top = Math.min(...geoms.map((g) => g.y));
+  const bottom = Math.max(...geoms.map((g) => g.y + g.h));
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  geoms.forEach((g) => { g.x += shiftX; g.y += shiftY; });
+  const rowCentersAbs = rowCenters.map((cy) => cy + shiftY);
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const elementSvg = elements
+    .map((el, i) => DiagramNode({ ...el, ...elementGeom[i] }, { concept: true, prefix: safeId }))
+    .join('');
+  const visitorSvg = _dispatchCard(visitor, visitorG, elements, rowCentersAbs, { HEAD_H, ROW_H }, safeId);
+
+  const entrySvg = elementGeom
+    .map((g) => _dispatchFlow(
+      { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2, x2: g.x, y2: g.y + g.h / 2 }, safeId, 'call'))
+    .join('');
+  const routeSvg = elementGeom
+    .map((g, i) => _dispatchFlow(
+      { x1: g.x + g.w, y1: g.y + g.h / 2, x2: visitorG.x, y2: rowCentersAbs[i] }, safeId, 'route'))
+    .join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--dispatch',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${routeSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${elementSvg}${visitorSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _dispatchCard(node, g, elements, rowCenters, dims, safeId) {
+  const { id, label = '', subtitle = '', icon = 'layers' } = node;
+  const { HEAD_H, ROW_H } = dims;
+
+  const CHIP = 40;
+  const chipX = g.x + g.w / 2 - CHIP / 2, chipY = g.y + 18;
+  const iconEl = icon ? renderIcon(icon, chipX + 6, chipY + 6, 28, 'diagram__dispatch-icon') : '';
+  const maxW = g.w - 32;
+  const titleY = chipY + CHIP + 21;
+  const subY = titleY + 19;
+  const titleTL = label.length * 8.5 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 7 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const headSvg = `
+      <rect class="diagram__dispatch-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="12" ry="12" aria-hidden="true" />${iconEl}
+      <text class="diagram__dispatch-title" x="${r2(g.x + g.w / 2)}" y="${r2(titleY)}" text-anchor="middle"${titleTL}>${escapeText(label)}</text>${
+    subtitle
+      ? `
+      <text class="diagram__dispatch-sub" x="${r2(g.x + g.w / 2)}" y="${r2(subY)}" text-anchor="middle"${subTL}>${escapeText(subtitle)}</text>`
+      : ''
+  }
+      <line class="diagram__dispatch-divider" x1="${r2(g.x + 16)}" y1="${r2(g.y + HEAD_H)}" x2="${r2(g.x + g.w - 16)}" y2="${r2(g.y + HEAD_H)}" />`;
+
+  const rowsSvg = elements.map((el, i) => {
+    const cy = rowCenters[i];
+    const ry = cy - ROW_H / 2;
+    const rx = g.x + 18;
+    const rw = g.w - 36;
+    const rowLabel = String(el.dispatch ?? '');
+    const rowMaxW = rw - 16;
+    const rowTL = rowLabel.length * 7.4 > rowMaxW ? ` textLength="${r2(rowMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+    return `
+      <g class="diagram__dispatch-row" aria-hidden="true">
+        <rect class="diagram__dispatch-row-bg" x="${r2(rx)}" y="${r2(ry)}" width="${r2(rw)}" height="${ROW_H}" rx="10" ry="10" />
+        <text class="diagram__dispatch-row-label" x="${r2(g.x + g.w / 2)}" y="${r2(cy + 4)}" text-anchor="middle"${rowTL}>${escapeText(rowLabel)}</text>
+        <circle class="diagram__dispatch-port" cx="${r2(g.x)}" cy="${r2(cy)}" r="6" />
+      </g>`;
+  }).join('');
+
+  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+
+  return `
+    <g class="diagram__dispatch" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__dispatch-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" style="fill:url(#${safeId}-grad)" />${headSvg}${rowsSvg}
+    </g>`;
+}
+
+function _dispatchFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--dispatch-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _overrideDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 880, height = 360,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const creator = nodes.find((n) => n && n.role === 'creator');
+  const product = nodes.find((n) => n && n.role === 'product');
+  if (!client || !creator || !product) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 880;
+  const H = Number(height) || 360;
+
+  const CLIENT_W = 172, CLIENT_H = 96;
+  const CREATOR_W = 276, HEAD_H = 92, ROW_H = 56, ROW_PAD = 22;
+  const CREATOR_H = HEAD_H + ROW_H + ROW_PAD;
+  const PRODUCT_W = 204, PRODUCT_H = 96;
+  const GAP1 = 68, GAP2 = 96;
+  const GHOSTS = Math.max(0, Number(creator.siblings) || 0);
+  const GHOST_STEP = 11;
+
+  let creatorG = { x: CLIENT_W + GAP1, y: 0, w: CREATOR_W, h: CREATOR_H };
+  const rowCy = creatorG.y + HEAD_H + ROW_H / 2;
+  let clientG = { x: 0, y: rowCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  let productG = {
+    x: creatorG.x + CREATOR_W + GAP2, y: rowCy - PRODUCT_H / 2, w: PRODUCT_W, h: PRODUCT_H,
+  };
+
+  const ghostSpan = GHOSTS * GHOST_STEP;
+  const left = clientG.x;
+  const right = Math.max(productG.x + productG.w, creatorG.x + CREATOR_W + ghostSpan);
+  const top = Math.min(clientG.y, creatorG.y);
+  const bottom = Math.max(
+    clientG.y + CLIENT_H, productG.y + PRODUCT_H, creatorG.y + CREATOR_H + ghostSpan,
+  );
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, creatorG, productG].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+  const rowCyAbs = rowCy + shiftY;
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const creatorSvg = _overrideCard(creator, creatorG, { HEAD_H, ROW_H, GHOSTS, GHOST_STEP }, safeId);
+  const productSvg = DiagramNode({ ...product, ...productG }, { concept: true, prefix: safeId });
+
+  const entrySvg = _overrideFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2, x2: creatorG.x, y2: creatorG.y + HEAD_H / 2 },
+    safeId, 'call');
+  const createSvg = _overrideFlow(
+    { x1: creatorG.x + CREATOR_W, y1: rowCyAbs, x2: productG.x, y2: productG.y + productG.h / 2 },
+    safeId, 'create');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--override',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${createSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${creatorSvg}${productSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _overrideCard(node, g, dims, safeId) {
+  const { id, label = '', subtitle = '', icon = 'layers', concrete = {} } = node;
+  const { HEAD_H, ROW_H, GHOSTS, GHOST_STEP } = dims;
+
+  const ghostsSvg = Array.from({ length: GHOSTS }, (_, k) => GHOSTS - k).map((n) => {
+    const dx = n * GHOST_STEP;
+    return `
+      <rect class="diagram__override-ghost" x="${r2(g.x + dx)}" y="${r2(g.y + dx)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" opacity="${r2(1 - n * 0.26)}" aria-hidden="true" />`;
+  }).join('');
+
+  const CHIP = 38;
+  const chipX = g.x + 16, chipY = g.y + 15;
+  const iconEl = icon ? renderIcon(icon, chipX + 6, chipY + 6, 26, 'diagram__override-icon') : '';
+  const titleX = chipX + CHIP + 12;
+  const maxW = g.w - (titleX - g.x) - 16;
+  const titleTL = label.length * 8 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.6 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const headSvg = `
+      <rect class="diagram__override-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="11" ry="11" aria-hidden="true" />${iconEl}
+      <text class="diagram__override-title" x="${r2(titleX)}" y="${r2(chipY + 16)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__override-sub" x="${r2(titleX)}" y="${r2(chipY + 33)}"${subTL}>${escapeText(subtitle)}</text>
+      <line class="diagram__override-divider" x1="${r2(g.x + 14)}" y1="${r2(g.y + HEAD_H)}" x2="${r2(g.x + g.w - 14)}" y2="${r2(g.y + HEAD_H)}" />`;
+
+  const rowY = g.y + HEAD_H;
+  const rowX = g.x + 14;
+  const rowW = g.w - 28;
+  const rowCy = rowY + ROW_H / 2;
+  const concreteLabel = String(concrete.label ?? '');
+  const concreteRole = String(concrete.role ?? '');
+  const rowMaxW = rowW - 44;
+  const rowTL = concreteLabel.length * 7.4 > rowMaxW ? ` textLength="${r2(rowMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const roleTL = concreteRole.length * 6 > rowMaxW ? ` textLength="${r2(rowMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const rowSvg = `
+      <g class="diagram__override-row" aria-hidden="true">
+        <rect class="diagram__override-row-bg" x="${r2(rowX)}" y="${r2(rowY)}" width="${r2(rowW)}" height="${ROW_H}" rx="12" ry="12" />${
+    concreteRole
+      ? `
+        <text class="diagram__override-row-role" x="${r2(rowX + 20)}" y="${r2(rowCy - 7)}"${roleTL}>${escapeText(concreteRole)}</text>
+        <text class="diagram__override-row-label" x="${r2(rowX + 20)}" y="${r2(rowCy + 15)}"${rowTL}>${escapeText(concreteLabel)}</text>`
+      : `
+        <text class="diagram__override-row-label" x="${r2(rowX + 20)}" y="${r2(rowCy + 4)}"${rowTL}>${escapeText(concreteLabel)}</text>`
+  }
+      </g>
+      <circle class="diagram__override-port" cx="${r2(g.x + g.w)}" cy="${r2(rowCy)}" r="7" />`;
+
+  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+
+  return `
+    <g class="diagram__override" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">${ghostsSvg}
+      <rect class="diagram__override-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" />${headSvg}${rowSvg}
+    </g>`;
+}
+
+function _overrideFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--override-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _familyDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 820, height = 480,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client   = nodes.find((n) => n && n.role === 'client');
+  const factory  = nodes.find((n) => n && n.role === 'factory');
+  const products = nodes.filter((n) => n && n.role === 'product');
+  if (!client || !factory || products.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 820;
+  const H = Number(height) || 480;
+
+  const CLIENT_W = 158, CLIENT_H = 92;
+  const FACTORY_W = 288, FACTORY_H = 150;
+  const PRODUCT_W = 206, PRODUCT_H = 124;
+  const GAP1 = 64;
+  const BRANCH_GAP = 74;
+  const PRODUCT_GAP = 36;
+  const BOUND_PAD = 22, BOUND_HEAD = 32;
+
+  const n = products.length;
+  const rowW = PRODUCT_W * n + PRODUCT_GAP * (n - 1);
+  const regionW = rowW + BOUND_PAD * 2;
+  const regionH = PRODUCT_H + BOUND_PAD * 2 + BOUND_HEAD;
+
+  let factoryG = { x: CLIENT_W + GAP1, y: 0, w: FACTORY_W, h: FACTORY_H };
+  const factoryCy = factoryG.y + FACTORY_H / 2;
+  let clientG = { x: 0, y: factoryCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  let regionG = {
+    x: factoryG.x + FACTORY_W / 2 - regionW / 2,
+    y: factoryG.y + FACTORY_H + BRANCH_GAP,
+    w: regionW, h: regionH,
+  };
+
+  let productGeoms = products.map((_, i) => ({
+    x: regionG.x + BOUND_PAD + i * (PRODUCT_W + PRODUCT_GAP),
+    y: regionG.y + BOUND_HEAD + BOUND_PAD,
+    w: PRODUCT_W, h: PRODUCT_H,
+  }));
+
+  const left = Math.min(clientG.x, regionG.x);
+  const right = Math.max(factoryG.x + FACTORY_W, regionG.x + regionW);
+  const top = Math.min(clientG.y, factoryG.y);
+  const bottom = regionG.y + regionH;
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, factoryG, regionG].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+  productGeoms = productGeoms.map((g) => ({ ...g, x: g.x + shiftX, y: g.y + shiftY }));
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const factorySvg = _familyCard(factory, factoryG, 'factory');
+  const productsSvg = products.map((p, i) => _familyCard(p, productGeoms[i], 'product')).join('');
+
+  const familyLabel = typeof model.familyLabel === 'string' ? model.familyLabel : '';
+  const regionSvg = _familyBoundary(regionG, familyLabel);
+
+  const entrySvg = _familyFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2,
+      x2: factoryG.x,            y2: factoryG.y + factoryG.h / 2 },
+    safeId, 'call');
+
+  const branchSvg = productGeoms.map((g, i) => {
+    const portX = factoryG.x + (FACTORY_W * (i + 1)) / (n + 1);
+    return _familyFlow(
+      { x1: portX, y1: factoryG.y + FACTORY_H, x2: g.x + g.w / 2, y2: g.y },
+      safeId, 'create');
+  }).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--family',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${regionSvg}${entrySvg}${branchSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${factorySvg}${productsSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _familyCard(node, g, kind) {
+  const { id, label = '', subtitle = '', icon = 'layers', concrete = {} } = node;
+  const HEAD_H = kind === 'factory' ? 70 : 62;
+
+  const CHIP = 34;
+  const chipX = g.x + 16, chipY = g.y + 14;
+  const iconEl = icon ? renderIcon(icon, chipX + 5, chipY + 5, 24, 'diagram__family-icon') : '';
+  const titleX = chipX + CHIP + 12;
+  const maxW = g.w - (titleX - g.x) - 16;
+  const titleTL = label.length * 8 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.6 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const headSvg = `
+      <rect class="diagram__family-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="10" ry="10" aria-hidden="true" />${iconEl}
+      <text class="diagram__family-title" x="${r2(titleX)}" y="${r2(chipY + 14)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__family-sub" x="${r2(titleX)}" y="${r2(chipY + 30)}"${subTL}>${escapeText(subtitle)}</text>
+      <line class="diagram__family-divider" x1="${r2(g.x + 14)}" y1="${r2(g.y + HEAD_H)}" x2="${r2(g.x + g.w - 14)}" y2="${r2(g.y + HEAD_H)}" />`;
+
+  const plateY = g.y + HEAD_H + 12;
+  const plateX = g.x + 14;
+  const plateW = g.w - 28;
+  const plateH = g.h - HEAD_H - 24;
+  const plateCy = plateY + plateH / 2;
+  const concreteLabel = String(concrete.label ?? '');
+  const concreteRole = String(concrete.role ?? '');
+  const plateMaxW = plateW - 24;
+  const roleTL = concreteRole.length * 6 > plateMaxW ? ` textLength="${r2(plateMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const labelTL = concreteLabel.length * 7.4 > plateMaxW ? ` textLength="${r2(plateMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const plateSvg = `
+      <rect class="diagram__family-plate-bg" x="${r2(plateX)}" y="${r2(plateY)}" width="${r2(plateW)}" height="${r2(plateH)}" rx="10" ry="10" />
+      <text class="diagram__family-plate-role" x="${r2(plateX + 12)}" y="${r2(plateCy - 6)}"${roleTL}>${escapeText(concreteRole)}</text>
+      <text class="diagram__family-plate-label" x="${r2(plateX + 12)}" y="${r2(plateCy + 14)}"${labelTL}>${escapeText(concreteLabel)}</text>`;
+
+  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+
+  return `
+    <g class="diagram__family diagram__family--${kind}" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__family-bg diagram__family-bg--${kind}" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="16" ry="16" />${headSvg}${plateSvg}
+    </g>`;
+}
+
+function _familyBoundary(g, label) {
+  const labelSvg = label
+    ? `
+      <text class="diagram__family-bound-title" x="${r2(g.x + g.w / 2)}" y="${r2(g.y + 21)}" text-anchor="middle">${escapeText(label)}</text>`
+    : '';
+  return `
+      <rect class="diagram__family-bound-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" />${labelSvg}`;
+}
+
+function _familyFlow(p, safeId, variant) {
+  return `
+      <circle class="diagram__family-port" cx="${r2(p.x1)}" cy="${r2(p.y1)}" r="5" aria-hidden="true" />
+      <path class="diagram__flow diagram__flow--family-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />
+      <circle class="diagram__family-port" cx="${r2(p.x2)}" cy="${r2(p.y2)}" r="5" aria-hidden="true" />`;
+}
+
+function _assemblyDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 840, height = 380,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client   = nodes.find((n) => n && n.role === 'client');
+  const builder  = nodes.find((n) => n && n.role === 'builder');
+  const director = nodes.find((n) => n && n.role === 'director');
+  const product  = nodes.find((n) => n && n.role === 'product');
+  const parts    = nodes.filter((n) => n && n.role === 'part');
+  if (!client || !builder || !product || parts.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 840;
+  const H = Number(height) || 380;
+
+  const CLIENT_W = 158, CLIENT_H = 92;
+  const BHEAD_H = 70, BPLATE_PAD = 14, BPLATE_H = 54;
+  const BUILDER_W = 230, BUILDER_H = BHEAD_H + BPLATE_PAD + BPLATE_H + BPLATE_PAD;
+  const DIRECTOR_W = 176, DIRECTOR_H = 60, DIR_GAP = 28;
+  const SLOT_W = 196, SLOT_H = 58, SLOT_GAP = 12;
+  const FRAME_PAD = 18, FRAME_HEAD = 64;
+  const GAP1 = 60, GAP2 = 68;
+
+  const n = parts.length;
+  const stackH = n * SLOT_H + (n - 1) * SLOT_GAP;
+  const frameW = SLOT_W + FRAME_PAD * 2;
+  const frameH = FRAME_HEAD + FRAME_PAD * 2 + stackH;
+
+  let builderG = { x: CLIENT_W + GAP1, y: 0, w: BUILDER_W, h: BUILDER_H };
+  const builderCy = builderG.y + BUILDER_H / 2;
+  let clientG = { x: 0, y: builderCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  let directorG = director
+    ? { x: builderG.x + BUILDER_W / 2 - DIRECTOR_W / 2, y: builderG.y - DIR_GAP - DIRECTOR_H, w: DIRECTOR_W, h: DIRECTOR_H }
+    : null;
+  let frameG = {
+    x: builderG.x + BUILDER_W + GAP2, y: builderCy - frameH / 2, w: frameW, h: frameH,
+  };
+
+  // parts[0] settles at the bottom of the frame, growing upward as each step fires
+  let slotGeoms = parts.map((_, i) => ({
+    x: frameG.x + FRAME_PAD,
+    y: frameG.y + frameH - FRAME_PAD - (i + 1) * SLOT_H - i * SLOT_GAP,
+    w: SLOT_W, h: SLOT_H,
+  }));
+
+  const boxes = [clientG, builderG, frameG, ...(directorG ? [directorG] : [])];
+  const left = Math.min(...boxes.map((g) => g.x));
+  const right = Math.max(...boxes.map((g) => g.x + g.w));
+  const top = Math.min(...boxes.map((g) => g.y));
+  const bottom = Math.max(...boxes.map((g) => g.y + g.h));
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, builderG, frameG].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+  if (directorG) { directorG.x += shiftX; directorG.y += shiftY; }
+  slotGeoms = slotGeoms.map((g) => ({ x: g.x + shiftX, y: g.y + shiftY, w: g.w, h: g.h }));
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const builderSvg = _assemblyBuilder(builder, builderG, { BHEAD_H, BPLATE_PAD, BPLATE_H });
+  const directorSvg = directorG
+    ? DiagramNode({ ...director, ...directorG }, { concept: true, prefix: safeId })
+    : '';
+  const slotsSvg = parts.map((p, i) => _assemblySlot(p, slotGeoms[i])).join('');
+  const frameSvg = _assemblyFrame(product, frameG, FRAME_HEAD);
+
+  const portX = builderG.x + BUILDER_W;
+  const portY = builderG.y + BHEAD_H + BPLATE_PAD + BPLATE_H / 2;
+
+  const entrySvg = _assemblyFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2, x2: builderG.x, y2: builderG.y + BHEAD_H / 2 },
+    safeId, 'call');
+  const buildSvg = slotGeoms.map((g) =>
+    _assemblyFlow({ x1: portX, y1: portY, x2: g.x, y2: g.y + g.h / 2 }, safeId, 'build')).join('');
+  const assembleSvg = _assemblyFlow(
+    { x1: portX, y1: portY, x2: frameG.x, y2: frameG.y + FRAME_HEAD / 2 }, safeId, 'assemble');
+  const depSvg = directorG
+    ? _assemblyDep(
+        { x1: directorG.x + directorG.w / 2, y1: directorG.y + directorG.h,
+          x2: builderG.x + BUILDER_W / 2,     y2: builderG.y },
+        safeId)
+    : '';
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--assembly',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${depSvg}${entrySvg}${buildSvg}${assembleSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${directorSvg}${builderSvg}${slotsSvg}${frameSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _assemblyBuilder(node, g, dims) {
+  const { id, label = '', subtitle = '', icon = 'layers', concrete = {} } = node;
+  const { BHEAD_H, BPLATE_PAD, BPLATE_H } = dims;
+
+  const CHIP = 36;
+  const chipX = g.x + 16, chipY = g.y + 14;
+  const iconEl = icon ? renderIcon(icon, chipX + 5, chipY + 5, 26, 'diagram__assembly-icon') : '';
+  const titleX = chipX + CHIP + 12;
+  const maxW = g.w - (titleX - g.x) - 16;
+  const titleTL = label.length * 8 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.6 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const headSvg = `
+      <rect class="diagram__assembly-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="10" ry="10" aria-hidden="true" />${iconEl}
+      <text class="diagram__assembly-title" x="${r2(titleX)}" y="${r2(chipY + 14)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__assembly-sub" x="${r2(titleX)}" y="${r2(chipY + 30)}"${subTL}>${escapeText(subtitle)}</text>
+      <line class="diagram__assembly-divider" x1="${r2(g.x + 14)}" y1="${r2(g.y + BHEAD_H)}" x2="${r2(g.x + g.w - 14)}" y2="${r2(g.y + BHEAD_H)}" />`;
+
+  const plateY = g.y + BHEAD_H + BPLATE_PAD;
+  const plateX = g.x + 14;
+  const plateW = g.w - 28;
+  const plateCy = plateY + BPLATE_H / 2;
+  const concreteLabel = String(concrete.label ?? '');
+  const concreteRole = String(concrete.role ?? '');
+  const plateMaxW = plateW - 24;
+  const roleTL = concreteRole.length * 6 > plateMaxW ? ` textLength="${r2(plateMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const labelTL = concreteLabel.length * 7.4 > plateMaxW ? ` textLength="${r2(plateMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const plateSvg = `
+      <rect class="diagram__assembly-plate-bg" x="${r2(plateX)}" y="${r2(plateY)}" width="${r2(plateW)}" height="${BPLATE_H}" rx="10" ry="10" />
+      <text class="diagram__assembly-plate-role" x="${r2(plateX + 12)}" y="${r2(plateCy - 6)}"${roleTL}>${escapeText(concreteRole)}</text>
+      <text class="diagram__assembly-plate-label" x="${r2(plateX + 12)}" y="${r2(plateCy + 14)}"${labelTL}>${escapeText(concreteLabel)}</text>
+      <circle class="diagram__assembly-port" cx="${r2(g.x + g.w)}" cy="${r2(plateCy)}" r="7" />`;
+
+  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+
+  return `
+    <g class="diagram__assembly-builder" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__assembly-builder-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" />${headSvg}${plateSvg}
+    </g>`;
+}
+
+function _assemblySlot(node, g) {
+  const { id, label = '', subtitle = '', icon = 'cube' } = node;
+
+  const CHIP = 30;
+  const chipX = g.x + 14, chipY = g.y + g.h / 2 - CHIP / 2;
+  const iconEl = icon ? renderIcon(icon, chipX + 4, chipY + 4, 22, 'diagram__assembly-slot-icon') : '';
+  const titleX = chipX + CHIP + 10;
+  const maxW = g.w - (titleX - g.x) - 14;
+  const titleTL = label.length * 7.6 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.2 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const cy = g.y + g.h / 2;
+  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+
+  return `
+    <g class="diagram__assembly-slot" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__assembly-slot-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="12" ry="12" />
+      <rect class="diagram__assembly-slot-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="9" ry="9" aria-hidden="true" />${iconEl}
+      <text class="diagram__assembly-slot-title" x="${r2(titleX)}" y="${r2(cy - 5)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__assembly-slot-sub" x="${r2(titleX)}" y="${r2(cy + 13)}"${subTL}>${escapeText(subtitle)}</text>
+    </g>`;
+}
+
+function _assemblyFrame(node, g, headH) {
+  const { id, label = '', subtitle = '', icon = 'spark' } = node;
+
+  const CHIP = 32;
+  const chipX = g.x + 14, chipY = g.y + 12;
+  const iconEl = icon ? renderIcon(icon, chipX + 5, chipY + 5, 22, 'diagram__assembly-frame-icon') : '';
+  const titleX = chipX + CHIP + 10;
+  const maxW = g.w - (titleX - g.x) - 14;
+  const titleTL = label.length * 8.4 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.4 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+
+  return `
+    <g class="diagram__assembly-frame" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__assembly-frame-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" />
+      <rect class="diagram__assembly-frame-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="9" ry="9" aria-hidden="true" />${iconEl}
+      <text class="diagram__assembly-frame-title" x="${r2(titleX)}" y="${r2(chipY + 14)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__assembly-frame-sub" x="${r2(titleX)}" y="${r2(chipY + 30)}"${subTL}>${escapeText(subtitle)}</text>
+      <line class="diagram__assembly-frame-divider" x1="${r2(g.x + 14)}" y1="${r2(g.y + headH)}" x2="${r2(g.x + g.w - 14)}" y2="${r2(g.y + headH)}" />
+    </g>`;
+}
+
+function _assemblyFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--assembly-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _assemblyDep(p, safeId) {
+  return `
+      <path class="diagram__assembly-dep-path" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _mirrorDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 800, height = 300,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const original = nodes.find((n) => n && n.role === 'original');
+  const clone = nodes.find((n) => n && n.role === 'clone');
+  if (!client || !original || !clone) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 800;
+  const H = Number(height) || 300;
+
+  const CLIENT_W = 168, CLIENT_H = 96;
+  const CARD_W = 224, HEAD_H = 84, ROW_H = 52, ROW_PAD = 18;
+  const CARD_H = HEAD_H + ROW_H + ROW_PAD;
+  const GAP1 = 60, GAP2 = 88;
+
+  let originalG = { x: CLIENT_W + GAP1, y: 0, w: CARD_W, h: CARD_H };
+  const rowCy = originalG.y + HEAD_H + ROW_H / 2;
+  let clientG = { x: 0, y: rowCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  let cloneG = { x: originalG.x + CARD_W + GAP2, y: 0, w: CARD_W, h: CARD_H };
+
+  const boxes = [clientG, originalG, cloneG];
+  const left = Math.min(...boxes.map((g) => g.x));
+  const right = Math.max(...boxes.map((g) => g.x + g.w));
+  const top = Math.min(...boxes.map((g) => g.y));
+  const bottom = Math.max(...boxes.map((g) => g.y + g.h));
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, originalG, cloneG].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+  const rowCyAbs = rowCy + shiftY;
+  const axisX = originalG.x + CARD_W + GAP2 / 2;
+
+  const dims = { HEAD_H, ROW_H };
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const originalSvg = _mirrorCard(original, originalG, false, dims, safeId);
+  const cloneSvg = _mirrorCard(clone, cloneG, true, dims, safeId);
+
+  const axisSvg = `
+      <line class="diagram__mirror-axis" x1="${r2(axisX)}" y1="${r2(originalG.y - 14)}" x2="${r2(axisX)}" y2="${r2(originalG.y + CARD_H + 14)}" aria-hidden="true" />
+      <circle class="diagram__mirror-axis-node" cx="${r2(axisX)}" cy="${r2(rowCyAbs)}" r="4" aria-hidden="true" />`;
+
+  const entrySvg = _mirrorFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2, x2: originalG.x, y2: originalG.y + HEAD_H / 2 },
+    safeId, 'call');
+  const cloneSvgFlow = _mirrorFlow(
+    { x1: originalG.x + CARD_W, y1: rowCyAbs, x2: cloneG.x, y2: rowCyAbs },
+    safeId, 'clone');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--mirror',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${cloneSvgFlow}
+        </g>
+        <g class="diagram__mirror-axis-group" aria-hidden="true">${axisSvg}</g>
+        <g class="diagram__nodes" role="list">${clientSvg}${originalSvg}${cloneSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _mirrorCard(node, g, flip, dims, safeId) {
+  const { id, label = '', subtitle = '', icon = 'cube', concrete = {} } = node;
+  const { HEAD_H, ROW_H } = dims;
+
+  const CHIP = 38;
+  const chipX = flip ? g.x + g.w - 16 - CHIP : g.x + 16;
+  const chipY = g.y + 15;
+  const iconEl = icon ? renderIcon(icon, chipX + 6, chipY + 6, 26, 'diagram__mirror-icon') : '';
+  const anchor = flip ? 'end' : 'start';
+  const titleX = flip ? chipX - 12 : chipX + CHIP + 12;
+  const maxW = g.w - CHIP - 42;
+  const titleTL = label.length * 8 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.6 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const headSvg = `
+      <rect class="diagram__mirror-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="11" ry="11" aria-hidden="true" />${iconEl}
+      <text class="diagram__mirror-title" x="${r2(titleX)}" y="${r2(chipY + 16)}" text-anchor="${anchor}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__mirror-sub" x="${r2(titleX)}" y="${r2(chipY + 33)}" text-anchor="${anchor}"${subTL}>${escapeText(subtitle)}</text>
+      <line class="diagram__mirror-divider" x1="${r2(g.x + 14)}" y1="${r2(g.y + HEAD_H)}" x2="${r2(g.x + g.w - 14)}" y2="${r2(g.y + HEAD_H)}" />`;
+
+  const rowY = g.y + HEAD_H;
+  const rowX = g.x + 14;
+  const rowW = g.w - 28;
+  const rowCy = rowY + ROW_H / 2;
+  const concreteLabel = String(concrete.label ?? '');
+  const concreteRole = String(concrete.role ?? '');
+  const rowMaxW = rowW - 20;
+  const rowTL = concreteLabel.length * 7.4 > rowMaxW ? ` textLength="${r2(rowMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const roleTL = concreteRole.length * 6 > rowMaxW ? ` textLength="${r2(rowMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const rowTextX = flip ? rowX + rowW - 20 : rowX + 20;
+
+  const rowSvg = concreteLabel
+    ? `
+      <g class="diagram__mirror-row" aria-hidden="true">
+        <rect class="diagram__mirror-row-bg" x="${r2(rowX)}" y="${r2(rowY)}" width="${r2(rowW)}" height="${ROW_H}" rx="12" ry="12" />
+        <text class="diagram__mirror-row-role" x="${r2(rowTextX)}" y="${r2(rowCy - 7)}" text-anchor="${anchor}"${roleTL}>${escapeText(concreteRole)}</text>
+        <text class="diagram__mirror-row-label" x="${r2(rowTextX)}" y="${r2(rowCy + 15)}" text-anchor="${anchor}"${rowTL}>${escapeText(concreteLabel)}</text>
+      </g>`
+    : '';
+
+  const port = flip
+    ? `<circle class="diagram__mirror-port" cx="${r2(g.x)}" cy="${r2(rowCy)}" r="7" />`
+    : `<circle class="diagram__mirror-port" cx="${r2(g.x + g.w)}" cy="${r2(rowCy)}" r="7" />`;
+
+  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+
+  return `
+    <g class="diagram__mirror diagram__mirror--${flip ? 'clone' : 'original'}" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__mirror-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="18" ry="18" />${headSvg}${rowSvg}${port}
+    </g>`;
+}
+
+function _mirrorFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--mirror-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _translateDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 420,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client  = nodes.find((n) => n && n.role === 'client');
+  const adapter = nodes.find((n) => n && n.role === 'adapter');
+  const adaptee = nodes.find((n) => n && n.role === 'adaptee');
+  const target  = nodes.find((n) => n && n.role === 'target');
+  if (!client || !adapter || !adaptee || !target) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 420;
+
+  const CLIENT_W = 168, CLIENT_H = 96;
+  const HEAD_H = 70, ROW_H = 54, ROW_PAD = 18;
+  const BOX_H = HEAD_H + ROW_H + ROW_PAD;
+  const ADAPTER_W = 228, ADAPTEE_W = 228;
+  const T_HEAD_H = 54, T_ROW_H = 46, T_ROW_PAD = 14;
+  const TARGET_W = 190, TARGET_H = T_HEAD_H + T_ROW_H + T_ROW_PAD;
+  const GAP1 = 60, GAP2 = 64, TARGET_GAP = 44;
+
+  let adapterG = { x: CLIENT_W + GAP1, y: TARGET_H + TARGET_GAP, w: ADAPTER_W, h: BOX_H };
+  const rowCy = adapterG.y + BOX_H / 2;
+  let clientG = { x: 0, y: rowCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  let adapteeG = { x: adapterG.x + ADAPTER_W + GAP2, y: rowCy - BOX_H / 2, w: ADAPTEE_W, h: BOX_H };
+  let targetG = { x: adapterG.x + ADAPTER_W / 2 - TARGET_W / 2, y: 0, w: TARGET_W, h: TARGET_H };
+
+  const boxes = [clientG, adapterG, adapteeG, targetG];
+  const left = Math.min(...boxes.map((g) => g.x));
+  const right = Math.max(...boxes.map((g) => g.x + g.w));
+  const top = Math.min(...boxes.map((g) => g.y));
+  const bottom = Math.max(...boxes.map((g) => g.y + g.h));
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  boxes.forEach((g) => { g.x += shiftX; g.y += shiftY; });
+  const rowCyAbs = rowCy + shiftY;
+
+  const dims = { HEAD_H, ROW_H };
+  const tDims = { HEAD_H: T_HEAD_H, ROW_H: T_ROW_H };
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const clientPortSvg = _translatePort(clientG, { side: 'right', shape: 'circle' });
+  const adapterSvg = _translateCard(adapter, adapterG, dims, safeId, 'adapter', [
+    { side: 'left', shape: 'circle' },
+    { side: 'right', shape: 'diamond' },
+    { side: 'top', shape: 'circle' },
+  ]);
+  const adapteeSvg = _translateCard(adaptee, adapteeG, dims, safeId, 'adaptee', [
+    { side: 'left', shape: 'diamond' },
+  ]);
+  const targetSvg = _translateCard(target, targetG, tDims, safeId, 'target', [
+    { side: 'bottom', shape: 'circle' },
+  ]);
+
+  const entrySvg = _translateFlow(
+    { x1: clientG.x + clientG.w, y1: rowCyAbs, x2: adapterG.x, y2: rowCyAbs },
+    safeId, 'call');
+  const forwardSvg = _translateFlow(
+    { x1: adapterG.x + ADAPTER_W, y1: rowCyAbs, x2: adapteeG.x, y2: rowCyAbs },
+    safeId, 'forward');
+  const shapeSvg = _translateFlow(
+    { x1: adapterG.x + ADAPTER_W / 2, y1: adapterG.y, x2: targetG.x + TARGET_W / 2, y2: targetG.y + TARGET_H },
+    safeId, 'shape');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--translate',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${forwardSvg}${shapeSvg}
+        </g>
+        <g class="diagram__translate-ports" aria-hidden="true">${clientPortSvg}</g>
+        <g class="diagram__nodes" role="list">${clientSvg}${targetSvg}${adapterSvg}${adapteeSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _translateCard(node, g, dims, safeId, role, ports = []) {
+  const { id, label = '', subtitle = '', icon = 'layers', concrete = {} } = node;
+  const { HEAD_H, ROW_H } = dims;
+
+  const CHIP = 36;
+  const chipX = g.x + 15, chipY = g.y + 13;
+  const iconEl = icon ? renderIcon(icon, chipX + 5, chipY + 5, 24, 'diagram__translate-icon') : '';
+  const titleX = chipX + CHIP + 11;
+  const maxW = g.w - (titleX - g.x) - 15;
+  const titleTL = label.length * 8 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 6.5 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const headSvg = `
+      <rect class="diagram__translate-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="10" ry="10" aria-hidden="true" />${iconEl}
+      <text class="diagram__translate-title" x="${r2(titleX)}" y="${r2(chipY + 13)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__translate-sub" x="${r2(titleX)}" y="${r2(chipY + 29)}"${subTL}>${escapeText(subtitle)}</text>
+      <line class="diagram__translate-divider" x1="${r2(g.x + 13)}" y1="${r2(g.y + HEAD_H)}" x2="${r2(g.x + g.w - 13)}" y2="${r2(g.y + HEAD_H)}" />`;
+
+  const rowY = g.y + HEAD_H;
+  const rowX = g.x + 13;
+  const rowW = g.w - 26;
+  const rowCy = rowY + ROW_H / 2;
+  const concreteLabel = String(concrete.label ?? '');
+  const concreteRole = String(concrete.role ?? '');
+  const rowMaxW = rowW - 24;
+  const roleTL = concreteRole.length * 6 > rowMaxW ? ` textLength="${r2(rowMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const labelTL = concreteLabel.length * 7.2 > rowMaxW ? ` textLength="${r2(rowMaxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const rowSvg = concreteLabel
+    ? `
+      <rect class="diagram__translate-row-bg" x="${r2(rowX)}" y="${r2(rowY)}" width="${r2(rowW)}" height="${ROW_H}" rx="10" ry="10" />
+      <text class="diagram__translate-row-role" x="${r2(rowX + 12)}" y="${r2(rowCy - 6)}"${roleTL}>${escapeText(concreteRole)}</text>
+      <text class="diagram__translate-row-label" x="${r2(rowX + 12)}" y="${r2(rowCy + 14)}"${labelTL}>${escapeText(concreteLabel)}</text>`
+    : '';
+
+  const portsSvg = ports.map((p) => _translatePort(g, p)).join('');
+
+  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+
+  return `
+    <g class="diagram__translate-card diagram__translate-card--${escapeText(role)}" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
+      <rect class="diagram__translate-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="16" ry="16" />${headSvg}${rowSvg}${portsSvg}
+    </g>`;
+}
+
+function _translatePort(g, spec) {
+  const { side, shape } = spec;
+  let cx = g.x + g.w / 2, cy = g.y + g.h / 2;
+  if (side === 'left')   { cx = g.x;         cy = g.y + g.h / 2; }
+  if (side === 'right')  { cx = g.x + g.w;   cy = g.y + g.h / 2; }
+  if (side === 'top')    { cx = g.x + g.w / 2; cy = g.y; }
+  if (side === 'bottom') { cx = g.x + g.w / 2; cy = g.y + g.h; }
+
+  const cls = `diagram__translate-port diagram__translate-port--${shape}`;
+  if (shape === 'diamond') {
+    return `<rect class="${cls}" x="${r2(cx - 6)}" y="${r2(cy - 6)}" width="12" height="12" transform="rotate(45 ${r2(cx)} ${r2(cy)})" />`;
+  }
+  return `<circle class="${cls}" cx="${r2(cx)}" cy="${r2(cy)}" r="6.5" />`;
+}
+
+function _translateFlow(p, safeId, variant) {
+  return `
+      <path class="diagram__flow diagram__flow--translate-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />`;
+}
+
+function _spanDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 900, height = 400,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const abstraction = nodes.find((n) => n && n.role === 'abstraction');
+  const refined = nodes.find((n) => n && n.role === 'refined');
+  const implementation = nodes.find((n) => n && n.role === 'implementation');
+  const concretes = nodes.filter((n) => n && n.role === 'concrete');
+  if (!abstraction || !refined || !implementation || concretes.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 900;
+  const H = Number(height) || 400;
+
+  const TOP_W = 208, IMPL_H = 110, ABSTRACTION_H = 172;
+  const BOT_H = 98;
+  const CONCRETE_W = 162;
+  const CONCRETE_GAP = 20;
+  const CANYON_GAP = 170;
+  const ROW_GAP = 72;
+
+  const topRowH = Math.max(ABSTRACTION_H, IMPL_H);
+  const rowCenterY = topRowH / 2;
+
+  let abstractionG = { x: 0, y: rowCenterY - ABSTRACTION_H / 2, w: TOP_W, h: ABSTRACTION_H };
+  let refinedG = { x: 0, y: topRowH + ROW_GAP, w: TOP_W, h: BOT_H };
+  let implG = { x: TOP_W + CANYON_GAP, y: rowCenterY - IMPL_H / 2, w: TOP_W, h: IMPL_H };
+
+  const n = concretes.length;
+  const rowW = CONCRETE_W * n + CONCRETE_GAP * (n - 1);
+  let concreteGeoms = concretes.map((_, i) => ({
+    x: implG.x + TOP_W / 2 - rowW / 2 + i * (CONCRETE_W + CONCRETE_GAP),
+    y: topRowH + ROW_GAP,
+    w: CONCRETE_W, h: BOT_H,
+  }));
+
+  const allG = [abstractionG, refinedG, implG, ...concreteGeoms];
+  const left = Math.min(...allG.map((g) => g.x));
+  const right = Math.max(...allG.map((g) => g.x + g.w));
+  const bottom = topRowH + ROW_GAP + BOT_H;
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - bottom) / 2;
+  [abstractionG, refinedG, implG].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+  concreteGeoms = concreteGeoms.map((g) => ({ ...g, x: g.x + shiftX, y: g.y + shiftY }));
+
+  const abstractionCy = abstractionG.y + ABSTRACTION_H / 2;
+
+  const abstractionSvg = DiagramNode({ ...abstraction, ...abstractionG, emphasis: true }, { concept: true, prefix: safeId });
+  const refinedSvg = DiagramNode({ ...refined, ...refinedG }, { concept: true, prefix: safeId });
+  const implSvg = DiagramNode({ ...implementation, ...implG }, { concept: true, prefix: safeId });
+  const concreteSvg = concretes
+    .map((c, i) => DiagramNode({ ...c, ...concreteGeoms[i] }, { concept: true, prefix: safeId }))
+    .join('');
+
+  const deckSvg = _spanDeck(abstractionG.x + TOP_W, implG.x, abstractionCy);
+
+  const extendSvg = _spanFlow(
+    { x1: refinedG.x + TOP_W / 2, y1: refinedG.y, x2: abstractionG.x + TOP_W / 2, y2: abstractionG.y + ABSTRACTION_H },
+    safeId, 'extend');
+  const crossSvg = _spanFlow(
+    { x1: abstractionG.x + TOP_W, y1: abstractionCy, x2: implG.x, y2: abstractionCy },
+    safeId, 'cross');
+  const realizeSvg = concreteGeoms.map((g, i) => {
+    const portX = implG.x + (TOP_W * (i + 1)) / (n + 1);
+    return _spanFlow(
+      { x1: portX, y1: implG.y + IMPL_H, x2: g.x + CONCRETE_W / 2, y2: g.y },
+      safeId, 'realize');
+  }).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--span',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__span-scenery" aria-hidden="true">${deckSvg}</g>
+        <g class="diagram__edges" aria-hidden="true">${extendSvg}${crossSvg}${realizeSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${abstractionSvg}${refinedSvg}${implSvg}${concreteSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _spanDeck(x1, x2, cy) {
+  const w = x2 - x1;
+  if (w <= 0) return '';
+  const deckSvg = `
+      <rect class="diagram__span-deck" x="${r2(x1)}" y="${r2(cy - 4)}" width="${r2(w)}" height="8" rx="4" ry="4" />`;
+  const TIES = 5;
+  let ties = '';
+  for (let i = 1; i < TIES; i += 1) {
+    const tx = x1 + (w * i) / TIES;
+    ties += `
+      <line class="diagram__span-tie" x1="${r2(tx)}" y1="${r2(cy - 12)}" x2="${r2(tx)}" y2="${r2(cy + 12)}" />`;
+  }
+  return `${deckSvg}${ties}`;
+}
+
+function _spanFlow(p, safeId, variant) {
+  return `
+      <circle class="diagram__span-port" cx="${r2(p.x1)}" cy="${r2(p.y1)}" r="5" aria-hidden="true" />
+      <path class="diagram__flow diagram__flow--span-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />
+      <circle class="diagram__span-port" cx="${r2(p.x2)}" cy="${r2(p.y2)}" r="5" aria-hidden="true" />`;
+}
+
+function _treeDiagram(model) {
+  const {
+    id = 'diagram', category = '', width = 920, height = 560,
+    title = '', description = '', caption = '',
+  } = model;
+
+  const nodes = Array.isArray(model.nodes) ? model.nodes : [];
+  const client = nodes.find((n) => n && n.role === 'client');
+  const component = nodes.find((n) => n && n.role === 'component');
+  const composite = nodes.find((n) => n && n.role === 'composite');
+  const leaves = nodes.filter((n) => n && n.role === 'leaf');
+  if (!client || !component || !composite || leaves.length === 0) return '';
+
+  const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, '') || 'diagram';
+  const titleId = `${safeId}-title`;
+  const descId = `${safeId}-desc`;
+  const W = Number(width) || 920;
+  const H = Number(height) || 560;
+
+  const CLIENT_W = 150, CLIENT_H = 92;
+  const COMPONENT_W = 220, COMPONENT_H = 172;
+  const COMPOSITE_W = 230, COMPOSITE_H = 104;
+  const LEAF_W = 190, LEAF_H = 92;
+  const GAP_CLIENT = 60, GAP_DOWN_1 = 66, GAP_DOWN_2 = 84, LEAF_GAP = 70;
+
+  let componentG = { x: CLIENT_W + GAP_CLIENT, y: 0, w: COMPONENT_W, h: COMPONENT_H };
+  const componentCy = componentG.y + COMPONENT_H / 2;
+  let clientG = { x: 0, y: componentCy - CLIENT_H / 2, w: CLIENT_W, h: CLIENT_H };
+  let compositeG = {
+    x: componentG.x + COMPONENT_W / 2 - COMPOSITE_W / 2,
+    y: componentG.y + COMPONENT_H + GAP_DOWN_1,
+    w: COMPOSITE_W, h: COMPOSITE_H,
+  };
+
+  const n = leaves.length;
+  const rowW = LEAF_W * n + LEAF_GAP * (n - 1);
+  const leafY = compositeG.y + COMPOSITE_H + GAP_DOWN_2;
+  let leafGeoms = leaves.map((_, i) => ({
+    x: compositeG.x + COMPOSITE_W / 2 - rowW / 2 + i * (LEAF_W + LEAF_GAP),
+    y: leafY, w: LEAF_W, h: LEAF_H,
+  }));
+
+  const allG = [clientG, componentG, compositeG, ...leafGeoms];
+  const left = Math.min(...allG.map((g) => g.x));
+  const right = Math.max(...allG.map((g) => g.x + g.w));
+  const top = Math.min(...allG.map((g) => g.y));
+  const bottom = Math.max(...allG.map((g) => g.y + g.h));
+  const shiftX = (W - (right - left)) / 2 - left;
+  const shiftY = (H - (bottom - top)) / 2 - top;
+  [clientG, componentG, compositeG].forEach((g) => { g.x += shiftX; g.y += shiftY; });
+  leafGeoms = leafGeoms.map((g) => ({ ...g, x: g.x + shiftX, y: g.y + shiftY }));
+
+  const clientSvg = DiagramNode({ ...client, ...clientG }, { concept: true, prefix: safeId });
+  const componentSvg = DiagramNode({ ...component, ...componentG, emphasis: true }, { concept: true, prefix: safeId });
+  const compositeSvg = _treeCard(composite, compositeG, 2);
+  const leafSvg = leaves.map((leaf, i) => _treeCard(leaf, leafGeoms[i], 0)).join('');
+
+  const entrySvg = _treeFlow(
+    { x1: clientG.x + clientG.w, y1: clientG.y + clientG.h / 2, x2: componentG.x, y2: componentCy },
+    safeId, 'call');
+  const delegateSvg = _treeFlow(
+    { x1: componentG.x + COMPONENT_W / 2, y1: componentG.y + COMPONENT_H, x2: compositeG.x + COMPOSITE_W / 2, y2: compositeG.y },
+    safeId, 'delegate');
+  const childSvg = leafGeoms.map((g) => _treeFlow(
+    { x1: compositeG.x + COMPOSITE_W / 2, y1: compositeG.y + COMPOSITE_H, x2: g.x + LEAF_W / 2, y2: g.y },
+    safeId, 'child')).join('');
+
+  const rootCls = [
+    'diagram', 'diagram--concept', 'diagram--tree',
+    category ? `diagram--${escapeText(category)}` : '',
+  ].filter(Boolean).join(' ');
+
+  const captionBlock = caption
+    ? `
+    <figcaption class="diagram__caption">${escapeText(caption)}</figcaption>`
+    : '';
+
+  return `
+  <figure class="${rootCls}">
+    <div class="diagram__viewport">
+      <svg class="diagram__svg"
+           viewBox="0 0 ${W} ${H}"
+           role="img"
+           aria-labelledby="${titleId}${description ? ` ${descId}` : ''}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <title id="${titleId}">${escapeText(title)}</title>${
+    description
+      ? `
+        <desc id="${descId}">${escapeText(description)}</desc>`
+      : ''
+  }
+        ${_conceptDefs(safeId)}
+        <g class="diagram__edges" aria-hidden="true">${entrySvg}${delegateSvg}${childSvg}
+        </g>
+        <g class="diagram__nodes" role="list">${clientSvg}${componentSvg}${compositeSvg}${leafSvg}
+        </g>
+      </svg>
+    </div>${captionBlock}
+  </figure>`;
+}
+
+function _treeCard(node, g, ghosts) {
+  const { id, label = '', subtitle = '', icon = 'layers' } = node;
+  const cy = g.y + g.h / 2;
+  const GHOST_STEP = 13;
+
+  const ghostsSvg = Array.from({ length: ghosts }, (_, k) => ghosts - k).map((nRemain) => {
+    const dx = nRemain * GHOST_STEP;
+    return `
+      <rect class="diagram__tree-ghost" x="${r2(g.x + dx)}" y="${r2(g.y + dx)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="16" ry="16" aria-hidden="true" />`;
+  }).join('');
+
+  const CHIP = 40;
+  const chipX = g.x + 14, chipY = cy - CHIP / 2;
+  const iconEl = icon ? renderIcon(icon, chipX + 7, chipY + 7, 26, 'diagram__tree-icon') : '';
+  const titleX = chipX + CHIP + 12;
+  const maxW = g.w - (titleX - g.x) - 34;
+  const titleTL = label.length * 8 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+  const subTL = subtitle.length * 7 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
+
+  const sealCx = g.x + g.w - 2, sealCy = g.y + 2;
+  const sealSvg = `
+      <circle class="diagram__tree-seal" cx="${r2(sealCx)}" cy="${r2(sealCy)}" r="13" aria-hidden="true" />${renderIcon('spark', sealCx - 7, sealCy - 7, 14, 'diagram__tree-seal-icon')}`;
+
+  const a11y = `${label} — ${subtitle}`;
+
+  return `
+    <g class="diagram__tree-card" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">${ghostsSvg}
+      <rect class="diagram__tree-bg" x="${r2(g.x)}" y="${r2(g.y)}" width="${r2(g.w)}" height="${r2(g.h)}" rx="16" ry="16" />
+      <rect class="diagram__tree-chip" x="${r2(chipX)}" y="${r2(chipY)}" width="${CHIP}" height="${CHIP}" rx="12" ry="12" aria-hidden="true" />${iconEl}
+      <text class="diagram__tree-title" x="${r2(titleX)}" y="${r2(cy - 6)}"${titleTL}>${escapeText(label)}</text>
+      <text class="diagram__tree-sub" x="${r2(titleX)}" y="${r2(cy + 14)}"${subTL}>${escapeText(subtitle)}</text>${sealSvg}
+    </g>`;
+}
+
+function _treeFlow(p, safeId, variant) {
+  return `
+      <circle class="diagram__tree-port" cx="${r2(p.x1)}" cy="${r2(p.y1)}" r="5" aria-hidden="true" />
+      <path class="diagram__flow diagram__flow--tree-${variant}" d="${curvePath(p)}" fill="none" marker-end="url(#${safeId}-flow)" aria-hidden="true" />
+      <circle class="diagram__tree-port" cx="${r2(p.x2)}" cy="${r2(p.y2)}" r="5" aria-hidden="true" />`;
+}
+

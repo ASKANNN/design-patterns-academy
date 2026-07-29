@@ -1,0 +1,413 @@
+{
+  "slug": "mediator",
+  "name": "Mediator",
+  "category": "behavioral",
+  "complexity": 2,
+  "popularity": 2,
+  "also_known_as": [
+    "Intermediary",
+    "Controller"
+  ],
+  "tags": [
+    "behavioral",
+    "communication",
+    "decoupling"
+  ],
+  "intent": {
+    "en": "Mediator is a behavioral pattern that pulls the web of interactions between a group of objects out into a separate go-between object, so the objects themselves no longer need to know about each other.",
+    "ru": "Посредник — это поведенческий паттерн, который выносит сеть взаимодействий между группой объектов в отдельный объект-координатор, избавляя сами объекты от необходимости знать друг о друге."
+  },
+  "problem": {
+    "en": "A group chat app lets several users exchange messages. If every user object calls every other user object directly to deliver a message, each user ends up hardcoding references to everyone else currently in the room.\n\nIt works with three people, but drop in a fourth and you have to rewire every existing user to know about them. Remove someone and the same rewiring happens in reverse. The web of direct references becomes a tangle that's hard to follow and even harder to change.",
+    "ru": "Групповой чат позволяет нескольким пользователям обмениваться сообщениями. Если каждый объект-пользователь напрямую вызывает каждого другого пользователя, чтобы доставить сообщение, то каждый пользователь оказывается жёстко завязан на знание обо всех остальных участниках комнаты.\n\nС тремя участниками это работает, но добавь четвёртого — и придётся перепроводить всех существующих пользователей, чтобы они знали о нём. Убери кого-то — и та же перепроводка происходит в обратную сторону. Сеть прямых ссылок превращается в клубок, который трудно понять и ещё труднее менять."
+  },
+  "solution": {
+    "en": "Mediator pulls all the cross-references out of the users and moves them into one dedicated coordinator object — the chat room. Users stop calling each other directly; instead, each one sends its message to the chat room through a single method, and the chat room looks up everyone currently registered and delivers the message to them.\n\nA user that wants to say something now just tells the chat room and forgets about who's listening. The chat room is the only place that knows the full list of participants, so users can join or leave without any other user's code changing.",
+    "ru": "Посредник забирает все перекрёстные связи из пользователей и переносит их в один выделенный объект-координатор — чат. Пользователи перестают обращаться друг к другу напрямую — вместо этого каждый отправляет своё сообщение в чат через единственный метод, а чат находит всех текущих зарегистрированных участников и доставляет им сообщение.\n\nПользователь, который хочет что-то сказать, теперь просто говорит об этом чату и забывает, кто его слушает. Только чат знает полный список участников, поэтому пользователи могут присоединяться и уходить без изменения кода других пользователей."
+  },
+  "structure": {
+    "description": {
+      "en": "Components no longer hold references to each other — only to the mediator. Each component reports events through a narrow mediator interface, and the concrete mediator, which knows about every component it coordinates, contains the actual reaction logic.",
+      "ru": "Компоненты больше не хранят ссылок друг на друга — только на посредника. Каждый компонент сообщает о событиях через узкий интерфейс посредника, а конкретный посредник, знающий обо всех координируемых компонентах, содержит саму логику реакций."
+    },
+    "participants": [
+      {
+        "name": "Mediator",
+        "role": {
+          "en": "A narrow interface, typically one method, through which components report what just happened to them without knowing who will act on it.",
+          "ru": "Узкий интерфейс, как правило из одного метода, через который компоненты сообщают о произошедшем с ними событии, не зная, кто на него отреагирует."
+        }
+      },
+      {
+        "name": "ConcreteMediator",
+        "role": {
+          "en": "Keeps references to the components it coordinates and contains the actual reaction rules — which components to update and how, in response to a reported event.",
+          "ru": "Хранит ссылки на координируемые компоненты и содержит сами правила реакции — какие компоненты и как обновлять в ответ на сообщённое событие."
+        }
+      },
+      {
+        "name": "Component (Colleague)",
+        "role": {
+          "en": "Only knows about the mediator, never about sibling components. Reports its own state changes and reacts only to calls the mediator makes on it.",
+          "ru": "Знает только о посреднике, но никогда — о соседних компонентах. Сообщает о собственных изменениях состояния и реагирует лишь на вызовы, которые делает посредник."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "class ChatMediator {\n  register(user) {}\n  sendMessage(message, sender) {}\n}\n\nclass ChatRoom extends ChatMediator {\n  #users = [];\n\n  register(user) {\n    this.#users.push(user);\n  }\n\n  sendMessage(message, sender) {\n    for (const user of this.#users) {\n      if (user !== sender) user.receive(message, sender);\n    }\n  }\n}\n\nclass User {\n  constructor(name, mediator) {\n    this.name = name;\n    this.mediator = mediator;\n    mediator.register(this);\n  }\n\n  send(message) {\n    console.log(`${this.name} sends: ${message}`);\n    this.mediator.sendMessage(message, this);\n  }\n\n  receive(message, sender) {\n    console.log(`${this.name} receives from ${sender.name}: ${message}`);\n  }\n}\n\nconst room = new ChatRoom();\nconst alice = new User('Alice', room);\nconst bob = new User('Bob', room);\nconst charlie = new User('Charlie', room);\nconst diana = new User('Diana', room);\n\nalice.send('Hello everyone!');",
+    "typescript": "interface ChatMediator {\n  register(user: User): void;\n  sendMessage(message: string, sender: User): void;\n}\n\nclass ChatRoom implements ChatMediator {\n  private users: User[] = [];\n\n  register(user: User): void {\n    this.users.push(user);\n  }\n\n  sendMessage(message: string, sender: User): void {\n    for (const user of this.users) {\n      if (user !== sender) user.receive(message, sender);\n    }\n  }\n}\n\nclass User {\n  constructor(public name: string, private mediator: ChatMediator) {\n    mediator.register(this);\n  }\n\n  send(message: string): void {\n    console.log(`${this.name} sends: ${message}`);\n    this.mediator.sendMessage(message, this);\n  }\n\n  receive(message: string, sender: User): void {\n    console.log(`${this.name} receives from ${sender.name}: ${message}`);\n  }\n}\n\nconst room = new ChatRoom();\nconst alice = new User('Alice', room);\nconst bob = new User('Bob', room);\nconst charlie = new User('Charlie', room);\nconst diana = new User('Diana', room);\n\nalice.send('Hello everyone!');",
+    "java": "interface ChatMediator {\n    void register(User user);\n    void sendMessage(String message, User sender);\n}\n\nclass ChatRoom implements ChatMediator {\n    private final List<User> users = new ArrayList<>();\n\n    public void register(User user) {\n        users.add(user);\n    }\n\n    public void sendMessage(String message, User sender) {\n        for (User user : users) {\n            if (user != sender) user.receive(message, sender);\n        }\n    }\n}\n\nclass User {\n    String name;\n    ChatMediator mediator;\n\n    User(String name, ChatMediator mediator) {\n        this.name = name;\n        this.mediator = mediator;\n        mediator.register(this);\n    }\n\n    void send(String message) {\n        System.out.println(name + \" sends: \" + message);\n        mediator.sendMessage(message, this);\n    }\n\n    void receive(String message, User sender) {\n        System.out.println(name + \" receives from \" + sender.name + \": \" + message);\n    }\n}\n\nChatRoom room = new ChatRoom();\nUser alice = new User(\"Alice\", room);\nUser bob = new User(\"Bob\", room);\nUser charlie = new User(\"Charlie\", room);\nUser diana = new User(\"Diana\", room);\n\nalice.send(\"Hello everyone!\");",
+    "csharp": "interface IChatMediator\n{\n    void Register(User user);\n    void SendMessage(string message, User sender);\n}\n\nclass ChatRoom : IChatMediator\n{\n    private readonly List<User> users = new();\n\n    public void Register(User user) => users.Add(user);\n\n    public void SendMessage(string message, User sender)\n    {\n        foreach (var user in users)\n        {\n            if (user != sender) user.Receive(message, sender);\n        }\n    }\n}\n\nclass User\n{\n    public string Name;\n    private readonly IChatMediator mediator;\n\n    public User(string name, IChatMediator mediator)\n    {\n        Name = name;\n        this.mediator = mediator;\n        mediator.Register(this);\n    }\n\n    public void Send(string message)\n    {\n        Console.WriteLine($\"{Name} sends: {message}\");\n        mediator.SendMessage(message, this);\n    }\n\n    public void Receive(string message, User sender)\n    {\n        Console.WriteLine($\"{Name} receives from {sender.Name}: {message}\");\n    }\n}\n\nvar room = new ChatRoom();\nvar alice = new User(\"Alice\", room);\nvar bob = new User(\"Bob\", room);\nvar charlie = new User(\"Charlie\", room);\nvar diana = new User(\"Diana\", room);\n\nalice.Send(\"Hello everyone!\");",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass ChatMediator(ABC):\n    @abstractmethod\n    def register(self, user: 'User') -> None: ...\n\n    @abstractmethod\n    def send_message(self, message: str, sender: 'User') -> None: ...\n\n\nclass ChatRoom(ChatMediator):\n    def __init__(self) -> None:\n        self._users: list['User'] = []\n\n    def register(self, user: 'User') -> None:\n        self._users.append(user)\n\n    def send_message(self, message: str, sender: 'User') -> None:\n        for user in self._users:\n            if user is not sender:\n                user.receive(message, sender)\n\n\nclass User:\n    def __init__(self, name: str, mediator: ChatMediator) -> None:\n        self.name = name\n        self.mediator = mediator\n        mediator.register(self)\n\n    def send(self, message: str) -> None:\n        print(f'{self.name} sends: {message}')\n        self.mediator.send_message(message, self)\n\n    def receive(self, message: str, sender: 'User') -> None:\n        print(f'{self.name} receives from {sender.name}: {message}')\n\n\nroom = ChatRoom()\nalice = User('Alice', room)\nbob = User('Bob', room)\ncharlie = User('Charlie', room)\ndiana = User('Diana', room)\n\nalice.send('Hello everyone!')"
+  },
+  "pros": [
+    {
+      "en": "Cross-component logic lives in one class instead of being smeared across every participant, so you can read the whole reaction chain in one place.",
+      "ru": "Логика взаимодействия компонентов сосредоточена в одном классе, а не размазана по каждому участнику, поэтому всю цепочку реакций можно прочитать в одном месте."
+    },
+    {
+      "en": "Components can be swapped, tested, or reused independently, since none of them hold references to the others.",
+      "ru": "Компоненты можно заменять, тестировать и переиспользовать независимо, поскольку ни один из них не хранит ссылок на другие."
+    },
+    {
+      "en": "Adding a new coordination rule usually means editing the mediator, not hunting through every component that might be affected.",
+      "ru": "Добавление нового правила координации обычно требует правки посредника, а не поиска по всем компонентам, которые могут быть задеты."
+    },
+    {
+      "en": "New component types can be plugged in by teaching the mediator about them, without touching the components that already work.",
+      "ru": "Новые типы компонентов подключаются через дополнение посредника, без изменения уже работающих компонентов."
+    }
+  ],
+  "cons": [
+    {
+      "en": "All the complexity that used to be spread across components now concentrates in the mediator, which can balloon into a class that knows and does too much.",
+      "ru": "Вся сложность, ранее распределённая по компонентам, теперь стягивается в посредника, который рискует разрастись в класс, знающий и делающий слишком много."
+    },
+    {
+      "en": "Debugging means tracing calls through an extra indirection layer instead of following a direct method call between two objects.",
+      "ru": "Отладка требует прослеживать вызовы через дополнительный слой косвенности, а не следовать за прямым вызовом метода между двумя объектами."
+    },
+    {
+      "en": "For a small, stable set of interactions the mediator can feel like unnecessary ceremony compared to a couple of direct calls.",
+      "ru": "Для небольшого и стабильного набора взаимодействий посредник может выглядеть как лишняя церемония по сравнению с парой прямых вызовов."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Mediator when a set of objects references so many of each other's methods that changing one ripples through the rest.",
+      "ru": "Применяйте Посредник, когда набор объектов обращается к методам друг друга настолько густо, что изменение одного отдаётся эхом по остальным."
+    },
+    {
+      "en": "Use it when a component can't be dropped into a new context because it's wired directly into a specific set of collaborators.",
+      "ru": "Используйте его, когда компонент нельзя перенести в новый контекст, потому что он жёстко связан с конкретным набором соседей."
+    },
+    {
+      "en": "Consider it when subclassing components just to vary how they react to each other has produced a pile of near-duplicate classes.",
+      "ru": "Рассмотрите его, если создание подклассов компонентов только ради вариаций их взаимной реакции породило кучу почти одинаковых классов."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Air traffic control towers** — aircraft never negotiate runway access with each other; every request and clearance passes through the tower.",
+      "ru": "**Диспетчерские вышки аэропортов** — воздушные суда никогда не согласовывают доступ к полосе друг с другом; каждый запрос и разрешение проходит через вышку."
+    },
+    {
+      "en": "**React Context / centralized state stores** — components dispatch actions to a shared store instead of passing callbacks down through every sibling.",
+      "ru": "**React Context и централизованные хранилища состояния** — компоненты отправляют действия в общее хранилище вместо передачи колбэков через каждого соседа по дереву."
+    },
+    {
+      "en": "**Message brokers like RabbitMQ** — publishers and consumers never connect to each other directly; the broker routes every message between them.",
+      "ru": "**Брокеры сообщений вроде RabbitMQ** — издатели и потребители никогда не соединяются друг с другом напрямую; брокер маршрутизирует между ними все сообщения."
+    }
+  ],
+  "related_patterns": [
+    "observer",
+    "command",
+    "facade",
+    "chain-of-responsibility"
+  ],
+  "quiz": [
+    {
+      "question": {
+        "en": "What does Mediator pull out of a group of interacting objects?",
+        "ru": "Что Посредник выносит из группы взаимодействующих объектов?"
+      },
+      "options": [
+        {
+          "en": "The web of interactions between them, into a separate go-between object, so the objects no longer need to know about each other",
+          "ru": "Сеть их взаимодействий, в отдельный объект-координатор, избавляя объекты от необходимости знать друг о друге"
+        },
+        {
+          "en": "Their internal state, into a private snapshot object",
+          "ru": "Их внутреннее состояние, в приватный объект-снимок"
+        },
+        {
+          "en": "Their shared interface, into a single common base class",
+          "ru": "Их общий интерфейс, в единый базовый класс"
+        },
+        {
+          "en": "Their creation logic, into a separate factory method",
+          "ru": "Их логику создания, в отдельный фабричный метод"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Mediator pulls the web of interactions between a group of objects out into a separate go-between object, so the objects themselves no longer need to know about each other.",
+        "ru": "Посредник выносит сеть взаимодействий между группой объектов в отдельный объект-координатор, избавляя сами объекты от необходимости знать друг о друге."
+      }
+    },
+    {
+      "question": {
+        "en": "What goes wrong in a group chat where every user object calls every other user directly?",
+        "ru": "Что идёт не так в групповом чате, где каждый пользователь напрямую вызывает всех остальных?"
+      },
+      "options": [
+        {
+          "en": "Adding a fourth participant requires rewiring every existing user to know about them, and removing someone reverses that",
+          "ru": "Добавление четвёртого участника требует перепроводки всех существующих пользователей, чтобы они знали о нём, а удаление кого-то — обратной перепроводки"
+        },
+        {
+          "en": "Messages can no longer be delivered to anyone",
+          "ru": "Сообщения вообще перестают доставляться кому-либо"
+        },
+        {
+          "en": "The chat works fine no matter how many users join",
+          "ru": "Чат отлично работает независимо от числа участников"
+        },
+        {
+          "en": "Users automatically lose the ability to send messages",
+          "ru": "Пользователи автоматически теряют возможность отправлять сообщения"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "It works with three people, but dropping in a fourth requires rewiring every existing user to know about them, and removing someone reverses that rewiring.",
+        "ru": "С тремя участниками это работает, но добавление четвёртого требует перепроводки всех существующих пользователей, чтобы они знали о нём, а удаление — той же перепроводки в обратную сторону."
+      }
+    },
+    {
+      "question": {
+        "en": "In the solution, how does a user send a message?",
+        "ru": "В решении — как пользователь отправляет сообщение?"
+      },
+      "options": [
+        {
+          "en": "It sends the message to the chat room through a single method, and the chat room looks up everyone registered and delivers it",
+          "ru": "Он отправляет сообщение в чат через единственный метод, а чат находит всех зарегистрированных участников и доставляет им сообщение"
+        },
+        {
+          "en": "It calls every other user's receiveMessage method directly, one by one",
+          "ru": "Он напрямую вызывает метод receiveMessage у каждого пользователя по очереди"
+        },
+        {
+          "en": "It broadcasts the message over a shared network socket without any coordinator",
+          "ru": "Он рассылает сообщение через общий сетевой сокет без какого-либо координатора"
+        },
+        {
+          "en": "It stores the message in the mediator without ever delivering it",
+          "ru": "Он сохраняет сообщение в посреднике, ни разу его не доставляя"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Each user sends its message to the chat room through a single method, and the chat room looks up everyone currently registered and delivers the message to them.",
+        "ru": "Каждый пользователь отправляет своё сообщение в чат через единственный метод, а чат находит всех текущих зарегистрированных участников и доставляет им сообщение."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a stated risk of concentrating coordination logic in the mediator?",
+        "ru": "Какой риск указан для сосредоточения координационной логики в посреднике?"
+      },
+      "options": [
+        {
+          "en": "Complexity that used to be spread across components now concentrates in the mediator, which can balloon into a class that knows and does too much",
+          "ru": "Сложность, ранее распределённая по компонентам, теперь стягивается в посредника, который рискует разрастись в класс, знающий и делающий слишком много"
+        },
+        {
+          "en": "The mediator automatically becomes stateless",
+          "ru": "Посредник автоматически становится не имеющим состояния"
+        },
+        {
+          "en": "Components gain direct references to each other again",
+          "ru": "Компоненты снова получают прямые ссылки друг на друга"
+        },
+        {
+          "en": "It becomes impossible to add a new participant",
+          "ru": "Становится невозможно добавить нового участника"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "All the complexity that used to be spread across components now concentrates in the mediator, which can balloon into a class that knows and does too much.",
+        "ru": "Вся сложность, ранее распределённая по компонентам, теперь стягивается в посредника, который рискует разрастись в класс, знающий и делающий слишком много."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a stated benefit of Mediator for testing components?",
+        "ru": "Какое преимущество Посредника указано для тестирования компонентов?"
+      },
+      "options": [
+        {
+          "en": "Components can be swapped, tested, or reused independently, since none of them hold references to the others",
+          "ru": "Компоненты можно заменять, тестировать и переиспользовать независимо, поскольку ни один из них не хранит ссылок на другие"
+        },
+        {
+          "en": "Testing components requires running the entire mediator network at once",
+          "ru": "Тестирование компонентов требует запуска всей сети посредника целиком"
+        },
+        {
+          "en": "Components can no longer be tested once a mediator is introduced",
+          "ru": "Компоненты больше нельзя тестировать после введения посредника"
+        },
+        {
+          "en": "Only the mediator itself can be tested, never the components",
+          "ru": "Тестировать можно только сам посредник, но не компоненты"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Components can be swapped, tested, or reused independently, since none of them hold references to the others.",
+        "ru": "Компоненты можно заменять, тестировать и переиспользовать независимо, поскольку ни один из них не хранит ссылок на другие."
+      }
+    }
+  ],
+  "visuals": [
+    {
+      "id": "mediator-concept",
+      "type": "flow",
+      "style": "hub",
+      "category": "behavioral",
+      "width": 920,
+      "height": 640,
+      "title": {
+        "en": "How Mediator works",
+        "ru": "Как работает Посредник"
+      },
+      "description": {
+        "en": "Components never communicate directly. Alice sends a message to the Chat Room (Mediator). The Mediator decides who receives it and routes the message to Bob, Charlie, and Diana. Adding a new participant only requires registering with the Mediator — no other component changes.",
+        "ru": "Компоненты никогда не общаются напрямую. Алиса отправляет сообщение в Чат (Посредник). Посредник решает, кто его получит, и доставляет сообщение Бобу, Чарли и Диане. Добавление нового участника требует только регистрации у Посредника — никакой другой компонент не меняется."
+      },
+      "caption": {
+        "en": "Components talk to the Mediator, never to each other.",
+        "ru": "Компоненты общаются с Посредником, но не друг с другом."
+      },
+      "nodes": [
+        {
+          "id": "mediator",
+          "role": "mediator",
+          "kind": "class",
+          "icon": "layers",
+          "label": {
+            "en": "Chat Room",
+            "ru": "Чат"
+          },
+          "subtitle": {
+            "en": "routes messages",
+            "ru": "маршрутизирует сообщения"
+          }
+        },
+        {
+          "id": "userA",
+          "role": "colleague",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Alice",
+            "ru": "Алиса"
+          },
+          "subtitle": {
+            "en": "sends & receives",
+            "ru": "отправляет и получает"
+          }
+        },
+        {
+          "id": "userB",
+          "role": "colleague",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Bob",
+            "ru": "Боб"
+          },
+          "subtitle": {
+            "en": "sends & receives",
+            "ru": "отправляет и получает"
+          }
+        },
+        {
+          "id": "userC",
+          "role": "colleague",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Charlie",
+            "ru": "Чарли"
+          },
+          "subtitle": {
+            "en": "sends & receives",
+            "ru": "отправляет и получает"
+          }
+        },
+        {
+          "id": "userD",
+          "role": "colleague",
+          "kind": "class",
+          "icon": "user",
+          "label": {
+            "en": "Diana",
+            "ru": "Диана"
+          },
+          "subtitle": {
+            "en": "sends & receives",
+            "ru": "отправляет и получает"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "userA",
+          "target": "mediator",
+          "relationship": "flow",
+          "variant": "create",
+          "label": {
+            "en": "send()",
+            "ru": "send()"
+          }
+        },
+        {
+          "source": "mediator",
+          "target": "userB",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": {
+            "en": "",
+            "ru": ""
+          }
+        },
+        {
+          "source": "mediator",
+          "target": "userC",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": {
+            "en": "",
+            "ru": ""
+          }
+        },
+        {
+          "source": "mediator",
+          "target": "userD",
+          "relationship": "flow",
+          "variant": "reuse",
+          "label": {
+            "en": "",
+            "ru": ""
+          }
+        }
+      ]
+    }
+  ]
+}

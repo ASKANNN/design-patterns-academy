@@ -1,0 +1,420 @@
+{
+  "slug": "strategy",
+  "name": "Strategy",
+  "category": "behavioral",
+  "complexity": 1,
+  "popularity": 3,
+  "also_known_as": [
+    "Policy"
+  ],
+  "tags": [
+    "behavioral",
+    "algorithm",
+    "interchangeable"
+  ],
+  "intent": {
+    "en": "Strategy packages a group of interchangeable algorithms into their own classes and lets the object using them switch between algorithms at runtime through a shared interface.",
+    "ru": "Стратегия оформляет набор взаимозаменяемых алгоритмов в виде отдельных классов и позволяет объекту, который их использует, переключаться между алгоритмами во время выполнения через общий интерфейс."
+  },
+  "problem": {
+    "en": "Imagine you're building a navigation app. Depending on how the traveler gets around — on foot or by car — the route between two points has to be calculated differently: a walking route favors footpaths and shortcuts, while a road route must follow streets and traffic rules.\n\nYou could implement all these options with a giant `if/else` block inside a `Navigator` class. But every time a new travel mode is added — cycling, public transit — you have to modify that class, violating the Open/Closed Principle and making it harder to maintain.\n\nAs the number of travel modes grows, the class becomes bloated with unrelated routing logic that is difficult to test in isolation.",
+    "ru": "Представьте, что вы создаёте навигационное приложение. В зависимости от того, как передвигается человек — пешком или на машине, — маршрут между двумя точками нужно считать по-разному: пеший маршрут предпочитает тропинки и срезки, а автомобильный обязан следовать улицам и правилам дорожного движения.\n\nМожно реализовать все варианты с помощью большого блока `if/else` внутри класса `Navigator`. Но каждый раз, когда добавляется новый способ передвижения — велосипед, общественный транспорт, — придётся менять этот класс, нарушая принцип открытости/закрытости.\n\nПо мере роста числа способов передвижения класс разбухает несвязанной логикой построения маршрута, которую сложно тестировать."
+  },
+  "solution": {
+    "en": "The Strategy pattern suggests extracting all these algorithms (route calculations) into separate classes called **strategies**. The original class, called the **context**, stores a reference to one of the strategy objects and delegates the work to it.\n\nThe context is not responsible for selecting the appropriate algorithm — the client does that. The context works with all strategies through a generic interface exposing a single method that triggers the algorithm.\n\nThis makes the context independent of concrete strategies, so you can add new travel modes without ever touching the `Navigator` class.",
+    "ru": "Паттерн Стратегия предлагает вынести все эти алгоритмы (расчёты маршрута) в отдельные классы — **стратегии**. Исходный класс, называемый **контекстом**, хранит ссылку на одну из стратегий и делегирует ей выполнение работы.\n\nКонтекст не выбирает подходящий алгоритм — это делает клиент. Контекст взаимодействует со всеми стратегиями через единый интерфейс.\n\nЭто делает контекст независимым от конкретных стратегий: можно добавлять новые способы передвижения, не изменяя класс `Navigator`."
+  },
+  "structure": {
+    "description": {
+      "en": "The Context holds a reference to a Strategy and delegates work to it. The Strategy interface is common to all supported algorithms. ConcreteStrategy classes implement each variation of the algorithm.",
+      "ru": "Контекст хранит ссылку на стратегию и делегирует ей выполнение работы. Интерфейс стратегии общий для всех поддерживаемых алгоритмов. Конкретные стратегии реализуют различные варианты алгоритма."
+    },
+    "participants": [
+      {
+        "name": "Context",
+        "role": {
+          "en": "Holds a reference to a strategy object and delegates all algorithm-specific work to it. Communicates with the strategy only through the Strategy interface.",
+          "ru": "Хранит ссылку на объект-стратегию и делегирует ей выполнение алгоритма. Взаимодействует со стратегией только через интерфейс."
+        }
+      },
+      {
+        "name": "Strategy",
+        "role": {
+          "en": "Declares an interface common to all supported versions of the algorithm. The context uses this interface to call the algorithm defined by a concrete strategy.",
+          "ru": "Объявляет интерфейс, общий для всех вариантов алгоритма. Контекст использует этот интерфейс для вызова алгоритма, определённого конкретной стратегией."
+        }
+      },
+      {
+        "name": "ConcreteStrategy",
+        "role": {
+          "en": "Implements a specific version of the algorithm using the Strategy interface.",
+          "ru": "Реализует конкретный вариант алгоритма, используя интерфейс стратегии."
+        }
+      },
+      {
+        "name": "Client",
+        "role": {
+          "en": "Creates a specific strategy object and passes it to the context. The context exposes a setter that lets clients replace the strategy at runtime.",
+          "ru": "Создаёт объект-стратегию и передаёт его контексту. Контекст предоставляет сеттер, позволяющий клиентам заменять стратегию во время выполнения."
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "javascript": "class RouteStrategy {\n  calculate(from, to) {\n    throw new Error('calculate() must be implemented');\n  }\n}\n\nclass WalkingRoute extends RouteStrategy {\n  calculate(from, to) {\n    return `Walking route from ${from} to ${to} via footpaths`;\n  }\n}\n\nclass RoadRoute extends RouteStrategy {\n  calculate(from, to) {\n    return `Driving route from ${from} to ${to} via roads`;\n  }\n}\n\nclass Navigator {\n  #strategy;\n\n  constructor(strategy) {\n    this.#strategy = strategy;\n  }\n\n  setStrategy(strategy) {\n    this.#strategy = strategy;\n  }\n\n  buildRoute(from, to) {\n    return this.#strategy.calculate(from, to);\n  }\n}\n\nconst navigator = new Navigator(new WalkingRoute());\nconsole.log(navigator.buildRoute('Home', 'Park'));\n\nnavigator.setStrategy(new RoadRoute());\nconsole.log(navigator.buildRoute('Home', 'Park'));",
+    "typescript": "interface RouteStrategy {\n  calculate(from: string, to: string): string;\n}\n\nclass WalkingRoute implements RouteStrategy {\n  calculate(from: string, to: string): string {\n    return `Walking route from ${from} to ${to} via footpaths`;\n  }\n}\n\nclass RoadRoute implements RouteStrategy {\n  calculate(from: string, to: string): string {\n    return `Driving route from ${from} to ${to} via roads`;\n  }\n}\n\nclass Navigator {\n  private strategy: RouteStrategy;\n\n  constructor(strategy: RouteStrategy) {\n    this.strategy = strategy;\n  }\n\n  setStrategy(strategy: RouteStrategy): void {\n    this.strategy = strategy;\n  }\n\n  buildRoute(from: string, to: string): string {\n    return this.strategy.calculate(from, to);\n  }\n}\n\nconst navigator = new Navigator(new WalkingRoute());\nconsole.log(navigator.buildRoute('Home', 'Park'));\n\nnavigator.setStrategy(new RoadRoute());\nconsole.log(navigator.buildRoute('Home', 'Park'));",
+    "java": "interface RouteStrategy {\n    String calculate(String from, String to);\n}\n\nclass WalkingRoute implements RouteStrategy {\n    public String calculate(String from, String to) {\n        return \"Walking route from \" + from + \" to \" + to + \" via footpaths\";\n    }\n}\n\nclass RoadRoute implements RouteStrategy {\n    public String calculate(String from, String to) {\n        return \"Driving route from \" + from + \" to \" + to + \" via roads\";\n    }\n}\n\nclass Navigator {\n    private RouteStrategy strategy;\n\n    Navigator(RouteStrategy strategy) {\n        this.strategy = strategy;\n    }\n\n    void setStrategy(RouteStrategy strategy) {\n        this.strategy = strategy;\n    }\n\n    String buildRoute(String from, String to) {\n        return strategy.calculate(from, to);\n    }\n}\n\nNavigator navigator = new Navigator(new WalkingRoute());\nSystem.out.println(navigator.buildRoute(\"Home\", \"Park\"));\n\nnavigator.setStrategy(new RoadRoute());\nSystem.out.println(navigator.buildRoute(\"Home\", \"Park\"));",
+    "csharp": "interface IRouteStrategy\n{\n    string Calculate(string from, string to);\n}\n\nclass WalkingRoute : IRouteStrategy\n{\n    public string Calculate(string from, string to) => $\"Walking route from {from} to {to} via footpaths\";\n}\n\nclass RoadRoute : IRouteStrategy\n{\n    public string Calculate(string from, string to) => $\"Driving route from {from} to {to} via roads\";\n}\n\nclass Navigator\n{\n    private IRouteStrategy strategy;\n\n    public Navigator(IRouteStrategy strategy) => this.strategy = strategy;\n\n    public void SetStrategy(IRouteStrategy strategy) => this.strategy = strategy;\n\n    public string BuildRoute(string from, string to) => strategy.Calculate(from, to);\n}\n\nvar navigator = new Navigator(new WalkingRoute());\nConsole.WriteLine(navigator.BuildRoute(\"Home\", \"Park\"));\n\nnavigator.SetStrategy(new RoadRoute());\nConsole.WriteLine(navigator.BuildRoute(\"Home\", \"Park\"));",
+    "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass RouteStrategy(ABC):\n    @abstractmethod\n    def calculate(self, start: str, end: str) -> str: ...\n\n\nclass WalkingRoute(RouteStrategy):\n    def calculate(self, start: str, end: str) -> str:\n        return f'Walking route from {start} to {end} via footpaths'\n\n\nclass RoadRoute(RouteStrategy):\n    def calculate(self, start: str, end: str) -> str:\n        return f'Driving route from {start} to {end} via roads'\n\n\nclass Navigator:\n    def __init__(self, strategy: RouteStrategy) -> None:\n        self._strategy = strategy\n\n    def set_strategy(self, strategy: RouteStrategy) -> None:\n        self._strategy = strategy\n\n    def build_route(self, start: str, end: str) -> str:\n        return self._strategy.calculate(start, end)\n\n\nnavigator = Navigator(WalkingRoute())\nprint(navigator.build_route('Home', 'Park'))\n\nnavigator.set_strategy(RoadRoute())\nprint(navigator.build_route('Home', 'Park'))"
+  },
+  "pros": [
+    {
+      "en": "New algorithms can be added as new strategy classes, without editing the context or any existing strategy.",
+      "ru": "Новые алгоритмы добавляются как новые классы стратегий — без правок контекста и уже существующих стратегий."
+    },
+    {
+      "en": "The active algorithm can be swapped while the program is running, simply by handing the context a different strategy object.",
+      "ru": "Активный алгоритм можно заменить прямо во время работы программы, просто передав контексту другой объект-стратегию."
+    },
+    {
+      "en": "Each algorithm becomes independently testable, since it lives in its own class with no dependency on the context's internals.",
+      "ru": "Каждый алгоритм можно тестировать отдельно, поскольку он находится в своём классе и не зависит от внутреннего устройства контекста."
+    },
+    {
+      "en": "A tangled chain of conditionals gets replaced by composition: the context simply holds and delegates to an object.",
+      "ru": "Запутанная цепочка условных операторов заменяется композицией: контекст просто хранит объект и делегирует ему работу."
+    }
+  ],
+  "cons": [
+    {
+      "en": "For a handful of algorithms that almost never change, a strategy hierarchy adds more ceremony than a simple conditional would.",
+      "ru": "Если алгоритмов немного и они почти не меняются, иерархия стратегий добавляет больше формальностей, чем простое условие."
+    },
+    {
+      "en": "The calling code has to know which strategies exist and what each one is for, so the decision logic doesn't disappear — it just moves to the client.",
+      "ru": "Вызывающий код должен знать, какие стратегии существуют и для чего каждая из них нужна, — логика выбора никуда не исчезает, а просто переносится к клиенту."
+    },
+    {
+      "en": "In languages with first-class functions, a single-method strategy interface can often be replaced by passing a plain function or closure instead.",
+      "ru": "В языках с функциями первого класса интерфейс стратегии с одним методом часто можно заменить обычной функцией или замыканием."
+    }
+  ],
+  "when_to_use": [
+    {
+      "en": "Reach for Strategy when an object needs to pick between several variants of a behavior and that choice may change while the program runs.",
+      "ru": "Применяйте Стратегию, когда объекту нужно выбирать между несколькими вариантами поведения и этот выбор может меняться во время работы программы."
+    },
+    {
+      "en": "It also helps when several classes are nearly identical except for one piece of behavior — that piece becomes the strategy, and the classes collapse into one.",
+      "ru": "Паттерн полезен и тогда, когда несколько классов почти идентичны и отличаются лишь одним фрагментом поведения — этот фрагмент выносится в стратегию, а классы объединяются в один."
+    },
+    {
+      "en": "Use it to keep an algorithm's implementation details out of a class whose main job is unrelated business logic.",
+      "ru": "Используйте паттерн, чтобы детали реализации алгоритма не засоряли класс, чья основная задача — не связанная с ними бизнес-логика."
+    }
+  ],
+  "real_world_examples": [
+    {
+      "en": "**Payment gateways** — checkout can switch between Stripe, PayPal, or Apple Pay without changing the cart logic.",
+      "ru": "**Платёжные шлюзы** — на странице оплаты можно переключаться между Stripe, PayPal или Apple Pay, не меняя логику корзины."
+    },
+    {
+      "en": "**`Array.prototype.sort()`** — the comparator function you pass is a strategy that defines how elements are ordered.",
+      "ru": "**`Array.prototype.sort()`** — функция-компаратор, переданная в `sort()`, является стратегией, определяющей порядок элементов."
+    },
+    {
+      "en": "**File compression** — archiving tools let users choose between ZIP, GZIP, or BZIP2 without changing the archiving UI.",
+      "ru": "**Сжатие файлов** — архиватор позволяет выбрать формат (ZIP, GZIP, BZIP2), не меняя интерфейс программы."
+    }
+  ],
+  "related_patterns": [
+    "state",
+    "template-method",
+    "command",
+    "decorator"
+  ],
+  "quiz": [
+    {
+      "question": {
+        "en": "What does Strategy package into their own classes?",
+        "ru": "Что Стратегия оформляет в виде отдельных классов?"
+      },
+      "options": [
+        {
+          "en": "A group of interchangeable algorithms, letting the object using them switch at runtime through a shared interface",
+          "ru": "Набор взаимозаменяемых алгоритмов, позволяя объекту, который их использует, переключаться между ними во время выполнения через общий интерфейс"
+        },
+        {
+          "en": "The internal state of an object, for later restoration",
+          "ru": "Внутреннее состояние объекта для последующего восстановления"
+        },
+        {
+          "en": "The web of interactions between several components",
+          "ru": "Сеть взаимодействий между несколькими компонентами"
+        },
+        {
+          "en": "A tree of grammar rules for a small language",
+          "ru": "Дерево правил грамматики маленького языка"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Strategy packages a group of interchangeable algorithms into their own classes and lets the object using them switch between algorithms at runtime through a shared interface.",
+        "ru": "Стратегия оформляет набор взаимозаменяемых алгоритмов в виде отдельных классов и позволяет объекту, который их использует, переключаться между алгоритмами во время выполнения через общий интерфейс."
+      }
+    },
+    {
+      "question": {
+        "en": "What problem does a giant if/else block inside Navigator cause as travel modes are added?",
+        "ru": "Какую проблему создаёт гигантский блок if/else внутри Navigator по мере добавления способов передвижения?"
+      },
+      "options": [
+        {
+          "en": "Every new travel mode requires modifying that class, violating the Open/Closed Principle and bloating it with unrelated logic",
+          "ru": "Каждый новый способ передвижения требует изменения этого класса, нарушая принцип открытости/закрытости и раздувая его несвязанной логикой"
+        },
+        {
+          "en": "Walking routes stop working entirely once a car mode is added",
+          "ru": "Пешие маршруты полностью перестают работать после добавления автомобильного режима"
+        },
+        {
+          "en": "The class becomes smaller with every new travel mode added",
+          "ru": "Класс становится меньше с каждым добавленным способом передвижения"
+        },
+        {
+          "en": "It removes the need for the Navigator class altogether",
+          "ru": "Это полностью устраняет необходимость в классе Navigator"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Every time a new travel mode is added, you have to modify that class, violating the Open/Closed Principle, and the class becomes bloated with unrelated routing logic that's hard to test in isolation.",
+        "ru": "Каждый раз при добавлении нового способа передвижения приходится менять этот класс, нарушая принцип открытости/закрытости, и класс разбухает несвязанной логикой построения маршрута, которую сложно тестировать."
+      }
+    },
+    {
+      "question": {
+        "en": "Who selects the appropriate strategy in the Strategy pattern?",
+        "ru": "Кто выбирает подходящую стратегию в паттерне Стратегия?"
+      },
+      "options": [
+        {
+          "en": "The client — the context is not responsible for selecting the algorithm",
+          "ru": "Клиент — контекст не отвечает за выбор алгоритма"
+        },
+        {
+          "en": "The context always picks a random strategy",
+          "ru": "Контекст всегда выбирает случайную стратегию"
+        },
+        {
+          "en": "Each strategy selects itself automatically at compile time",
+          "ru": "Каждая стратегия сама выбирает себя на этапе компиляции"
+        },
+        {
+          "en": "The base Navigator class hardcodes the choice",
+          "ru": "Базовый класс Navigator жёстко фиксирует выбор"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The context is not responsible for selecting the appropriate algorithm — the client does that.",
+        "ru": "Контекст не выбирает подходящий алгоритм — это делает клиент."
+      }
+    },
+    {
+      "question": {
+        "en": "How does the context interact with strategies?",
+        "ru": "Как контекст взаимодействует со стратегиями?"
+      },
+      "options": [
+        {
+          "en": "Through a generic interface exposing a single method that triggers the algorithm, making the context independent of concrete strategies",
+          "ru": "Через единый интерфейс с единственным методом, запускающим алгоритм, — это делает контекст независимым от конкретных стратегий"
+        },
+        {
+          "en": "By copy-pasting each strategy's code directly into itself",
+          "ru": "Копируя код каждой стратегии напрямую внутрь себя"
+        },
+        {
+          "en": "By calling a different method name for every concrete strategy class",
+          "ru": "Вызывая разное имя метода для каждого конкретного класса стратегии"
+        },
+        {
+          "en": "It never interacts with strategies directly, only through the client",
+          "ru": "Он вообще никогда не взаимодействует со стратегиями напрямую, только через клиента"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The context works with all strategies through a generic interface exposing a single method that triggers the algorithm, making it independent of concrete strategies.",
+        "ru": "Контекст взаимодействует со всеми стратегиями через единый интерфейс, выставляющий один метод, запускающий алгоритм, — это делает контекст независимым от конкретных стратегий."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a stated alternative to a single-method strategy interface in languages with first-class functions?",
+        "ru": "Какая альтернатива интерфейсу стратегии с одним методом указана для языков с функциями первого класса?"
+      },
+      "options": [
+        {
+          "en": "It can often be replaced by passing a plain function or closure instead",
+          "ru": "Его часто можно заменить обычной функцией или замыканием"
+        },
+        {
+          "en": "There is no alternative — a full class hierarchy is always required",
+          "ru": "Альтернативы нет — полноценная иерархия классов требуется всегда"
+        },
+        {
+          "en": "Strategies must always be implemented as global variables",
+          "ru": "Стратегии всегда обязаны быть реализованы как глобальные переменные"
+        },
+        {
+          "en": "First-class functions make the Strategy pattern impossible to use",
+          "ru": "Функции первого класса делают паттерн Стратегия невозможным для использования"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "In languages with first-class functions, a single-method strategy interface can often be replaced by passing a plain function or closure instead.",
+        "ru": "В языках с функциями первого класса интерфейс стратегии с одним методом часто можно заменить обычной функцией или замыканием."
+      }
+    }
+  ],
+  "visuals": [
+    {
+      "id": "strategy-concept",
+      "type": "flow",
+      "style": "slot",
+      "category": "behavioral",
+      "width": 820,
+      "height": 420,
+      "title": {
+        "en": "How Strategy works",
+        "ru": "Как работает Стратегия"
+      },
+      "description": {
+        "en": "The Context always calls the same calculate() method on whatever object currently occupies its RouteStrategy slot. Only the Client is allowed to change what sits in that slot — swapping the Walking route for the Road route changes the result without touching a single line of the Context.",
+        "ru": "Контекст всегда вызывает один и тот же метод calculate() у того объекта, что сейчас занимает его слот RouteStrategy. Только Клиент может изменить содержимое этого слота — замена Пешего маршрута на Авто меняет результат, не трогая ни строки в самом Контексте."
+      },
+      "caption": {
+        "en": "Same call, same slot — a different object plugged in changes the result.",
+        "ru": "Тот же вызов, тот же слот — другой объект внутри меняет результат."
+      },
+      "rackLabel": {
+        "en": "Strategy slot",
+        "ru": "Слот стратегии"
+      },
+      "nodes": [
+        {
+          "id": "client",
+          "role": "client",
+          "kind": "actor",
+          "icon": "user",
+          "label": {
+            "en": "Client",
+            "ru": "Клиент"
+          },
+          "subtitle": {
+            "en": "picks the strategy",
+            "ru": "выбирает стратегию"
+          }
+        },
+        {
+          "id": "context",
+          "role": "context",
+          "kind": "class",
+          "icon": "layers",
+          "label": {
+            "en": "Navigator",
+            "ru": "Навигатор"
+          },
+          "subtitle": {
+            "en": "always calls calculate()",
+            "ru": "всегда вызывает calculate()"
+          }
+        },
+        {
+          "id": "strategy",
+          "role": "interface",
+          "kind": "interface",
+          "icon": "spark",
+          "emphasis": true,
+          "label": {
+            "en": "RouteStrategy",
+            "ru": "СтратегияПути"
+          },
+          "subtitle": {
+            "en": "current strategy slot",
+            "ru": "текущий слот стратегии"
+          }
+        },
+        {
+          "id": "ground",
+          "role": "concrete",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "WalkingRoute",
+            "ru": "ПешийМаршрут"
+          },
+          "subtitle": {
+            "en": "on foot",
+            "ru": "пешком"
+          }
+        },
+        {
+          "id": "air",
+          "role": "concrete",
+          "kind": "class",
+          "icon": "cube",
+          "label": {
+            "en": "RoadRoute",
+            "ru": "АвтоМаршрут"
+          },
+          "subtitle": {
+            "en": "by car",
+            "ru": "на машине"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "client",
+          "target": "context",
+          "relationship": "flow",
+          "label": {
+            "en": "setStrategy()",
+            "ru": "выбратьСтратегию()"
+          }
+        },
+        {
+          "source": "context",
+          "target": "strategy",
+          "relationship": "flow",
+          "label": {
+            "en": "calculate()",
+            "ru": "рассчитать()"
+          }
+        },
+        {
+          "source": "strategy",
+          "target": "ground",
+          "relationship": "flow",
+          "label": {
+            "en": "run",
+            "ru": "запуск"
+          }
+        },
+        {
+          "source": "strategy",
+          "target": "air",
+          "relationship": "flow",
+          "label": {
+            "en": "run",
+            "ru": "запуск"
+          }
+        }
+      ]
+    }
+  ]
+}
