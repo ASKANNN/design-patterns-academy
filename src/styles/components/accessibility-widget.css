@@ -235,7 +235,11 @@ body.a11y-contrast-high {
   --color-bg-base:        #FFFFFF;
   --color-bg-surface:     #FFFFFF;
   --color-bg-elevated:    #FFFFFF;
+  --color-bg-subtle:      #E5E5E5;
   --color-text-link:      #0000EE;
+  --color-accent:         #0000EE;
+  --color-accent-hover:   #0000EE;
+  --color-accent-pressed: #0000EE;
 }
 
 /* Инверсия и монохром компонуются через переменные --a11y-grayscale/--a11y-invert,
