@@ -16,41 +16,41 @@
   ],
   "intent": {
     "en": "Memento is a behavioral pattern that captures an object's internal state into a separate snapshot object, so that state can later be restored without any outside code ever seeing what the snapshot contains.",
-    "ru": "Снимок — это поведенческий паттерн, который фиксирует внутреннее состояние объекта в отдельном объекте-снимке, чтобы позже восстановить это состояние, не раскрывая посторонним, что именно снимок хранит."
+    "ru": "Снимок - это поведенческий паттерн, который фиксирует внутреннее состояние объекта в отдельном объекте-снимке, чтобы позже восстановить это состояние, не раскрывая посторонним, что именно снимок хранит."
   },
   "problem": {
-    "en": "A vector-graphics app needs undo: before every move, resize, or color change, it should remember how the shape looked a moment ago. The obvious approach is to have the undo manager reach into the shape and copy out its fields.\n\nThat forces the shape to expose everything an outside snapshot-taker might ever need — position, dimensions, fill, stroke, z-order — as public fields or getters. The shape's internals are now part of its public contract, so refactoring its internal representation later means also rewriting the undo manager. And every new property added to the shape has to be remembered by whoever is copying it from outside.",
-    "ru": "Векторному редактору нужна отмена действий: перед каждым перемещением, изменением размера или цвета он должен запомнить, как фигура выглядела мгновение назад. Напрашивающийся вариант — дать менеджеру отмены залезть внутрь фигуры и скопировать её поля.\n\nЭто вынуждает фигуру раскрыть всё, что может понадобиться внешнему коду для снимка, — позицию, размеры, заливку, обводку, порядок отрисовки — в виде публичных полей или геттеров. Внутреннее устройство фигуры становится частью её публичного контракта, поэтому изменение внутреннего представления позже потребует переписывать и менеджер отмены. А каждое новое свойство фигуры придётся не забыть учесть тому, кто копирует её состояние снаружи."
+    "en": "A vector-graphics app needs undo: before every move, resize, or color change, it should remember how the shape looked a moment ago. The obvious approach is to have the undo manager reach into the shape and copy out its fields.\n\nThat forces the shape to expose everything an outside snapshot-taker might ever need - position, dimensions, fill, stroke, z-order - as public fields or getters. The shape's internals are now part of its public contract, so refactoring its internal representation later means also rewriting the undo manager. And every new property added to the shape has to be remembered by whoever is copying it from outside.",
+    "ru": "Векторному редактору нужна отмена действий: перед каждым перемещением, изменением размера или цвета он должен запомнить, как фигура выглядела мгновение назад. Напрашивающийся вариант - дать менеджеру отмены залезть внутрь фигуры и скопировать её поля.\n\nЭто вынуждает фигуру раскрыть всё, что может понадобиться внешнему коду для снимка, - позицию, размеры, заливку, обводку, порядок отрисовки - в виде публичных полей или геттеров. Внутреннее устройство фигуры становится частью её публичного контракта, поэтому изменение внутреннего представления позже потребует переписывать и менеджер отмены. А каждое новое свойство фигуры придётся не забыть учесть тому, кто копирует её состояние снаружи."
   },
   "solution": {
-    "en": "Memento moves the job of taking a snapshot inside the object that owns the state — the **originator**. Since the originator already has full access to its own fields, it can package a private copy of them into a **memento** object and hand that memento back to whoever asked for it.\n\nThe memento itself is opaque to everyone except the originator that created it: outside code can hold onto it, store it, or pass it back later to be restored, but it can't peek inside or modify what it holds. The object responsible for keeping a history of these mementos — the **caretaker** — never needs to know what a shape's position or fill color actually is; it just archives snapshots and returns them on request.",
-    "ru": "Паттерн Снимок переносит создание снимка внутрь объекта, владеющего состоянием, — объекта-**создателя** (originator). Поскольку у создателя уже есть полный доступ к собственным полям, он может упаковать их приватную копию в объект-**снимок** (memento) и вернуть его тому, кто запросил.\n\nСам снимок непрозрачен для всех, кроме создавшего его создателя: внешний код может хранить снимок, передавать его дальше и позже вернуть для восстановления, но не может заглянуть внутрь или изменить содержимое. Объект, отвечающий за хранение истории таких снимков, — **опекун** (caretaker) — вообще не должен знать, чему равна позиция фигуры или цвет заливки; он просто архивирует снимки и возвращает их по запросу."
+    "en": "Memento moves the job of taking a snapshot inside the object that owns the state - the **originator**. Since the originator already has full access to its own fields, it can package a private copy of them into a **memento** object and hand that memento back to whoever asked for it.\n\nThe memento itself is opaque to everyone except the originator that created it: outside code can hold onto it, store it, or pass it back later to be restored, but it can't peek inside or modify what it holds. The object responsible for keeping a history of these mementos - the **caretaker** - never needs to know what a shape's position or fill color actually is; it just archives snapshots and returns them on request.",
+    "ru": "Паттерн Снимок переносит создание снимка внутрь объекта, владеющего состоянием, - объекта-**создателя** (originator). Поскольку у создателя уже есть полный доступ к собственным полям, он может упаковать их приватную копию в объект-**снимок** (memento) и вернуть его тому, кто запросил.\n\nСам снимок непрозрачен для всех, кроме создавшего его создателя: внешний код может хранить снимок, передавать его дальше и позже вернуть для восстановления, но не может заглянуть внутрь или изменить содержимое. Объект, отвечающий за хранение истории таких снимков, - **опекун** (caretaker) - вообще не должен знать, чему равна позиция фигуры или цвет заливки; он просто архивирует снимки и возвращает их по запросу."
   },
   "structure": {
     "description": {
-      "en": "The Originator is the only party that can read or write the full contents of a Memento — it builds one from its current fields and can later reset itself from one. The Caretaker holds a collection of mementos (say, an undo stack) purely as opaque handles, requesting a save or a restore from the originator without ever touching the state inside.",
-      "ru": "Создатель — единственная сторона, способная читать и записывать полное содержимое снимка: он формирует снимок из текущих полей и позже может сбросить своё состояние по снимку. Опекун хранит коллекцию снимков (например, стек отмены) как непрозрачные дескрипторы, запрашивая у создателя сохранение или восстановление, но никогда не трогая состояние внутри."
+      "en": "The Originator is the only party that can read or write the full contents of a Memento - it builds one from its current fields and can later reset itself from one. The Caretaker holds a collection of mementos (say, an undo stack) purely as opaque handles, requesting a save or a restore from the originator without ever touching the state inside.",
+      "ru": "Создатель - единственная сторона, способная читать и записывать полное содержимое снимка: он формирует снимок из текущих полей и позже может сбросить своё состояние по снимку. Опекун хранит коллекцию снимков (например, стек отмены) как непрозрачные дескрипторы, запрашивая у создателя сохранение или восстановление, но никогда не трогая состояние внутри."
     },
     "participants": [
       {
         "name": "Originator",
         "role": {
-          "en": "Owns the actual state. Builds a memento from its current fields on request, and can reset itself from a memento it's handed back.",
-          "ru": "Владеет реальным состоянием. По запросу формирует снимок из текущих полей и может сбросить своё состояние по переданному ему снимку."
+          "en": "Owns the actual state. Builds a memento from its current fields on request, and can reset itself from a memento it's handed back. In the diagram: Editor.",
+          "ru": "Владеет реальным состоянием. По запросу формирует снимок из текущих полей и может сбросить своё состояние по переданному ему снимку. На диаграмме: Редактор."
         }
       },
       {
         "name": "Memento",
         "role": {
-          "en": "A sealed container for one copy of the originator's state. Its contents are readable only by the originator class that produced it.",
-          "ru": "Закрытый контейнер для одной копии состояния создателя. Его содержимое читаемо только классом создателя, который его сформировал."
+          "en": "A sealed container for one copy of the originator's state. Its contents are readable only by the originator class that produced it. In the diagram: Editor Memento.",
+          "ru": "Закрытый контейнер для одной копии состояния создателя. Его содержимое читаемо только классом создателя, который его сформировал. На диаграмме: Снимок редактора."
         }
       },
       {
         "name": "Caretaker",
         "role": {
-          "en": "Manages a collection of mementos over time — for example, a linear undo stack — without ever inspecting or altering what any single memento contains.",
-          "ru": "Управляет коллекцией снимков во времени — например, линейным стеком отмены, — никогда не заглядывая внутрь отдельного снимка и не изменяя его."
+          "en": "Manages a collection of mementos over time - for example, a linear undo stack - without ever inspecting or altering what any single memento contains. In the diagram: History.",
+          "ru": "Управляет коллекцией снимков во времени - например, линейным стеком отмены, - никогда не заглядывая внутрь отдельного снимка и не изменяя его. На диаграмме: История."
         }
       }
     ]
@@ -64,8 +64,8 @@
   },
   "pros": [
     {
-      "en": "The originator's internal layout stays private — no field, getter, or setter needs to be exposed just so external code can take a snapshot.",
-      "ru": "Внутреннее устройство создателя остаётся приватным — не нужно открывать ни поля, ни геттеры, ни сеттеры только ради того, чтобы внешний код мог сделать снимок."
+      "en": "The originator's internal layout stays private - no field, getter, or setter needs to be exposed just so external code can take a snapshot.",
+      "ru": "Внутреннее устройство создателя остаётся приватным - не нужно открывать ни поля, ни геттеры, ни сеттеры только ради того, чтобы внешний код мог сделать снимок."
     },
     {
       "en": "History bookkeeping (how many snapshots to keep, when to discard old ones) is entirely the caretaker's job, keeping that logic out of the originator.",
@@ -73,7 +73,7 @@
     },
     {
       "en": "Because a memento is just a value carrying a copy of state, it's easy to serialize, log, or send across a network for later replay.",
-      "ru": "Поскольку снимок — это просто значение с копией состояния, его легко сериализовать, логировать или отправлять по сети для последующего воспроизведения."
+      "ru": "Поскольку снимок - это просто значение с копией состояния, его легко сериализовать, логировать или отправлять по сети для последующего воспроизведения."
     }
   ],
   "cons": [
@@ -92,8 +92,8 @@
   ],
   "when_to_use": [
     {
-      "en": "Reach for Memento when you need to capture and later restore an object's state — undo stacks, rollback points, checkpoints.",
-      "ru": "Применяйте Снимок, когда нужно фиксировать и позже восстанавливать состояние объекта — стеки отмены, точки отката, контрольные точки."
+      "en": "Reach for Memento when you need to capture and later restore an object's state - undo stacks, rollback points, checkpoints.",
+      "ru": "Применяйте Снимок, когда нужно фиксировать и позже восстанавливать состояние объекта - стеки отмены, точки отката, контрольные точки."
     },
     {
       "en": "Use it when the only way to grab that state from outside the object would mean exposing fields that should stay implementation detail.",
@@ -102,16 +102,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**Ctrl+Z in editors** — word processors and design tools like Figma snapshot the document before each edit so changes can be stepped back through.",
-      "ru": "**Ctrl+Z в редакторах** — текстовые процессоры и инструменты вроде Figma делают снимок документа перед каждым изменением, чтобы можно было шагать по истории назад."
+      "en": "**Ctrl+Z in editors** - word processors and design tools like Figma snapshot the document before each edit so changes can be stepped back through.",
+      "ru": "**Ctrl+Z в редакторах** - текстовые процессоры и инструменты вроде Figma делают снимок документа перед каждым изменением, чтобы можно было шагать по истории назад."
     },
     {
-      "en": "**SQL SAVEPOINT** — a database transaction marks a savepoint it can roll back to without discarding the whole transaction.",
-      "ru": "**SQL SAVEPOINT** — транзакция базы данных отмечает точку сохранения, к которой можно откатиться, не отменяя всю транзакцию целиком."
+      "en": "**SQL SAVEPOINT** - a database transaction marks a savepoint it can roll back to without discarding the whole transaction.",
+      "ru": "**SQL SAVEPOINT** - транзакция базы данных отмечает точку сохранения, к которой можно откатиться, не отменяя всю транзакцию целиком."
     },
     {
-      "en": "**Git stash** — Git packs away the working tree's current state as an opaque commit-like object you can reapply later.",
-      "ru": "**Git stash** — Git упаковывает текущее состояние рабочего дерева в непрозрачный объект наподобие коммита, который можно применить позже."
+      "en": "**Git stash** - Git packs away the working tree's current state as an opaque commit-like object you can reapply later.",
+      "ru": "**Git stash** - Git упаковывает текущее состояние рабочего дерева в непрозрачный объект наподобие коммита, который можно применить позже."
     }
   ],
   "related_patterns": [
@@ -128,8 +128,8 @@
       },
       "options": [
         {
-          "en": "An object's internal state, into a separate snapshot object, so it can be restored without outside code seeing what it contains",
-          "ru": "Внутреннее состояние объекта, в отдельный объект-снимок, чтобы позже его восстановить, не раскрывая посторонним содержимое"
+          "en": "An object's internal state, into a separate snapshot object",
+          "ru": "Внутреннее состояние объекта, в отдельный объект-снимок"
         },
         {
           "en": "The web of interactions between several objects, into a coordinator",
@@ -157,8 +157,8 @@
       },
       "options": [
         {
-          "en": "The shape must expose everything as public fields or getters, so its internals become part of its public contract",
-          "ru": "Фигуре приходится раскрыть всё как публичные поля или геттеры, из-за чего её внутреннее устройство становится частью публичного контракта"
+          "en": "The shape must expose everything as public fields or getters",
+          "ru": "Фигуре приходится раскрыть всё как публичные поля или геттеры"
         },
         {
           "en": "The shape can no longer be moved, resized, or recolored at all",
@@ -186,8 +186,8 @@
       },
       "options": [
         {
-          "en": "The originator, since it already has full access to its own fields and can package a private copy of them",
-          "ru": "Создатель (originator), поскольку у него уже есть полный доступ к собственным полям и он может упаковать их приватную копию"
+          "en": "The originator - it already has access to its own fields",
+          "ru": "Создатель (originator) - у него уже есть доступ к своим полям"
         },
         {
           "en": "The caretaker, by directly reading the originator's public fields",
@@ -215,8 +215,8 @@
       },
       "options": [
         {
-          "en": "Nothing — it never needs to know what a shape's position or fill color actually is; it just archives snapshots and returns them on request",
-          "ru": "Ничего — ему вообще не нужно знать, чему равна позиция фигуры или цвет заливки; он просто архивирует снимки и возвращает их по запросу"
+          "en": "Nothing - it just archives snapshots and returns them on request",
+          "ru": "Ничего - он просто архивирует снимки и возвращает их по запросу"
         },
         {
           "en": "It must know every field name inside the memento to store it correctly",
@@ -244,8 +244,8 @@
       },
       "options": [
         {
-          "en": "It can burn through memory fast, especially if the originator's state is large",
-          "ru": "Это может быстро съедать память, особенно если состояние создателя велико"
+          "en": "It can burn through memory fast for large objects",
+          "ru": "Это может быстро съедать память при большом объекте"
         },
         {
           "en": "It automatically speeds up every restore operation",
@@ -280,12 +280,12 @@
         "ru": "Как работает Снимок"
       },
       "description": {
-        "en": "The Editor builds its own Memento and is the only party that can read one back. The History archives whatever memento it's handed as an opaque object, and later hands the same one back for the Editor to restore from — without ever looking inside it.",
-        "ru": "Редактор сам формирует свой снимок и является единственной стороной, способной прочитать его обратно. История архивирует переданный ей снимок как непрозрачный объект, а позже возвращает тот же снимок редактору для восстановления — ни разу не заглянув внутрь."
+        "en": "The Editor builds its own Memento and is the only party that can read one back. The History archives whatever memento it's handed as an opaque object, and later hands the same one back for the Editor to restore from - without ever looking inside it.",
+        "ru": "Редактор сам формирует свой снимок и является единственной стороной, способной прочитать его обратно. История архивирует переданный ей снимок как непрозрачный объект, а позже возвращает тот же снимок редактору для восстановления - ни разу не заглянув внутрь."
       },
       "caption": {
-        "en": "The Editor is the only one who ever reads or writes a memento — the History just archives opaque handles.",
-        "ru": "Только редактор когда-либо читает и пишет содержимое снимка — история лишь архивирует непрозрачные дескрипторы."
+        "en": "The Editor is the only one who ever reads or writes a memento - the History just archives opaque handles.",
+        "ru": "Только редактор когда-либо читает и пишет содержимое снимка - история лишь архивирует непрозрачные дескрипторы."
       },
       "nodes": [
         {

@@ -7,7 +7,7 @@ export const PRIMITIVES = Object.freeze({
   traversal: { kind: 'packet', css: '',                  teaches: 'a visitor walks the structure node by node' },
 
   creation:  { kind: 'node', css: 'viz-anim--creation',  teaches: 'created for the first time' },
-  reuse:     { kind: 'node', css: 'viz-anim--reuse',     teaches: 'reused — still only one' },
+  reuse:     { kind: 'node', css: 'viz-anim--reuse',     teaches: 'reused - still only one' },
 
   wrap:      { kind: 'node', css: 'viz-anim--wrap',      teaches: 'a layer wraps around the core' },
   expansion: { kind: 'node', css: 'viz-anim--expansion', teaches: 'a container opens to reveal its parts' },

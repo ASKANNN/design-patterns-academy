@@ -16,12 +16,12 @@
     "ru": "Фасад прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиентский код делает один высокоуровневый вызов вместо самостоятельной оркестровки подсистемы."
   },
   "problem": {
-    "en": "Suppose your app lets users watch a movie at the press of a button. Behind the scenes, that means dimming the lights, powering on the projector and switching it to widescreen mode, powering on the amplifier and setting its volume, and powering on the DVD player before telling it to play — five objects, each with its own methods, called in a specific order that the client code has to get exactly right.\n\nIf that setup logic lives directly in the client, every place that wants to watch a movie duplicates the same multi-step sequence — and stopping a movie needs its own mirrored sequence to power everything down in the right order. Miss a step or get the order wrong, and the amplifier blasts at full volume into a bright room, or the DVD player tries to play before the projector is even on.",
-    "ru": "Допустим, приложение позволяет пользователю посмотреть фильм одним нажатием кнопки. За кулисами это означает: приглушить свет, включить проектор и переключить его в широкоэкранный режим, включить усилитель и настроить громкость, включить DVD-плеер и запустить воспроизведение — пять объектов, у каждого свои методы, и вызывать их нужно в строго определённом порядке, который клиентский код обязан соблюдать в точности.\n\nЕсли эта логика настройки живёт прямо в клиентском коде, каждое место, где нужно посмотреть фильм, дублирует одну и ту же многошаговую последовательность — а остановка фильма требует своей зеркальной последовательности, чтобы выключить всё в правильном порядке. Пропустишь шаг или перепутаешь порядок — и усилитель врубится на полную громкость в светлой комнате, или DVD-плеер попытается начать воспроизведение раньше, чем включится проектор."
+    "en": "Suppose your app lets users watch a movie at the press of a button. Behind the scenes, that means dimming the lights, powering on the projector and switching it to widescreen mode, powering on the amplifier and setting its volume, and powering on the DVD player before telling it to play - five objects, each with its own methods, called in a specific order that the client code has to get exactly right.\n\nIf that setup logic lives directly in the client, every place that wants to watch a movie duplicates the same multi-step sequence - and stopping a movie needs its own mirrored sequence to power everything down in the right order. Miss a step or get the order wrong, and the amplifier blasts at full volume into a bright room, or the DVD player tries to play before the projector is even on.",
+    "ru": "Допустим, приложение позволяет пользователю посмотреть фильм одним нажатием кнопки. За кулисами это означает: приглушить свет, включить проектор и переключить его в широкоэкранный режим, включить усилитель и настроить громкость, включить DVD-плеер и запустить воспроизведение - пять объектов, у каждого свои методы, и вызывать их нужно в строго определённом порядке, который клиентский код обязан соблюдать в точности.\n\nЕсли эта логика настройки живёт прямо в клиентском коде, каждое место, где нужно посмотреть фильм, дублирует одну и ту же многошаговую последовательность - а остановка фильма требует своей зеркальной последовательности, чтобы выключить всё в правильном порядке. Пропустишь шаг или перепутаешь порядок - и усилитель врубится на полную громкость в светлой комнате, или DVD-плеер попытается начать воспроизведение раньше, чем включится проектор."
   },
   "solution": {
-    "en": "Introduce one class — the facade — that sits in front of the subsystem and exposes only the operations clients actually need, such as `exportVideo(format)`. Internally, the facade owns the job of creating subsystem objects, wiring their dependencies, and calling them in the correct order.\n\nClients no longer see the codec manager, bitrate reader, or mixer at all — they see one method call. Direct access to the subsystem still exists for cases that need fine-grained control; the facade is an added convenience layer, not a wall.",
-    "ru": "Вводится один класс — фасад, — который стоит перед подсистемой и открывает наружу только те операции, что действительно нужны клиентам, например `exportVideo(format)`. Внутри себя фасад берёт на себя создание объектов подсистемы, связывание их зависимостей и вызов методов в нужной последовательности.\n\nКлиенты больше не видят ни менеджер кодеков, ни читатель битрейта, ни микшер — они видят один вызов метода. Прямой доступ к подсистеме при этом никуда не пропадает и остаётся для случаев, где нужен тонкий контроль — фасад лишь добавляет удобный слой, а не закрывает подсистему стеной."
+    "en": "Introduce one class - the facade - that sits in front of the subsystem and exposes only the operations clients actually need, such as `exportVideo(format)`. Internally, the facade owns the job of creating subsystem objects, wiring their dependencies, and calling them in the correct order.\n\nClients no longer see the codec manager, bitrate reader, or mixer at all - they see one method call. Direct access to the subsystem still exists for cases that need fine-grained control; the facade is an added convenience layer, not a wall.",
+    "ru": "Вводится один класс - фасад, - который стоит перед подсистемой и открывает наружу только те операции, что действительно нужны клиентам, например `exportVideo(format)`. Внутри себя фасад берёт на себя создание объектов подсистемы, связывание их зависимостей и вызов методов в нужной последовательности.\n\nКлиенты больше не видят ни менеджер кодеков, ни читатель битрейта, ни микшер - они видят один вызов метода. Прямой доступ к подсистеме при этом никуда не пропадает и остаётся для случаев, где нужен тонкий контроль - фасад лишь добавляет удобный слой, а не закрывает подсистему стеной."
   },
   "structure": {
     "description": {
@@ -32,22 +32,22 @@
       {
         "name": "Facade",
         "role": {
-          "en": "Exposes a small set of high-level operations and holds the knowledge of which subsystem objects to create, configure, and call in what order to fulfill each one.",
-          "ru": "Открывает наружу небольшой набор высокоуровневых операций и знает, какие объекты подсистемы создавать, настраивать и вызывать — и в каком порядке — для выполнения каждой из них."
+          "en": "Exposes a small set of high-level operations and holds the knowledge of which subsystem objects to create, configure, and call in what order to fulfill each one. In the diagram: Facade.",
+          "ru": "Открывает наружу небольшой набор высокоуровневых операций и знает, какие объекты подсистемы создавать, настраивать и вызывать - и в каком порядке - для выполнения каждой из них. На диаграмме: Фасад."
         }
       },
       {
         "name": "Complex Subsystem",
         "role": {
-          "en": "The collection of classes doing the actual work — codecs, mixers, readers, and the like. These classes have no notion that a facade exists and can be used with or without it.",
-          "ru": "Набор классов, выполняющих реальную работу — кодеки, микшеры, читатели и подобное. Эти классы ничего не знают о существовании фасада и могут использоваться как с ним, так и без него."
+          "en": "The collection of classes doing the actual work - codecs, mixers, readers, and the like. These classes have no notion that a facade exists and can be used with or without it. In the diagram: Amplifier, Projector, DVD Player, Lights.",
+          "ru": "Набор классов, выполняющих реальную работу - кодеки, микшеры, читатели и подобное. Эти классы ничего не знают о существовании фасада и могут использоваться как с ним, так и без него. На диаграмме: Усилитель, Проектор, DVD-плеер, Свет."
         }
       },
       {
         "name": "Client",
         "role": {
-          "en": "Calls the facade's simplified methods instead of assembling subsystem objects itself, staying insulated from internal wiring and sequencing details.",
-          "ru": "Вызывает упрощённые методы фасада вместо самостоятельной сборки объектов подсистемы, оставаясь изолированным от деталей внутренней связки и последовательности вызовов."
+          "en": "Calls the facade's simplified methods instead of assembling subsystem objects itself, staying insulated from internal wiring and sequencing details. In the diagram: Client.",
+          "ru": "Вызывает упрощённые методы фасада вместо самостоятельной сборки объектов подсистемы, оставаясь изолированным от деталей внутренней связки и последовательности вызовов. На диаграмме: Клиент."
         }
       }
     ]
@@ -70,7 +70,7 @@
     },
     {
       "en": "Large subsystems can be split into layers, each fronted by its own facade, giving a clear entry point per layer instead of one tangled dependency graph.",
-      "ru": "Крупные подсистемы можно разбить на уровни, каждый со своим фасадом, — это даёт чёткую точку входа на каждый уровень вместо одного запутанного графа зависимостей."
+      "ru": "Крупные подсистемы можно разбить на уровни, каждый со своим фасадом, - это даёт чёткую точку входа на каждый уровень вместо одного запутанного графа зависимостей."
     }
   ],
   "cons": [
@@ -99,16 +99,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**jQuery** — collapses inconsistent, verbose cross-browser DOM APIs into a handful of chainable calls like `$(el).hide()`, hiding browser-specific quirks entirely.",
-      "ru": "**jQuery** — сворачивает непоследовательные и многословные кросс-браузерные DOM API в несколько цепочечных вызовов вроде `$(el).hide()`, полностью скрывая особенности конкретных браузеров."
+      "en": "**jQuery** - collapses inconsistent, verbose cross-browser DOM APIs into a handful of chainable calls like `$(el).hide()`, hiding browser-specific quirks entirely.",
+      "ru": "**jQuery** - сворачивает непоследовательные и многословные кросс-браузерные DOM API в несколько цепочечных вызовов вроде `$(el).hide()`, полностью скрывая особенности конкретных браузеров."
     },
     {
-      "en": "**Django's `Model.objects`** — a facade over SQL connection handling, query building, and row-to-object mapping, letting `User.objects.filter(...)` stand in for dozens of lower-level steps.",
-      "ru": "**`Model.objects` в Django** — фасад над установкой соединения с БД, построением запросов и преобразованием строк в объекты; `User.objects.filter(...)` заменяет собой десятки низкоуровневых шагов."
+      "en": "**Django's `Model.objects`** - a facade over SQL connection handling, query building, and row-to-object mapping, letting `User.objects.filter(...)` stand in for dozens of lower-level steps.",
+      "ru": "**`Model.objects` в Django** - фасад над установкой соединения с БД, построением запросов и преобразованием строк в объекты; `User.objects.filter(...)` заменяет собой десятки низкоуровневых шагов."
     },
     {
-      "en": "**Stripe's SDK `charge()` call** — hides HTTP request construction, authentication headers, retries, and error mapping behind a single method for the merchant's application.",
-      "ru": "**Вызов `charge()` в SDK Stripe** — прячет построение HTTP-запроса, заголовки аутентификации, повторные попытки и обработку ошибок за одним методом, доступным приложению продавца."
+      "en": "**Stripe's SDK `charge()` call** - hides HTTP request construction, authentication headers, retries, and error mapping behind a single method for the merchant's application.",
+      "ru": "**Вызов `charge()` в SDK Stripe** - прячет построение HTTP-запроса, заголовки аутентификации, повторные попытки и обработку ошибок за одним методом, доступным приложению продавца."
     }
   ],
   "related_patterns": [
@@ -125,8 +125,8 @@
       },
       "options": [
         {
-          "en": "Hides a tangle of interacting classes behind one clean entry point, so the client issues one high-level call instead of orchestrating the subsystem",
-          "ru": "Прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиент делает один высокоуровневый вызов вместо самостоятельной оркестровки подсистемы"
+          "en": "Hides interacting classes behind one clean entry point",
+          "ru": "Прячет взаимодействующие классы за единой точкой входа"
         },
         {
           "en": "Duplicates the subsystem's classes for redundancy",
@@ -143,19 +143,19 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Facade hides a tangle of interacting classes behind one clean entry point, so client code issues a single high-level call instead of orchestrating the subsystem itself.",
-        "ru": "Фасад прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиентский код делает один высокоуровневый вызов вместо самостоятельной оркестровки подсистемы."
+        "en": "Facade hides a tangle of interacting classes behind one clean entry point, so client code makes a single call instead of managing the subsystem itself.",
+        "ru": "Фасад прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиентский код делает один вызов вместо самостоятельной оркестровки подсистемы."
       }
     },
     {
       "question": {
         "en": "In the home-theater example, what goes wrong if the multi-step setup logic lives directly in client code?",
-        "ru": "В примере с домашним кинотеатром — что идёт не так, если многошаговая логика настройки живёт прямо в клиентском коде?"
+        "ru": "В примере с домашним кинотеатром - что идёт не так, если многошаговая логика настройки живёт прямо в клиентском коде?"
       },
       "options": [
         {
-          "en": "Every place that wants to watch a movie duplicates the sequence, and getting a step or order wrong causes real problems (e.g. full volume in a bright room)",
-          "ru": "Каждое место, где нужно посмотреть фильм, дублирует последовательность, а ошибка в шаге или порядке приводит к реальным проблемам (например, полная громкость в светлой комнате)"
+          "en": "Every place duplicates the same setup sequence",
+          "ru": "Каждое место повторяет одну и ту же последовательность"
         },
         {
           "en": "The projector permanently stops working",
@@ -183,12 +183,12 @@
       },
       "options": [
         {
-          "en": "No — direct access still exists for cases needing fine-grained control; the facade is an added convenience layer, not a wall",
-          "ru": "Нет — прямой доступ по-прежнему остаётся для случаев, где нужен тонкий контроль; фасад лишь добавляет удобный слой, а не закрывает подсистему стеной"
+          "en": "No - direct access still exists; the facade just adds convenience",
+          "ru": "Нет - прямой доступ остаётся, фасад лишь добавляет удобство"
         },
         {
-          "en": "Yes — after adding a facade, the subsystem classes can no longer be called directly",
-          "ru": "Да — после добавления фасада классы подсистемы больше нельзя вызывать напрямую"
+          "en": "Yes - after adding a facade, the subsystem classes can no longer be called directly",
+          "ru": "Да - после добавления фасада классы подсистемы больше нельзя вызывать напрямую"
         },
         {
           "en": "Yes, but only for the codec manager class",
@@ -202,7 +202,7 @@
       "correct": 0,
       "explanation": {
         "en": "Direct access to the subsystem still exists for cases that need fine-grained control; the facade is an added convenience layer, not a wall.",
-        "ru": "Прямой доступ к подсистеме при этом никуда не пропадает и остаётся для случаев, где нужен тонкий контроль — фасад лишь добавляет удобный слой, а не закрывает подсистему стеной."
+        "ru": "Прямой доступ к подсистеме при этом никуда не пропадает и остаётся для случаев, где нужен тонкий контроль - фасад лишь добавляет удобный слой, а не закрывает подсистему стеной."
       }
     },
     {
@@ -212,8 +212,8 @@
       },
       "options": [
         {
-          "en": "The subsystem can be refactored, upgraded, or replaced with fewer ripple effects, since only the facade needs to track its API surface",
-          "ru": "Подсистему можно рефакторить, обновлять или заменять с меньшими побочными эффектами, поскольку только фасаду нужно отслеживать её API"
+          "en": "The subsystem can be refactored with fewer ripple effects",
+          "ru": "Подсистему можно рефакторить с меньшими побочными эффектами"
         },
         {
           "en": "The subsystem can never be changed once a facade is introduced",
@@ -241,8 +241,8 @@
       },
       "options": [
         {
-          "en": "It tends to accumulate responsibilities for every subsystem and turns into a god object that everything depends on",
-          "ru": "Он склонен накапливать ответственность за все подсистемы и превращается в «божественный объект», от которого зависит всё"
+          "en": "It tends to accumulate responsibilities and become a god object",
+          "ru": "Он накапливает ответственность и превращается в божественный объект"
         },
         {
           "en": "It automatically deletes unused subsystem classes",
@@ -277,12 +277,12 @@
         "ru": "Как работает Фасад"
       },
       "description": {
-        "en": "The Client makes a single watchMovie() call to the Home Theater Facade — and nothing else. The Facade is the one entry point across the boundary into the subsystem: only it reaches the Amplifier, Projector, DVD Player and Lights, coordinating them in the right order. The Client never touches any subsystem part directly.",
-        "ru": "Клиент делает единственный вызов watchMovie() к Фасаду домашнего кинотеатра — и больше ничего. Фасад — единственная точка входа через границу в подсистему: только он обращается к Усилителю, Проектору, DVD-плееру и Свету, координируя их в правильном порядке. Клиент никогда не обращается к частям подсистемы напрямую."
+        "en": "The Client makes a single watchMovie() call to the Home Theater Facade - and nothing else. The Facade is the one entry point across the boundary into the subsystem: only it reaches the Amplifier, Projector, DVD Player and Lights, coordinating them in the right order. The Client never touches any subsystem part directly.",
+        "ru": "Клиент делает единственный вызов watchMovie() к Фасаду домашнего кинотеатра - и больше ничего. Фасад - единственная точка входа через границу в подсистему: только он обращается к Усилителю, Проектору, DVD-плееру и Свету, координируя их в правильном порядке. Клиент никогда не обращается к частям подсистемы напрямую."
       },
       "caption": {
-        "en": "One call to the Facade. It coordinates the whole subsystem — the Client stays outside the complexity.",
-        "ru": "Один вызов к Фасаду. Он координирует всю подсистему — Клиент остаётся снаружи сложности."
+        "en": "One call to the Facade. It coordinates the whole subsystem - the Client stays outside the complexity.",
+        "ru": "Один вызов к Фасаду. Он координирует всю подсистему - Клиент остаётся снаружи сложности."
       },
       "subsystemLabel": {
         "en": "Home Theater subsystem",

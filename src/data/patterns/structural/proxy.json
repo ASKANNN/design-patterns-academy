@@ -16,20 +16,20 @@
   ],
   "intent": {
     "en": "Proxy stands in for another object behind an identical interface, letting it intercept every call to add checks, caching, lazy creation, or logging without the real object or its callers knowing.",
-    "ru": "Заместитель подменяет собой другой объект за счёт идентичного интерфейса, позволяя перехватывать каждый вызов и добавлять проверки, кэширование, отложенное создание или логирование — незаметно ни для реального объекта, ни для вызывающего кода."
+    "ru": "Заместитель подменяет собой другой объект за счёт идентичного интерфейса, позволяя перехватывать каждый вызов и добавлять проверки, кэширование, отложенное создание или логирование - незаметно ни для реального объекта, ни для вызывающего кода."
   },
   "problem": {
-    "en": "A reporting service wraps a slow, network-bound call to a remote analytics API. Every screen that displays a report re-triggers that call, even when the underlying data hasn't changed in the last five minutes — burning bandwidth and making the UI feel sluggish.\n\nThe obvious fix is to add caching, but the service class is generated from an API spec (or shared across teams), so editing it directly means the caching logic gets tangled with unrelated code, or lost on the next regeneration. Meanwhile the service object itself is expensive enough to construct that creating it eagerly at startup — before anyone has even opened a report — wastes resources on every run.",
-    "ru": "Сервис отчётов оборачивает медленный сетевой вызов к удалённому API аналитики. Каждый экран, отображающий отчёт, заново запускает этот вызов, даже если исходные данные не менялись последние пять минут — впустую расходуя трафик и делая интерфейс менее отзывчивым.\n\nОчевидное решение — добавить кэширование, но класс сервиса сгенерирован по спецификации API (или используется совместно несколькими командами), поэтому прямое редактирование либо перемешает логику кэширования с посторонним кодом, либо потеряется при следующей регенерации. При этом сам объект сервиса достаточно дорог в создании, чтобы жадно инициализировать его при старте приложения — ещё до того, как кто-то откроет отчёт, — впустую тратя ресурсы при каждом запуске."
+    "en": "A reporting service wraps a slow, network-bound call to a remote analytics API. Every screen that displays a report re-triggers that call, even when the underlying data hasn't changed in the last five minutes - burning bandwidth and making the UI feel sluggish.\n\nThe obvious fix is to add caching, but the service class is generated from an API spec (or shared across teams), so editing it directly means the caching logic gets tangled with unrelated code, or lost on the next regeneration. Meanwhile the service object itself is expensive enough to construct that creating it eagerly at startup - before anyone has even opened a report - wastes resources on every run.",
+    "ru": "Сервис отчётов оборачивает медленный сетевой вызов к удалённому API аналитики. Каждый экран, отображающий отчёт, заново запускает этот вызов, даже если исходные данные не менялись последние пять минут - впустую расходуя трафик и делая интерфейс менее отзывчивым.\n\nОчевидное решение - добавить кэширование, но класс сервиса сгенерирован по спецификации API (или используется совместно несколькими командами), поэтому прямое редактирование либо перемешает логику кэширования с посторонним кодом, либо потеряется при следующей регенерации. При этом сам объект сервиса достаточно дорог в создании, чтобы жадно инициализировать его при старте приложения - ещё до того, как кто-то откроет отчёт, - впустую тратя ресурсы при каждом запуске."
   },
   "solution": {
-    "en": "Introduce a **Proxy** class that implements the exact same interface as the service and gets substituted for it everywhere the service was expected. Every call to the proxy first passes through its own logic — check the cache, verify permissions, construct the real service on first use — before optionally delegating to the wrapped object.\n\nBecause the interface is identical, nothing on the calling side changes: code that used to hold a service reference now holds a proxy reference and is none the wiser. The original service class stays untouched, so its logic and the cross-cutting behavior evolve independently.",
-    "ru": "Вводится класс **Заместителя**, реализующий тот же самый интерфейс, что и сервис, и подставляемый вместо него везде, где ожидался сервис. Каждый вызов сначала проходит через собственную логику заместителя — проверку кэша, прав доступа, создание реального сервиса при первом обращении — и лишь затем, при необходимости, делегируется обёрнутому объекту.\n\nПоскольку интерфейс идентичен, на стороне вызывающего кода ничего не меняется: код, ранее хранивший ссылку на сервис, теперь хранит ссылку на заместителя и не замечает разницы. Исходный класс сервиса остаётся нетронутым, поэтому его логика и сквозное поведение развиваются независимо друг от друга."
+    "en": "Introduce a **Proxy** class that implements the exact same interface as the service and gets substituted for it everywhere the service was expected. Every call to the proxy first passes through its own logic - check the cache, verify permissions, construct the real service on first use - before optionally delegating to the wrapped object.\n\nBecause the interface is identical, nothing on the calling side changes: code that used to hold a service reference now holds a proxy reference and is none the wiser. The original service class stays untouched, so its logic and the cross-cutting behavior evolve independently.",
+    "ru": "Вводится класс **Заместителя**, реализующий тот же самый интерфейс, что и сервис, и подставляемый вместо него везде, где ожидался сервис. Каждый вызов сначала проходит через собственную логику заместителя - проверку кэша, прав доступа, создание реального сервиса при первом обращении - и лишь затем, при необходимости, делегируется обёрнутому объекту.\n\nПоскольку интерфейс идентичен, на стороне вызывающего кода ничего не меняется: код, ранее хранивший ссылку на сервис, теперь хранит ссылку на заместителя и не замечает разницы. Исходный класс сервиса остаётся нетронутым, поэтому его логика и сквозное поведение развиваются независимо друг от друга."
   },
   "structure": {
     "description": {
-      "en": "A common ServiceInterface is implemented by both the real Service and its Proxy, which is what makes the substitution transparent. The Service focuses purely on its business logic. The Proxy holds a reference to the Service (created eagerly, lazily, or supplied externally) and wraps each call with extra behavior — caching, access checks, logging — before or after delegating. The Client depends only on ServiceInterface and never needs to know which implementation it received.",
-      "ru": "Общий интерфейс ServiceInterface реализуют и реальный Сервис, и его Заместитель — именно это делает подмену прозрачной. Сервис сосредоточен исключительно на бизнес-логике. Заместитель хранит ссылку на Сервис (созданную заранее, лениво или переданную извне) и оборачивает каждый вызов дополнительным поведением — кэшированием, проверкой доступа, логированием — до или после делегирования. Клиент зависит только от ServiceInterface и никогда не обязан знать, какую реализацию он получил."
+      "en": "A common ServiceInterface is implemented by both the real Service and its Proxy, which is what makes the substitution transparent. The Service focuses purely on its business logic. The Proxy holds a reference to the Service (created eagerly, lazily, or supplied externally) and wraps each call with extra behavior - caching, access checks, logging - before or after delegating. The Client depends only on ServiceInterface and never needs to know which implementation it received.",
+      "ru": "Общий интерфейс ServiceInterface реализуют и реальный Сервис, и его Заместитель - именно это делает подмену прозрачной. Сервис сосредоточен исключительно на бизнес-логике. Заместитель хранит ссылку на Сервис (созданную заранее, лениво или переданную извне) и оборачивает каждый вызов дополнительным поведением - кэшированием, проверкой доступа, логированием - до или после делегирования. Клиент зависит только от ServiceInterface и никогда не обязан знать, какую реализацию он получил."
     },
     "participants": [
       {
@@ -42,22 +42,22 @@
       {
         "name": "Service",
         "role": {
-          "en": "Implements the real behavior clients ultimately want. Typically the expensive or sensitive part of the equation — slow to construct, costly to call, or requiring guarded access.",
-          "ru": "Реализует то реальное поведение, которое в конечном счёте нужно клиентам. Как правило, это затратная или чувствительная часть системы — медленная в создании, дорогая в вызове или требующая контролируемого доступа."
+          "en": "Implements the real behavior clients ultimately want. Typically the expensive or sensitive part of the equation - slow to construct, costly to call, or requiring guarded access. In the diagram: Database Service.",
+          "ru": "Реализует то реальное поведение, которое в конечном счёте нужно клиентам. Как правило, это затратная или чувствительная часть системы - медленная в создании, дорогая в вызове или требующая контролируемого доступа. На диаграмме: Сервис базы данных."
         }
       },
       {
         "name": "Proxy",
         "role": {
-          "en": "Implements the same interface and forwards calls to a Service instance it owns or creates, inserting its own logic — a cache lookup, a permission check, deferred construction — around the delegation.",
-          "ru": "Реализует тот же интерфейс и перенаправляет вызовы экземпляру Сервиса, которым владеет или который создаёт, вставляя вокруг делегирования собственную логику — обращение к кэшу, проверку прав, отложенное создание."
+          "en": "Implements the same interface and forwards calls to a Service instance it owns or creates, inserting its own logic - a cache lookup, a permission check, deferred construction - around the delegation. In the diagram: Caching Proxy.",
+          "ru": "Реализует тот же интерфейс и перенаправляет вызовы экземпляру Сервиса, которым владеет или который создаёт, вставляя вокруг делегирования собственную логику - обращение к кэшу, проверку прав, отложенное создание. На диаграмме: Кэширующий заместитель."
         }
       },
       {
         "name": "Client",
         "role": {
-          "en": "Depends only on ServiceInterface, so it can be handed a Proxy in place of the real Service with no code changes on its side.",
-          "ru": "Зависит только от ServiceInterface, поэтому вместо реального Сервиса ему можно передать Заместителя без каких-либо изменений в его коде."
+          "en": "Depends only on ServiceInterface, so it can be handed a Proxy in place of the real Service with no code changes on its side. In the diagram: Client.",
+          "ru": "Зависит только от ServiceInterface, поэтому вместо реального Сервиса ему можно передать Заместителя без каких-либо изменений в его коде. На диаграмме: Клиент."
         }
       }
     ]
@@ -94,7 +94,7 @@
     },
     {
       "en": "A stale or overly aggressive cache inside the proxy can silently return outdated results, a class of bug that's easy to introduce and awkward to trace back to the proxy layer.",
-      "ru": "Устаревший или слишком агрессивный кэш внутри заместителя может незаметно возвращать неактуальные результаты — такую ошибку легко внести и трудно проследить до слоя заместителя."
+      "ru": "Устаревший или слишком агрессивный кэш внутри заместителя может незаметно возвращать неактуальные результаты - такую ошибку легко внести и трудно проследить до слоя заместителя."
     },
     {
       "en": "The response received by the client might now come from the proxy (a cached value) rather than the service itself, which can be surprising if callers assume they're always hitting live data.",
@@ -117,16 +117,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**Nginx / HAProxy reverse proxies** — sit in front of application servers, terminating TLS, rate-limiting, and serving cached responses before a request ever reaches the backend.",
-      "ru": "**Обратные прокси Nginx / HAProxy** — стоят перед серверами приложений, завершая TLS-соединение, ограничивая частоту запросов и отдавая кэшированные ответы ещё до того, как запрос дойдёт до бэкенда."
+      "en": "**Nginx / HAProxy reverse proxies** - sit in front of application servers, terminating TLS, rate-limiting, and serving cached responses before a request ever reaches the backend.",
+      "ru": "**Обратные прокси Nginx / HAProxy** - стоят перед серверами приложений, завершая TLS-соединение, ограничивая частоту запросов и отдавая кэшированные ответы ещё до того, как запрос дойдёт до бэкенда."
     },
     {
-      "en": "**The built-in JavaScript `Proxy` object** — wraps a target object and lets you intercept `get`, `set`, and function-call traps, which is how libraries like Vue 3 implement reactive data.",
-      "ru": "**Встроенный объект `Proxy` в JavaScript** — оборачивает целевой объект и позволяет перехватывать ловушки `get`, `set` и вызовы функций; именно так библиотеки вроде Vue 3 реализуют реактивные данные."
+      "en": "**The built-in JavaScript `Proxy` object** - wraps a target object and lets you intercept `get`, `set`, and function-call traps, which is how libraries like Vue 3 implement reactive data.",
+      "ru": "**Встроенный объект `Proxy` в JavaScript** - оборачивает целевой объект и позволяет перехватывать ловушки `get`, `set` и вызовы функций; именно так библиотеки вроде Vue 3 реализуют реактивные данные."
     },
     {
-      "en": "**ORM lazy-loaded associations (Hibernate, SQLAlchemy, Entity Framework)** — a related entity is represented by a placeholder proxy object, and the actual SQL query only fires the first time a field on it is accessed.",
-      "ru": "**Отложенно загружаемые связи в ORM (Hibernate, SQLAlchemy, Entity Framework)** — связанная сущность представлена объектом-заместителем, а реальный SQL-запрос выполняется только при первом обращении к её полю."
+      "en": "**ORM lazy-loaded associations (Hibernate, SQLAlchemy, Entity Framework)** - a related entity is represented by a placeholder proxy object, and the actual SQL query only fires the first time a field on it is accessed.",
+      "ru": "**Отложенно загружаемые связи в ORM (Hibernate, SQLAlchemy, Entity Framework)** - связанная сущность представлена объектом-заместителем, а реальный SQL-запрос выполняется только при первом обращении к её полю."
     }
   ],
   "related_patterns": [
@@ -142,8 +142,8 @@
       },
       "options": [
         {
-          "en": "Stands in for another object, intercepting every call to add checks, caching, lazy creation, or logging",
-          "ru": "Подменяет собой другой объект, перехватывая каждый вызов для добавления проверок, кэширования, отложенного создания или логирования"
+          "en": "Stands in for another object, intercepting every call",
+          "ru": "Подменяет собой другой объект, перехватывая каждый вызов"
         },
         {
           "en": "Merges two unrelated interfaces into one",
@@ -161,7 +161,7 @@
       "correct": 0,
       "explanation": {
         "en": "Proxy stands in for another object behind an identical interface, letting it intercept every call to add checks, caching, lazy creation, or logging without the real object or its callers knowing.",
-        "ru": "Заместитель подменяет собой другой объект за счёт идентичного интерфейса, позволяя перехватывать каждый вызов и добавлять проверки, кэширование, отложенное создание или логирование — незаметно ни для реального объекта, ни для вызывающего кода."
+        "ru": "Заместитель подменяет собой другой объект за счёт идентичного интерфейса, позволяя перехватывать каждый вызов и добавлять проверки, кэширование, отложенное создание или логирование - незаметно ни для реального объекта, ни для вызывающего кода."
       }
     },
     {
@@ -171,8 +171,8 @@
       },
       "options": [
         {
-          "en": "The class is generated from an API spec or shared across teams, so editing it tangles unrelated code or gets lost on regeneration",
-          "ru": "Класс сгенерирован по спецификации API или используется совместно несколькими командами, поэтому редактирование перемешает посторонний код или потеряется при регенерации"
+          "en": "The class is generated or shared, so editing it is risky",
+          "ru": "Класс сгенерирован или используется совместно, редактировать его рискованно"
         },
         {
           "en": "The service class has no methods to intercept",
@@ -200,8 +200,8 @@
       },
       "options": [
         {
-          "en": "The proxy implements the exact same interface as the service, so code holding a service reference now holds a proxy reference unknowingly",
-          "ru": "Заместитель реализует тот же самый интерфейс, что и сервис, поэтому код, хранивший ссылку на сервис, теперь хранит ссылку на заместителя и не замечает разницы"
+          "en": "The proxy implements the same interface, so callers don't notice",
+          "ru": "Заместитель реализует тот же интерфейс, и разницы не видно"
         },
         {
           "en": "The proxy rewrites all calling code automatically at build time",
@@ -229,8 +229,8 @@
       },
       "options": [
         {
-          "en": "It can defer creating an expensive object until it's genuinely needed, saving startup time and resources",
-          "ru": "Он может отложить создание дорогого объекта до момента, когда он действительно понадобится, экономя время запуска и ресурсы"
+          "en": "It can defer creating an expensive object until needed",
+          "ru": "Он может отложить создание дорогого объекта до момента, когда он понадобится"
         },
         {
           "en": "It permanently removes the need to ever construct the real object",
@@ -258,8 +258,8 @@
       },
       "options": [
         {
-          "en": "A stale or overly aggressive cache can silently return outdated results, a bug that's awkward to trace back to the proxy layer",
-          "ru": "Устаревший или слишком агрессивный кэш может незаметно возвращать неактуальные результаты — такую ошибку трудно проследить до слоя заместителя"
+          "en": "A stale cache can silently return outdated results",
+          "ru": "Устаревший кэш может незаметно вернуть неактуальные данные"
         },
         {
           "en": "Caching inside a proxy is impossible without changing the service's interface",
@@ -277,7 +277,7 @@
       "correct": 0,
       "explanation": {
         "en": "A stale or overly aggressive cache inside the proxy can silently return outdated results, a class of bug that's easy to introduce and awkward to trace back to the proxy layer.",
-        "ru": "Устаревший или слишком агрессивный кэш внутри заместителя может незаметно возвращать неактуальные результаты — такую ошибку легко внести и трудно проследить до слоя заместителя."
+        "ru": "Устаревший или слишком агрессивный кэш внутри заместителя может незаметно возвращать неактуальные результаты - такую ошибку легко внести и трудно проследить до слоя заместителя."
       }
     }
   ],
@@ -294,8 +294,8 @@
         "ru": "Как работает Заместитель"
       },
       "description": {
-        "en": "The Client calls fetchData(\"users\") on the Caching Proxy — never directly on the Database Service. The first call is a cache MISS: the Proxy delegates to the real Service and stores the result. The identical second call is a cache HIT: the Proxy returns the stored result itself. The Service is never contacted again.",
-        "ru": "Клиент вызывает fetchData(\"users\") у Кэширующего заместителя — никогда напрямую у Сервиса базы данных. Первый вызов — промах кэша: Заместитель делегирует его реальному Сервису и сохраняет результат. Повторный такой же вызов — попадание: Заместитель сам возвращает сохранённый результат. К Сервису больше не обращаются."
+        "en": "The Client calls fetchData(\"users\") on the Caching Proxy - never directly on the Database Service. The first call is a cache MISS: the Proxy delegates to the real Service and stores the result. The identical second call is a cache HIT: the Proxy returns the stored result itself. The Service is never contacted again.",
+        "ru": "Клиент вызывает fetchData(\"users\") у Кэширующего заместителя - никогда напрямую у Сервиса базы данных. Первый вызов - промах кэша: Заместитель делегирует его реальному Сервису и сохраняет результат. Повторный такой же вызов - попадание: Заместитель сам возвращает сохранённый результат. К Сервису больше не обращаются."
       },
       "caption": {
         "en": "The client never knew. The proxy decided.",

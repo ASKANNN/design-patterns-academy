@@ -14,35 +14,35 @@
     "transaction"
   ],
   "intent": {
-    "en": "Command is a behavioral pattern that wraps a request — the receiver, the action, and its arguments — into a self-contained object, so the request itself can be passed around, stored, and invoked independently of whatever triggered it.",
-    "ru": "Команда — это поведенческий паттерн, который упаковывает запрос (получателя, действие и его аргументы) в самостоятельный объект, благодаря чему запрос можно передавать, хранить и выполнять независимо от того, что его инициировало."
+    "en": "Command is a behavioral pattern that wraps a request - the receiver, the action, and its arguments - into a self-contained object, so the request itself can be passed around, stored, and invoked independently of whatever triggered it.",
+    "ru": "Команда - это поведенческий паттерн, который упаковывает запрос (получателя, действие и его аргументы) в самостоятельный объект, благодаря чему запрос можно передавать, хранить и выполнять независимо от того, что его инициировало."
   },
   "problem": {
-    "en": "Consider a drawing app where the same \"delete shape\" action can be triggered from a toolbar button, a keyboard shortcut, and a right-click menu — and where the app also needs to support undo.\n\nIf each UI element calls the deletion logic directly, that logic ends up duplicated in three places, and none of them has any record of what just happened, so undo has nowhere to hook in. Wiring undo support after the fact usually means threading extra state through every place that can trigger an action.\n\nThe real issue is that \"what to do\" and \"how it got triggered\" are tangled together, with no single object representing the action itself that could be stored, replayed, or reversed.",
-    "ru": "Рассмотрим графический редактор, где одно и то же действие «удалить фигуру» можно вызвать кнопкой на панели инструментов, горячей клавишей и пунктом контекстного меню — и где приложению вдобавок нужна отмена действий.\n\nЕсли каждый элемент интерфейса напрямую вызывает логику удаления, эта логика дублируется в трёх местах, и ни в одном из них нет записи о том, что произошло, — отмене попросту не за что зацепиться. Добавить отмену задним числом обычно означает протащить дополнительное состояние через каждое место, способное инициировать действие.\n\nНастоящая проблема в том, что «что сделать» и «чем это было вызвано» перепутаны, и нет ни одного объекта, представляющего само действие, который можно было бы сохранить, повторить или откатить."
+    "en": "Consider a drawing app where the same \"delete shape\" action can be triggered from a toolbar button, a keyboard shortcut, and a right-click menu - and where the app also needs to support undo.\n\nIf each UI element calls the deletion logic directly, that logic ends up duplicated in three places, and none of them has any record of what just happened, so undo has nowhere to hook in. Wiring undo support after the fact usually means threading extra state through every place that can trigger an action.\n\nThe real issue is that \"what to do\" and \"how it got triggered\" are tangled together, with no single object representing the action itself that could be stored, replayed, or reversed.",
+    "ru": "Рассмотрим графический редактор, где одно и то же действие «удалить фигуру» можно вызвать кнопкой на панели инструментов, горячей клавишей и пунктом контекстного меню - и где приложению вдобавок нужна отмена действий.\n\nЕсли каждый элемент интерфейса напрямую вызывает логику удаления, эта логика дублируется в трёх местах, и ни в одном из них нет записи о том, что произошло, - отмене попросту не за что зацепиться. Добавить отмену задним числом обычно означает протащить дополнительное состояние через каждое место, способное инициировать действие.\n\nНастоящая проблема в том, что «что сделать» и «чем это было вызвано» перепутаны, и нет ни одного объекта, представляющего само действие, который можно было бы сохранить, повторить или откатить."
   },
   "solution": {
-    "en": "Command pulls the request itself out into its own object: everything needed to perform the action — which receiver to call, which operation, with which arguments — is captured behind a single `execute()` method.\n\nThe UI element that triggers the action no longer calls the receiver directly; it just holds a command object and calls `execute()` on it, without caring what that command actually does or which object ends up doing the work. Because the command is a real object rather than a bare function call, it can be stored in a history list, serialized to disk, handed to a queue for later execution, or paired with an `undo()` method that reverses whatever `execute()` did.",
-    "ru": "Команда выносит сам запрос в отдельный объект: всё необходимое для выполнения действия (какого получателя вызвать, какую операцию, с какими аргументами) прячется за единственным методом `execute()`.\n\nЭлемент интерфейса, инициирующий действие, больше не вызывает получателя напрямую — он лишь хранит объект-команду и вызывает у него `execute()`, не зная, что именно эта команда делает и какой объект в итоге выполнит работу. Поскольку команда — полноценный объект, а не голый вызов функции, её можно сохранить в списке истории, сериализовать на диск, передать в очередь для отложенного выполнения или снабдить методом `undo()`, откатывающим то, что сделал `execute()`."
+    "en": "Command pulls the request itself out into its own object: everything needed to perform the action - which receiver to call, which operation, with which arguments - is captured behind a single `execute()` method.\n\nThe UI element that triggers the action no longer calls the receiver directly; it just holds a command object and calls `execute()` on it, without caring what that command actually does or which object ends up doing the work. Because the command is a real object rather than a bare function call, it can be stored in a history list, serialized to disk, handed to a queue for later execution, or paired with an `undo()` method that reverses whatever `execute()` did.",
+    "ru": "Команда выносит сам запрос в отдельный объект: всё необходимое для выполнения действия (какого получателя вызвать, какую операцию, с какими аргументами) прячется за единственным методом `execute()`.\n\nЭлемент интерфейса, инициирующий действие, больше не вызывает получателя напрямую - он лишь хранит объект-команду и вызывает у него `execute()`, не зная, что именно эта команда делает и какой объект в итоге выполнит работу. Поскольку команда - полноценный объект, а не голый вызов функции, её можно сохранить в списке истории, сериализовать на диск, передать в очередь для отложенного выполнения или снабдить методом `undo()`, откатывающим то, что сделал `execute()`."
   },
   "structure": {
     "description": {
       "en": "The Invoker holds a command and triggers it without knowing what it does. The Command interface exposes a uniform way to run (and optionally undo) an action. ConcreteCommand instances bind together a specific Receiver and the operation to call on it. The Receiver is where the actual work happens; the Client wires receivers, commands, and invokers together.",
-      "ru": "Инициатор хранит команду и запускает её, не зная, что она делает. Интерфейс команды предоставляет единообразный способ выполнить (и опционально отменить) действие. Конкретная команда связывает воедино конкретного получателя и операцию, которую нужно у него вызвать. Получатель — место, где происходит реальная работа; клиент связывает получателей, команды и инициаторов между собой."
+      "ru": "Инициатор хранит команду и запускает её, не зная, что она делает. Интерфейс команды предоставляет единообразный способ выполнить (и опционально отменить) действие. Конкретная команда связывает воедино конкретного получателя и операцию, которую нужно у него вызвать. Получатель - место, где происходит реальная работа; клиент связывает получателей, команды и инициаторов между собой."
     },
     "participants": [
       {
         "name": "Invoker (Sender)",
         "role": {
-          "en": "Holds a reference to a command and triggers its execution — right away, on a delay, or as part of a queue — without knowing what the command does internally.",
-          "ru": "Хранит ссылку на команду и запускает её выполнение — сразу, с задержкой или как часть очереди, — не зная, что команда делает внутри."
+          "en": "Holds a reference to a command and triggers its execution - right away, on a delay, or as part of a queue - without knowing what the command does internally. In the diagram: Invoker.",
+          "ru": "Хранит ссылку на команду и запускает её выполнение - сразу, с задержкой или как часть очереди, - не зная, что команда делает внутри. На диаграмме: Инициатор."
         }
       },
       {
         "name": "Command",
         "role": {
-          "en": "A minimal interface, usually just `execute()` and optionally `undo()`, that every concrete command must provide so invokers can treat them uniformly.",
-          "ru": "Минимальный интерфейс, обычно состоящий из `execute()` и опционально `undo()`, который должна предоставлять каждая конкретная команда, чтобы инициаторы могли работать с ними единообразно."
+          "en": "A minimal interface, usually just `execute()` and optionally `undo()`, that every concrete command must provide so invokers can treat them uniformly. In the diagram: Command.",
+          "ru": "Минимальный интерфейс, обычно состоящий из `execute()` и опционально `undo()`, который должна предоставлять каждая конкретная команда, чтобы инициаторы могли работать с ними единообразно. На диаграмме: Команда."
         }
       },
       {
@@ -55,15 +55,15 @@
       {
         "name": "Receiver",
         "role": {
-          "en": "Owns the domain logic that gets the work done. It has no idea it's being driven by a command — any object with a callable method can play this role.",
-          "ru": "Владеет доменной логикой, которая выполняет работу. Он не подозревает, что им управляет команда, — эту роль может играть любой объект с вызываемым методом."
+          "en": "Owns the domain logic that gets the work done. It has no idea it's being driven by a command - any object with a callable method can play this role. In the diagram: Receiver.",
+          "ru": "Владеет доменной логикой, которая выполняет работу. Он не подозревает, что им управляет команда, - эту роль может играть любой объект с вызываемым методом. На диаграмме: Получатель."
         }
       },
       {
         "name": "Client",
         "role": {
-          "en": "Assembles the pieces: creates a Receiver, wraps the desired operation on it in a ConcreteCommand, and hands the command to an Invoker.",
-          "ru": "Собирает всё воедино: создаёт получателя, оборачивает нужную операцию над ним в конкретную команду и передаёт команду инициатору."
+          "en": "Assembles the pieces: creates a Receiver, wraps the desired operation on it in a ConcreteCommand, and hands the command to an Invoker. In the diagram: Client.",
+          "ru": "Собирает всё воедино: создаёт получателя, оборачивает нужную операцию над ним в конкретную команду и передаёт команду инициатору. На диаграмме: Клиент."
         }
       }
     ]
@@ -77,8 +77,8 @@
   },
   "pros": [
     {
-      "en": "UI or trigger code no longer needs to know how a request is fulfilled — it just holds a command object, which keeps the two sides free to change independently.",
-      "ru": "Код-инициатор больше не обязан знать, как выполняется запрос, — он просто держит объект-команду, благодаря чему обе стороны меняются независимо друг от друга."
+      "en": "UI or trigger code no longer needs to know how a request is fulfilled - it just holds a command object, which keeps the two sides free to change independently.",
+      "ru": "Код-инициатор больше не обязан знать, как выполняется запрос, - он просто держит объект-команду, благодаря чему обе стороны меняются независимо друг от друга."
     },
     {
       "en": "Adding a brand-new action means writing one new command class; nothing about the invoker or the existing commands has to change.",
@@ -86,7 +86,7 @@
     },
     {
       "en": "Because a command is a real object, it can be stacked in a history list to give you undo/redo almost for free.",
-      "ru": "Поскольку команда — полноценный объект, её можно складывать в список истории, что почти бесплатно даёт отмену и повтор действий."
+      "ru": "Поскольку команда - полноценный объект, её можно складывать в список истории, что почти бесплатно даёт отмену и повтор действий."
     },
     {
       "en": "Commands can be serialized, queued, retried, or shipped off to run on a different thread or machine, since they carry everything needed to execute later.",
@@ -100,17 +100,17 @@
     },
     {
       "en": "A large application can accumulate a long tail of tiny, single-purpose command classes that are individually simple but collectively noisy.",
-      "ru": "В крупном приложении может накопиться длинный хвост мелких узкоспециализированных классов-команд — по отдельности простых, но в совокупности загромождающих проект."
+      "ru": "В крупном приложении может накопиться длинный хвост мелких узкоспециализированных классов-команд - по отдельности простых, но в совокупности загромождающих проект."
     },
     {
       "en": "Supporting undo properly often requires each command to capture enough prior state to reverse itself, which is extra bookkeeping beyond just running the action once.",
-      "ru": "Корректная поддержка отмены обычно требует, чтобы каждая команда сохраняла достаточно состояния для собственного отката, — это дополнительная работа сверх простого однократного выполнения действия."
+      "ru": "Корректная поддержка отмены обычно требует, чтобы каждая команда сохраняла достаточно состояния для собственного отката, - это дополнительная работа сверх простого однократного выполнения действия."
     }
   ],
   "when_to_use": [
     {
-      "en": "Reach for Command when you want to hand an operation to something else — a button, a menu item, a scheduler — as a value, rather than hardcoding the call site.",
-      "ru": "Применяйте Команду, когда операцию нужно передать чему-то другому — кнопке, пункту меню, планировщику — как значение, а не жёстко прописывать место вызова."
+      "en": "Reach for Command when you want to hand an operation to something else - a button, a menu item, a scheduler - as a value, rather than hardcoding the call site.",
+      "ru": "Применяйте Команду, когда операцию нужно передать чему-то другому - кнопке, пункту меню, планировщику - как значение, а не жёстко прописывать место вызова."
     },
     {
       "en": "It's a natural fit when requests need to be queued, delayed, retried, or dispatched to a worker rather than executed immediately in place.",
@@ -118,21 +118,21 @@
     },
     {
       "en": "Use it whenever the application must support reversing actions the user has taken, since each command can carry its own undo logic.",
-      "ru": "Используйте его, когда приложению нужна отмена действий пользователя, — каждая команда может нести собственную логику отмены."
+      "ru": "Используйте его, когда приложению нужна отмена действий пользователя, - каждая команда может нести собственную логику отмены."
     }
   ],
   "real_world_examples": [
     {
-      "en": "**`document.execCommand` and editor undo stacks** — rich-text editors represent formatting and edit operations as discrete command objects pushed onto a history stack for multi-level undo.",
-      "ru": "**`document.execCommand` и стеки отмены в редакторах** — текстовые редакторы представляют операции форматирования и правки как отдельные объекты-команды, помещаемые в стек истории для многоуровневой отмены."
+      "en": "**`document.execCommand` and editor undo stacks** - rich-text editors represent formatting and edit operations as discrete command objects pushed onto a history stack for multi-level undo.",
+      "ru": "**`document.execCommand` и стеки отмены в редакторах** - текстовые редакторы представляют операции форматирования и правки как отдельные объекты-команды, помещаемые в стек истории для многоуровневой отмены."
     },
     {
-      "en": "**GUI toolkit actions** — frameworks like Qt and Swing model menu items, toolbar buttons, and shortcuts as `QAction`/`Action` objects so the same command can be triggered from multiple UI entry points.",
-      "ru": "**Actions в GUI-фреймворках** — библиотеки вроде Qt и Swing моделируют пункты меню, кнопки панели инструментов и горячие клавиши как объекты `QAction`/`Action`, чтобы одна и та же команда запускалась из разных мест интерфейса."
+      "en": "**GUI toolkit actions** - frameworks like Qt and Swing model menu items, toolbar buttons, and shortcuts as `QAction`/`Action` objects so the same command can be triggered from multiple UI entry points.",
+      "ru": "**Actions в GUI-фреймворках** - библиотеки вроде Qt и Swing моделируют пункты меню, кнопки панели инструментов и горячие клавиши как объекты `QAction`/`Action`, чтобы одна и та же команда запускалась из разных мест интерфейса."
     },
     {
-      "en": "**Background job queues** — systems like Sidekiq, Celery, and Bull serialize a job's target method and arguments into a command-like payload that a worker process picks up and executes later.",
-      "ru": "**Очереди фоновых задач** — системы вроде Sidekiq, Celery и Bull сериализуют метод и аргументы задачи в похожую на команду полезную нагрузку, которую позже подхватывает и выполняет рабочий процесс."
+      "en": "**Background job queues** - systems like Sidekiq, Celery, and Bull serialize a job's target method and arguments into a command-like payload that a worker process picks up and executes later.",
+      "ru": "**Очереди фоновых задач** - системы вроде Sidekiq, Celery и Bull сериализуют метод и аргументы задачи в похожую на команду полезную нагрузку, которую позже подхватывает и выполняет рабочий процесс."
     }
   ],
   "related_patterns": [
@@ -149,8 +149,8 @@
       },
       "options": [
         {
-          "en": "A request — the receiver, the action, and its arguments — so it can be passed around, stored, and invoked independently",
-          "ru": "Запрос — получателя, действие и его аргументы, — чтобы его можно было передавать, хранить и выполнять независимо"
+          "en": "One object holding the receiver, action, and arguments",
+          "ru": "Один объект с получателем, действием и аргументами"
         },
         {
           "en": "The entire class hierarchy of the application",
@@ -167,8 +167,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Command wraps a request — the receiver, the action, and its arguments — into a self-contained object that can be passed around, stored, and invoked independently of whatever triggered it.",
-        "ru": "Команда упаковывает запрос (получателя, действие и его аргументы) в самостоятельный объект, благодаря чему запрос можно передавать, хранить и выполнять независимо от того, что его инициировало."
+        "en": "Command wraps the receiver, the action, and its arguments into one object that can be passed around, stored, and invoked independently.",
+        "ru": "Команда упаковывает получателя, действие и аргументы в один объект, который можно передавать, хранить и выполнять независимо."
       }
     },
     {
@@ -178,8 +178,8 @@
       },
       "options": [
         {
-          "en": "The logic ends up duplicated in three places, and none of them has a record of what happened, so undo has nowhere to hook in",
-          "ru": "Логика дублируется в трёх местах, и ни в одном из них нет записи о произошедшем — отмене попросту не за что зацепиться"
+          "en": "Duplicated logic in three places, with no record for undo",
+          "ru": "Логика дублируется в трёх местах, и отменить нечего"
         },
         {
           "en": "The shape can no longer be deleted at all",
@@ -196,19 +196,19 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "If each UI element calls the deletion logic directly, that logic ends up duplicated in three places, and none of them has any record of what just happened, so undo has nowhere to hook in.",
-        "ru": "Если каждый элемент интерфейса напрямую вызывает логику удаления, эта логика дублируется в трёх местах, и ни в одном из них нет записи о том, что произошло, — отмене попросту не за что зацепиться."
+        "en": "Duplicating the logic in three places leaves no record of what happened, so undo has nothing to hook into.",
+        "ru": "Дублирование логики в трёх местах не оставляет записи о произошедшем, поэтому отменить нечего."
       }
     },
     {
       "question": {
         "en": "In the solution, what does the UI element that triggers the action do?",
-        "ru": "В решении — что делает элемент интерфейса, инициирующий действие?"
+        "ru": "В решении - что делает элемент интерфейса, инициирующий действие?"
       },
       "options": [
         {
-          "en": "It holds a command object and calls execute() on it, without caring what the command actually does",
-          "ru": "Он хранит объект-команду и вызывает у него execute(), не зная, что именно эта команда делает"
+          "en": "It holds a command object and calls execute() on it",
+          "ru": "Он хранит объект-команду и вызывает у него execute()"
         },
         {
           "en": "It calls the receiver's methods directly, bypassing any command object",
@@ -226,7 +226,7 @@
       "correct": 0,
       "explanation": {
         "en": "The UI element that triggers the action no longer calls the receiver directly; it just holds a command object and calls execute() on it.",
-        "ru": "Элемент интерфейса, инициирующий действие, больше не вызывает получателя напрямую — он лишь хранит объект-команду и вызывает у него execute()."
+        "ru": "Элемент интерфейса, инициирующий действие, больше не вызывает получателя напрямую - он лишь хранит объект-команду и вызывает у него execute()."
       }
     },
     {
@@ -236,8 +236,8 @@
       },
       "options": [
         {
-          "en": "Because a command is a real object, it can be stacked in a history list, giving undo/redo almost for free",
-          "ru": "Поскольку команда — полноценный объект, её можно складывать в список истории, что почти бесплатно даёт отмену и повтор действий"
+          "en": "A command is a real object, so it can be stored in a history list",
+          "ru": "Команда - полноценный объект, поэтому её можно хранить в списке истории"
         },
         {
           "en": "Undo/redo is impossible with the Command pattern",
@@ -255,7 +255,7 @@
       "correct": 0,
       "explanation": {
         "en": "Because the command is a real object rather than a bare function call, it can be stored in a history list, giving undo/redo almost for free.",
-        "ru": "Поскольку команда — полноценный объект, а не голый вызов функции, её можно сохранить в списке истории, что почти бесплатно даёт отмену и повтор."
+        "ru": "Поскольку команда - полноценный объект, а не голый вызов функции, её можно сохранить в списке истории, что почти бесплатно даёт отмену и повтор."
       }
     },
     {
@@ -265,8 +265,8 @@
       },
       "options": [
         {
-          "en": "Each command has to capture enough prior state to reverse itself, which is extra bookkeeping beyond running the action once",
-          "ru": "Каждая команда должна сохранять достаточно состояния для собственного отката, — это дополнительная работа сверх простого однократного выполнения"
+          "en": "Each command must save enough state to reverse itself",
+          "ru": "Каждая команда должна сохранять состояние для отката"
         },
         {
           "en": "Undo automatically works with zero extra code in every command",
@@ -284,7 +284,7 @@
       "correct": 0,
       "explanation": {
         "en": "Supporting undo properly often requires each command to capture enough prior state to reverse itself, which is extra bookkeeping beyond just running the action once.",
-        "ru": "Корректная поддержка отмены обычно требует, чтобы каждая команда сохраняла достаточно состояния для собственного отката, — это дополнительная работа сверх простого однократного выполнения действия."
+        "ru": "Корректная поддержка отмены обычно требует, чтобы каждая команда сохраняла достаточно состояния для собственного отката, - это дополнительная работа сверх простого однократного выполнения действия."
       }
     }
   ],
@@ -299,12 +299,12 @@
         "ru": "Как работает Команда"
       },
       "description": {
-        "en": "A client hands a command capsule to the invoker. The invoker never touches the receiver directly — it just triggers whatever capsule is currently plugged into its socket, and that capsule knows how to run and reverse itself.",
-        "ru": "Клиент передаёт инициатору капсулу-команду. Инициатор никогда не обращается к получателю напрямую — он лишь запускает ту капсулу, что сейчас вставлена в его гнездо, а капсула сама знает, как выполнить действие и как его отменить."
+        "en": "A client hands a command capsule to the invoker. The invoker never touches the receiver directly - it just triggers whatever capsule is currently plugged into its socket, and that capsule knows how to run and reverse itself.",
+        "ru": "Клиент передаёт инициатору капсулу-команду. Инициатор никогда не обращается к получателю напрямую - он лишь запускает ту капсулу, что сейчас вставлена в его гнездо, а капсула сама знает, как выполнить действие и как его отменить."
       },
       "caption": {
         "en": "The invoker only ever holds a slot. Whatever capsule is plugged in decides what happens next.",
-        "ru": "Инициатор хранит лишь гнездо. Что произойдёт дальше — решает вставленная в него капсула."
+        "ru": "Инициатор хранит лишь гнездо. Что произойдёт дальше - решает вставленная в него капсула."
       },
       "nodes": [
         {

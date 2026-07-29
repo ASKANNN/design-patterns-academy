@@ -15,11 +15,11 @@
   ],
   "intent": {
     "en": "Decorator is a structural pattern that adds behavior to an individual object by wrapping it in layers that share its interface, without touching the object's class or affecting other instances.",
-    "ru": "Декоратор — структурный паттерн, добавляющий поведение отдельному объекту путём оборачивания его в слои с тем же интерфейсом, не изменяя класс объекта и не затрагивая другие экземпляры."
+    "ru": "Декоратор - структурный паттерн, добавляющий поведение отдельному объекту путём оборачивания его в слои с тем же интерфейсом, не изменяя класс объекта и не затрагивая другие экземпляры."
   },
   "problem": {
-    "en": "A coffee shop's ordering system starts with a `Coffee` class that has a `cost()` method. Customers can add milk, an extra shot, whipped cream, or any combination of the three. Modeling every combination as a subclass — `CoffeeWithMilk`, `CoffeeWithMilkAndShot`, `CoffeeWithMilkAndShotAndCream` — multiplies out of control as more add-ons are introduced, and most of those subclasses only differ by which extras they tack onto the price.\n\nWorse, inheritance locks the combination in at class-definition time. If a customer wants to add whipped cream to an order that's already in progress, there's no subclass for \"whatever this order already is, plus cream.\"",
-    "ru": "Система заказов в кофейне начинается с класса `Coffee` с методом `cost()`. Клиенты могут добавить молоко, дополнительный эспрессо-шот, взбитые сливки или любую их комбинацию. Моделирование каждой комбинации отдельным подклассом — `CoffeeWithMilk`, `CoffeeWithMilkAndShot`, `CoffeeWithMilkAndShotAndCream` — выходит из-под контроля по мере добавления новых опций, при этом большинство таких подклассов отличаются только тем, какие добавки прибавляются к цене.\n\nХуже того, наследование фиксирует комбинацию ещё на этапе определения класса. Если клиент хочет добавить взбитые сливки к уже оформленному заказу, подходящего подкласса «то, чем уже является этот заказ, плюс сливки» просто не существует."
+    "en": "A coffee shop's ordering system starts with a `Coffee` class that has a `cost()` method. Customers can add milk, an extra shot, whipped cream, or any combination of the three. Modeling every combination as a subclass - `CoffeeWithMilk`, `CoffeeWithMilkAndShot`, `CoffeeWithMilkAndShotAndCream` - multiplies out of control as more add-ons are introduced, and most of those subclasses only differ by which extras they tack onto the price.\n\nWorse, inheritance locks the combination in at class-definition time. If a customer wants to add whipped cream to an order that's already in progress, there's no subclass for \"whatever this order already is, plus cream.\"",
+    "ru": "Система заказов в кофейне начинается с класса `Coffee` с методом `cost()`. Клиенты могут добавить молоко, дополнительный эспрессо-шот, взбитые сливки или любую их комбинацию. Моделирование каждой комбинации отдельным подклассом - `CoffeeWithMilk`, `CoffeeWithMilkAndShot`, `CoffeeWithMilkAndShotAndCream` - выходит из-под контроля по мере добавления новых опций, при этом большинство таких подклассов отличаются только тем, какие добавки прибавляются к цене.\n\nХуже того, наследование фиксирует комбинацию ещё на этапе определения класса. Если клиент хочет добавить взбитые сливки к уже оформленному заказу, подходящего подкласса «то, чем уже является этот заказ, плюс сливки» просто не существует."
   },
   "solution": {
     "en": "Give each add-on its own small wrapper class that implements the same interface as the base object and holds a reference to whatever it's wrapping. Calling `cost()` on a wrapper first asks the wrapped object for its cost, then adds its own charge on top.\n\nBecause every wrapper looks exactly like the object it wraps, wrappers stack: a `Coffee` can be wrapped in a `MilkDecorator`, then that result wrapped again in a `WhipDecorator`, and the outermost object still answers to `cost()` and any other shared method. Combinations are assembled at runtime by choosing which wrappers to apply, instead of being baked into a fixed subclass.",
@@ -34,36 +34,36 @@
       {
         "name": "Component (Notifier)",
         "role": {
-          "en": "The interface every layer must satisfy — both the original object and every decorator around it. In the diagram, that's `Notifier` and its send() method.",
-          "ru": "Интерфейс, которому должен соответствовать каждый слой — и исходный объект, и каждый декоратор вокруг него. На схеме это `Notifier` с методом send()."
+          "en": "The interface every layer must satisfy - both the original object and every decorator around it. In the diagram, that's `Notifier` and its send() method.",
+          "ru": "Интерфейс, которому должен соответствовать каждый слой - и исходный объект, и каждый декоратор вокруг него. На схеме это `Notifier` с методом send()."
         }
       },
       {
         "name": "Concrete Component (EmailNotifier)",
         "role": {
-          "en": "The plain, undecorated object at the center of the stack, carrying the original behavior the wrappers will build on — the Email Notifier in the diagram.",
-          "ru": "Обычный, ещё не декорированный объект в центре стека, несущий исходное поведение, на котором строятся обёртки, — Email-нотификатор на схеме."
+          "en": "The plain, undecorated object at the center of the stack, carrying the original behavior the wrappers will build on - the Email Notifier in the diagram.",
+          "ru": "Обычный, ещё не декорированный объект в центре стека, несущий исходное поведение, на котором строятся обёртки, - Email-нотификатор на схеме."
         }
       },
       {
         "name": "Base Decorator (NotifierDecorator)",
         "role": {
           "en": "A shared parent for all decorators that stores the wrapped Component and forwards calls to it, so each concrete decorator only needs to add its own piece.",
-          "ru": "Общий родитель для всех декораторов, хранящий вложенный Компонент и передающий ему вызовы, — благодаря чему каждый конкретный декоратор добавляет только свою часть."
+          "ru": "Общий родитель для всех декораторов, хранящий вложенный Компонент и передающий ему вызовы, - благодаря чему каждый конкретный декоратор добавляет только свою часть."
         }
       },
       {
         "name": "Concrete Decorator (SMSDecorator / SlackDecorator)",
         "role": {
-          "en": "One extra behavior layered on top — calls into the wrapped object first, then performs its own step. The SMS and Slack decorators in the diagram are two such layers.",
-          "ru": "Один дополнительный слой поведения — сначала вызывает вложенный объект, затем выполняет собственный шаг. SMS- и Slack-декораторы на схеме — два таких слоя."
+          "en": "One extra behavior layered on top - calls into the wrapped object first, then performs its own step. The SMS and Slack decorators in the diagram are two such layers.",
+          "ru": "Один дополнительный слой поведения - сначала вызывает вложенный объект, затем выполняет собственный шаг. SMS- и Slack-декораторы на схеме - два таких слоя."
         }
       },
       {
         "name": "Client",
         "role": {
-          "en": "Assembles the desired stack of decorators around the base object, then calls the outermost layer through the shared Component interface — a single send() call in the diagram.",
-          "ru": "Собирает нужный стек декораторов вокруг базового объекта, а затем вызывает самый внешний слой через общий интерфейс Компонента — на схеме это единственный вызов send()."
+          "en": "Assembles the desired stack of decorators around the base object, then calls the outermost layer through the shared Component interface - a single send() call in the diagram.",
+          "ru": "Собирает нужный стек декораторов вокруг базового объекта, а затем вызывает самый внешний слой через общий интерфейс Компонента - на схеме это единственный вызов send()."
         }
       }
     ]
@@ -123,16 +123,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**Java I/O streams** — `BufferedInputStream` and `GZIPInputStream` wrap a raw `InputStream` to add buffering or decompression without changing the underlying stream class.",
-      "ru": "**Потоки ввода-вывода Java** — `BufferedInputStream` и `GZIPInputStream` оборачивают исходный `InputStream`, добавляя буферизацию или разжатие без изменения самого класса потока."
+      "en": "**Java I/O streams** - `BufferedInputStream` and `GZIPInputStream` wrap a raw `InputStream` to add buffering or decompression without changing the underlying stream class.",
+      "ru": "**Потоки ввода-вывода Java** - `BufferedInputStream` и `GZIPInputStream` оборачивают исходный `InputStream`, добавляя буферизацию или разжатие без изменения самого класса потока."
     },
     {
-      "en": "**Python function decorators** — `@lru_cache` and `@retry` wrap a function with caching or retry logic while leaving the original function definition untouched.",
-      "ru": "**Декораторы функций в Python** — `@lru_cache` и `@retry` оборачивают функцию логикой кэширования или повторных попыток, не изменяя саму функцию."
+      "en": "**Python function decorators** - `@lru_cache` and `@retry` wrap a function with caching or retry logic while leaving the original function definition untouched.",
+      "ru": "**Декораторы функций в Python** - `@lru_cache` и `@retry` оборачивают функцию логикой кэширования или повторных попыток, не изменяя саму функцию."
     },
     {
-      "en": "**Express/Koa middleware chains** — each middleware wraps the next handler, layering on logging, authentication, or compression without modifying the route logic itself.",
-      "ru": "**Цепочки middleware в Express/Koa** — каждый middleware оборачивает следующий обработчик, добавляя логирование, аутентификацию или сжатие без изменения логики самого маршрута."
+      "en": "**Express/Koa middleware chains** - each middleware wraps the next handler, layering on logging, authentication, or compression without modifying the route logic itself.",
+      "ru": "**Цепочки middleware в Express/Koa** - каждый middleware оборачивает следующий обработчик, добавляя логирование, аутентификацию или сжатие без изменения логики самого маршрута."
     }
   ],
   "related_patterns": [
@@ -149,8 +149,8 @@
       },
       "options": [
         {
-          "en": "Behavior, by wrapping the object in layers that share its interface, without touching its class or other instances",
-          "ru": "Поведение, оборачивая объект в слои с тем же интерфейсом, не изменяя его класс и не затрагивая другие экземпляры"
+          "en": "Behavior, by wrapping the object in layers with the same interface",
+          "ru": "Поведение, оборачивая объект в слои с тем же интерфейсом"
         },
         {
           "en": "A completely new interface that replaces the old one",
@@ -178,8 +178,8 @@
       },
       "options": [
         {
-          "en": "It multiplies out of control as more add-ons are introduced, and inheritance locks the combination in at class-definition time",
-          "ru": "Число подклассов выходит из-под контроля по мере добавления опций, а наследование фиксирует комбинацию ещё на этапе определения класса"
+          "en": "It multiplies out of control as more add-ons are introduced",
+          "ru": "Число подклассов выходит из-под контроля с новыми добавками"
         },
         {
           "en": "The Coffee class loses its cost() method entirely",
@@ -196,8 +196,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Modeling every combination as a subclass multiplies out of control, and inheritance locks the combination in at class-definition time — there's no subclass for adding cream to an order already in progress.",
-        "ru": "Моделирование каждой комбинации подклассом выходит из-под контроля, а наследование фиксирует комбинацию ещё на этапе определения класса — нет подкласса для добавления сливок к уже оформленному заказу."
+        "en": "Modeling every combination as a subclass multiplies out of control, and inheritance locks the combination in at class-definition time - there's no subclass for adding cream to an order already in progress.",
+        "ru": "Моделирование каждой комбинации подклассом выходит из-под контроля, а наследование фиксирует комбинацию ещё на этапе определения класса - нет подкласса для добавления сливок к уже оформленному заказу."
       }
     },
     {
@@ -225,8 +225,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Calling cost() on a wrapper first asks the wrapped object for its cost, then adds its own charge on top — that's how wrappers stack.",
-        "ru": "Вызов cost() у обёртки сначала запрашивает стоимость у вложенного объекта, а затем добавляет к ней собственную наценку — именно так обёртки складываются в стек."
+        "en": "Calling cost() on a wrapper first asks the wrapped object for its cost, then adds its own charge on top - that's how wrappers stack.",
+        "ru": "Вызов cost() у обёртки сначала запрашивает стоимость у вложенного объекта, а затем добавляет к ней собственную наценку - именно так обёртки складываются в стек."
       }
     },
     {
@@ -236,8 +236,8 @@
       },
       "options": [
         {
-          "en": "Behavior can be attached to or removed from one specific object at runtime, without touching the class definition or any other instance",
-          "ru": "Поведение можно подключить к конкретному объекту или убрать от него во время выполнения, не трогая определение класса или другие экземпляры"
+          "en": "Behavior can be attached to one object at runtime, no class changes",
+          "ru": "Поведение можно подключить к объекту во время выполнения"
         },
         {
           "en": "Behavior must be fixed at class-definition time for all instances",
@@ -265,8 +265,8 @@
       },
       "options": [
         {
-          "en": "It usually means rebuilding the stack, since each layer only knows about its immediate neighbor",
-          "ru": "Это обычно требует пересборки всего стека, поскольку каждый слой знает только о своём непосредственном соседе"
+          "en": "It usually means rebuilding the whole stack",
+          "ru": "Это обычно требует пересборки всего стека"
         },
         {
           "en": "It automatically deletes the base object",
@@ -301,12 +301,12 @@
         "ru": "Как работает Декоратор"
       },
       "description": {
-        "en": "The Client makes a single send() call. It enters the outermost wrapper — the Slack Decorator — then travels inward through the SMS Decorator to the Email Notifier at the core. The core runs the original behaviour, then each wrapper adds its own on the way back out. The core object is never modified: every layer only wraps the one inside it.",
-        "ru": "Клиент делает один вызов send(). Он входит во внешнюю обёртку — Slack-декоратор — и движется внутрь через SMS-декоратор к ядру Email-нотификатору. Ядро выполняет исходное поведение, а затем каждая обёртка добавляет своё на обратном пути наружу. Ядро при этом не меняется: каждый слой лишь оборачивает тот, что внутри."
+        "en": "The Client makes a single send() call. It enters the outermost wrapper - the Slack Decorator - then travels inward through the SMS Decorator to the Email Notifier at the core. The core runs the original behaviour, then each wrapper adds its own on the way back out. The core object is never modified: every layer only wraps the one inside it.",
+        "ru": "Клиент делает один вызов send(). Он входит во внешнюю обёртку - Slack-декоратор - и движется внутрь через SMS-декоратор к ядру Email-нотификатору. Ядро выполняет исходное поведение, а затем каждая обёртка добавляет своё на обратном пути наружу. Ядро при этом не меняется: каждый слой лишь оборачивает тот, что внутри."
       },
       "caption": {
-        "en": "One send() passes through the wrappers. Each layer adds behaviour — the core stays unchanged.",
-        "ru": "Один send() проходит сквозь обёртки. Каждый слой добавляет поведение — ядро остаётся прежним."
+        "en": "One send() passes through the wrappers. Each layer adds behaviour - the core stays unchanged.",
+        "ru": "Один send() проходит сквозь обёртки. Каждый слой добавляет поведение - ядро остаётся прежним."
       },
       "nodes": [
         {

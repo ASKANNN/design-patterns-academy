@@ -14,49 +14,49 @@
     "decoupling"
   ],
   "intent": {
-    "en": "Bridge is a structural pattern that splits a class along two independent axes of change — what it does and how it does it — connecting the two halves through composition instead of inheritance.",
-    "ru": "Мост — структурный паттерн, разделяющий класс по двум независимым осям изменения — что он делает и как он это делает, — соединяя обе половины через композицию, а не наследование."
+    "en": "Bridge is a structural pattern that splits a class along two independent axes of change - what it does and how it does it - connecting the two halves through composition instead of inheritance.",
+    "ru": "Мост - структурный паттерн, разделяющий класс по двум независимым осям изменения - что он делает и как он это делает, - соединяя обе половины через композицию, а не наследование."
   },
   "problem": {
-    "en": "A remote-control class hierarchy starts with a base `RemoteControl` and a `AdvancedRemote` subclass that adds extras like mute. Then the team needs to support multiple device types — TVs, radios, and more. Following the same inheritance approach means creating `TVBasicRemote`, `TVAdvancedRemote`, `RadioBasicRemote`, `RadioAdvancedRemote`, and so on.\n\nEach new device type or new remote variant multiplies the existing subclasses instead of adding one class. The hierarchy is really modeling two separate concerns — the remote's control logic and the device it operates — but inheritance forces them into a single chain, so they can't vary independently.",
-    "ru": "Иерархия классов пультов начинается с базового `RemoteControl` и подкласса `AdvancedRemote`, добавляющего дополнительные возможности вроде отключения звука. Затем команде нужно поддержать несколько типов устройств — телевизоры, радиоприёмники и другие. При том же подходе через наследование приходится создавать `TVBasicRemote`, `TVAdvancedRemote`, `RadioBasicRemote`, `RadioAdvancedRemote` и так далее.\n\nКаждый новый тип устройства или новый вариант пульта умножает существующие подклассы вместо добавления одного класса. Иерархия на самом деле описывает две разные ответственности — логику управления пульта и устройство, которым он управляет, — но наследование вынуждает объединить их в одну цепочку, из-за чего они не могут изменяться независимо."
+    "en": "A remote-control class hierarchy starts with a base `RemoteControl` and a `AdvancedRemote` subclass that adds extras like mute. Then the team needs to support multiple device types - TVs, radios, and more. Following the same inheritance approach means creating `TVBasicRemote`, `TVAdvancedRemote`, `RadioBasicRemote`, `RadioAdvancedRemote`, and so on.\n\nEach new device type or new remote variant multiplies the existing subclasses instead of adding one class. The hierarchy is really modeling two separate concerns - the remote's control logic and the device it operates - but inheritance forces them into a single chain, so they can't vary independently.",
+    "ru": "Иерархия классов пультов начинается с базового `RemoteControl` и подкласса `AdvancedRemote`, добавляющего дополнительные возможности вроде отключения звука. Затем команде нужно поддержать несколько типов устройств - телевизоры, радиоприёмники и другие. При том же подходе через наследование приходится создавать `TVBasicRemote`, `TVAdvancedRemote`, `RadioBasicRemote`, `RadioAdvancedRemote` и так далее.\n\nКаждый новый тип устройства или новый вариант пульта умножает существующие подклассы вместо добавления одного класса. Иерархия на самом деле описывает две разные ответственности - логику управления пульта и устройство, которым он управляет, - но наследование вынуждает объединить их в одну цепочку, из-за чего они не могут изменяться независимо."
   },
   "solution": {
-    "en": "Pull one of the two concerns out into its own hierarchy, and connect it to the original hierarchy through a held reference rather than inheritance. In the remote-control example, devices (`TV`, `Radio`) become a separate hierarchy behind a common `Device` interface. The `RemoteControl` class stops assuming a specific device and instead holds a device object, forwarding the actual power and volume operations to it.\n\nThat held reference is the bridge: remote variants and device types can now each grow their own hierarchy, and any remote — basic or advanced — can be paired with any device at runtime, without a combinatorial explosion of subclasses.",
-    "ru": "Выделите одну из двух ответственностей в отдельную иерархию и свяжите её с исходной иерархией через хранимую ссылку, а не через наследование. В примере с пультами устройства (`TV`, `Radio`) становятся отдельной иерархией за общим интерфейсом `Device`. Класс `RemoteControl` перестаёт полагаться на конкретное устройство и вместо этого хранит объект устройства, делегируя ему фактические операции включения и регулировки громкости.\n\nЭта хранимая ссылка и есть мост: варианты пультов и типы устройств теперь могут каждый развивать собственную иерархию, а любой пульт — простой или продвинутый — можно сочетать с любым устройством во время выполнения, без комбинаторного взрыва подклассов."
+    "en": "Pull one of the two concerns out into its own hierarchy, and connect it to the original hierarchy through a held reference rather than inheritance. In the remote-control example, devices (`TV`, `Radio`) become a separate hierarchy behind a common `Device` interface. The `RemoteControl` class stops assuming a specific device and instead holds a device object, forwarding the actual power and volume operations to it.\n\nThat held reference is the bridge: remote variants and device types can now each grow their own hierarchy, and any remote - basic or advanced - can be paired with any device at runtime, without a combinatorial explosion of subclasses.",
+    "ru": "Выделите одну из двух ответственностей в отдельную иерархию и свяжите её с исходной иерархией через хранимую ссылку, а не через наследование. В примере с пультами устройства (`TV`, `Radio`) становятся отдельной иерархией за общим интерфейсом `Device`. Класс `RemoteControl` перестаёт полагаться на конкретное устройство и вместо этого хранит объект устройства, делегируя ему фактические операции включения и регулировки громкости.\n\nЭта хранимая ссылка и есть мост: варианты пультов и типы устройств теперь могут каждый развивать собственную иерархию, а любой пульт - простой или продвинутый - можно сочетать с любым устройством во время выполнения, без комбинаторного взрыва подклассов."
   },
   "structure": {
     "description": {
-      "en": "Two hierarchies sit side by side. The Abstraction side models what the client wants to do and holds a reference to an Implementation object; the Implementation side models how it actually gets done on a given platform or backend. The only connection between them is that stored reference — swapping it changes behavior without touching the Abstraction's code at all.",
-      "ru": "Две иерархии существуют бок о бок. Сторона Абстракции моделирует то, что хочет сделать клиент, и хранит ссылку на объект Реализации; сторона Реализации моделирует то, как это фактически выполняется на конкретной платформе или бэкенде. Единственная связь между ними — эта хранимая ссылка: её замена меняет поведение, вообще не затрагивая код Абстракции."
+      "en": "Two hierarchies sit side by side. The Abstraction side models what the client wants to do and holds a reference to an Implementation object; the Implementation side models how it actually gets done on a given platform or backend. The only connection between them is that stored reference - swapping it changes behavior without touching the Abstraction's code at all.",
+      "ru": "Две иерархии существуют бок о бок. Сторона Абстракции моделирует то, что хочет сделать клиент, и хранит ссылку на объект Реализации; сторона Реализации моделирует то, как это фактически выполняется на конкретной платформе или бэкенде. Единственная связь между ними - эта хранимая ссылка: её замена меняет поведение, вообще не затрагивая код Абстракции."
     },
     "participants": [
       {
         "name": "Abstraction",
         "role": {
-          "en": "Exposes the high-level operations the client calls, and forwards the low-level work to whatever Implementation object it currently holds.",
-          "ru": "Предоставляет высокоуровневые операции, которые вызывает клиент, и передаёт низкоуровневую работу тому объекту Реализации, который она хранит в данный момент."
+          "en": "Exposes the high-level operations the client calls, and forwards the low-level work to whatever Implementation object it currently holds. In the diagram: Abstraction, shown as RemoteControl.",
+          "ru": "Предоставляет высокоуровневые операции, которые вызывает клиент, и передаёт низкоуровневую работу тому объекту Реализации, который она хранит в данный момент. На диаграмме: Абстракция, показанная как RemoteControl."
         }
       },
       {
         "name": "Refined Abstraction",
         "role": {
-          "en": "Adds specialized operations on top of the base Abstraction without needing any changes on the Implementation side.",
-          "ru": "Добавляет специализированные операции поверх базовой Абстракции, не требуя изменений на стороне Реализации."
+          "en": "Adds specialized operations on top of the base Abstraction without needing any changes on the Implementation side. In the diagram: Refined Abstraction, shown as AdvancedRemote.",
+          "ru": "Добавляет специализированные операции поверх базовой Абстракции, не требуя изменений на стороне Реализации. На диаграмме: Уточнённая абстракция, показанная как AdvancedRemote."
         }
       },
       {
         "name": "Implementation",
         "role": {
-          "en": "Defines the low-level operations available to any Abstraction — a contract that is deliberately independent from the Abstraction's own API.",
-          "ru": "Определяет набор низкоуровневых операций, доступных любой Абстракции, — контракт, намеренно независимый от собственного API Абстракции."
+          "en": "Defines the low-level operations available to any Abstraction - a contract that is deliberately independent from the Abstraction's own API. In the diagram: Implementation, shown as the Device interface.",
+          "ru": "Определяет набор низкоуровневых операций, доступных любой Абстракции, - контракт, намеренно независимый от собственного API Абстракции. На диаграмме: Реализация, показанная как интерфейс Device."
         }
       },
       {
         "name": "Concrete Implementation",
         "role": {
-          "en": "Supplies one actual backend or platform — the piece that gets swapped in or out when the Abstraction needs to target something different.",
-          "ru": "Предоставляет один конкретный бэкенд или платформу — часть, которую подставляют или заменяют, когда Абстракции нужно работать с чем-то другим."
+          "en": "Supplies one actual backend or platform - the piece that gets swapped in or out when the Abstraction needs to target something different. In the diagram: TV, Radio.",
+          "ru": "Предоставляет один конкретный бэкенд или платформу - часть, которую подставляют или заменяют, когда Абстракции нужно работать с чем-то другим. На диаграмме: TV, Radio."
         }
       }
     ]
@@ -70,8 +70,8 @@
   },
   "pros": [
     {
-      "en": "The two hierarchies genuinely stop interfering with each other — adding a new device type like Radio never touches RemoteControl or AdvancedRemote code, and adding a new remote variant never touches TV or Radio code.",
-      "ru": "Две иерархии по-настоящему перестают мешать друг другу — добавление нового типа устройства вроде Radio никогда не затрагивает код RemoteControl или AdvancedRemote, а добавление нового варианта пульта не затрагивает код TV или Radio."
+      "en": "The two hierarchies genuinely stop interfering with each other - adding a new device type like Radio never touches RemoteControl or AdvancedRemote code, and adding a new remote variant never touches TV or Radio code.",
+      "ru": "Две иерархии по-настоящему перестают мешать друг другу - добавление нового типа устройства вроде Radio никогда не затрагивает код RemoteControl или AdvancedRemote, а добавление нового варианта пульта не затрагивает код TV или Radio."
     },
     {
       "en": "New abstractions and new implementations ship as isolated additions instead of edits to a shared class.",
@@ -82,8 +82,8 @@
       "ru": "Разделяет высокоуровневую логику оркестрации и низкоуровневые детали платформы по разным классам, благодаря чему каждый остаётся проще для чтения и тестирования."
     },
     {
-      "en": "The implementation object can be swapped at runtime — useful for switching a real backend for a test double, or changing behavior based on configuration.",
-      "ru": "Объект реализации можно заменить во время выполнения — полезно для подстановки тестового дублёра вместо реального бэкенда или для смены поведения на основе конфигурации."
+      "en": "The implementation object can be swapped at runtime - useful for switching a real backend for a test double, or changing behavior based on configuration.",
+      "ru": "Объект реализации можно заменить во время выполнения - полезно для подстановки тестового дублёра вместо реального бэкенда или для смены поведения на основе конфигурации."
     }
   ],
   "cons": [
@@ -97,35 +97,35 @@
     },
     {
       "en": "Choosing which concern belongs in the Abstraction and which in the Implementation isn't always obvious, and getting it wrong defeats the purpose.",
-      "ru": "Не всегда очевидно, какая забота должна относиться к Абстракции, а какая — к Реализации, и ошибка в этом выборе сводит на нет весь смысл паттерна."
+      "ru": "Не всегда очевидно, какая забота должна относиться к Абстракции, а какая - к Реализации, и ошибка в этом выборе сводит на нет весь смысл паттерна."
     }
   ],
   "when_to_use": [
     {
-      "en": "A class is growing subclasses along two unrelated dimensions at once — for example, message priority and delivery channel, or shape type and rendering backend.",
-      "ru": "Класс обрастает подклассами сразу по двум не связанным измерениям — например, приоритет сообщения и канал доставки, или тип фигуры и бэкенд рендеринга."
+      "en": "A class is growing subclasses along two unrelated dimensions at once - for example, message priority and delivery channel, or shape type and rendering backend.",
+      "ru": "Класс обрастает подклассами сразу по двум не связанным измерениям - например, приоритет сообщения и канал доставки, или тип фигуры и бэкенд рендеринга."
     },
     {
       "en": "You expect to add new variants on either side over time and want that growth to stay linear, not multiplicative.",
       "ru": "Ожидается, что со временем появятся новые варианты с любой из сторон, и важно, чтобы их рост оставался линейным, а не мультипликативным."
     },
     {
-      "en": "You need to swap the underlying implementation at runtime — for instance, pointing the same high-level code at a live service in production and a stub in tests.",
-      "ru": "Нужно менять базовую реализацию во время выполнения — например, направлять один и тот же высокоуровневый код то на реальный сервис в продакшене, то на заглушку в тестах."
+      "en": "You need to swap the underlying implementation at runtime - for instance, pointing the same high-level code at a live service in production and a stub in tests.",
+      "ru": "Нужно менять базовую реализацию во время выполнения - например, направлять один и тот же высокоуровневый код то на реальный сервис в продакшене, то на заглушку в тестах."
     }
   ],
   "real_world_examples": [
     {
-      "en": "**JDBC drivers** — application code calls the same `Connection`/`Statement` abstraction while MySQL, PostgreSQL, or SQLite each supply their own driver implementation underneath.",
-      "ru": "**Драйверы JDBC** — код приложения вызывает одну и ту же абстракцию `Connection`/`Statement`, а MySQL, PostgreSQL или SQLite подставляют под неё собственную реализацию драйвера."
+      "en": "**JDBC drivers** - application code calls the same `Connection`/`Statement` abstraction while MySQL, PostgreSQL, or SQLite each supply their own driver implementation underneath.",
+      "ru": "**Драйверы JDBC** - код приложения вызывает одну и ту же абстракцию `Connection`/`Statement`, а MySQL, PostgreSQL или SQLite подставляют под неё собственную реализацию драйвера."
     },
     {
-      "en": "**SLF4J logging facade** — code logs through one abstract API regardless of whether Logback, Log4j2, or java.util.logging ends up handling the actual output.",
-      "ru": "**Фасад логирования SLF4J** — код пишет в лог через единый абстрактный API независимо от того, кто в итоге обрабатывает вывод — Logback, Log4j2 или java.util.logging."
+      "en": "**SLF4J logging facade** - code logs through one abstract API regardless of whether Logback, Log4j2, or java.util.logging ends up handling the actual output.",
+      "ru": "**Фасад логирования SLF4J** - код пишет в лог через единый абстрактный API независимо от того, кто в итоге обрабатывает вывод - Logback, Log4j2 или java.util.logging."
     },
     {
-      "en": "**Cross-platform rendering in game engines** — a `Renderer` abstraction stays the same while separate implementations target DirectX, Vulkan, or Metal depending on the platform.",
-      "ru": "**Кроссплатформенный рендеринг в игровых движках** — абстракция `Renderer` остаётся неизменной, а отдельные реализации нацелены на DirectX, Vulkan или Metal в зависимости от платформы."
+      "en": "**Cross-platform rendering in game engines** - a `Renderer` abstraction stays the same while separate implementations target DirectX, Vulkan, or Metal depending on the platform.",
+      "ru": "**Кроссплатформенный рендеринг в игровых движках** - абстракция `Renderer` остаётся неизменной, а отдельные реализации нацелены на DirectX, Vulkan или Metal в зависимости от платформы."
     }
   ],
   "related_patterns": [
@@ -141,8 +141,8 @@
       },
       "options": [
         {
-          "en": "What it does and how it does it, connected through composition instead of inheritance",
-          "ru": "Что он делает и как он это делает, соединённые через композицию, а не наследование"
+          "en": "What it does and how, via composition not inheritance",
+          "ru": "Что делает и как, через композицию, а не наследование"
         },
         {
           "en": "Its public interface and its private fields",
@@ -159,8 +159,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Bridge splits a class along two independent axes of change — what it does and how it does it — connecting the two halves through composition instead of inheritance.",
-        "ru": "Мост разделяет класс по двум независимым осям изменения — что он делает и как он это делает, — соединяя обе половины через композицию, а не наследование."
+        "en": "Bridge splits a class along two independent axes of change - what it does and how it does it - connecting the two halves through composition instead of inheritance.",
+        "ru": "Мост разделяет класс по двум независимым осям изменения - что он делает и как он это делает, - соединяя обе половины через композицию, а не наследование."
       }
     },
     {
@@ -170,8 +170,8 @@
       },
       "options": [
         {
-          "en": "It multiplies into TVBasicRemote, TVAdvancedRemote, RadioBasicRemote, RadioAdvancedRemote and so on",
-          "ru": "Она размножается в TVBasicRemote, TVAdvancedRemote, RadioBasicRemote, RadioAdvancedRemote и так далее"
+          "en": "It multiplies into TVBasicRemote, RadioAdvancedRemote, and more",
+          "ru": "Она размножается в TVBasicRemote, RadioAdvancedRemote и так далее"
         },
         {
           "en": "It stays exactly the same size regardless of new device types",
@@ -195,12 +195,12 @@
     {
       "question": {
         "en": "In the Bridge solution, how does RemoteControl relate to a Device?",
-        "ru": "В решении Моста — как RemoteControl связан с Device?"
+        "ru": "В решении Моста - как RemoteControl связан с Device?"
       },
       "options": [
         {
-          "en": "It holds a device object as a reference and forwards operations to it, instead of assuming a specific device via inheritance",
-          "ru": "Он хранит объект устройства как ссылку и делегирует ему операции, вместо того чтобы полагаться на конкретное устройство через наследование"
+          "en": "It holds a device reference and forwards operations to it",
+          "ru": "Он хранит устройство как ссылку и делегирует ему операции"
         },
         {
           "en": "It inherits directly from the TV and Radio classes",
@@ -217,8 +217,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "RemoteControl holds a device object and forwards the actual power/volume operations to it — that held reference is the bridge.",
-        "ru": "RemoteControl хранит объект устройства и делегирует ему фактические операции включения/громкости — эта хранимая ссылка и есть мост."
+        "en": "RemoteControl holds a device object and forwards the actual power/volume operations to it - that held reference is the bridge.",
+        "ru": "RemoteControl хранит объект устройства и делегирует ему фактические операции включения/громкости - эта хранимая ссылка и есть мост."
       }
     },
     {
@@ -228,8 +228,8 @@
       },
       "options": [
         {
-          "en": "The implementation object can be swapped at runtime, e.g. a real backend for a test double",
-          "ru": "Объект реализации можно заменить во время выполнения, например реальный бэкенд на тестовый дублёр"
+          "en": "The implementation can be swapped at runtime",
+          "ru": "Объект реализации можно заменить во время выполнения"
         },
         {
           "en": "It removes the need for any interface between the two hierarchies",
@@ -246,8 +246,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "The implementation object can be swapped at runtime — useful for switching a real backend for a test double, or changing behavior based on configuration.",
-        "ru": "Объект реализации можно заменить во время выполнения — полезно для подстановки тестового дублёра вместо реального бэкенда или для смены поведения по конфигурации."
+        "en": "The implementation object can be swapped at runtime - useful for switching a real backend for a test double, or changing behavior based on configuration.",
+        "ru": "Объект реализации можно заменить во время выполнения - полезно для подстановки тестового дублёра вместо реального бэкенда или для смены поведения по конфигурации."
       }
     },
     {
@@ -293,12 +293,12 @@
         "ru": "Как работает Мост"
       },
       "description": {
-        "en": "Abstraction and Implementation grow as two independent towers. On the left, Refined Abstraction (AdvancedRemote) extends straight down from Abstraction (RemoteControl) — ordinary inheritance. On the right, TV and Radio each stand as a Concrete Implementation of the same Device interface. The only link between the two towers is the bridge itself: RemoteControl holds a reference to whichever device is currently plugged in and can swap it at runtime without inheriting from it.",
-        "ru": "Абстракция и Реализация растут как две независимые башни. Слева Уточнённая абстракция (AdvancedRemote) расширяет напрямую вниз Абстракцию (RemoteControl) — обычное наследование. Справа TV и Radio — каждый Конкретная реализация одного и того же интерфейса Device. Единственная связь между башнями — сам мост: RemoteControl хранит ссылку на то устройство, что подключено сейчас, и может заменить его во время выполнения, не наследуясь от него."
+        "en": "Abstraction and Implementation grow as two independent towers. On the left, Refined Abstraction (AdvancedRemote) extends straight down from Abstraction (RemoteControl) - ordinary inheritance. On the right, TV and Radio each stand as a Concrete Implementation of the same Device interface. The only link between the two towers is the bridge itself: RemoteControl holds a reference to whichever device is currently plugged in and can swap it at runtime without inheriting from it.",
+        "ru": "Абстракция и Реализация растут как две независимые башни. Слева Уточнённая абстракция (AdvancedRemote) расширяет напрямую вниз Абстракцию (RemoteControl) - обычное наследование. Справа TV и Radio - каждый Конкретная реализация одного и того же интерфейса Device. Единственная связь между башнями - сам мост: RemoteControl хранит ссылку на то устройство, что подключено сейчас, и может заменить его во время выполнения, не наследуясь от него."
       },
       "caption": {
-        "en": "Two independent hierarchies, connected by a single held reference — the bridge.",
-        "ru": "Две независимые иерархии, соединённые единственной хранимой ссылкой — мостом."
+        "en": "Two independent hierarchies, connected by a single held reference - the bridge.",
+        "ru": "Две независимые иерархии, соединённые единственной хранимой ссылкой - мостом."
       },
       "nodes": [
         {

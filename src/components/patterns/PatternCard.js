@@ -21,7 +21,7 @@ export function PatternCard(pattern, { showSummary = true, hidden = false } = {}
       class="pattern-card pattern-card--${category}${!isAvailable ? ' pattern-card--coming-soon' : ''}${hidden ? ' is-filtered-out' : ''}"
       data-filter-item
       data-filter-category="${category}"
-      aria-label="${name}${!isAvailable ? ' — ' + soonLabel : ''}"
+      aria-label="${name}${!isAvailable ? ' - ' + soonLabel : ''}"
       ${hidden ? 'aria-hidden="true"' : ''}
       ${!isAvailable ? 'aria-disabled="true" tabindex="-1"' : ''}
     >

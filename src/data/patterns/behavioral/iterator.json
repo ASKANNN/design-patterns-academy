@@ -14,48 +14,48 @@
   ],
   "intent": {
     "en": "Iterator is a behavioral pattern that provides a uniform way to step through the elements of a collection one at a time, without revealing whether the collection is stored as an array, a tree, a linked list, or something else.",
-    "ru": "Итератор — это поведенческий паттерн, который даёт единообразный способ последовательно проходить по элементам коллекции, не раскрывая, хранит ли она их в виде массива, дерева, связного списка или чего-то ещё."
+    "ru": "Итератор - это поведенческий паттерн, который даёт единообразный способ последовательно проходить по элементам коллекции, не раскрывая, хранит ли она их в виде массива, дерева, связного списка или чего-то ещё."
   },
   "problem": {
-    "en": "A media library might store playlists as a flat array, favorites as a hash set, and a \"recently played\" history as a fixed-size ring buffer. Every part of the UI that needs to loop over one of these — the shuffle button, the export feature, the search filter — ends up with a different loop shape depending on which structure it's touching.\n\nIf the traversal logic is written straight into each collection class, that class now has two jobs: managing its data and knowing every way someone might want to walk through it. Adding a new traversal order, like reverse or shuffled playback, means going back into the collection class again, and switching the underlying storage later breaks every piece of client code that assumed array indexing.",
-    "ru": "Медиатека может хранить плейлисты в виде плоского массива, избранное — в виде хеш-множества, а историю «недавно прослушанного» — в кольцевом буфере фиксированного размера. Каждая часть интерфейса, которой нужно пройтись по одной из этих коллекций — кнопка перемешивания, экспорт, фильтр поиска, — получает свой собственный вид цикла в зависимости от того, с какой структурой она работает.\n\nЕсли логика обхода прописана прямо в каждом классе коллекции, у этого класса появляется две обязанности: управлять данными и знать все возможные способы обхода. Добавление нового порядка обхода, например обратного или перемешанного воспроизведения, снова требует лезть в класс коллекции, а смена внутреннего хранилища позже ломает весь клиентский код, рассчитывавший на индексацию массива."
+    "en": "A media library might store playlists as a flat array, favorites as a hash set, and a \"recently played\" history as a fixed-size ring buffer. Every part of the UI that needs to loop over one of these - the shuffle button, the export feature, the search filter - ends up with a different loop shape depending on which structure it's touching.\n\nIf the traversal logic is written straight into each collection class, that class now has two jobs: managing its data and knowing every way someone might want to walk through it. Adding a new traversal order, like reverse or shuffled playback, means going back into the collection class again, and switching the underlying storage later breaks every piece of client code that assumed array indexing.",
+    "ru": "Медиатека может хранить плейлисты в виде плоского массива, избранное - в виде хеш-множества, а историю «недавно прослушанного» - в кольцевом буфере фиксированного размера. Каждая часть интерфейса, которой нужно пройтись по одной из этих коллекций - кнопка перемешивания, экспорт, фильтр поиска, - получает свой собственный вид цикла в зависимости от того, с какой структурой она работает.\n\nЕсли логика обхода прописана прямо в каждом классе коллекции, у этого класса появляется две обязанности: управлять данными и знать все возможные способы обхода. Добавление нового порядка обхода, например обратного или перемешанного воспроизведения, снова требует лезть в класс коллекции, а смена внутреннего хранилища позже ломает весь клиентский код, рассчитывавший на индексацию массива."
   },
   "solution": {
-    "en": "Iterator moves the traversal logic out of the collection and into a dedicated companion object — the **iterator** — that knows how to walk that one specific structure and nothing else.\n\nEvery iterator, regardless of what it's walking, exposes the same small interface: something like \"is there a next element\" and \"give me the next element.\" Client code loops using only that interface, so it never has to know or care whether it's iterating an array, a tree, or a ring buffer underneath. A collection can hand out several independent iterators at once, each tracking its own position, and a new traversal order — reverse, shuffled, filtered — is just a new iterator class sitting alongside the existing ones, leaving the collection itself untouched.",
-    "ru": "Итератор выносит логику обхода из коллекции в отдельный сопутствующий объект — **итератор**, который умеет обходить именно эту конкретную структуру и ничего больше.\n\nКаждый итератор, что бы он ни обходил, предоставляет один и тот же небольшой интерфейс: примерно «есть ли следующий элемент» и «дай следующий элемент». Клиентский код проходит по коллекции, используя только этот интерфейс, поэтому ему не важно и не нужно знать, что под капотом — массив, дерево или кольцевой буфер. Коллекция может выдать сразу несколько независимых итераторов, каждый со своей позицией, а новый порядок обхода — обратный, перемешанный, отфильтрованный — это просто ещё один класс итератора рядом с уже существующими, не затрагивающий саму коллекцию."
+    "en": "Iterator moves the traversal logic out of the collection and into a dedicated companion object - the **iterator** - that knows how to walk that one specific structure and nothing else.\n\nEvery iterator, regardless of what it's walking, exposes the same small interface: something like \"is there a next element\" and \"give me the next element.\" Client code loops using only that interface, so it never has to know or care whether it's iterating an array, a tree, or a ring buffer underneath. A collection can hand out several independent iterators at once, each tracking its own position, and a new traversal order - reverse, shuffled, filtered - is just a new iterator class sitting alongside the existing ones, leaving the collection itself untouched.",
+    "ru": "Итератор выносит логику обхода из коллекции в отдельный сопутствующий объект - **итератор**, который умеет обходить именно эту конкретную структуру и ничего больше.\n\nКаждый итератор, что бы он ни обходил, предоставляет один и тот же небольшой интерфейс: примерно «есть ли следующий элемент» и «дай следующий элемент». Клиентский код проходит по коллекции, используя только этот интерфейс, поэтому ему не важно и не нужно знать, что под капотом - массив, дерево или кольцевой буфер. Коллекция может выдать сразу несколько независимых итераторов, каждый со своей позицией, а новый порядок обхода - обратный, перемешанный, отфильтрованный - это просто ещё один класс итератора рядом с уже существующими, не затрагивающий саму коллекцию."
   },
   "structure": {
     "description": {
-      "en": "The Iterator interface fixes the minimal contract for stepping through elements — checking for more and fetching the next one. A ConcreteIterator implements that contract for one particular collection and one particular traversal order, holding its own cursor. The collection side mirrors this split: an IterableCollection interface promises a way to produce a compatible iterator, and a ConcreteCollection implements that by handing back a fresh ConcreteIterator on request.",
+      "en": "The Iterator interface fixes the minimal contract for stepping through elements - checking for more and fetching the next one. A ConcreteIterator implements that contract for one particular collection and one particular traversal order, holding its own cursor. The collection side mirrors this split: an IterableCollection interface promises a way to produce a compatible iterator, and a ConcreteCollection implements that by handing back a fresh ConcreteIterator on request.",
       "ru": "Интерфейс итератора фиксирует минимальный контракт обхода элементов: проверить, есть ли ещё элементы, и получить следующий. Конкретный итератор реализует этот контракт для одной конкретной коллекции и одного конкретного порядка обхода, храня собственный курсор. Со стороны коллекции разделение зеркальное: интерфейс коллекции обещает способ создать совместимый итератор, а конкретная коллекция реализует это, возвращая по запросу новый экземпляр конкретного итератора."
     },
     "participants": [
       {
         "name": "Iterator",
         "role": {
-          "en": "Fixes the minimal contract every traversal must offer — typically a way to check for remaining elements and a way to fetch the next one.",
-          "ru": "Фиксирует минимальный контракт, который должен предоставлять любой обход, — как правило, способ проверить наличие оставшихся элементов и способ получить следующий."
+          "en": "Fixes the minimal contract every traversal must offer - typically a way to check for remaining elements and a way to fetch the next one. In the diagram: Iterator.",
+          "ru": "Фиксирует минимальный контракт, который должен предоставлять любой обход, - как правило, способ проверить наличие оставшихся элементов и способ получить следующий. На диаграмме: Итератор."
         }
       },
       {
         "name": "ConcreteIterator",
         "role": {
-          "en": "Implements one specific traversal strategy over one specific collection, keeping its own cursor so multiple iterators over the same collection don't interfere with each other.",
-          "ru": "Реализует одну конкретную стратегию обхода для одной конкретной коллекции, храня собственный курсор, чтобы несколько итераторов по одной коллекции не мешали друг другу."
+          "en": "Implements one specific traversal strategy over one specific collection, keeping its own cursor so multiple iterators over the same collection don't interfere with each other. In the diagram: Iterator, the object stepping through the Song one part at a time.",
+          "ru": "Реализует одну конкретную стратегию обхода для одной конкретной коллекции, храня собственный курсор, чтобы несколько итераторов по одной коллекции не мешали друг другу. На диаграмме: Итератор, проходящий по Песне часть за частью."
         }
       },
       {
         "name": "IterableCollection",
         "role": {
-          "en": "Promises a factory method that produces an iterator matching the collection, without exposing anything about how elements are actually stored.",
-          "ru": "Обещает фабричный метод, создающий подходящий коллекции итератор, не раскрывая при этом ничего о фактическом хранении элементов."
+          "en": "Promises a factory method that produces an iterator matching the collection, without exposing anything about how elements are actually stored. In the diagram: Song.",
+          "ru": "Обещает фабричный метод, создающий подходящий коллекции итератор, не раскрывая при этом ничего о фактическом хранении элементов. На диаграмме: Песня."
         }
       },
       {
         "name": "ConcreteCollection",
         "role": {
-          "en": "Owns the actual storage and produces a properly initialized ConcreteIterator each time client code asks to traverse it.",
-          "ru": "Владеет фактическим хранилищем и создаёт корректно инициализированный конкретный итератор всякий раз, когда клиентский код запрашивает обход."
+          "en": "Owns the actual storage and produces a properly initialized ConcreteIterator each time client code asks to traverse it. In the diagram: Song, holding the Intro, Verse, Chorus, and Outro parts.",
+          "ru": "Владеет фактическим хранилищем и создаёт корректно инициализированный конкретный итератор всякий раз, когда клиентский код запрашивает обход. На диаграмме: Песня, хранящая части Интро, Куплет, Припев и Концовка."
         }
       }
     ]
@@ -115,16 +115,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**The JavaScript iteration protocol** — any object exposing `Symbol.iterator` automatically works with `for...of`, the spread operator, and array destructuring.",
-      "ru": "**Протокол итерации JavaScript** — любой объект, предоставляющий `Symbol.iterator`, автоматически работает с `for...of`, оператором расширения и деструктуризацией массивов."
+      "en": "**The JavaScript iteration protocol** - any object exposing `Symbol.iterator` automatically works with `for...of`, the spread operator, and array destructuring.",
+      "ru": "**Протокол итерации JavaScript** - любой объект, предоставляющий `Symbol.iterator`, автоматически работает с `for...of`, оператором расширения и деструктуризацией массивов."
     },
     {
-      "en": "**Java's `Iterable`/`Iterator` interfaces** — every collection in the Java Collections Framework implements `Iterable`, which is what lets it plug into the enhanced for-loop.",
-      "ru": "**Интерфейсы `Iterable`/`Iterator` в Java** — каждая коллекция во фреймворке Java Collections реализует `Iterable`, что и позволяет использовать её в расширенном цикле for."
+      "en": "**Java's `Iterable`/`Iterator` interfaces** - every collection in the Java Collections Framework implements `Iterable`, which is what lets it plug into the enhanced for-loop.",
+      "ru": "**Интерфейсы `Iterable`/`Iterator` в Java** - каждая коллекция во фреймворке Java Collections реализует `Iterable`, что и позволяет использовать её в расширенном цикле for."
     },
     {
-      "en": "**Database result cursors** — a JDBC `ResultSet` or a Postgres server-side cursor streams query results row by row instead of loading the whole table into memory at once.",
-      "ru": "**Курсоры результатов запросов к БД** — `ResultSet` в JDBC или серверный курсор PostgreSQL передаёт результаты запроса построчно, а не загружает всю таблицу в память целиком."
+      "en": "**Database result cursors** - a JDBC `ResultSet` or a Postgres server-side cursor streams query results row by row instead of loading the whole table into memory at once.",
+      "ru": "**Курсоры результатов запросов к БД** - `ResultSet` в JDBC или серверный курсор PostgreSQL передаёт результаты запроса построчно, а не загружает всю таблицу в память целиком."
     }
   ],
   "related_patterns": [
@@ -171,8 +171,8 @@
       },
       "options": [
         {
-          "en": "That class now has two jobs — managing data and knowing every way to walk through it — and switching storage later breaks client code",
-          "ru": "У этого класса появляется две обязанности — управлять данными и знать все способы обхода, — а смена хранилища позже ломает клиентский код"
+          "en": "The class ends up handling both storage and traversal",
+          "ru": "Класс отвечает и за хранение данных, и за обход"
         },
         {
           "en": "The collection can no longer store any elements",
@@ -189,8 +189,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "That class now has two jobs — managing its data and knowing every way someone might want to walk through it — and switching storage later breaks client code that assumed array indexing.",
-        "ru": "У этого класса появляется две обязанности — управлять данными и знать все возможные способы обхода, — а смена внутреннего хранилища позже ломает клиентский код, рассчитывавший на индексацию массива."
+        "en": "That class ends up handling both storage and traversal, so switching storage later breaks client code.",
+        "ru": "У этого класса появляется две обязанности - управлять данными и знать все возможные способы обхода, - а смена внутреннего хранилища позже ломает клиентский код, рассчитывавший на индексацию массива."
       }
     },
     {
@@ -200,8 +200,8 @@
       },
       "options": [
         {
-          "en": "Something like \"is there a next element\" and \"give me the next element\"",
-          "ru": "Что-то вроде «есть ли следующий элемент» и «дай следующий элемент»"
+          "en": "Something like \"is there a next\" and \"give me the next\"",
+          "ru": "Что-то вроде «есть ли следующий» и «дай следующий»"
         },
         {
           "en": "A method that returns the entire collection at once",
@@ -229,12 +229,12 @@
       },
       "options": [
         {
-          "en": "Yes — several independent iterators can run at once, each tracking its own position",
-          "ru": "Да — несколько независимых итераторов могут работать одновременно, каждый со своим положением"
+          "en": "Yes - several independent iterators can run at once",
+          "ru": "Да - несколько независимых итераторов могут работать одновременно"
         },
         {
-          "en": "No — only one iterator can ever exist per collection",
-          "ru": "Нет — на коллекцию может существовать только один итератор"
+          "en": "No - only one iterator can ever exist per collection",
+          "ru": "Нет - на коллекцию может существовать только один итератор"
         },
         {
           "en": "Only if the collection is a linked list",
@@ -270,8 +270,8 @@
           "ru": "Итератор незаметно переключается на другую коллекцию"
         },
         {
-          "en": "Nothing happens — iterators are always immune to mutation",
-          "ru": "Ничего не происходит — итераторы всегда защищены от изменений"
+          "en": "Nothing happens - iterators are always immune to mutation",
+          "ru": "Ничего не происходит - итераторы всегда защищены от изменений"
         }
       ],
       "correct": 0,
@@ -294,12 +294,12 @@
         "ru": "Как работает Итератор"
       },
       "description": {
-        "en": "The client never touches the song's internal storage. It asks the Iterator for the next part with next(), and the Iterator's own cursor decides which part comes back — always exactly one, always in order.",
-        "ru": "Клиент никогда не трогает внутреннее хранилище песни. Он лишь просит у Итератора следующую часть через next(), а собственный курсор итератора решает, какая часть вернётся — всегда ровно одна и всегда по порядку."
+        "en": "The client never touches the song's internal storage. It asks the Iterator for the next part with next(), and the Iterator's own cursor decides which part comes back - always exactly one, always in order.",
+        "ru": "Клиент никогда не трогает внутреннее хранилище песни. Он лишь просит у Итератора следующую часть через next(), а собственный курсор итератора решает, какая часть вернётся - всегда ровно одна и всегда по порядку."
       },
       "caption": {
-        "en": "One iterator, one cursor, one element at a time — the song plays in order without the client ever seeing how it's stored.",
-        "ru": "Один итератор, один курсор, один элемент за раз — песня звучит по порядку, а клиент так и не узнаёт, как она хранится внутри."
+        "en": "One iterator, one cursor, one element at a time - the song plays in order without the client ever seeing how it's stored.",
+        "ru": "Один итератор, один курсор, один элемент за раз - песня звучит по порядку, а клиент так и не узнаёт, как она хранится внутри."
       },
       "collectionLabel": {
         "en": "Song",

@@ -2,7 +2,7 @@
   "_meta": {
     "version": "1.0.0",
     "total": 23,
-    "source": "Gang of Four — Design Patterns: Elements of Reusable Object-Oriented Software"
+    "source": "Gang of Four - Design Patterns: Elements of Reusable Object-Oriented Software"
   },
 
   "patterns": [
@@ -94,8 +94,8 @@
       "status": "available",
       "tags": ["structural", "abstraction", "implementation"],
       "summary": {
-        "en": "Splits a class into two independent hierarchies — abstraction and implementation — connected through composition.",
-        "ru": "Разделяет класс на две независимые иерархии — абстракцию и реализацию, — связанные через композицию."
+        "en": "Splits a class into two independent hierarchies - abstraction and implementation - connected through composition.",
+        "ru": "Разделяет класс на две независимые иерархии - абстракцию и реализацию, - связанные через композицию."
       }
     },
     {

@@ -19,12 +19,12 @@
     "ru": "Легковес сокращает потребление памяти при работе с множеством похожих объектов, вынося их общие данные в разделяемые экземпляры и оставляя в каждом объекте только то, что делает его уникальным."
   },
   "problem": {
-    "en": "A map-rendering engine needs to place a million trees across a forest layer. Each tree object naively stores its coordinates, current growth stage, plus a mesh, a texture atlas, and material settings describing what an oak or a pine looks like.\n\nThe mesh and texture data alone might be several megabytes per species, and it's identical across every tree of that species — yet if it lives inside each `Tree` instance, a million trees means a million redundant copies of the same few megabytes, quickly exceeding any reasonable memory budget and stalling the renderer.",
-    "ru": "Движку рендеринга карты нужно разместить миллион деревьев на слое леса. Каждый наивно реализованный объект дерева хранит свои координаты, текущую стадию роста, а также меш, текстурный атлас и настройки материала, описывающие внешний вид дуба или сосны.\n\nОдни только данные меша и текстуры могут занимать несколько мегабайт на вид дерева, и они одинаковы для каждого дерева этого вида — но если хранить их внутри каждого экземпляра `Tree`, миллион деревьев означает миллион избыточных копий одних и тех же нескольких мегабайт, что быстро исчерпывает любой разумный бюджет памяти и замедляет рендерер."
+    "en": "A map-rendering engine needs to place a million trees across a forest layer. Each tree object naively stores its coordinates, current growth stage, plus a mesh, a texture atlas, and material settings describing what an oak or a pine looks like.\n\nThe mesh and texture data alone might be several megabytes per species, and it's identical across every tree of that species - yet if it lives inside each `Tree` instance, a million trees means a million redundant copies of the same few megabytes, quickly exceeding any reasonable memory budget and stalling the renderer.",
+    "ru": "Движку рендеринга карты нужно разместить миллион деревьев на слое леса. Каждый наивно реализованный объект дерева хранит свои координаты, текущую стадию роста, а также меш, текстурный атлас и настройки материала, описывающие внешний вид дуба или сосны.\n\nОдни только данные меша и текстуры могут занимать несколько мегабайт на вид дерева, и они одинаковы для каждого дерева этого вида - но если хранить их внутри каждого экземпляра `Tree`, миллион деревьев означает миллион избыточных копий одних и тех же нескольких мегабайт, что быстро исчерпывает любой разумный бюджет памяти и замедляет рендерер."
   },
   "solution": {
-    "en": "Split each object's data along a fault line: the part that's identical across many instances (species, mesh, texture — the **intrinsic state**) versus the part that's unique to this one instance (position, growth stage — the **extrinsic state**).\n\nPull the intrinsic part out into a small, shared object — the flyweight — and store only one copy per distinct combination. The extrinsic part stays with the caller and gets passed into the flyweight's methods as arguments whenever behavior is needed. A **factory** sits in front of flyweight creation: it hands back an existing shared instance if one already matches the requested intrinsic data, and only builds a new one when it doesn't.",
-    "ru": "Разделите данные каждого объекта по линии разлома: часть, одинаковую для многих экземпляров (вид, меш, текстура — **внутреннее состояние**), и часть, уникальную для конкретного экземпляра (позиция, стадия роста — **внешнее состояние**).\n\nВынесите внутреннюю часть в небольшой разделяемый объект — легковес — и храните лишь одну копию на каждую отдельную комбинацию данных. Внешняя часть остаётся у вызывающего кода и передаётся в методы легковеса аргументами, когда нужно выполнить какое-то поведение. Перед созданием легковесов стоит **фабрика**: она возвращает уже существующий разделяемый экземпляр, если он подходит по внутренним данным, и создаёт новый только тогда, когда подходящего нет."
+    "en": "Split each object's data along a fault line: the part that's identical across many instances (species, mesh, texture - the **intrinsic state**) versus the part that's unique to this one instance (position, growth stage - the **extrinsic state**).\n\nPull the intrinsic part out into a small, shared object - the flyweight - and store only one copy per distinct combination. The extrinsic part stays with the caller and gets passed into the flyweight's methods as arguments whenever behavior is needed. A **factory** sits in front of flyweight creation: it hands back an existing shared instance if one already matches the requested intrinsic data, and only builds a new one when it doesn't.",
+    "ru": "Разделите данные каждого объекта по линии разлома: часть, одинаковую для многих экземпляров (вид, меш, текстура - **внутреннее состояние**), и часть, уникальную для конкретного экземпляра (позиция, стадия роста - **внешнее состояние**).\n\nВынесите внутреннюю часть в небольшой разделяемый объект - легковес - и храните лишь одну копию на каждую отдельную комбинацию данных. Внешняя часть остаётся у вызывающего кода и передаётся в методы легковеса аргументами, когда нужно выполнить какое-то поведение. Перед созданием легковесов стоит **фабрика**: она возвращает уже существующий разделяемый экземпляр, если он подходит по внутренним данным, и создаёт новый только тогда, когда подходящего нет."
   },
   "structure": {
     "description": {
@@ -35,15 +35,15 @@
       {
         "name": "Flyweight",
         "role": {
-          "en": "Holds only the data that's identical across a whole class of objects and exposes operations parameterized by whatever unique data the caller supplies at call time.",
-          "ru": "Хранит только те данные, что одинаковы для целого класса объектов, и предоставляет операции, параметризуемые уникальными данными, которые вызывающий код передаёт в момент вызова."
+          "en": "Holds only the data that's identical across a whole class of objects and exposes operations parameterized by whatever unique data the caller supplies at call time. In the diagram: Oak, Pine.",
+          "ru": "Хранит только те данные, что одинаковы для целого класса объектов, и предоставляет операции, параметризуемые уникальными данными, которые вызывающий код передаёт в момент вызова. На диаграмме: Дуб, Сосна."
         }
       },
       {
         "name": "Flyweight Factory",
         "role": {
-          "en": "Keeps a lookup pool keyed by intrinsic data. Given a request, it returns a matching flyweight from the pool or constructs and stores one if none exists yet.",
-          "ru": "Хранит пул объектов с индексацией по внутренним данным. По запросу возвращает подходящий легковес из пула либо создаёт и сохраняет новый, если подходящего ещё нет."
+          "en": "Keeps a lookup pool keyed by intrinsic data. Given a request, it returns a matching flyweight from the pool or constructs and stores one if none exists yet. In the diagram: Flyweight Factory.",
+          "ru": "Хранит пул объектов с индексацией по внутренним данным. По запросу возвращает подходящий легковес из пула либо создаёт и сохраняет новый, если подходящего ещё нет. На диаграмме: Фабрика легковесов."
         }
       },
       {
@@ -56,8 +56,8 @@
       {
         "name": "Client",
         "role": {
-          "en": "Tracks or computes each object's extrinsic state and obtains the matching flyweight from the factory instead of allocating a fully self-contained object.",
-          "ru": "Отслеживает или вычисляет внешнее состояние каждого объекта и получает подходящий легковес через фабрику вместо создания полностью самодостаточного объекта."
+          "en": "Tracks or computes each object's extrinsic state and obtains the matching flyweight from the factory instead of allocating a fully self-contained object. In the diagram: Client.",
+          "ru": "Отслеживает или вычисляет внешнее состояние каждого объекта и получает подходящий легковес через фабрику вместо создания полностью самодостаточного объекта. На диаграмме: Клиент."
         }
       }
     ]
@@ -85,16 +85,16 @@
   ],
   "cons": [
     {
-      "en": "You're spending CPU time to save memory — recomputing or re-passing extrinsic state on every call can outweigh the savings if objects aren't numerous enough.",
-      "ru": "Экономия памяти достигается за счёт затрат процессорного времени — повторное вычисление или передача внешнего состояния при каждом вызове может перевесить выигрыш, если объектов не так уж много."
+      "en": "You're spending CPU time to save memory - recomputing or re-passing extrinsic state on every call can outweigh the savings if objects aren't numerous enough.",
+      "ru": "Экономия памяти достигается за счёт затрат процессорного времени - повторное вычисление или передача внешнего состояния при каждом вызове может перевесить выигрыш, если объектов не так уж много."
     },
     {
       "en": "Separating state into intrinsic and extrinsic parts adds a layer of indirection that makes the code harder to follow than a plain self-contained object.",
       "ru": "Разделение состояния на внутреннее и внешнее добавляет уровень косвенности, из-за чего код читать сложнее, чем при работе с обычным самодостаточным объектом."
     },
     {
-      "en": "Since flyweights are shared, mutating one accidentally affects every context referencing it — intrinsic state has to stay strictly read-only.",
-      "ru": "Поскольку легковесы разделяются между объектами, случайное изменение одного из них затронет все контексты, на него ссылающиеся, — внутреннее состояние обязано оставаться строго неизменяемым."
+      "en": "Since flyweights are shared, mutating one accidentally affects every context referencing it - intrinsic state has to stay strictly read-only.",
+      "ru": "Поскольку легковесы разделяются между объектами, случайное изменение одного из них затронет все контексты, на него ссылающиеся, - внутреннее состояние обязано оставаться строго неизменяемым."
     }
   ],
   "when_to_use": [
@@ -104,21 +104,21 @@
     },
     {
       "en": "Most of what makes those objects heavy is data that repeats identically across many of them, leaving only a small, cheap remainder that's genuinely unique per instance.",
-      "ru": "Когда основная часть «веса» этих объектов — данные, которые в точности повторяются у многих из них, а по-настоящему уникальным остаётся лишь небольшой, дешёвый остаток."
+      "ru": "Когда основная часть «веса» этих объектов - данные, которые в точности повторяются у многих из них, а по-настоящему уникальным остаётся лишь небольшой, дешёвый остаток."
     }
   ],
   "real_world_examples": [
     {
-      "en": "**Browser text rendering** — a font/size/weight glyph bitmap is rasterized once and shared by every occurrence of that character on the page; each occurrence only needs its own screen position.",
-      "ru": "**Рендеринг текста в браузере** — растровое изображение глифа для конкретного шрифта, размера и начертания создаётся один раз и используется всеми вхождениями этого символа на странице; для каждого вхождения хранится лишь собственная позиция на экране."
+      "en": "**Browser text rendering** - a font/size/weight glyph bitmap is rasterized once and shared by every occurrence of that character on the page; each occurrence only needs its own screen position.",
+      "ru": "**Рендеринг текста в браузере** - растровое изображение глифа для конкретного шрифта, размера и начертания создаётся один раз и используется всеми вхождениями этого символа на странице; для каждого вхождения хранится лишь собственная позиция на экране."
     },
     {
-      "en": "**Java's `Integer.valueOf()` cache** — small boxed integers (-128 to 127) are pooled and reused rather than allocated fresh, since the same handful of values recur constantly in typical programs.",
-      "ru": "**Кэш `Integer.valueOf()` в Java** — небольшие упакованные целые числа (от -128 до 127) берутся из пула и переиспользуются вместо создания заново, поскольку одни и те же значения постоянно повторяются в типичных программах."
+      "en": "**Java's `Integer.valueOf()` cache** - small boxed integers (-128 to 127) are pooled and reused rather than allocated fresh, since the same handful of values recur constantly in typical programs.",
+      "ru": "**Кэш `Integer.valueOf()` в Java** - небольшие упакованные целые числа (от -128 до 127) берутся из пула и переиспользуются вместо создания заново, поскольку одни и те же значения постоянно повторяются в типичных программах."
     },
     {
-      "en": "**Game engine particle/instance systems** — thousands of bullets or foliage sprites reference one shared mesh-and-material record, while each instance keeps only its own transform and velocity.",
-      "ru": "**Системы частиц и инстансинга в игровых движках** — тысячи пуль или спрайтов растительности ссылаются на одну общую запись меша и материала, а каждый экземпляр хранит только собственную трансформацию и скорость."
+      "en": "**Game engine particle/instance systems** - thousands of bullets or foliage sprites reference one shared mesh-and-material record, while each instance keeps only its own transform and velocity.",
+      "ru": "**Системы частиц и инстансинга в игровых движках** - тысячи пуль или спрайтов растительности ссылаются на одну общую запись меша и материала, а каждый экземпляр хранит только собственную трансформацию и скорость."
     }
   ],
   "related_patterns": [
@@ -134,8 +134,8 @@
       },
       "options": [
         {
-          "en": "Memory usage for large populations of similar objects, by factoring out shared data into shared instances",
-          "ru": "Потребление памяти при работе с множеством похожих объектов, вынося общие данные в разделяемые экземпляры"
+          "en": "Memory usage, by sharing data across similar objects",
+          "ru": "Потребление памяти, вынося общие данные в разделяемые экземпляры"
         },
         {
           "en": "Network latency, by batching remote calls",
@@ -159,12 +159,12 @@
     {
       "question": {
         "en": "In the million-trees example, what specifically consumes excessive memory if each Tree stores its own mesh and texture?",
-        "ru": "В примере с миллионом деревьев — что именно расходует избыточную память, если каждое дерево хранит собственный меш и текстуру?"
+        "ru": "В примере с миллионом деревьев - что именно расходует избыточную память, если каждое дерево хранит собственный меш и текстуру?"
       },
       "options": [
         {
-          "en": "The mesh and texture data are identical per species, so a million trees means a million redundant copies of the same few megabytes",
-          "ru": "Данные меша и текстуры одинаковы для каждого вида, поэтому миллион деревьев означает миллион избыточных копий одних и тех же нескольких мегабайт"
+          "en": "Mesh and texture are identical per species, duplicated a million times",
+          "ru": "Меш и текстура одинаковы для вида, копируются миллион раз"
         },
         {
           "en": "The coordinates alone take up several megabytes each",
@@ -181,8 +181,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "The mesh and texture data are identical across every tree of a species — storing it per instance means a million trees means a million redundant copies.",
-        "ru": "Данные меша и текстуры одинаковы для каждого дерева этого вида — хранение их в каждом экземпляре означает миллион избыточных копий на миллион деревьев."
+        "en": "The mesh and texture data are identical across every tree of a species - storing it per instance means a million trees means a million redundant copies.",
+        "ru": "Данные меша и текстуры одинаковы для каждого дерева этого вида - хранение их в каждом экземпляре означает миллион избыточных копий на миллион деревьев."
       }
     },
     {
@@ -192,12 +192,12 @@
       },
       "options": [
         {
-          "en": "Intrinsic is the part identical across many instances (shared in the flyweight); extrinsic is unique per instance and passed in as arguments",
-          "ru": "Внутреннее — часть, одинаковая для многих экземпляров (хранится в легковесе); внешнее — уникальна для каждого экземпляра и передаётся аргументом"
+          "en": "Intrinsic is shared across instances; extrinsic is unique and passed in",
+          "ru": "Внутреннее общее для всех; внешнее уникально и передаётся аргументом"
         },
         {
           "en": "Intrinsic is stored on disk; extrinsic is stored in memory",
-          "ru": "Внутреннее хранится на диске; внешнее — в памяти"
+          "ru": "Внутреннее хранится на диске; внешнее - в памяти"
         },
         {
           "en": "Intrinsic is computed at runtime; extrinsic is fixed at compile time",
@@ -221,8 +221,8 @@
       },
       "options": [
         {
-          "en": "It hands back an existing shared instance if one already matches the requested intrinsic data, and only builds a new one when it doesn't",
-          "ru": "Она возвращает уже существующий разделяемый экземпляр, если он подходит по внутренним данным, и создаёт новый только тогда, когда подходящего нет"
+          "en": "It returns an existing instance if one matches, else builds new",
+          "ru": "Возвращает существующий экземпляр, если он подходит, иначе создаёт новый"
         },
         {
           "en": "It creates a brand-new flyweight for every single request, regardless of duplicates",
@@ -250,8 +250,8 @@
       },
       "options": [
         {
-          "en": "Since flyweights are shared, mutating one accidentally affects every context referencing it, so intrinsic state must stay strictly read-only",
-          "ru": "Поскольку легковесы разделяются, случайное изменение одного из них затронет все контексты, на него ссылающиеся, — внутреннее состояние обязано оставаться строго неизменяемым"
+          "en": "Mutating one shared flyweight affects every context using it",
+          "ru": "Изменение одного легковеса затронет все ссылающиеся на него контексты"
         },
         {
           "en": "Mutating a flyweight has no effect on any other object",
@@ -268,8 +268,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Since flyweights are shared, mutating one accidentally affects every context referencing it — intrinsic state has to stay strictly read-only.",
-        "ru": "Поскольку легковесы разделяются между объектами, случайное изменение одного из них затронет все контексты, на него ссылающиеся, — внутреннее состояние обязано оставаться строго неизменяемым."
+        "en": "Since flyweights are shared, mutating one accidentally affects every context referencing it - intrinsic state has to stay strictly read-only.",
+        "ru": "Поскольку легковесы разделяются между объектами, случайное изменение одного из них затронет все контексты, на него ссылающиеся, - внутреннее состояние обязано оставаться строго неизменяемым."
       }
     }
   ],
@@ -286,12 +286,12 @@
         "ru": "Как работает Легковес"
       },
       "description": {
-        "en": "The Client asks the Flyweight Factory for a tree type by name. The first \"Oak\" request is a MISS — the factory creates a new shared TreeType and adds it to the pool. Every later \"Oak\" request is a HIT: the factory returns that exact same object instead of creating a duplicate. A different key, like \"Pine\", still gets its own new shared instance.",
-        "ru": "Клиент запрашивает у Фабрики легковесов тип дерева по имени. Первый запрос «Oak» — промах: фабрика создаёт новый общий TreeType и добавляет его в пул. Каждый следующий запрос «Oak» — попадание: фабрика возвращает тот же самый объект вместо создания дубликата. Другой ключ, например «Pine», всё равно получает свой собственный новый общий экземпляр."
+        "en": "The Client asks the Flyweight Factory for a tree type by name. The first \"Oak\" request is a MISS - the factory creates a new shared TreeType and adds it to the pool. Every later \"Oak\" request is a HIT: the factory returns that exact same object instead of creating a duplicate. A different key, like \"Pine\", still gets its own new shared instance.",
+        "ru": "Клиент запрашивает у Фабрики легковесов тип дерева по имени. Первый запрос «Oak» - промах: фабрика создаёт новый общий TreeType и добавляет его в пул. Каждый следующий запрос «Oak» - попадание: фабрика возвращает тот же самый объект вместо создания дубликата. Другой ключ, например «Pine», всё равно получает свой собственный новый общий экземпляр."
       },
       "caption": {
-        "en": "One shared token per key. Every later request for the same key reuses it — nothing is duplicated.",
-        "ru": "Один общий объект на ключ. Каждый повторный запрос с тем же ключом использует его снова — без дублирования."
+        "en": "One shared token per key. Every later request for the same key reuses it - nothing is duplicated.",
+        "ru": "Один общий объект на ключ. Каждый повторный запрос с тем же ключом использует его снова - без дублирования."
       },
       "poolLabel": {
         "en": "Flyweight pool",

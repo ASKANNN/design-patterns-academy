@@ -1,8 +1,5 @@
 import { getA11yState, setA11y, resetA11y } from '../../config/accessibility.js';
 
-// Разметка кнопки и панели виджета доступности.
-// Все подписи идут через data-i18n / data-i18n-aria-label — переводы берутся из
-// src/data/locales/{en,ru}/ui.json, ключ "a11y.*", отдельного хардкода языка тут нет.
 export function AccessibilityWidget() {
   return `
     <button

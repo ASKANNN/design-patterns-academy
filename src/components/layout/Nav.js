@@ -7,7 +7,7 @@ export function MobileNav() {
       <nav class="mobile-nav__panel" aria-label="Mobile navigation" data-i18n-aria-label="a11y.mobile_nav">
 
         <div class="mobile-nav__header">
-          <a href="#/" class="mobile-nav__logo" aria-label="Design Patterns Academy — Home" data-i18n-aria-label="a11y.logo_home">
+          <a href="#/" class="mobile-nav__logo" aria-label="Design Patterns Academy - Home" data-i18n-aria-label="a11y.logo_home">
             <svg width="22" height="22" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
               <polygon points="14 2 26 8 26 20 14 26 2 20 2 8"/>
               <line x1="14" y1="2" x2="14" y2="26"/>

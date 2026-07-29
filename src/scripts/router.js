@@ -133,22 +133,22 @@ export function setPageMeta(path, params) {
   let desc  = defaultDesc;
 
   if (path === '/catalog') {
-    title = `Knowledge Catalog — ${base}`;
+    title = `Knowledge Catalog - ${base}`;
     desc  = 'Browse all Software Engineering knowledge modules available on Design Patterns Academy.';
   } else if (path === '/patterns') {
-    title = `Design Patterns — ${base}`;
+    title = `Design Patterns - ${base}`;
     desc  = 'Explore all 23 Gang of Four design patterns organized by category: Creational, Structural, and Behavioral.';
   } else if (path.startsWith('/patterns/') && params.slug) {
-    title = `${_titleCase(params.slug)} Pattern — ${base}`;
+    title = `${_titleCase(params.slug)} Pattern - ${base}`;
     desc  = `Learn the ${_titleCase(params.slug)} design pattern: intent, structure, implementation, and real-world examples.`;
   } else if (path.startsWith('/patterns/') && params.category) {
-    title = `${_titleCase(params.category)} Patterns — ${base}`;
+    title = `${_titleCase(params.category)} Patterns - ${base}`;
     desc  = `All ${_titleCase(params.category)} design patterns from the Gang of Four book.`;
   } else if (path === '/about') {
-    title = `About — ${base}`;
-    desc  = 'Learn about Design Patterns Academy — a source-available educational platform for Software Engineering.';
+    title = `About - ${base}`;
+    desc  = 'Learn about Design Patterns Academy - a source-available educational platform for Software Engineering.';
   } else if (path === '/search') {
-    title = `Search — ${base}`;
+    title = `Search - ${base}`;
     desc  = defaultDesc;
   }
 

@@ -41,7 +41,7 @@ function _conceptCard(node, opts) {
   const cls = `diagram__card${emphasis ? ' diagram__card--emphasis' : ''}${accent ? ` diagram__card--accent-${escapeText(accent)}` : ''}`;
 
   const a11yLabel =
-    ariaLabel || (subtitle ? `${label} — ${subtitle}` : label);
+    ariaLabel || (subtitle ? `${label} - ${subtitle}` : label);
 
   const focusAttrs = focusable
     ? ` tabindex="0" role="listitem" aria-label="${escapeText(a11yLabel)}"`

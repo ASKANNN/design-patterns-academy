@@ -32,7 +32,7 @@
     "result_count": "Found <strong>{{count}}</strong> result{{s}} for <strong>\"{{query}}\"</strong>",
     "no_match": "No results for <strong>\"{{query}}\"</strong>",
     "enter_keyword": "Enter a keyword to search all 23 patterns.",
-    "no_match_desc": "Try different keywords — pattern name, category, or a tag like \"factory\" or \"event\".",
+    "no_match_desc": "Try different keywords - pattern name, category, or a tag like \"factory\" or \"event\".",
     "browse_all": "Browse All Patterns"
   },
 
@@ -112,7 +112,7 @@
     "code_example": "Code example",
     "pattern_card": "{{name}} pattern",
     "external_link": "Opens in new tab",
-    "logo_home": "Design Patterns Academy — Home",
+    "logo_home": "Design Patterns Academy - Home",
     "site_utilities": "Site utilities",
     "nav_dialog": "Navigation menu",
     "loading": "Loading",
@@ -178,17 +178,17 @@
     "subtitle": "Choose a learning path. More modules arriving soon.",
     "badge_active": "Active",
     "badge_coming_soon": "Coming Soon",
-    "aria_coming_soon": " — coming soon"
+    "aria_coming_soon": " - coming soon"
   },
 
   "about": {
-    "lead": "A premium source-available educational platform for learning the 23 Gang of Four design patterns — built with modern web standards, no frameworks, and a passion for great developer experience.",
+    "lead": "A premium source-available educational platform for learning the 23 Gang of Four design patterns - built with modern web standards, no frameworks, and a passion for great developer experience.",
     "section_project": "The Project",
     "project_p1": "Design Patterns Academy was created to provide a clean, distraction-free learning experience for one of the most important topics in software engineering: design patterns.",
     "project_p2": "Unlike many resources, every pattern explanation here comes with clear intent, real-world context, implementation examples in multiple languages, and honest trade-off analysis.",
-    "project_p3": "The platform is designed to grow into a full knowledge catalog covering algorithms, data structures, software architecture, and more — all following the same editorial standards.",
+    "project_p3": "The platform is designed to grow into a full knowledge catalog covering algorithms, data structures, software architecture, and more - all following the same editorial standards.",
     "section_philosophy": "Design Philosophy",
-    "philosophy_p1": "Every decision — from typography to component structure — follows the same principles that the patterns themselves teach: separation of concerns, single responsibility, and clean interfaces.",
+    "philosophy_p1": "Every decision - from typography to component structure - follows the same principles that the patterns themselves teach: separation of concerns, single responsibility, and clean interfaces.",
     "tooltip_solid": "Five object-oriented design principles that help create maintainable, flexible and scalable software.",
     "tooltip_dry": "Don't Repeat Yourself. Avoid duplicating knowledge or business logic in multiple places.",
     "tooltip_kiss": "Keep It Simple, Stupid. Prefer the simplest solution that correctly solves the problem.",

@@ -15,15 +15,15 @@
   ],
   "intent": {
     "en": "Adapter is a structural pattern that wraps an object with a mismatched interface behind a translator, letting client code call it as if it spoke the expected language all along.",
-    "ru": "Адаптер — структурный паттерн, оборачивающий объект с неподходящим интерфейсом в переходник-транслятор, позволяя клиентскому коду вызывать его так, будто он изначально говорил на нужном «языке»."
+    "ru": "Адаптер - структурный паттерн, оборачивающий объект с неподходящим интерфейсом в переходник-транслятор, позволяя клиентскому коду вызывать его так, будто он изначально говорил на нужном «языке»."
   },
   "problem": {
-    "en": "A payment module in your checkout flow was built around a `charge(amountCents, cardToken)` method, and every screen in the app calls it that way. Now the business wants to add a new payment provider whose SDK only exposes `submitTransaction({ total, currency, source })`.\n\nYou can't rename the SDK's method — it's someone else's package, updated independently. Rewriting your entire checkout flow to match the new SDK's shape would touch dozens of call sites for the sake of one provider. And the next provider you integrate will likely have yet another shape, repeating the problem.",
-    "ru": "Модуль оплаты в вашем чекауте построен вокруг метода `charge(amountCents, cardToken)`, и все экраны приложения вызывают его именно так. Теперь бизнес просит подключить нового платёжного провайдера, чей SDK предоставляет только `submitTransaction({ total, currency, source })`.\n\nПереименовать метод в чужом SDK нельзя — он обновляется отдельно от вашего кода. Переписывать весь чекаут под форму нового SDK ради одного провайдера означало бы правку десятков мест вызова. А следующий провайдер почти наверняка предложит третью, непохожую сигнатуру — и проблема повторится."
+    "en": "A payment module in your checkout flow was built around a `charge(amountCents, cardToken)` method, and every screen in the app calls it that way. Now the business wants to add a new payment provider whose SDK only exposes `submitTransaction({ total, currency, source })`.\n\nYou can't rename the SDK's method - it's someone else's package, updated independently. Rewriting your entire checkout flow to match the new SDK's shape would touch dozens of call sites for the sake of one provider. And the next provider you integrate will likely have yet another shape, repeating the problem.",
+    "ru": "Модуль оплаты в вашем чекауте построен вокруг метода `charge(amountCents, cardToken)`, и все экраны приложения вызывают его именно так. Теперь бизнес просит подключить нового платёжного провайдера, чей SDK предоставляет только `submitTransaction({ total, currency, source })`.\n\nПереименовать метод в чужом SDK нельзя - он обновляется отдельно от вашего кода. Переписывать весь чекаут под форму нового SDK ради одного провайдера означало бы правку десятков мест вызова. А следующий провайдер почти наверняка предложит третью, непохожую сигнатуру - и проблема повторится."
   },
   "solution": {
-    "en": "Introduce a thin wrapper class that implements the interface your code already expects, and internally translates each call into whatever the external object actually needs. The wrapper receives calls in the familiar shape, reformats the arguments, invokes the wrapped object, and reshapes the result back if needed.\n\nNeither side has to change: the caller keeps using the interface it always used, and the wrapped object keeps its own interface untouched. All the translation logic — renaming fields, converting units, reordering parameters — lives in one isolated place instead of being smeared across the codebase.",
-    "ru": "Введите тонкий класс-обёртку, реализующий интерфейс, который уже ожидает ваш код, и внутри переводящий каждый вызов в форму, понятную внешнему объекту. Обёртка принимает вызовы в привычном виде, переформатирует аргументы, вызывает оборачиваемый объект и при необходимости преобразует результат обратно.\n\nНи одна из сторон не меняется: вызывающий код продолжает использовать привычный интерфейс, а оборачиваемый объект сохраняет собственный интерфейс нетронутым. Вся логика перевода — переименование полей, конвертация единиц, изменение порядка параметров — сосредоточена в одном изолированном месте, а не размазана по всей кодовой базе."
+    "en": "Introduce a thin wrapper class that implements the interface your code already expects, and internally translates each call into whatever the external object actually needs. The wrapper receives calls in the familiar shape, reformats the arguments, invokes the wrapped object, and reshapes the result back if needed.\n\nNeither side has to change: the caller keeps using the interface it always used, and the wrapped object keeps its own interface untouched. All the translation logic - renaming fields, converting units, reordering parameters - lives in one isolated place instead of being smeared across the codebase.",
+    "ru": "Введите тонкий класс-обёртку, реализующий интерфейс, который уже ожидает ваш код, и внутри переводящий каждый вызов в форму, понятную внешнему объекту. Обёртка принимает вызовы в привычном виде, переформатирует аргументы, вызывает оборачиваемый объект и при необходимости преобразует результат обратно.\n\nНи одна из сторон не меняется: вызывающий код продолжает использовать привычный интерфейс, а оборачиваемый объект сохраняет собственный интерфейс нетронутым. Вся логика перевода - переименование полей, конвертация единиц, изменение порядка параметров - сосредоточена в одном изолированном месте, а не размазана по всей кодовой базе."
   },
   "structure": {
     "description": {
@@ -34,29 +34,29 @@
       {
         "name": "Client",
         "role": {
-          "en": "Drives the application logic and calls objects strictly through the Target interface, unaware of any adapting happening behind it.",
-          "ru": "Управляет логикой приложения и вызывает объекты строго через интерфейс Target, не подозревая о происходящем за ним преобразовании."
+          "en": "Drives the application logic and calls objects strictly through the Target interface, unaware of any adapting happening behind it. In the diagram: Client.",
+          "ru": "Управляет логикой приложения и вызывает объекты строго через интерфейс Target, не подозревая о происходящем за ним преобразовании. На диаграмме: Клиент."
         }
       },
       {
         "name": "Target",
         "role": {
-          "en": "The interface the Client already relies on — the contract that any object handed to the Client must satisfy.",
-          "ru": "Интерфейс, на который уже полагается клиент, — контракт, которому должен соответствовать любой передаваемый ему объект."
+          "en": "The interface the Client already relies on - the contract that any object handed to the Client must satisfy. In the diagram: Target, implemented as PaymentProcessor.",
+          "ru": "Интерфейс, на который уже полагается клиент, - контракт, которому должен соответствовать любой передаваемый ему объект. На диаграмме: Target, реализуемый как PaymentProcessor."
         }
       },
       {
         "name": "Adaptee",
         "role": {
-          "en": "The existing class with the useful behavior — often a third-party SDK or legacy module — whose method signatures don't match Target.",
-          "ru": "Существующий класс с нужным поведением — часто сторонний SDK или унаследованный модуль, — чьи сигнатуры методов не совпадают с Target."
+          "en": "The existing class with the useful behavior - often a third-party SDK or legacy module - whose method signatures don't match Target. In the diagram: Adaptee, implemented as NewProviderSDK.",
+          "ru": "Существующий класс с нужным поведением - часто сторонний SDK или унаследованный модуль, - чьи сигнатуры методов не совпадают с Target. На диаграмме: Adaptee, реализуемый как NewProviderSDK."
         }
       },
       {
         "name": "Adapter",
         "role": {
-          "en": "Sits between the two: implements Target so the Client can call it normally, and internally reformats each call before forwarding it to the wrapped Adaptee.",
-          "ru": "Находится между двумя сторонами: реализует Target, чтобы клиент мог вызывать его как обычно, и внутренне переформатирует каждый вызов перед передачей его обёрнутому Adaptee."
+          "en": "Sits between the two: implements Target so the Client can call it normally, and internally reformats each call before forwarding it to the wrapped Adaptee. In the diagram: Adapter, implemented as PaymentAdapter.",
+          "ru": "Находится между двумя сторонами: реализует Target, чтобы клиент мог вызывать его как обычно, и внутренне переформатирует каждый вызов перед передачей его обёрнутому Adaptee. На диаграмме: Adapter, реализуемый как PaymentAdapter."
         }
       }
     ]
@@ -70,8 +70,8 @@
   },
   "pros": [
     {
-      "en": "Keeps translation logic out of your business code — each adapter is a small, focused unit that only knows how to speak to one external interface.",
-      "ru": "Держит логику преобразования вне бизнес-кода — каждый адаптер представляет собой небольшой, сфокусированный модуль, умеющий работать только с одним внешним интерфейсом."
+      "en": "Keeps translation logic out of your business code - each adapter is a small, focused unit that only knows how to speak to one external interface.",
+      "ru": "Держит логику преобразования вне бизнес-кода - каждый адаптер представляет собой небольшой, сфокусированный модуль, умеющий работать только с одним внешним интерфейсом."
     },
     {
       "en": "New external systems get their own adapter without touching the Client or any adapter already in production.",
@@ -84,16 +84,16 @@
   ],
   "cons": [
     {
-      "en": "Adds an extra class and an extra hop for every adaptation — for a one-off integration, editing the original class (if you can) may be simpler.",
-      "ru": "Добавляет лишний класс и лишний шаг вызова на каждое преобразование — для разовой интеграции проще (если возможно) просто изменить исходный класс."
+      "en": "Adds an extra class and an extra hop for every adaptation - for a one-off integration, editing the original class (if you can) may be simpler.",
+      "ru": "Добавляет лишний класс и лишний шаг вызова на каждое преобразование - для разовой интеграции проще (если возможно) просто изменить исходный класс."
     },
     {
       "en": "Stacking several adapters on top of one another obscures where a value actually gets transformed, complicating debugging.",
       "ru": "Наложение нескольких адаптеров друг на друга скрывает место, где значение фактически преобразуется, усложняя отладку."
     },
     {
-      "en": "An adapter can only translate what the underlying interface exposes — it can't invent capabilities the Adaptee doesn't have.",
-      "ru": "Адаптер может транслировать только то, что предоставляет базовый интерфейс, — он не способен добавить возможности, которых у Adaptee нет."
+      "en": "An adapter can only translate what the underlying interface exposes - it can't invent capabilities the Adaptee doesn't have.",
+      "ru": "Адаптер может транслировать только то, что предоставляет базовый интерфейс, - он не способен добавить возможности, которых у Adaptee нет."
     }
   ],
   "when_to_use": [
@@ -112,16 +112,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**Travel power plug adapters** — let a device built for one country's socket shape connect to a different country's outlet without altering the device.",
-      "ru": "**Дорожные переходники для розеток** — позволяют устройству, рассчитанному на вилку одной страны, подключиться к розетке другой страны без изменения самого устройства."
+      "en": "**Travel power plug adapters** - let a device built for one country's socket shape connect to a different country's outlet without altering the device.",
+      "ru": "**Дорожные переходники для розеток** - позволяют устройству, рассчитанному на вилку одной страны, подключиться к розетке другой страны без изменения самого устройства."
     },
     {
-      "en": "**Java's `Arrays.asList()`** — wraps a plain array so it can be handed to any code expecting the `List` interface, without copying the underlying data.",
-      "ru": "**`Arrays.asList()` в Java** — оборачивает обычный массив, позволяя передать его в код, ожидающий интерфейс `List`, без копирования исходных данных."
+      "en": "**Java's `Arrays.asList()`** - wraps a plain array so it can be handed to any code expecting the `List` interface, without copying the underlying data.",
+      "ru": "**`Arrays.asList()` в Java** - оборачивает обычный массив, позволяя передать его в код, ожидающий интерфейс `List`, без копирования исходных данных."
     },
     {
-      "en": "**Payment gateway SDK wrappers** — normalize Stripe's, PayPal's, and Adyen's differently-shaped charge APIs behind one internal `PaymentProvider` interface.",
-      "ru": "**Обёртки над SDK платёжных шлюзов** — приводят разные по форме API оплаты Stripe, PayPal и Adyen к единому внутреннему интерфейсу `PaymentProvider`."
+      "en": "**Payment gateway SDK wrappers** - normalize Stripe's, PayPal's, and Adyen's differently-shaped charge APIs behind one internal `PaymentProvider` interface.",
+      "ru": "**Обёртки над SDK платёжных шлюзов** - приводят разные по форме API оплаты Stripe, PayPal и Adyen к единому внутреннему интерфейсу `PaymentProvider`."
     }
   ],
   "related_patterns": [
@@ -138,8 +138,8 @@
       },
       "options": [
         {
-          "en": "Wraps an object with a mismatched interface behind a translator, so client code can call it as expected",
-          "ru": "Оборачивает объект с неподходящим интерфейсом в переходник-транслятор, чтобы клиентский код мог вызывать его как ожидается"
+          "en": "Wraps a mismatched interface behind a translator object",
+          "ru": "Оборачивает несовместимый интерфейс в переходник"
         },
         {
           "en": "Merges two classes into one to avoid duplication",
@@ -163,12 +163,12 @@
     {
       "question": {
         "en": "In the payment example, why can't you just rename the new provider's `submitTransaction` method to `charge`?",
-        "ru": "В примере с оплатой — почему нельзя просто переименовать метод `submitTransaction` нового провайдера в `charge`?"
+        "ru": "В примере с оплатой - почему нельзя просто переименовать метод `submitTransaction` нового провайдера в `charge`?"
       },
       "options": [
         {
-          "en": "It's someone else's package, updated independently, so you can't modify its source",
-          "ru": "Это чужой пакет, обновляемый независимо, поэтому его исходный код нельзя менять"
+          "en": "It's someone else's package, so its source can't be changed",
+          "ru": "Это чужой пакет, его исходный код нельзя менять"
         },
         {
           "en": "JavaScript doesn't allow renaming methods",
@@ -185,8 +185,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "The SDK belongs to someone else and is updated independently, so you can't rename its method — you need a wrapper instead.",
-        "ru": "SDK принадлежит другой стороне и обновляется независимо, поэтому переименовать его метод нельзя — нужна обёртка."
+        "en": "The SDK belongs to someone else and is updated independently, so you can't rename its method - you need a wrapper instead.",
+        "ru": "SDK принадлежит другой стороне и обновляется независимо, поэтому переименовать его метод нельзя - нужна обёртка."
       }
     },
     {
@@ -196,8 +196,8 @@
       },
       "options": [
         {
-          "en": "In one isolated wrapper class, instead of being smeared across the codebase",
-          "ru": "В одном изолированном классе-обёртке, а не размазана по всей кодовой базе"
+          "en": "In one isolated wrapper class, not smeared across the code",
+          "ru": "В одном изолированном классе-обёртке, а не по всей базе"
         },
         {
           "en": "Duplicated in every call site that needs the new provider",
@@ -225,8 +225,8 @@
       },
       "options": [
         {
-          "en": "It can only translate what the underlying interface exposes — it can't invent capabilities the Adaptee doesn't have",
-          "ru": "Он может транслировать только то, что предоставляет базовый интерфейс, — не может добавить возможности, которых у Adaptee нет"
+          "en": "It can only translate what the interface exposes",
+          "ru": "Он может транслировать только то, что даёт интерфейс"
         },
         {
           "en": "It requires rewriting the entire client codebase",
@@ -244,7 +244,7 @@
       "correct": 0,
       "explanation": {
         "en": "An adapter can only translate what the underlying interface exposes; it can't invent capabilities the Adaptee doesn't have.",
-        "ru": "Адаптер может транслировать только то, что предоставляет базовый интерфейс, — он не способен добавить возможности, которых у Adaptee нет."
+        "ru": "Адаптер может транслировать только то, что предоставляет базовый интерфейс, - он не способен добавить возможности, которых у Adaptee нет."
       }
     },
     {
@@ -254,8 +254,8 @@
       },
       "options": [
         {
-          "en": "It obscures where a value actually gets transformed, complicating debugging",
-          "ru": "Скрывает место, где значение фактически преобразуется, усложняя отладку"
+          "en": "It obscures where a value actually gets transformed",
+          "ru": "Скрывает место, где значение реально преобразуется"
         },
         {
           "en": "It automatically breaks the client's original interface",
@@ -290,12 +290,12 @@
         "ru": "Как работает Адаптер"
       },
       "description": {
-        "en": "The Client calls the Adapter through the Target interface it already knows — charge(). Implemented as PaymentAdapter, the Adapter holds an Adaptee (NewProviderSDK) and forwards a translated call to its incompatible submitTransaction() method. Once Adaptee responds, the Adapter reshapes that result into the exact shape Target promised, then returns it to the Client.",
-        "ru": "Клиент вызывает Адаптер через уже знакомый ему интерфейс Target — charge(). Реализованный как PaymentAdapter, Адаптер хранит Adaptee (NewProviderSDK) и передаёт ему переведённый вызов его несовместимого метода submitTransaction(). Получив ответ от Adaptee, Адаптер преобразует результат точно в ту форму, которую обещает Target, и возвращает его Клиенту."
+        "en": "The Client calls the Adapter through the Target interface it already knows - charge(). Implemented as PaymentAdapter, the Adapter holds an Adaptee (NewProviderSDK) and forwards a translated call to its incompatible submitTransaction() method. Once Adaptee responds, the Adapter reshapes that result into the exact shape Target promised, then returns it to the Client.",
+        "ru": "Клиент вызывает Адаптер через уже знакомый ему интерфейс Target - charge(). Реализованный как PaymentAdapter, Адаптер хранит Adaptee (NewProviderSDK) и передаёт ему переведённый вызов его несовместимого метода submitTransaction(). Получив ответ от Adaptee, Адаптер преобразует результат точно в ту форму, которую обещает Target, и возвращает его Клиенту."
       },
       "caption": {
         "en": "One Adapter, two shapes: it speaks Target on one side and Adaptee on the other, so the Client never has to know NewProviderSDK exists.",
-        "ru": "Один Адаптер — две формы: с одной стороны он говорит на Target, с другой — на Adaptee, поэтому Клиенту не нужно знать о существовании NewProviderSDK."
+        "ru": "Один Адаптер - две формы: с одной стороны он говорит на Target, с другой - на Adaptee, поэтому Клиенту не нужно знать о существовании NewProviderSDK."
       },
       "nodes": [
         {
@@ -347,8 +347,8 @@
             "ru": "Adaptee"
           },
           "subtitle": {
-            "en": "submitTransaction() — incompatible API",
-            "ru": "submitTransaction() — несовместимый API"
+            "en": "submitTransaction() - incompatible API",
+            "ru": "submitTransaction() - несовместимый API"
           },
           "concrete": {
             "role": {
@@ -371,8 +371,8 @@
             "ru": "Target"
           },
           "subtitle": {
-            "en": "charge() — expected interface",
-            "ru": "charge() — ожидаемый интерфейс"
+            "en": "charge() - expected interface",
+            "ru": "charge() - ожидаемый интерфейс"
           },
           "concrete": {
             "role": {

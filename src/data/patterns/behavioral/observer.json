@@ -17,15 +17,15 @@
   ],
   "intent": {
     "en": "Observer is a behavioral pattern that lets any number of objects register interest in another object's changes and get notified automatically whenever those changes happen.",
-    "ru": "Наблюдатель — это поведенческий паттерн, позволяющий произвольному числу объектов подписаться на изменения другого объекта и автоматически получать уведомления при каждом таком изменении."
+    "ru": "Наблюдатель - это поведенческий паттерн, позволяющий произвольному числу объектов подписаться на изменения другого объекта и автоматически получать уведомления при каждом таком изменении."
   },
   "problem": {
-    "en": "A weather station gathers new sensor readings every few minutes. A phone app, a desktop widget, and a logging service all need to know the instant fresh data lands, but none of them should have to ask the station directly on a timer.\n\nPolling is the naive fix — each consumer calls the station repeatedly and compares against the last value it saw. That wastes cycles when nothing has changed and adds lag between an update and the moment consumers see it. Hardcoding calls from the station to each specific consumer is worse: the station now has to know about the phone app, the widget, and the logger by name, and adding a fourth consumer means editing the station's code.",
-    "ru": "Метеостанция получает новые показания датчиков каждые несколько минут. Мобильное приложение, виджет на рабочем столе и сервис логирования — всем им нужно узнавать о свежих данных мгновенно, но ни один из них не должен постоянно опрашивать станцию по таймеру.\n\nНаивное решение — опрос: каждый потребитель периодически обращается к станции и сравнивает данные с последним увиденным значением. Это впустую расходует ресурсы, когда ничего не изменилось, и создаёт задержку между обновлением и моментом, когда потребитель его увидит. Жёстко прописанные вызовы от станции к каждому конкретному потребителю ещё хуже: станции пришлось бы поимённо знать о приложении, виджете и логгере, а добавление четвёртого потребителя означало бы правку кода самой станции."
+    "en": "A weather station gathers new sensor readings every few minutes. A phone app, a desktop widget, and a logging service all need to know the instant fresh data lands, but none of them should have to ask the station directly on a timer.\n\nPolling is the naive fix - each consumer calls the station repeatedly and compares against the last value it saw. That wastes cycles when nothing has changed and adds lag between an update and the moment consumers see it. Hardcoding calls from the station to each specific consumer is worse: the station now has to know about the phone app, the widget, and the logger by name, and adding a fourth consumer means editing the station's code.",
+    "ru": "Метеостанция получает новые показания датчиков каждые несколько минут. Мобильное приложение, виджет на рабочем столе и сервис логирования - всем им нужно узнавать о свежих данных мгновенно, но ни один из них не должен постоянно опрашивать станцию по таймеру.\n\nНаивное решение - опрос: каждый потребитель периодически обращается к станции и сравнивает данные с последним увиденным значением. Это впустую расходует ресурсы, когда ничего не изменилось, и создаёт задержку между обновлением и моментом, когда потребитель его увидит. Жёстко прописанные вызовы от станции к каждому конкретному потребителю ещё хуже: станции пришлось бы поимённо знать о приложении, виджете и логгере, а добавление четвёртого потребителя означало бы правку кода самой станции."
   },
   "solution": {
-    "en": "Observer gives the object holding the interesting state — the **publisher** — a guest list it doesn't need to know the contents of in advance. Any object can join that list by **subscribing**, and any object can leave by **unsubscribing**; the publisher just keeps a generic collection of registered listeners.\n\nWhen the publisher's state changes, it walks that list and calls the same notification method on every entry, without caring what each subscriber actually does with the news — update a display, write a log line, trigger a recalculation. New subscriber types can be added at runtime with zero changes to the publisher, because the publisher only ever depends on a small notification interface, not on any concrete consumer.",
-    "ru": "Наблюдатель даёт объекту с интересующим состоянием — **издателю** — список получателей, содержимое которого ему заранее знать не нужно. Любой объект может войти в этот список через **подписку** и выйти через **отписку**; издатель просто хранит обобщённую коллекцию зарегистрированных слушателей.\n\nКогда состояние издателя меняется, он проходит по этому списку и вызывает один и тот же метод уведомления у каждой записи, не заботясь о том, что именно подписчик делает с новостью — обновляет экран, пишет строку в лог или запускает пересчёт. Новые типы подписчиков можно добавлять во время выполнения без единого изменения в издателе, поскольку издатель зависит лишь от небольшого интерфейса уведомления, а не от конкретных потребителей."
+    "en": "Observer gives the object holding the interesting state - the **publisher** - a guest list it doesn't need to know the contents of in advance. Any object can join that list by **subscribing**, and any object can leave by **unsubscribing**; the publisher just keeps a generic collection of registered listeners.\n\nWhen the publisher's state changes, it walks that list and calls the same notification method on every entry, without caring what each subscriber actually does with the news - update a display, write a log line, trigger a recalculation. New subscriber types can be added at runtime with zero changes to the publisher, because the publisher only ever depends on a small notification interface, not on any concrete consumer.",
+    "ru": "Наблюдатель даёт объекту с интересующим состоянием - **издателю** - список получателей, содержимое которого ему заранее знать не нужно. Любой объект может войти в этот список через **подписку** и выйти через **отписку**; издатель просто хранит обобщённую коллекцию зарегистрированных слушателей.\n\nКогда состояние издателя меняется, он проходит по этому списку и вызывает один и тот же метод уведомления у каждой записи, не заботясь о том, что именно подписчик делает с новостью - обновляет экран, пишет строку в лог или запускает пересчёт. Новые типы подписчиков можно добавлять во время выполнения без единого изменения в издателе, поскольку издатель зависит лишь от небольшого интерфейса уведомления, а не от конкретных потребителей."
   },
   "structure": {
     "description": {
@@ -36,22 +36,22 @@
       {
         "name": "Publisher (Subject)",
         "role": {
-          "en": "Holds the observable state, keeps a registry of current subscribers, and walks that registry to notify everyone whenever the state changes.",
-          "ru": "Хранит наблюдаемое состояние, ведёт реестр текущих подписчиков и обходит его, оповещая всех при изменении состояния."
+          "en": "Holds the observable state, keeps a registry of current subscribers, and walks that registry to notify everyone whenever the state changes. In the diagram: Weather Station.",
+          "ru": "Хранит наблюдаемое состояние, ведёт реестр текущих подписчиков и обходит его, оповещая всех при изменении состояния. На диаграмме: Метеостанция."
         }
       },
       {
         "name": "Subscriber (Observer)",
         "role": {
-          "en": "A minimal contract — usually one notification method — that lets the publisher call any registered subscriber without knowing its concrete type.",
-          "ru": "Минимальный контракт — обычно один метод уведомления, — позволяющий издателю вызывать любого зарегистрированного подписчика, не зная его конкретного типа."
+          "en": "A minimal contract - usually one notification method - that lets the publisher call any registered subscriber without knowing its concrete type.",
+          "ru": "Минимальный контракт - обычно один метод уведомления, - позволяющий издателю вызывать любого зарегистрированного подписчика, не зная его конкретного типа."
         }
       },
       {
         "name": "ConcreteSubscriber",
         "role": {
-          "en": "Registers itself with a publisher and implements its own reaction to each notification, independent of what other subscribers do.",
-          "ru": "Регистрируется у издателя и реализует собственную реакцию на каждое уведомление, независимо от того, что делают другие подписчики."
+          "en": "Registers itself with a publisher and implements its own reaction to each notification, independent of what other subscribers do. In the diagram: Phone App, Desktop Widget, Logging Service.",
+          "ru": "Регистрируется у издателя и реализует собственную реакцию на каждое уведомление, независимо от того, что делают другие подписчики. На диаграмме: Мобильное приложение, Виджет, Сервис логирования."
         }
       }
     ]
@@ -74,7 +74,7 @@
     },
     {
       "en": "The publisher depends only on a thin notification interface, never on any subscriber's concrete class, keeping the two sides loosely coupled.",
-      "ru": "Издатель зависит лишь от тонкого интерфейса уведомления, но никогда — от конкретного класса подписчика, что сохраняет слабую связанность сторон."
+      "ru": "Издатель зависит лишь от тонкого интерфейса уведомления, но никогда - от конкретного класса подписчика, что сохраняет слабую связанность сторон."
     }
   ],
   "cons": [
@@ -97,22 +97,22 @@
       "ru": "Применяйте Наблюдатель, когда изменение состояния одного объекта должно затрагивать набор других объектов, который заранее не фиксирован или не полностью известен."
     },
     {
-      "en": "Use it when interested parties need to come and go dynamically — watching only during a specific screen, session, or operation.",
-      "ru": "Используйте его, когда заинтересованные стороны должны динамически появляться и исчезать — наблюдая только в течение конкретного экрана, сессии или операции."
+      "en": "Use it when interested parties need to come and go dynamically - watching only during a specific screen, session, or operation.",
+      "ru": "Используйте его, когда заинтересованные стороны должны динамически появляться и исчезать - наблюдая только в течение конкретного экрана, сессии или операции."
     }
   ],
   "real_world_examples": [
     {
-      "en": "**DOM events** — `element.addEventListener('click', handler)` subscribes a handler to notifications the element publishes.",
-      "ru": "**DOM-события** — `element.addEventListener('click', handler)` подписывает обработчик на уведомления, которые публикует элемент."
+      "en": "**DOM events** - `element.addEventListener('click', handler)` subscribes a handler to notifications the element publishes.",
+      "ru": "**DOM-события** - `element.addEventListener('click', handler)` подписывает обработчик на уведомления, которые публикует элемент."
     },
     {
-      "en": "**RxJS Observables** — a stream publisher notifies every subscribed operator chain each time a new value is emitted.",
-      "ru": "**RxJS Observable** — издатель потока оповещает каждую подписанную цепочку операторов при появлении нового значения."
+      "en": "**RxJS Observables** - a stream publisher notifies every subscribed operator chain each time a new value is emitted.",
+      "ru": "**RxJS Observable** - издатель потока оповещает каждую подписанную цепочку операторов при появлении нового значения."
     },
     {
-      "en": "**Spreadsheet formulas** — changing one cell automatically recalculates and re-renders every cell whose formula references it.",
-      "ru": "**Формулы в электронных таблицах** — изменение одной ячейки автоматически пересчитывает и перерисовывает каждую ячейку, чья формула на неё ссылается."
+      "en": "**Spreadsheet formulas** - changing one cell automatically recalculates and re-renders every cell whose formula references it.",
+      "ru": "**Формулы в электронных таблицах** - изменение одной ячейки автоматически пересчитывает и перерисовывает каждую ячейку, чья формула на неё ссылается."
     }
   ],
   "related_patterns": [
@@ -129,8 +129,8 @@
       },
       "options": [
         {
-          "en": "Any number of objects register interest in another object's changes and get notified automatically when those changes happen",
-          "ru": "Произвольное число объектов подписаться на изменения другого объекта и автоматически получать уведомления при каждом таком изменении"
+          "en": "Any number of objects can register and get notified of changes",
+          "ru": "Произвольное число объектов подписаться и получать уведомления"
         },
         {
           "en": "Wrap a mismatched interface behind a translator",
@@ -158,8 +158,8 @@
       },
       "options": [
         {
-          "en": "It wastes cycles when nothing has changed and adds lag between an update and the moment consumers see it",
-          "ru": "Он впустую расходует ресурсы, когда ничего не изменилось, и создаёт задержку между обновлением и моментом, когда потребитель его увидит"
+          "en": "It wastes cycles when nothing changed and adds lag",
+          "ru": "Он впустую тратит ресурсы и создаёт задержку обновления"
         },
         {
           "en": "It makes the phone app, widget, and logger receive updates instantly with zero cost",
@@ -187,8 +187,8 @@
       },
       "options": [
         {
-          "en": "Nothing — it keeps a generic collection of registered listeners it doesn't need to know the contents of in advance",
-          "ru": "Ничего — он хранит обобщённую коллекцию зарегистрированных слушателей, содержимое которой ему заранее знать не нужно"
+          "en": "Nothing - it keeps a generic list of listeners",
+          "ru": "Ничего - он хранит обобщённую коллекцию слушателей"
         },
         {
           "en": "The exact concrete class of every subscriber that will ever join",
@@ -205,7 +205,7 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Observer gives the publisher a guest list it doesn't need to know the contents of in advance — it just keeps a generic collection of registered listeners.",
+        "en": "Observer gives the publisher a guest list it doesn't need to know the contents of in advance - it just keeps a generic collection of registered listeners.",
         "ru": "Наблюдатель даёт издателю список получателей, содержимое которого ему заранее знать не нужно; он просто хранит обобщённую коллекцию зарегистрированных слушателей."
       }
     },
@@ -245,8 +245,8 @@
       },
       "options": [
         {
-          "en": "It keeps a live reference in the publisher's list, quietly leaking memory long after it should have been collected",
-          "ru": "Он продолжает висеть в списке издателя, незаметно вызывая утечку памяти задолго после того, как должен был быть собран сборщиком мусора"
+          "en": "It stays in the publisher's list, quietly leaking memory",
+          "ru": "Он продолжает висеть в списке издателя, вызывая утечку памяти"
         },
         {
           "en": "It automatically gets removed by the publisher after one notification",
@@ -281,8 +281,8 @@
         "ru": "Как работает Наблюдатель"
       },
       "description": {
-        "en": "The Weather Station holds no fixed list of consumers. When fresh readings land, it walks its subscriber registry and notifies the Phone App, Desktop Widget, and Logging Service at once — all through the same notification method, none of them known by name in advance.",
-        "ru": "Метеостанция не хранит фиксированный список потребителей. Когда приходят новые показания, она обходит реестр подписчиков и одновременно уведомляет мобильное приложение, виджет и сервис логирования — через один и тот же метод уведомления, не зная заранее ни одного из них по имени."
+        "en": "The Weather Station holds no fixed list of consumers. When fresh readings land, it walks its subscriber registry and notifies the Phone App, Desktop Widget, and Logging Service at once - all through the same notification method, none of them known by name in advance.",
+        "ru": "Метеостанция не хранит фиксированный список потребителей. Когда приходят новые показания, она обходит реестр подписчиков и одновременно уведомляет мобильное приложение, виджет и сервис логирования - через один и тот же метод уведомления, не зная заранее ни одного из них по имени."
       },
       "caption": {
         "en": "One state change fans out to every current subscriber at once.",

@@ -15,15 +15,15 @@
   ],
   "intent": {
     "en": "State is a behavioral pattern that lets an object switch its entire behavior at runtime by delegating to one of several interchangeable state objects, so from the outside it looks as though the object's class changed.",
-    "ru": "Состояние — это поведенческий паттерн, позволяющий объекту полностью менять своё поведение во время выполнения за счёт делегирования одному из нескольких взаимозаменяемых объектов-состояний, так что со стороны кажется, будто изменился класс самого объекта."
+    "ru": "Состояние - это поведенческий паттерн, позволяющий объекту полностью менять своё поведение во время выполнения за счёт делегирования одному из нескольких взаимозаменяемых объектов-состояний, так что со стороны кажется, будто изменился класс самого объекта."
   },
   "problem": {
-    "en": "A traffic light controller has to behave completely differently depending on which color is lit: Red means stop and wait, Yellow means caution and get ready to switch, Green means go. Each color also has its own duration and its own idea of what the next color should be.\n\nThe natural first attempt is one `TrafficLight` class with a `color` field and an `if`/`else` chain (or a `switch`) inside `tick()` that checks the current color to decide how long to stay lit and what to switch to next. Every branch needs to know about every other color just to figure out where to go next, so adding a fifth state — a flashing amber for night mode, say — means touching the same sprawling `tick()` method again. The branches keep growing denser as more colors and edge cases pile in, and it's easy to wire a transition to the wrong color while editing a neighboring branch.",
-    "ru": "Контроллер светофора должен вести себя совершенно по-разному в зависимости от того, какой цвет горит: Красный означает «стой и жди», Жёлтый — «внимание, приготовься к переключению», Зелёный — «можно ехать». У каждого цвета также своя длительность и своё представление о том, каким должен быть следующий цвет.\n\nЕстественная первая попытка — один класс `TrafficLight` с полем `color` и цепочкой `if`/`else` (или `switch`) внутри `tick()`, которая проверяет текущий цвет, чтобы решить, сколько ему гореть и на что переключиться дальше. Каждой ветке нужно знать обо всех остальных цветах просто для того, чтобы понять, куда переходить дальше, поэтому добавление пятого состояния — скажем, мигающего жёлтого для ночного режима — означает правку того же разросшегося метода `tick()`. Ветки становятся всё гуще по мере добавления новых цветов и крайних случаев, и легко перепутать переход не с тем цветом, редактируя соседнюю ветку."
+    "en": "A traffic light controller has to behave completely differently depending on which color is lit: Red means stop and wait, Yellow means caution and get ready to switch, Green means go. Each color also has its own duration and its own idea of what the next color should be.\n\nThe natural first attempt is one `TrafficLight` class with a `color` field and an `if`/`else` chain (or a `switch`) inside `tick()` that checks the current color to decide how long to stay lit and what to switch to next. Every branch needs to know about every other color just to figure out where to go next, so adding a fifth state - a flashing amber for night mode, say - means touching the same sprawling `tick()` method again. The branches keep growing denser as more colors and edge cases pile in, and it's easy to wire a transition to the wrong color while editing a neighboring branch.",
+    "ru": "Контроллер светофора должен вести себя совершенно по-разному в зависимости от того, какой цвет горит: Красный означает «стой и жди», Жёлтый - «внимание, приготовься к переключению», Зелёный - «можно ехать». У каждого цвета также своя длительность и своё представление о том, каким должен быть следующий цвет.\n\nЕстественная первая попытка - один класс `TrafficLight` с полем `color` и цепочкой `if`/`else` (или `switch`) внутри `tick()`, которая проверяет текущий цвет, чтобы решить, сколько ему гореть и на что переключиться дальше. Каждой ветке нужно знать обо всех остальных цветах просто для того, чтобы понять, куда переходить дальше, поэтому добавление пятого состояния - скажем, мигающего жёлтого для ночного режима - означает правку того же разросшегося метода `tick()`. Ветки становятся всё гуще по мере добавления новых цветов и крайних случаев, и легко перепутать переход не с тем цветом, редактируя соседнюю ветку."
   },
   "solution": {
-    "en": "State takes each branch of that `tick()` chain and turns it into its own class — `RedState`, `YellowState`, `GreenState` — each implementing a common `TrafficLightState` interface with a `handle()` method. The original object, now called the **context** (`TrafficLight`), stops asking \"what color am I\" and instead just forwards every `tick()` call to whichever state object it currently holds.\n\nA concrete state's `handle()` does whatever that color should do, and then transitions the context to the next state in the cycle — `RedState` hands off to `YellowState`, `YellowState` to `GreenState`, and `GreenState` back to `RedState`. The context's own code never branches on color at all; it just holds a reference to the current state and delegates, while every state-specific decision and every transition lives inside the state classes themselves.",
-    "ru": "Паттерн Состояние превращает каждую ветку цепочки `tick()` в отдельный класс — `RedState`, `YellowState`, `GreenState`, — и каждый реализует общий интерфейс `TrafficLightState` с методом `handle()`. Исходный объект, теперь называемый **контекстом** (`TrafficLight`), перестаёт спрашивать «какой я сейчас цвет» и просто перенаправляет каждый вызов `tick()` тому объекту-состоянию, который держит в данный момент.\n\nМетод `handle()` конкретного состояния делает то, что положено этому цвету, а затем переводит контекст в следующее состояние цикла — `RedState` передаёт эстафету `YellowState`, тот — `GreenState`, а `GreenState` возвращает контекст к `RedState`. Код самого контекста вообще не содержит ветвлений по цвету — он просто хранит ссылку на текущее состояние и делегирует, а вся специфичная для состояний логика и все переходы живут внутри классов состояний."
+    "en": "State takes each branch of that `tick()` chain and turns it into its own class - `RedState`, `YellowState`, `GreenState` - each implementing a common `TrafficLightState` interface with a `handle()` method. The original object, now called the **context** (`TrafficLight`), stops asking \"what color am I\" and instead just forwards every `tick()` call to whichever state object it currently holds.\n\nA concrete state's `handle()` does whatever that color should do, and then transitions the context to the next state in the cycle - `RedState` hands off to `YellowState`, `YellowState` to `GreenState`, and `GreenState` back to `RedState`. The context's own code never branches on color at all; it just holds a reference to the current state and delegates, while every state-specific decision and every transition lives inside the state classes themselves.",
+    "ru": "Паттерн Состояние превращает каждую ветку цепочки `tick()` в отдельный класс - `RedState`, `YellowState`, `GreenState`, - и каждый реализует общий интерфейс `TrafficLightState` с методом `handle()`. Исходный объект, теперь называемый **контекстом** (`TrafficLight`), перестаёт спрашивать «какой я сейчас цвет» и просто перенаправляет каждый вызов `tick()` тому объекту-состоянию, который держит в данный момент.\n\nМетод `handle()` конкретного состояния делает то, что положено этому цвету, а затем переводит контекст в следующее состояние цикла - `RedState` передаёт эстафету `YellowState`, тот - `GreenState`, а `GreenState` возвращает контекст к `RedState`. Код самого контекста вообще не содержит ветвлений по цвету - он просто хранит ссылку на текущее состояние и делегирует, а вся специфичная для состояний логика и все переходы живут внутри классов состояний."
   },
   "structure": {
     "description": {
@@ -34,8 +34,8 @@
       {
         "name": "Context",
         "role": {
-          "en": "Delegates every state-dependent call to the State object it currently references, and exposes a way for state objects to replace that reference.",
-          "ru": "Делегирует каждый зависящий от состояния вызов объекту-состоянию, на который ссылается в данный момент, и предоставляет способ заменить эту ссылку."
+          "en": "Delegates every state-dependent call to the State object it currently references, and exposes a way for state objects to replace that reference. In the diagram: Traffic Light.",
+          "ru": "Делегирует каждый зависящий от состояния вызов объекту-состоянию, на который ссылается в данный момент, и предоставляет способ заменить эту ссылку. На диаграмме: Светофор."
         }
       },
       {
@@ -48,8 +48,8 @@
       {
         "name": "ConcreteState",
         "role": {
-          "en": "Implements the reaction appropriate to one specific state, and decides whether and to which other state the context should transition next.",
-          "ru": "Реализует реакцию, подобающую конкретному состоянию, и решает, следует ли и в какое другое состояние должен перейти контекст."
+          "en": "Implements the reaction appropriate to one specific state, and decides whether and to which other state the context should transition next. In the diagram: Red State, Yellow State, Green State.",
+          "ru": "Реализует реакцию, подобающую конкретному состоянию, и решает, следует ли и в какое другое состояние должен перейти контекст. На диаграмме: Состояние «Красный», Состояние «Жёлтый», Состояние «Зелёный»."
         }
       }
     ]
@@ -71,14 +71,14 @@
       "ru": "Новое состояние добавляется написанием нового класса, без единой правки в контексте или уже корректно работающих состояниях."
     },
     {
-      "en": "The context's own code shrinks down to plain delegation — there's no conditional logic left in it to accidentally break.",
-      "ru": "Собственный код контекста сжимается до простого делегирования — в нём не остаётся условной логики, которую можно случайно сломать."
+      "en": "The context's own code shrinks down to plain delegation - there's no conditional logic left in it to accidentally break.",
+      "ru": "Собственный код контекста сжимается до простого делегирования - в нём не остаётся условной логики, которую можно случайно сломать."
     }
   ],
   "cons": [
     {
       "en": "For an object with two states and one transition, a full set of state classes is more machinery than the problem calls for.",
-      "ru": "Для объекта с двумя состояниями и одним переходом полноценный набор классов состояний — это больше механики, чем требует задача."
+      "ru": "Для объекта с двумя состояниями и одним переходом полноценный набор классов состояний - это больше механики, чем требует задача."
     },
     {
       "en": "Because a state object often decides what the next state should be, following the full transition graph means reading through several state classes rather than one table.",
@@ -101,16 +101,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**Traffic lights** — a signal controller behaves differently in the Red, Yellow, and Green states, each dictating what the next state and timing will be.",
-      "ru": "**Светофоры** — контроллер сигнала ведёт себя по-разному в состояниях «красный», «жёлтый» и «зелёный», каждое из которых определяет следующее состояние и тайминг."
+      "en": "**Traffic lights** - a signal controller behaves differently in the Red, Yellow, and Green states, each dictating what the next state and timing will be.",
+      "ru": "**Светофоры** - контроллер сигнала ведёт себя по-разному в состояниях «красный», «жёлтый» и «зелёный», каждое из которых определяет следующее состояние и тайминг."
     },
     {
-      "en": "**Order fulfillment workflows** — an e-commerce order moves through Pending, Processing, Shipped, Delivered, and Cancelled, each allowing a different set of actions.",
-      "ru": "**Обработка заказов в интернет-магазинах** — заказ проходит через состояния Pending, Processing, Shipped, Delivered и Cancelled, каждое из которых допускает свой набор действий."
+      "en": "**Order fulfillment workflows** - an e-commerce order moves through Pending, Processing, Shipped, Delivered, and Cancelled, each allowing a different set of actions.",
+      "ru": "**Обработка заказов в интернет-магазинах** - заказ проходит через состояния Pending, Processing, Shipped, Delivered и Cancelled, каждое из которых допускает свой набор действий."
     },
     {
-      "en": "**TCP sockets** — a connection moves through Listen, Established, and Closed, reacting differently to the same incoming packet depending on which one it's in.",
-      "ru": "**TCP-сокеты** — соединение проходит через состояния Listen, Established и Closed, по-разному реагируя на один и тот же входящий пакет в зависимости от текущего состояния."
+      "en": "**TCP sockets** - a connection moves through Listen, Established, and Closed, reacting differently to the same incoming packet depending on which one it's in.",
+      "ru": "**TCP-сокеты** - соединение проходит через состояния Listen, Established и Closed, по-разному реагируя на один и тот же входящий пакет в зависимости от текущего состояния."
     }
   ],
   "related_patterns": [
@@ -127,8 +127,8 @@
       },
       "options": [
         {
-          "en": "Switch its entire behavior by delegating to one of several interchangeable state objects, so it looks as though its class changed",
-          "ru": "Полностью менять своё поведение за счёт делегирования одному из нескольких взаимозаменяемых объектов-состояний, так что кажется, будто изменился его класс"
+          "en": "Switch its behavior via one of several state objects",
+          "ru": "Менять поведение, делегируя объекту-состоянию"
         },
         {
           "en": "Merge with another object into a single combined class",
@@ -156,8 +156,8 @@
       },
       "options": [
         {
-          "en": "Every branch needs to know about every other color, so adding a fifth state means touching the same sprawling method again",
-          "ru": "Каждой ветке нужно знать обо всех остальных цветах, поэтому добавление пятого состояния означает правку того же разросшегося метода"
+          "en": "Every branch must know all other colors",
+          "ru": "Каждой ветке нужно знать обо всех остальных цветах"
         },
         {
           "en": "The traffic light stops being able to turn red at all",
@@ -185,8 +185,8 @@
       },
       "options": [
         {
-          "en": "It stops asking \"what color am I\" and just forwards every tick() call to whichever state object it currently holds",
-          "ru": "Он перестаёт спрашивать «какой я сейчас цвет» и просто перенаправляет каждый вызов tick() тому объекту-состоянию, который держит в данный момент"
+          "en": "It stops asking its color and forwards tick() to its state object",
+          "ru": "Он просто перенаправляет tick() текущему объекту-состоянию"
         },
         {
           "en": "It keeps the same if/else chain but wraps it in a try/catch",
@@ -214,8 +214,8 @@
       },
       "options": [
         {
-          "en": "Inside the state classes themselves — a concrete state's handle() transitions the context to the next state",
-          "ru": "Внутри самих классов состояний — handle() конкретного состояния переводит контекст в следующее состояние"
+          "en": "Inside the state classes - handle() sets the next state",
+          "ru": "Внутри классов состояний - handle() задаёт следующее"
         },
         {
           "en": "Inside the context's constructor, fixed once and never changed",
@@ -232,14 +232,14 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "A concrete state's handle() does whatever that color should do, and then transitions the context to the next state — every state-specific decision lives inside the state classes.",
-        "ru": "Метод handle() конкретного состояния делает то, что положено этому цвету, а затем переводит контекст в следующее состояние — вся специфичная для состояний логика живёт внутри классов состояний."
+        "en": "A concrete state's handle() does whatever that color should do, and then transitions the context to the next state - every state-specific decision lives inside the state classes.",
+        "ru": "Метод handle() конкретного состояния делает то, что положено этому цвету, а затем переводит контекст в следующее состояние - вся специфичная для состояний логика живёт внутри классов состояний."
       }
     },
     {
       "question": {
         "en": "When is applying State said to be more machinery than the problem calls for?",
-        "ru": "Когда, согласно паттерну, применение Состояния — это больше механики, чем требует задача?"
+        "ru": "Когда, согласно паттерну, применение Состояния - это больше механики, чем требует задача?"
       },
       "options": [
         {
@@ -262,7 +262,7 @@
       "correct": 0,
       "explanation": {
         "en": "For an object with two states and one transition, a full set of state classes is more machinery than the problem calls for.",
-        "ru": "Для объекта с двумя состояниями и одним переходом полноценный набор классов состояний — это больше механики, чем требует задача."
+        "ru": "Для объекта с двумя состояниями и одним переходом полноценный набор классов состояний - это больше механики, чем требует задача."
       }
     }
   ],
@@ -279,12 +279,12 @@
         "ru": "Как работает Состояние"
       },
       "description": {
-        "en": "A traffic light's Context never checks its own status field. It just forwards every tick to whichever ConcreteState object it currently holds, and that state object decides what happens next — including which state the context should hold afterward.",
-        "ru": "Контекст светофора никогда не проверяет собственное поле статуса. Он просто перенаправляет каждый тик тому объекту-состоянию, который держит в данный момент, а этот объект сам решает, что делать дальше — включая то, какое состояние контекст будет держать после этого."
+        "en": "A traffic light's Context never checks its own status field. It just forwards every tick to whichever ConcreteState object it currently holds, and that state object decides what happens next - including which state the context should hold afterward.",
+        "ru": "Контекст светофора никогда не проверяет собственное поле статуса. Он просто перенаправляет каждый тик тому объекту-состоянию, который держит в данный момент, а этот объект сам решает, что делать дальше - включая то, какое состояние контекст будет держать после этого."
       },
       "caption": {
-        "en": "Each tick delegates to whichever state is active now — Red, then Yellow, then Green — and the cycle loops back to Red once Green's tick has passed.",
-        "ru": "Каждый тик делегируется текущему активному состоянию — Красный, затем Жёлтый, затем Зелёный, — а после Зелёного цикл возвращается к Красному."
+        "en": "Each tick delegates to whichever state is active now - Red, then Yellow, then Green - and the cycle loops back to Red once Green's tick has passed.",
+        "ru": "Каждый тик делегируется текущему активному состоянию - Красный, затем Жёлтый, затем Зелёный, - а после Зелёного цикл возвращается к Красному."
       },
       "nodes": [
         {

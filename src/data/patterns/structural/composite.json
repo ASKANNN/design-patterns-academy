@@ -15,48 +15,48 @@
   ],
   "intent": {
     "en": "Composite is a structural pattern that lets individual objects and groups of objects be treated through the same interface, so client code can operate on a whole tree without caring how deep it goes.",
-    "ru": "Компоновщик — структурный паттерн, позволяющий работать с отдельными объектами и группами объектов через один и тот же интерфейс, благодаря чему клиентский код может обрабатывать целое дерево, не заботясь о его глубине."
+    "ru": "Компоновщик - структурный паттерн, позволяющий работать с отдельными объектами и группами объектов через один и тот же интерфейс, благодаря чему клиентский код может обрабатывать целое дерево, не заботясь о его глубине."
   },
   "problem": {
-    "en": "A file manager needs to compute the total size of anything a user selects: a single file, or a directory that itself contains files and other directories nested several levels deep. The obvious first attempt writes a function that checks `if (item.type === 'file')` versus `if (item.type === 'directory')` and sums up children in the directory branch.\n\nThat branch multiplies everywhere size is computed — disk-usage reports, copy previews, quota checks — and every one of them has to be kept in sync. Add a third kind of filesystem entry, like a symlink that points at a directory, and every one of those call sites needs a new branch.",
-    "ru": "Файловому менеджеру нужно вычислять общий размер того, что выбрал пользователь: как отдельного файла, так и директории, которая сама может содержать файлы и другие директории, вложенные на несколько уровней. Первая очевидная попытка — написать функцию, которая проверяет `if (item.type === 'file')` и `if (item.type === 'directory')`, суммируя дочерние элементы в ветке директории.\n\nЭта ветка размножается везде, где считается размер, — в отчётах об использовании диска, в предпросмотре копирования, в проверке квот, — и все эти места нужно держать синхронными. Добавьте третий вид записи файловой системы, например симлинк, указывающий на директорию, — и в каждом из этих мест понадобится новая ветка."
+    "en": "A file manager needs to compute the total size of anything a user selects: a single file, or a directory that itself contains files and other directories nested several levels deep. The obvious first attempt writes a function that checks `if (item.type === 'file')` versus `if (item.type === 'directory')` and sums up children in the directory branch.\n\nThat branch multiplies everywhere size is computed - disk-usage reports, copy previews, quota checks - and every one of them has to be kept in sync. Add a third kind of filesystem entry, like a symlink that points at a directory, and every one of those call sites needs a new branch.",
+    "ru": "Файловому менеджеру нужно вычислять общий размер того, что выбрал пользователь: как отдельного файла, так и директории, которая сама может содержать файлы и другие директории, вложенные на несколько уровней. Первая очевидная попытка - написать функцию, которая проверяет `if (item.type === 'file')` и `if (item.type === 'directory')`, суммируя дочерние элементы в ветке директории.\n\nЭта ветка размножается везде, где считается размер, - в отчётах об использовании диска, в предпросмотре копирования, в проверке квот, - и все эти места нужно держать синхронными. Добавьте третий вид записи файловой системы, например симлинк, указывающий на директорию, - и в каждом из этих мест понадобится новая ветка."
   },
   "solution": {
-    "en": "Give every filesystem entry — files and directories alike — the same interface, say a `getSize()` method. A file simply returns its own size. A directory implements `getSize()` by looping over whatever it contains and summing each child's `getSize()`, regardless of whether that child is itself a file or another directory.\n\nBecause a directory calls the exact same method it exposes, the recursion handles arbitrary nesting for free. Any code that needs a size just calls `getSize()` on whatever it was handed, without ever branching on what kind of item it is.",
-    "ru": "Дайте каждой записи файловой системы — и файлам, и директориям — один и тот же интерфейс, скажем, метод `getSize()`. Файл просто возвращает свой размер. Директория реализует `getSize()`, перебирая всё, что в ней содержится, и суммируя `getSize()` каждого дочернего элемента — независимо от того, является ли этот элемент файлом или другой директорией.\n\nПоскольку директория вызывает тот же самый метод, который сама предоставляет, рекурсия бесплатно справляется с произвольной вложенностью. Любому коду, которому нужен размер, достаточно вызвать `getSize()` у переданного объекта, ни разу не проверяя, с каким видом записи он имеет дело."
+    "en": "Give every filesystem entry - files and directories alike - the same interface, say a `getSize()` method. A file simply returns its own size. A directory implements `getSize()` by looping over whatever it contains and summing each child's `getSize()`, regardless of whether that child is itself a file or another directory.\n\nBecause a directory calls the exact same method it exposes, the recursion handles arbitrary nesting for free. Any code that needs a size just calls `getSize()` on whatever it was handed, without ever branching on what kind of item it is.",
+    "ru": "Дайте каждой записи файловой системы - и файлам, и директориям - один и тот же интерфейс, скажем, метод `getSize()`. Файл просто возвращает свой размер. Директория реализует `getSize()`, перебирая всё, что в ней содержится, и суммируя `getSize()` каждого дочернего элемента - независимо от того, является ли этот элемент файлом или другой директорией.\n\nПоскольку директория вызывает тот же самый метод, который сама предоставляет, рекурсия бесплатно справляется с произвольной вложенностью. Любому коду, которому нужен размер, достаточно вызвать `getSize()` у переданного объекта, ни разу не проверяя, с каким видом записи он имеет дело."
   },
   "structure": {
     "description": {
-      "en": "A single shared interface covers both ends of the tree. Leaf nodes implement it by computing their own answer directly; container nodes implement the very same interface by looping over their children and combining whatever those children return — including other containers.",
-      "ru": "Единый общий интерфейс покрывает оба конца дерева. Листовые узлы реализуют его, вычисляя собственный ответ напрямую; узлы-контейнеры реализуют тот же интерфейс, перебирая своих потомков и объединяя то, что те возвращают, — включая другие контейнеры."
+      "en": "A single shared interface covers both ends of the tree. Leaf nodes implement it by computing their own answer directly; container nodes implement the very same interface by looping over their children and combining whatever those children return - including other containers.",
+      "ru": "Единый общий интерфейс покрывает оба конца дерева. Листовые узлы реализуют его, вычисляя собственный ответ напрямую; узлы-контейнеры реализуют тот же интерфейс, перебирая своих потомков и объединяя то, что те возвращают, - включая другие контейнеры."
     },
     "participants": [
       {
         "name": "Component",
         "role": {
-          "en": "The shared interface that both single elements and containers implement, defining the operations client code is allowed to call.",
-          "ru": "Общий интерфейс, который реализуют и отдельные элементы, и контейнеры, определяющий операции, доступные клиентскому коду."
+          "en": "The shared interface that both single elements and containers implement, defining the operations client code is allowed to call. In the diagram: Component.",
+          "ru": "Общий интерфейс, который реализуют и отдельные элементы, и контейнеры, определяющий операции, доступные клиентскому коду. На диаграмме: Компонент."
         }
       },
       {
         "name": "Leaf",
         "role": {
-          "en": "A terminal node with no children of its own; it answers a Component call directly instead of forwarding it anywhere.",
-          "ru": "Конечный узел без собственных потомков; он отвечает на вызов Компонента напрямую, а не передаёт его кому-либо ещё."
+          "en": "A terminal node with no children of its own; it answers a Component call directly instead of forwarding it anywhere. In the diagram: File A, File B, File C.",
+          "ru": "Конечный узел без собственных потомков; он отвечает на вызов Компонента напрямую, а не передаёт его кому-либо ещё. На диаграмме: Файл A, Файл B, Файл C."
         }
       },
       {
         "name": "Composite",
         "role": {
-          "en": "A node that keeps a collection of child Components — leaves, other composites, or a mix — and answers a Component call by combining the results of calling it on each child.",
-          "ru": "Узел, хранящий коллекцию дочерних Компонентов — листьев, других составных элементов или их смеси, — и отвечающий на вызов Компонента, объединяя результаты вызова на каждом потомке."
+          "en": "A node that keeps a collection of child Components - leaves, other composites, or a mix - and answers a Component call by combining the results of calling it on each child. In the diagram: Directory.",
+          "ru": "Узел, хранящий коллекцию дочерних Компонентов - листьев, других составных элементов или их смеси, - и отвечающий на вызов Компонента, объединяя результаты вызова на каждом потомке. На диаграмме: Директория."
         }
       },
       {
         "name": "Client",
         "role": {
-          "en": "Calls Component operations on whatever object it's given, never checking whether it's holding a single element or an entire subtree.",
-          "ru": "Вызывает операции Компонента на переданном ему объекте, никогда не проверяя, держит ли он отдельный элемент или целое поддерево."
+          "en": "Calls Component operations on whatever object it's given, never checking whether it's holding a single element or an entire subtree. In the diagram: Client.",
+          "ru": "Вызывает операции Компонента на переданном ему объекте, никогда не проверяя, держит ли он отдельный элемент или целое поддерево. На диаграмме: Клиент."
         }
       }
     ]
@@ -70,8 +70,8 @@
   },
   "pros": [
     {
-      "en": "Eliminates type-checking branches for tree traversal entirely — recursion through a shared interface handles any depth automatically.",
-      "ru": "Полностью устраняет ветвления по типу при обходе дерева — рекурсия через общий интерфейс автоматически справляется с любой глубиной."
+      "en": "Eliminates type-checking branches for tree traversal entirely - recursion through a shared interface handles any depth automatically.",
+      "ru": "Полностью устраняет ветвления по типу при обходе дерева - рекурсия через общий интерфейс автоматически справляется с любой глубиной."
     },
     {
       "en": "New kinds of leaves or containers slot in by implementing the Component interface, with zero changes to code that already traverses the tree.",
@@ -98,8 +98,8 @@
   ],
   "when_to_use": [
     {
-      "en": "Your domain is naturally a part-whole hierarchy — folders and files, menus and menu items, org charts, nested UI layouts.",
-      "ru": "Ваша предметная область естественным образом представляет иерархию часть-целое — папки и файлы, меню и пункты меню, оргструктуры, вложенные UI-макеты."
+      "en": "Your domain is naturally a part-whole hierarchy - folders and files, menus and menu items, org charts, nested UI layouts.",
+      "ru": "Ваша предметная область естественным образом представляет иерархию часть-целое - папки и файлы, меню и пункты меню, оргструктуры, вложенные UI-макеты."
     },
     {
       "en": "You want callers to run the same operation on a single item or an entire subtree without writing separate code paths for each case.",
@@ -108,16 +108,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**Filesystem APIs** — a `File` and a `Directory` both expose size and traversal operations; computing a folder's total size just recurses through whatever it contains.",
-      "ru": "**API файловых систем** — и `File`, и `Directory` предоставляют операции получения размера и обхода; вычисление размера папки — это просто рекурсия по её содержимому."
+      "en": "**Filesystem APIs** - a `File` and a `Directory` both expose size and traversal operations; computing a folder's total size just recurses through whatever it contains.",
+      "ru": "**API файловых систем** - и `File`, и `Directory` предоставляют операции получения размера и обхода; вычисление размера папки - это просто рекурсия по её содержимому."
     },
     {
-      "en": "**DOM tree** — a text node and an element node both implement the same `Node` interface, so traversal code like `querySelectorAll` works uniformly at any depth.",
-      "ru": "**Дерево DOM** — текстовый узел и узел-элемент оба реализуют один интерфейс `Node`, поэтому обходящий код вроде `querySelectorAll` работает единообразно на любой глубине."
+      "en": "**DOM tree** - a text node and an element node both implement the same `Node` interface, so traversal code like `querySelectorAll` works uniformly at any depth.",
+      "ru": "**Дерево DOM** - текстовый узел и узел-элемент оба реализуют один интерфейс `Node`, поэтому обходящий код вроде `querySelectorAll` работает единообразно на любой глубине."
     },
     {
-      "en": "**Protobuf / JSON AST parsers** — a scalar value and a nested object both conform to one node interface, letting a single visitor function walk the entire parsed tree.",
-      "ru": "**Парсеры AST для Protobuf / JSON** — скалярное значение и вложенный объект оба соответствуют одному интерфейсу узла, что позволяет одной функции-обходчику пройтись по всему разобранному дереву."
+      "en": "**Protobuf / JSON AST parsers** - a scalar value and a nested object both conform to one node interface, letting a single visitor function walk the entire parsed tree.",
+      "ru": "**Парсеры AST для Protobuf / JSON** - скалярное значение и вложенный объект оба соответствуют одному интерфейсу узла, что позволяет одной функции-обходчику пройтись по всему разобранному дереву."
     }
   ],
   "related_patterns": [
@@ -134,8 +134,8 @@
       },
       "options": [
         {
-          "en": "Treat individual objects and groups of objects through the same interface, operating on a whole tree without caring how deep it goes",
-          "ru": "Работать с отдельными объектами и группами объектов через один и тот же интерфейс, обрабатывая целое дерево, не заботясь о его глубине"
+          "en": "Treat individual objects and groups through one interface",
+          "ru": "Работать с объектами и группами через один интерфейс"
         },
         {
           "en": "Create only one instance of a tree node class",
@@ -163,8 +163,8 @@
       },
       "options": [
         {
-          "en": "The branching multiplies everywhere size is computed, and adding a new entry kind like a symlink needs a new branch at every call site",
-          "ru": "Ветвление размножается везде, где считается размер, а добавление нового вида записи вроде симлинка требует новой ветки в каждом месте вызова"
+          "en": "Branching multiplies everywhere size is computed",
+          "ru": "Ветвление размножается везде, где считается размер"
         },
         {
           "en": "It fails to compute the size of a single file correctly",
@@ -181,8 +181,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "The branch multiplies everywhere size is computed — disk-usage reports, copy previews, quota checks — and every call site needs a new branch for a new entry kind.",
-        "ru": "Ветка размножается везде, где считается размер, — в отчётах об использовании диска, предпросмотре копирования, проверке квот, — и каждое из этих мест требует новой ветки для нового вида записи."
+        "en": "The branch multiplies everywhere size is computed - disk-usage reports, copy previews, quota checks - and every call site needs a new branch for a new entry kind.",
+        "ru": "Ветка размножается везде, где считается размер, - в отчётах об использовании диска, предпросмотре копирования, проверке квот, - и каждое из этих мест требует новой ветки для нового вида записи."
       }
     },
     {
@@ -192,8 +192,8 @@
       },
       "options": [
         {
-          "en": "By looping over its children and summing each child's getSize(), recursing for free since it calls the exact same method it exposes",
-          "ru": "Перебирая свои дочерние элементы и суммируя getSize() каждого — рекурсия работает бесплатно, поскольку вызывается тот же метод, который директория сама предоставляет"
+          "en": "By summing each child's getSize() - recursion comes for free",
+          "ru": "Суммируя getSize() каждого потомка - рекурсия работает сама"
         },
         {
           "en": "By hardcoding the maximum nesting depth allowed",
@@ -221,8 +221,8 @@
       },
       "options": [
         {
-          "en": "It can leave leaves with methods that make no sense for them, like managing children",
-          "ru": "Он может оставить у листьев методы, которые для них бессмысленны, например управление потомками"
+          "en": "It can leave leaves with methods that make no sense for them",
+          "ru": "У листьев появляются методы, для них бессмысленные"
         },
         {
           "en": "It makes it impossible to compute a file's own size",
@@ -250,8 +250,8 @@
       },
       "options": [
         {
-          "en": "Simple aggregate operations can become expensive since one call may fan out recursively across the whole structure",
-          "ru": "Простые агрегирующие операции могут стать затратными, поскольку один вызов может рекурсивно развернуться по всей структуре"
+          "en": "Simple operations can get expensive as they fan out recursively",
+          "ru": "Простые операции могут стать затратными из-за рекурсии"
         },
         {
           "en": "The Component interface stops working entirely",
@@ -286,12 +286,12 @@
         "ru": "Как работает Компоновщик"
       },
       "description": {
-        "en": "The Client calls getSize() through the shared Component interface. A Composite (the Directory) implements that same interface by fanning the call out to each of its children — here three Leaves (File A/B/C) that answer directly. Because a Composite could just as easily hold another Composite instead of a Leaf, the same call shape repeats at any depth.",
-        "ru": "Клиент вызывает getSize() через общий интерфейс Компонента. Контейнер (Директория) реализует тот же интерфейс, разветвляя вызов на каждого потомка — здесь это три Листа (Файл A/B/C), которые отвечают напрямую. Поскольку Контейнер с тем же успехом мог бы содержать другой Контейнер вместо Листа, одна и та же форма вызова повторяется на любой глубине."
+        "en": "The Client calls getSize() through the shared Component interface. A Composite (the Directory) implements that same interface by fanning the call out to each of its children - here three Leaves (File A/B/C) that answer directly. Because a Composite could just as easily hold another Composite instead of a Leaf, the same call shape repeats at any depth.",
+        "ru": "Клиент вызывает getSize() через общий интерфейс Компонента. Контейнер (Директория) реализует тот же интерфейс, разветвляя вызов на каждого потомка - здесь это три Листа (Файл A/B/C), которые отвечают напрямую. Поскольку Контейнер с тем же успехом мог бы содержать другой Контейнер вместо Листа, одна и та же форма вызова повторяется на любой глубине."
       },
       "caption": {
-        "en": "Composite and Leaf both implement Component — Client never needs to tell them apart.",
-        "ru": "Контейнер и Лист оба реализуют Компонент — Клиент никогда их не различает."
+        "en": "Composite and Leaf both implement Component - Client never needs to tell them apart.",
+        "ru": "Контейнер и Лист оба реализуют Компонент - Клиент никогда их не различает."
       },
       "nodes": [
         {

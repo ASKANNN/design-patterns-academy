@@ -17,12 +17,12 @@
     "ru": "Стратегия оформляет набор взаимозаменяемых алгоритмов в виде отдельных классов и позволяет объекту, который их использует, переключаться между алгоритмами во время выполнения через общий интерфейс."
   },
   "problem": {
-    "en": "Imagine you're building a navigation app. Depending on how the traveler gets around — on foot or by car — the route between two points has to be calculated differently: a walking route favors footpaths and shortcuts, while a road route must follow streets and traffic rules.\n\nYou could implement all these options with a giant `if/else` block inside a `Navigator` class. But every time a new travel mode is added — cycling, public transit — you have to modify that class, violating the Open/Closed Principle and making it harder to maintain.\n\nAs the number of travel modes grows, the class becomes bloated with unrelated routing logic that is difficult to test in isolation.",
-    "ru": "Представьте, что вы создаёте навигационное приложение. В зависимости от того, как передвигается человек — пешком или на машине, — маршрут между двумя точками нужно считать по-разному: пеший маршрут предпочитает тропинки и срезки, а автомобильный обязан следовать улицам и правилам дорожного движения.\n\nМожно реализовать все варианты с помощью большого блока `if/else` внутри класса `Navigator`. Но каждый раз, когда добавляется новый способ передвижения — велосипед, общественный транспорт, — придётся менять этот класс, нарушая принцип открытости/закрытости.\n\nПо мере роста числа способов передвижения класс разбухает несвязанной логикой построения маршрута, которую сложно тестировать."
+    "en": "Imagine you're building a navigation app. Depending on how the traveler gets around - on foot or by car - the route between two points has to be calculated differently: a walking route favors footpaths and shortcuts, while a road route must follow streets and traffic rules.\n\nYou could implement all these options with a giant `if/else` block inside a `Navigator` class. But every time a new travel mode is added - cycling, public transit - you have to modify that class, violating the Open/Closed Principle and making it harder to maintain.\n\nAs the number of travel modes grows, the class becomes bloated with unrelated routing logic that is difficult to test in isolation.",
+    "ru": "Представьте, что вы создаёте навигационное приложение. В зависимости от того, как передвигается человек - пешком или на машине, - маршрут между двумя точками нужно считать по-разному: пеший маршрут предпочитает тропинки и срезки, а автомобильный обязан следовать улицам и правилам дорожного движения.\n\nМожно реализовать все варианты с помощью большого блока `if/else` внутри класса `Navigator`. Но каждый раз, когда добавляется новый способ передвижения - велосипед, общественный транспорт, - придётся менять этот класс, нарушая принцип открытости/закрытости.\n\nПо мере роста числа способов передвижения класс разбухает несвязанной логикой построения маршрута, которую сложно тестировать."
   },
   "solution": {
-    "en": "The Strategy pattern suggests extracting all these algorithms (route calculations) into separate classes called **strategies**. The original class, called the **context**, stores a reference to one of the strategy objects and delegates the work to it.\n\nThe context is not responsible for selecting the appropriate algorithm — the client does that. The context works with all strategies through a generic interface exposing a single method that triggers the algorithm.\n\nThis makes the context independent of concrete strategies, so you can add new travel modes without ever touching the `Navigator` class.",
-    "ru": "Паттерн Стратегия предлагает вынести все эти алгоритмы (расчёты маршрута) в отдельные классы — **стратегии**. Исходный класс, называемый **контекстом**, хранит ссылку на одну из стратегий и делегирует ей выполнение работы.\n\nКонтекст не выбирает подходящий алгоритм — это делает клиент. Контекст взаимодействует со всеми стратегиями через единый интерфейс.\n\nЭто делает контекст независимым от конкретных стратегий: можно добавлять новые способы передвижения, не изменяя класс `Navigator`."
+    "en": "The Strategy pattern suggests extracting all these algorithms (route calculations) into separate classes called **strategies**. The original class, called the **context**, stores a reference to one of the strategy objects and delegates the work to it.\n\nThe context is not responsible for selecting the appropriate algorithm - the client does that. The context works with all strategies through a generic interface exposing a single method that triggers the algorithm.\n\nThis makes the context independent of concrete strategies, so you can add new travel modes without ever touching the `Navigator` class.",
+    "ru": "Паттерн Стратегия предлагает вынести все эти алгоритмы (расчёты маршрута) в отдельные классы - **стратегии**. Исходный класс, называемый **контекстом**, хранит ссылку на одну из стратегий и делегирует ей выполнение работы.\n\nКонтекст не выбирает подходящий алгоритм - это делает клиент. Контекст взаимодействует со всеми стратегиями через единый интерфейс.\n\nЭто делает контекст независимым от конкретных стратегий: можно добавлять новые способы передвижения, не изменяя класс `Navigator`."
   },
   "structure": {
     "description": {
@@ -33,29 +33,29 @@
       {
         "name": "Context",
         "role": {
-          "en": "Holds a reference to a strategy object and delegates all algorithm-specific work to it. Communicates with the strategy only through the Strategy interface.",
-          "ru": "Хранит ссылку на объект-стратегию и делегирует ей выполнение алгоритма. Взаимодействует со стратегией только через интерфейс."
+          "en": "Holds a reference to a strategy object and delegates all algorithm-specific work to it. Communicates with the strategy only through the Strategy interface. In the diagram: Navigator.",
+          "ru": "Хранит ссылку на объект-стратегию и делегирует ей выполнение алгоритма. Взаимодействует со стратегией только через интерфейс. На диаграмме: Навигатор."
         }
       },
       {
         "name": "Strategy",
         "role": {
-          "en": "Declares an interface common to all supported versions of the algorithm. The context uses this interface to call the algorithm defined by a concrete strategy.",
-          "ru": "Объявляет интерфейс, общий для всех вариантов алгоритма. Контекст использует этот интерфейс для вызова алгоритма, определённого конкретной стратегией."
+          "en": "Declares an interface common to all supported versions of the algorithm. The context uses this interface to call the algorithm defined by a concrete strategy. In the diagram: RouteStrategy.",
+          "ru": "Объявляет интерфейс, общий для всех вариантов алгоритма. Контекст использует этот интерфейс для вызова алгоритма, определённого конкретной стратегией. На диаграмме: СтратегияПути."
         }
       },
       {
         "name": "ConcreteStrategy",
         "role": {
-          "en": "Implements a specific version of the algorithm using the Strategy interface.",
-          "ru": "Реализует конкретный вариант алгоритма, используя интерфейс стратегии."
+          "en": "Implements a specific version of the algorithm using the Strategy interface. In the diagram: WalkingRoute, RoadRoute.",
+          "ru": "Реализует конкретный вариант алгоритма, используя интерфейс стратегии. На диаграмме: ПешийМаршрут, АвтоМаршрут."
         }
       },
       {
         "name": "Client",
         "role": {
-          "en": "Creates a specific strategy object and passes it to the context. The context exposes a setter that lets clients replace the strategy at runtime.",
-          "ru": "Создаёт объект-стратегию и передаёт его контексту. Контекст предоставляет сеттер, позволяющий клиентам заменять стратегию во время выполнения."
+          "en": "Creates a specific strategy object and passes it to the context. The context exposes a setter that lets clients replace the strategy at runtime. In the diagram: Client.",
+          "ru": "Создаёт объект-стратегию и передаёт его контексту. Контекст предоставляет сеттер, позволяющий клиентам заменять стратегию во время выполнения. На диаграмме: Клиент."
         }
       }
     ]
@@ -70,7 +70,7 @@
   "pros": [
     {
       "en": "New algorithms can be added as new strategy classes, without editing the context or any existing strategy.",
-      "ru": "Новые алгоритмы добавляются как новые классы стратегий — без правок контекста и уже существующих стратегий."
+      "ru": "Новые алгоритмы добавляются как новые классы стратегий - без правок контекста и уже существующих стратегий."
     },
     {
       "en": "The active algorithm can be swapped while the program is running, simply by handing the context a different strategy object.",
@@ -91,8 +91,8 @@
       "ru": "Если алгоритмов немного и они почти не меняются, иерархия стратегий добавляет больше формальностей, чем простое условие."
     },
     {
-      "en": "The calling code has to know which strategies exist and what each one is for, so the decision logic doesn't disappear — it just moves to the client.",
-      "ru": "Вызывающий код должен знать, какие стратегии существуют и для чего каждая из них нужна, — логика выбора никуда не исчезает, а просто переносится к клиенту."
+      "en": "The calling code has to know which strategies exist and what each one is for, so the decision logic doesn't disappear - it just moves to the client.",
+      "ru": "Вызывающий код должен знать, какие стратегии существуют и для чего каждая из них нужна, - логика выбора никуда не исчезает, а просто переносится к клиенту."
     },
     {
       "en": "In languages with first-class functions, a single-method strategy interface can often be replaced by passing a plain function or closure instead.",
@@ -105,26 +105,26 @@
       "ru": "Применяйте Стратегию, когда объекту нужно выбирать между несколькими вариантами поведения и этот выбор может меняться во время работы программы."
     },
     {
-      "en": "It also helps when several classes are nearly identical except for one piece of behavior — that piece becomes the strategy, and the classes collapse into one.",
-      "ru": "Паттерн полезен и тогда, когда несколько классов почти идентичны и отличаются лишь одним фрагментом поведения — этот фрагмент выносится в стратегию, а классы объединяются в один."
+      "en": "It also helps when several classes are nearly identical except for one piece of behavior - that piece becomes the strategy, and the classes collapse into one.",
+      "ru": "Паттерн полезен и тогда, когда несколько классов почти идентичны и отличаются лишь одним фрагментом поведения - этот фрагмент выносится в стратегию, а классы объединяются в один."
     },
     {
       "en": "Use it to keep an algorithm's implementation details out of a class whose main job is unrelated business logic.",
-      "ru": "Используйте паттерн, чтобы детали реализации алгоритма не засоряли класс, чья основная задача — не связанная с ними бизнес-логика."
+      "ru": "Используйте паттерн, чтобы детали реализации алгоритма не засоряли класс, чья основная задача - не связанная с ними бизнес-логика."
     }
   ],
   "real_world_examples": [
     {
-      "en": "**Payment gateways** — checkout can switch between Stripe, PayPal, or Apple Pay without changing the cart logic.",
-      "ru": "**Платёжные шлюзы** — на странице оплаты можно переключаться между Stripe, PayPal или Apple Pay, не меняя логику корзины."
+      "en": "**Payment gateways** - checkout can switch between Stripe, PayPal, or Apple Pay without changing the cart logic.",
+      "ru": "**Платёжные шлюзы** - на странице оплаты можно переключаться между Stripe, PayPal или Apple Pay, не меняя логику корзины."
     },
     {
-      "en": "**`Array.prototype.sort()`** — the comparator function you pass is a strategy that defines how elements are ordered.",
-      "ru": "**`Array.prototype.sort()`** — функция-компаратор, переданная в `sort()`, является стратегией, определяющей порядок элементов."
+      "en": "**`Array.prototype.sort()`** - the comparator function you pass is a strategy that defines how elements are ordered.",
+      "ru": "**`Array.prototype.sort()`** - функция-компаратор, переданная в `sort()`, является стратегией, определяющей порядок элементов."
     },
     {
-      "en": "**File compression** — archiving tools let users choose between ZIP, GZIP, or BZIP2 without changing the archiving UI.",
-      "ru": "**Сжатие файлов** — архиватор позволяет выбрать формат (ZIP, GZIP, BZIP2), не меняя интерфейс программы."
+      "en": "**File compression** - archiving tools let users choose between ZIP, GZIP, or BZIP2 without changing the archiving UI.",
+      "ru": "**Сжатие файлов** - архиватор позволяет выбрать формат (ZIP, GZIP, BZIP2), не меняя интерфейс программы."
     }
   ],
   "related_patterns": [
@@ -141,8 +141,8 @@
       },
       "options": [
         {
-          "en": "A group of interchangeable algorithms, letting the object using them switch at runtime through a shared interface",
-          "ru": "Набор взаимозаменяемых алгоритмов, позволяя объекту, который их использует, переключаться между ними во время выполнения через общий интерфейс"
+          "en": "A group of interchangeable algorithms behind a shared interface",
+          "ru": "Набор взаимозаменяемых алгоритмов за общим интерфейсом"
         },
         {
           "en": "The internal state of an object, for later restoration",
@@ -170,8 +170,8 @@
       },
       "options": [
         {
-          "en": "Every new travel mode requires modifying that class, violating the Open/Closed Principle and bloating it with unrelated logic",
-          "ru": "Каждый новый способ передвижения требует изменения этого класса, нарушая принцип открытости/закрытости и раздувая его несвязанной логикой"
+          "en": "Every new mode means editing that class, making it grow",
+          "ru": "Каждый новый способ требует правки класса, он разрастается"
         },
         {
           "en": "Walking routes stop working entirely once a car mode is added",
@@ -199,8 +199,8 @@
       },
       "options": [
         {
-          "en": "The client — the context is not responsible for selecting the algorithm",
-          "ru": "Клиент — контекст не отвечает за выбор алгоритма"
+          "en": "The client - the context is not responsible for selecting the algorithm",
+          "ru": "Клиент - контекст не отвечает за выбор алгоритма"
         },
         {
           "en": "The context always picks a random strategy",
@@ -217,8 +217,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "The context is not responsible for selecting the appropriate algorithm — the client does that.",
-        "ru": "Контекст не выбирает подходящий алгоритм — это делает клиент."
+        "en": "The context is not responsible for selecting the appropriate algorithm - the client does that.",
+        "ru": "Контекст не выбирает подходящий алгоритм - это делает клиент."
       }
     },
     {
@@ -228,8 +228,8 @@
       },
       "options": [
         {
-          "en": "Through a generic interface exposing a single method that triggers the algorithm, making the context independent of concrete strategies",
-          "ru": "Через единый интерфейс с единственным методом, запускающим алгоритм, — это делает контекст независимым от конкретных стратегий"
+          "en": "Through one shared method - it doesn't need to know the strategy",
+          "ru": "Через один общий метод, не зная, какая стратегия используется"
         },
         {
           "en": "By copy-pasting each strategy's code directly into itself",
@@ -247,7 +247,7 @@
       "correct": 0,
       "explanation": {
         "en": "The context works with all strategies through a generic interface exposing a single method that triggers the algorithm, making it independent of concrete strategies.",
-        "ru": "Контекст взаимодействует со всеми стратегиями через единый интерфейс, выставляющий один метод, запускающий алгоритм, — это делает контекст независимым от конкретных стратегий."
+        "ru": "Контекст взаимодействует со всеми стратегиями через единый интерфейс, выставляющий один метод, запускающий алгоритм, - это делает контекст независимым от конкретных стратегий."
       }
     },
     {
@@ -261,8 +261,8 @@
           "ru": "Его часто можно заменить обычной функцией или замыканием"
         },
         {
-          "en": "There is no alternative — a full class hierarchy is always required",
-          "ru": "Альтернативы нет — полноценная иерархия классов требуется всегда"
+          "en": "There is no alternative - a full class hierarchy is always required",
+          "ru": "Альтернативы нет - полноценная иерархия классов требуется всегда"
         },
         {
           "en": "Strategies must always be implemented as global variables",
@@ -293,12 +293,12 @@
         "ru": "Как работает Стратегия"
       },
       "description": {
-        "en": "The Context always calls the same calculate() method on whatever object currently occupies its RouteStrategy slot. Only the Client is allowed to change what sits in that slot — swapping the Walking route for the Road route changes the result without touching a single line of the Context.",
-        "ru": "Контекст всегда вызывает один и тот же метод calculate() у того объекта, что сейчас занимает его слот RouteStrategy. Только Клиент может изменить содержимое этого слота — замена Пешего маршрута на Авто меняет результат, не трогая ни строки в самом Контексте."
+        "en": "The Context always calls the same calculate() method on whatever object currently occupies its RouteStrategy slot. Only the Client is allowed to change what sits in that slot - swapping the Walking route for the Road route changes the result without touching a single line of the Context.",
+        "ru": "Контекст всегда вызывает один и тот же метод calculate() у того объекта, что сейчас занимает его слот RouteStrategy. Только Клиент может изменить содержимое этого слота - замена Пешего маршрута на Авто меняет результат, не трогая ни строки в самом Контексте."
       },
       "caption": {
-        "en": "Same call, same slot — a different object plugged in changes the result.",
-        "ru": "Тот же вызов, тот же слот — другой объект внутри меняет результат."
+        "en": "Same call, same slot - a different object plugged in changes the result.",
+        "ru": "Тот же вызов, тот же слот - другой объект внутри меняет результат."
       },
       "rackLabel": {
         "en": "Strategy slot",

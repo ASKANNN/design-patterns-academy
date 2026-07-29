@@ -268,7 +268,7 @@ function _nestedDiagram(model) {
 
 function _shellNode(node, g, index) {
   const { id, label = '', badge = '', action = '', icon = 'layers' } = node;
-  const aria = action ? `${label} — ${action}` : label;
+  const aria = action ? `${label} - ${action}` : label;
 
   const CHIP = 38;
   const chipX = g.x + 16, chipY = g.y + 13;
@@ -426,7 +426,7 @@ function _stationNode(node, g, index) {
   const title = String(label);
   const guardText = String(guard ?? '');
   const decisionText = String(decision ?? '');
-  const aria = guardText ? `${title} — ${guardText}` : title;
+  const aria = guardText ? `${title} - ${guardText}` : title;
 
   const cx = g.x + g.w / 2;
 
@@ -2032,7 +2032,7 @@ function _skeletonSpine(node, g, steps, dims) {
   const portSvg = `
       <circle class="diagram__spine-port" cx="${r2(g.x + g.w)}" cy="${r2(portCy)}" r="7" aria-hidden="true" />`;
 
-  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+  const a11y = subtitle ? `${label} - ${subtitle}` : label;
 
   return `
     <g class="diagram__spine" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
@@ -2183,7 +2183,7 @@ function _dispatchCard(node, g, elements, rowCenters, dims, safeId) {
       </g>`;
   }).join('');
 
-  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+  const a11y = subtitle ? `${label} - ${subtitle}` : label;
 
   return `
     <g class="diagram__dispatch" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
@@ -2334,7 +2334,7 @@ function _overrideCard(node, g, dims, safeId) {
       </g>
       <circle class="diagram__override-port" cx="${r2(g.x + g.w)}" cy="${r2(rowCy)}" r="7" />`;
 
-  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+  const a11y = concreteLabel ? `${label} - ${concreteLabel}` : (subtitle ? `${label} - ${subtitle}` : label);
 
   return `
     <g class="diagram__override" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">${ghostsSvg}
@@ -2490,7 +2490,7 @@ function _familyCard(node, g, kind) {
       <text class="diagram__family-plate-role" x="${r2(plateX + 12)}" y="${r2(plateCy - 6)}"${roleTL}>${escapeText(concreteRole)}</text>
       <text class="diagram__family-plate-label" x="${r2(plateX + 12)}" y="${r2(plateCy + 14)}"${labelTL}>${escapeText(concreteLabel)}</text>`;
 
-  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+  const a11y = concreteLabel ? `${label} - ${concreteLabel}` : (subtitle ? `${label} - ${subtitle}` : label);
 
   return `
     <g class="diagram__family diagram__family--${kind}" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
@@ -2669,7 +2669,7 @@ function _assemblyBuilder(node, g, dims) {
       <text class="diagram__assembly-plate-label" x="${r2(plateX + 12)}" y="${r2(plateCy + 14)}"${labelTL}>${escapeText(concreteLabel)}</text>
       <circle class="diagram__assembly-port" cx="${r2(g.x + g.w)}" cy="${r2(plateCy)}" r="7" />`;
 
-  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+  const a11y = concreteLabel ? `${label} - ${concreteLabel}` : (subtitle ? `${label} - ${subtitle}` : label);
 
   return `
     <g class="diagram__assembly-builder" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
@@ -2688,7 +2688,7 @@ function _assemblySlot(node, g) {
   const titleTL = label.length * 7.6 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
   const subTL = subtitle.length * 6.2 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
   const cy = g.y + g.h / 2;
-  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+  const a11y = subtitle ? `${label} - ${subtitle}` : label;
 
   return `
     <g class="diagram__assembly-slot" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
@@ -2709,7 +2709,7 @@ function _assemblyFrame(node, g, headH) {
   const maxW = g.w - (titleX - g.x) - 14;
   const titleTL = label.length * 8.4 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
   const subTL = subtitle.length * 6.4 > maxW ? ` textLength="${r2(maxW)}" lengthAdjust="spacingAndGlyphs"` : '';
-  const a11y = subtitle ? `${label} — ${subtitle}` : label;
+  const a11y = subtitle ? `${label} - ${subtitle}` : label;
 
   return `
     <g class="diagram__assembly-frame" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
@@ -2866,7 +2866,7 @@ function _mirrorCard(node, g, flip, dims, safeId) {
     ? `<circle class="diagram__mirror-port" cx="${r2(g.x)}" cy="${r2(rowCy)}" r="7" />`
     : `<circle class="diagram__mirror-port" cx="${r2(g.x + g.w)}" cy="${r2(rowCy)}" r="7" />`;
 
-  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+  const a11y = concreteLabel ? `${label} - ${concreteLabel}` : (subtitle ? `${label} - ${subtitle}` : label);
 
   return `
     <g class="diagram__mirror diagram__mirror--${flip ? 'clone' : 'original'}" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
@@ -3022,7 +3022,7 @@ function _translateCard(node, g, dims, safeId, role, ports = []) {
 
   const portsSvg = ports.map((p) => _translatePort(g, p)).join('');
 
-  const a11y = concreteLabel ? `${label} — ${concreteLabel}` : (subtitle ? `${label} — ${subtitle}` : label);
+  const a11y = concreteLabel ? `${label} - ${concreteLabel}` : (subtitle ? `${label} - ${subtitle}` : label);
 
   return `
     <g class="diagram__translate-card diagram__translate-card--${escapeText(role)}" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">
@@ -3307,7 +3307,7 @@ function _treeCard(node, g, ghosts) {
   const sealSvg = `
       <circle class="diagram__tree-seal" cx="${r2(sealCx)}" cy="${r2(sealCy)}" r="13" aria-hidden="true" />${renderIcon('spark', sealCx - 7, sealCy - 7, 14, 'diagram__tree-seal-icon')}`;
 
-  const a11y = `${label} — ${subtitle}`;
+  const a11y = `${label} - ${subtitle}`;
 
   return `
     <g class="diagram__tree-card" data-node-id="${escapeText(id)}" tabindex="0" role="listitem" aria-label="${escapeText(a11y)}">${ghostsSvg}

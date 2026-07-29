@@ -14,48 +14,48 @@
   ],
   "intent": {
     "en": "Factory Method delegates object creation to a method that subclasses can override, so a base class can work with products whose exact type it doesn't need to know.",
-    "ru": "Фабричный метод выносит создание объекта в отдельный метод, который могут переопределять подклассы, — благодаря этому базовому классу не нужно знать точный тип создаваемых продуктов."
+    "ru": "Фабричный метод выносит создание объекта в отдельный метод, который могут переопределять подклассы, - благодаря этому базовому классу не нужно знать точный тип создаваемых продуктов."
   },
   "problem": {
-    "en": "A logistics module starts out delivering only by road, so `Logistics.planDelivery()` builds a `Truck` object right inside its own method body. Months later, sea shipping is added. Every place that constructed a `Truck` directly now needs an `if/else` or `switch` on delivery mode, and that branching logic tends to get copy-pasted into every method that needs a transport rather than living in one place.\n\nThe underlying issue is that the class doing the useful work — planning the delivery, tracking it, logging it — is welded to one specific concrete class it happens to instantiate, so extending it to a new mode of transport means editing code that has nothing to do with that new mode conceptually.",
-    "ru": "Модуль логистики начинался с доставки только по земле, поэтому `Logistics.planDelivery()` создаёт объект `Truck` прямо внутри своего метода. Спустя месяцы добавляется морская доставка. В каждом месте, где раньше напрямую создавался `Truck`, теперь нужен `if/else` или `switch` по способу доставки, и такую ветвящуюся логику приходится копировать в каждый метод, которому нужен транспорт, вместо того чтобы держать её в одном месте.\n\nКорень проблемы в том, что класс, выполняющий полезную работу — планирование доставки, её отслеживание, логирование, — намертво привязан к одному конкретному классу, который он создаёт, поэтому расширение под новый вид транспорта требует правки кода, концептуально не имеющего отношения к этому новому виду транспорта."
+    "en": "A logistics module starts out delivering only by road, so `Logistics.planDelivery()` builds a `Truck` object right inside its own method body. Months later, sea shipping is added. Every place that constructed a `Truck` directly now needs an `if/else` or `switch` on delivery mode, and that branching logic tends to get copy-pasted into every method that needs a transport rather than living in one place.\n\nThe underlying issue is that the class doing the useful work - planning the delivery, tracking it, logging it - is welded to one specific concrete class it happens to instantiate, so extending it to a new mode of transport means editing code that has nothing to do with that new mode conceptually.",
+    "ru": "Модуль логистики начинался с доставки только по земле, поэтому `Logistics.planDelivery()` создаёт объект `Truck` прямо внутри своего метода. Спустя месяцы добавляется морская доставка. В каждом месте, где раньше напрямую создавался `Truck`, теперь нужен `if/else` или `switch` по способу доставки, и такую ветвящуюся логику приходится копировать в каждый метод, которому нужен транспорт, вместо того чтобы держать её в одном месте.\n\nКорень проблемы в том, что класс, выполняющий полезную работу - планирование доставки, её отслеживание, логирование, - намертво привязан к одному конкретному классу, который он создаёт, поэтому расширение под новый вид транспорта требует правки кода, концептуально не имеющего отношения к этому новому виду транспорта."
   },
   "solution": {
-    "en": "Pull the `new Truck(...)` call out of the method body and into its own method — the **factory method** — and have the rest of the class call that method instead of a constructor directly. The base class only knows that the factory method returns something implementing a common `Transport` interface; it never names a concrete class.\n\nEach delivery mode then becomes a subclass that overrides just the factory method: `RoadLogistics` returns a `Truck`, `SeaLogistics` returns a `Ship`. All the shared logic — planning, tracking, logging — stays untouched in the base class and automatically works with whatever concrete product the subclass decides to hand back.",
-    "ru": "Вызов `new Truck(...)` выносится из тела метода в собственный метод — **фабричный метод**, — и остальной код класса вызывает уже этот метод, а не конструктор напрямую. Базовый класс знает лишь, что фабричный метод возвращает нечто, реализующее общий интерфейс `Transport`; он никогда не называет конкретный класс.\n\nКаждый способ доставки становится подклассом, переопределяющим только фабричный метод: `RoadLogistics` возвращает `Truck`, `SeaLogistics` — `Ship`. Вся общая логика — планирование, отслеживание, логирование — остаётся нетронутой в базовом классе и автоматически работает с тем конкретным продуктом, который вернёт подкласс."
+    "en": "Pull the `new Truck(...)` call out of the method body and into its own method - the **factory method** - and have the rest of the class call that method instead of a constructor directly. The base class only knows that the factory method returns something implementing a common `Transport` interface; it never names a concrete class.\n\nEach delivery mode then becomes a subclass that overrides just the factory method: `RoadLogistics` returns a `Truck`, `SeaLogistics` returns a `Ship`. All the shared logic - planning, tracking, logging - stays untouched in the base class and automatically works with whatever concrete product the subclass decides to hand back.",
+    "ru": "Вызов `new Truck(...)` выносится из тела метода в собственный метод - **фабричный метод**, - и остальной код класса вызывает уже этот метод, а не конструктор напрямую. Базовый класс знает лишь, что фабричный метод возвращает нечто, реализующее общий интерфейс `Transport`; он никогда не называет конкретный класс.\n\nКаждый способ доставки становится подклассом, переопределяющим только фабричный метод: `RoadLogistics` возвращает `Truck`, `SeaLogistics` - `Ship`. Вся общая логика - планирование, отслеживание, логирование - остаётся нетронутой в базовом классе и автоматически работает с тем конкретным продуктом, который вернёт подкласс."
   },
   "structure": {
     "description": {
-      "en": "The Creator hosts the shared workflow and calls its own factory method whenever it needs a new product, without knowing which concrete class that method will return. Each ConcreteCreator overrides just the factory method to supply one specific ConcreteProduct, and every product — regardless of which creator built it — is used through the same Product interface.",
-      "ru": "Создатель содержит общий рабочий процесс и вызывает собственный фабричный метод всякий раз, когда ему нужен новый продукт, не зная, какой конкретный класс этот метод вернёт. Каждый ConcreteCreator переопределяет только фабричный метод, поставляя один конкретный ConcreteProduct, а любой продукт — независимо от того, каким создателем он построен — используется через один и тот же интерфейс Product."
+      "en": "The Creator hosts the shared workflow and calls its own factory method whenever it needs a new product, without knowing which concrete class that method will return. Each ConcreteCreator overrides just the factory method to supply one specific ConcreteProduct, and every product - regardless of which creator built it - is used through the same Product interface.",
+      "ru": "Создатель содержит общий рабочий процесс и вызывает собственный фабричный метод всякий раз, когда ему нужен новый продукт, не зная, какой конкретный класс этот метод вернёт. Каждый ConcreteCreator переопределяет только фабричный метод, поставляя один конкретный ConcreteProduct, а любой продукт - независимо от того, каким создателем он построен - используется через один и тот же интерфейс Product."
     },
     "participants": [
       {
         "name": "Creator",
         "role": {
-          "en": "Contains the workflow that needs a product and calls its own factory method to obtain one, optionally with a default implementation.",
-          "ru": "Содержит рабочий процесс, которому нужен продукт, и вызывает собственный фабричный метод, чтобы его получить, при необходимости с реализацией по умолчанию."
+          "en": "Contains the workflow that needs a product and calls its own factory method to obtain one, optionally with a default implementation. In the diagram: Creator.",
+          "ru": "Содержит рабочий процесс, которому нужен продукт, и вызывает собственный фабричный метод, чтобы его получить, при необходимости с реализацией по умолчанию. На диаграмме: Creator."
         }
       },
       {
         "name": "ConcreteCreator",
         "role": {
-          "en": "Overrides only the factory method, returning one specific ConcreteProduct instance while inheriting all the shared workflow unchanged.",
-          "ru": "Переопределяет только фабричный метод, возвращая экземпляр одного конкретного ConcreteProduct, при этом наследуя весь общий рабочий процесс без изменений."
+          "en": "Overrides only the factory method, returning one specific ConcreteProduct instance while inheriting all the shared workflow unchanged. In the diagram: RoadLogistics.",
+          "ru": "Переопределяет только фабричный метод, возвращая экземпляр одного конкретного ConcreteProduct, при этом наследуя весь общий рабочий процесс без изменений. На диаграмме: RoadLogistics."
         }
       },
       {
         "name": "Product",
         "role": {
-          "en": "The interface every product must satisfy, letting the Creator's workflow stay identical regardless of which concrete product is actually in play.",
-          "ru": "Интерфейс, которому должен соответствовать любой продукт, — благодаря ему рабочий процесс Создателя остаётся неизменным независимо от того, какой конкретный продукт используется."
+          "en": "The interface every product must satisfy, letting the Creator's workflow stay identical regardless of which concrete product is actually in play. In the diagram: Product.",
+          "ru": "Интерфейс, которому должен соответствовать любой продукт, - благодаря ему рабочий процесс Создателя остаётся неизменным независимо от того, какой конкретный продукт используется. На диаграмме: Product."
         }
       },
       {
         "name": "ConcreteProduct",
         "role": {
-          "en": "A specific class implementing Product, instantiated only inside the matching ConcreteCreator's factory method.",
-          "ru": "Конкретный класс, реализующий Product, создаваемый только внутри фабричного метода соответствующего ConcreteCreator."
+          "en": "A specific class implementing Product, instantiated only inside the matching ConcreteCreator's factory method. In the diagram: Truck.",
+          "ru": "Конкретный класс, реализующий Product, создаваемый только внутри фабричного метода соответствующего ConcreteCreator. На диаграмме: Truck."
         }
       }
     ]
@@ -77,8 +77,8 @@
       "ru": "Все решения о создании объектов для семейства связанных классов сосредоточены в одном переопределяемом методе, а не разбросаны копипастой по местам, где нужен новый экземпляр."
     },
     {
-      "en": "Adding a new product variant is purely additive — write one new ConcreteCreator/ConcreteProduct pair, and nothing in the existing hierarchy has to change.",
-      "ru": "Добавление нового варианта продукта — чисто аддитивная операция: пишется одна новая пара ConcreteCreator/ConcreteProduct, а существующая иерархия не меняется."
+      "en": "Adding a new product variant is purely additive - write one new ConcreteCreator/ConcreteProduct pair, and nothing in the existing hierarchy has to change.",
+      "ru": "Добавление нового варианта продукта - чисто аддитивная операция: пишется одна новая пара ConcreteCreator/ConcreteProduct, а существующая иерархия не меняется."
     }
   ],
   "cons": [
@@ -88,13 +88,13 @@
     },
     {
       "en": "For a class that only ever needs to build one type of object, introducing a factory method is pure overhead with no payoff.",
-      "ru": "Для класса, которому нужно создавать объекты только одного типа, введение фабричного метода — чистые накладные расходы без какой-либо выгоды."
+      "ru": "Для класса, которому нужно создавать объекты только одного типа, введение фабричного метода - чистые накладные расходы без какой-либо выгоды."
     }
   ],
   "when_to_use": [
     {
-      "en": "Reach for it when a class can't know in advance the exact type of object it will need to create — that decision belongs to a subclass or is resolved at runtime.",
-      "ru": "Применяйте паттерн, когда класс заранее не может знать точный тип объекта, который ему нужно создать, — это решение принадлежит подклассу или разрешается во время выполнения."
+      "en": "Reach for it when a class can't know in advance the exact type of object it will need to create - that decision belongs to a subclass or is resolved at runtime.",
+      "ru": "Применяйте паттерн, когда класс заранее не может знать точный тип объекта, который ему нужно создать, - это решение принадлежит подклассу или разрешается во время выполнения."
     },
     {
       "en": "Reach for it when you're building a library or framework and want callers to be able to plug in their own product types without modifying your internal code.",
@@ -107,16 +107,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**`document.createElement(tag)`** — the browser returns different concrete element classes (`HTMLButtonElement`, `HTMLInputElement`) behind the same `Element` interface, chosen by the tag argument.",
-      "ru": "**`document.createElement(tag)`** — браузер возвращает разные конкретные классы элементов (`HTMLButtonElement`, `HTMLInputElement`) за одним интерфейсом `Element`, выбирая их по имени тега."
+      "en": "**`document.createElement(tag)`** - the browser returns different concrete element classes (`HTMLButtonElement`, `HTMLInputElement`) behind the same `Element` interface, chosen by the tag argument.",
+      "ru": "**`document.createElement(tag)`** - браузер возвращает разные конкретные классы элементов (`HTMLButtonElement`, `HTMLInputElement`) за одним интерфейсом `Element`, выбирая их по имени тега."
     },
     {
-      "en": "**Java's `Calendar.getInstance()`** — returns a locale-appropriate concrete calendar subclass (Gregorian, Buddhist, Japanese) without the caller ever choosing the class directly.",
-      "ru": "**`Calendar.getInstance()` в Java** — возвращает конкретный подкласс календаря, подходящий для локали (григорианский, буддийский, японский), причём вызывающий код никогда не выбирает класс напрямую."
+      "en": "**Java's `Calendar.getInstance()`** - returns a locale-appropriate concrete calendar subclass (Gregorian, Buddhist, Japanese) without the caller ever choosing the class directly.",
+      "ru": "**`Calendar.getInstance()` в Java** - возвращает конкретный подкласс календаря, подходящий для локали (григорианский, буддийский, японский), причём вызывающий код никогда не выбирает класс напрямую."
     },
     {
-      "en": "**Logger factories in frameworks like Log4j/SLF4J** — `LoggerFactory.getLogger()` hands back a concrete logger implementation appropriate for the configured backend, behind one common `Logger` interface.",
-      "ru": "**Фабрики логгеров во фреймворках вроде Log4j/SLF4J** — `LoggerFactory.getLogger()` возвращает конкретную реализацию логгера, подходящую под настроенный бэкенд, за одним общим интерфейсом `Logger`."
+      "en": "**Logger factories in frameworks like Log4j/SLF4J** - `LoggerFactory.getLogger()` hands back a concrete logger implementation appropriate for the configured backend, behind one common `Logger` interface.",
+      "ru": "**Фабрики логгеров во фреймворках вроде Log4j/SLF4J** - `LoggerFactory.getLogger()` возвращает конкретную реализацию логгера, подходящую под настроенный бэкенд, за одним общим интерфейсом `Logger`."
     }
   ],
   "related_patterns": [
@@ -133,8 +133,8 @@
       },
       "options": [
         {
-          "en": "Object creation, so the base class can work with products without knowing their exact type",
-          "ru": "Создание объекта, чтобы базовый класс мог работать с продуктами, не зная их точного типа"
+          "en": "Object creation, delegated to a subclass method",
+          "ru": "Создание объекта, делегированное методу подкласса"
         },
         {
           "en": "The entire business logic of the class",
@@ -151,8 +151,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "The base class only knows the factory method returns something implementing a common Transport interface — it never names a concrete class.",
-        "ru": "Базовый класс знает лишь, что фабричный метод возвращает нечто, реализующее общий интерфейс Transport, — он никогда не называет конкретный класс."
+        "en": "The base class only knows the factory method returns something implementing the Transport interface, not a concrete class.",
+        "ru": "Базовый класс знает лишь, что фабричный метод возвращает нечто, реализующее интерфейс Transport, а не конкретный класс."
       }
     },
     {
@@ -162,8 +162,8 @@
       },
       "options": [
         {
-          "en": "Every place that constructed a Truck directly now needs branching logic on delivery mode, often copy-pasted across methods",
-          "ru": "В каждом месте, где раньше напрямую создавался Truck, теперь нужна ветвящаяся логика по способу доставки, часто копируемая по методам"
+          "en": "Every place needs its own branching logic for delivery mode",
+          "ru": "Каждое место нуждается в своей логике выбора доставки"
         },
         {
           "en": "The Truck class stops working entirely",
@@ -187,12 +187,12 @@
     {
       "question": {
         "en": "In the solution, how does RoadLogistics differ from SeaLogistics?",
-        "ru": "В решении — чем RoadLogistics отличается от SeaLogistics?"
+        "ru": "В решении - чем RoadLogistics отличается от SeaLogistics?"
       },
       "options": [
         {
-          "en": "They override only the factory method: RoadLogistics returns a Truck, SeaLogistics returns a Ship, while shared logic stays in the base class",
-          "ru": "Они переопределяют только фабричный метод: RoadLogistics возвращает Truck, SeaLogistics — Ship, а общая логика остаётся в базовом классе"
+          "en": "They override only the factory method: one returns a Truck, the other a Ship",
+          "ru": "Они переопределяют только фабричный метод: Truck или Ship"
         },
         {
           "en": "They each reimplement planDelivery() from scratch with duplicated logic",
@@ -220,8 +220,8 @@
       },
       "options": [
         {
-          "en": "It's purely additive — one new ConcreteCreator/ConcreteProduct pair, and nothing in the existing hierarchy has to change",
-          "ru": "Это чисто аддитивная операция — одна новая пара ConcreteCreator/ConcreteProduct, а существующая иерархия не меняется"
+          "en": "It's purely additive - one new Creator/Product pair",
+          "ru": "Это чисто аддитивно - одна новая пара Creator/Product"
         },
         {
           "en": "It requires rewriting the base class entirely",
@@ -238,8 +238,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Adding a new product variant is purely additive — write one new ConcreteCreator/ConcreteProduct pair, and nothing in the existing hierarchy has to change.",
-        "ru": "Добавление нового варианта продукта — чисто аддитивная операция: пишется одна новая пара ConcreteCreator/ConcreteProduct, а существующая иерархия не меняется."
+        "en": "Adding a new product variant is purely additive - write one new ConcreteCreator/ConcreteProduct pair, and nothing in the existing hierarchy has to change.",
+        "ru": "Добавление нового варианта продукта - чисто аддитивная операция: пишется одна новая пара ConcreteCreator/ConcreteProduct, а существующая иерархия не меняется."
       }
     },
     {
@@ -249,8 +249,8 @@
       },
       "options": [
         {
-          "en": "Each new product variant typically means a new subclass, so a family with many variants can produce a sizeable parallel class hierarchy",
-          "ru": "Каждый новый вариант продукта обычно означает новый подкласс, поэтому семейство с большим числом вариантов может породить заметную параллельную иерархию классов"
+          "en": "Each new variant means a new subclass, so variants can pile up",
+          "ru": "Каждый новый вариант - новый подкласс, их может стать много"
         },
         {
           "en": "It makes it impossible to add new transport types",
@@ -285,12 +285,12 @@
         "ru": "Как работает Фабричный метод"
       },
       "description": {
-        "en": "The Client only ever calls the Creator's abstract factory method — it never names a concrete class. RoadLogistics is the ConcreteCreator currently plugged into that method, so calling it returns a Truck. The dashed cards behind Creator are the other ConcreteCreators the family could have plugged in instead, each wired to return a different Product — the Client's code would stay exactly the same either way.",
-        "ru": "Клиент лишь вызывает абстрактный фабричный метод Создателя — он никогда не называет конкретный класс. RoadLogistics — это ConcreteCreator, который сейчас подключён к этому методу, поэтому вызов возвращает Truck. Пунктирные карточки позади Создателя — другие ConcreteCreator из того же семейства, которые могли бы быть подключены вместо него, каждый со своим Product. Код клиента при этом не изменился бы ни на строчку."
+        "en": "The Client only ever calls the Creator's abstract factory method - it never names a concrete class. RoadLogistics is the ConcreteCreator currently plugged into that method, so calling it returns a Truck. The dashed cards behind Creator are the other ConcreteCreators the family could have plugged in instead, each wired to return a different Product - the Client's code would stay exactly the same either way.",
+        "ru": "Клиент лишь вызывает абстрактный фабричный метод Создателя - он никогда не называет конкретный класс. RoadLogistics - это ConcreteCreator, который сейчас подключён к этому методу, поэтому вызов возвращает Truck. Пунктирные карточки позади Создателя - другие ConcreteCreator из того же семейства, которые могли бы быть подключены вместо него, каждый со своим Product. Код клиента при этом не изменился бы ни на строчку."
       },
       "caption": {
-        "en": "Whichever ConcreteCreator is plugged in decides the Product — the Client never picks the class.",
-        "ru": "Какой ConcreteCreator подключён — тот и решает, каким будет Продукт. Клиент класс не выбирает."
+        "en": "Whichever ConcreteCreator is plugged in decides the Product - the Client never picks the class.",
+        "ru": "Какой ConcreteCreator подключён - тот и решает, каким будет Продукт. Клиент класс не выбирает."
       },
       "nodes": [
         {

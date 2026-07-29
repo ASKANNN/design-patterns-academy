@@ -220,12 +220,12 @@
    Эффекты, применяемые к сайту через классы на <body>
    ========================================================= */
 
-/* Размер шрифта — меняем базовый font-size у <html>, чтобы пересчитались все rem-размеры */
+/* Размер шрифта - меняем базовый font-size у <html>, чтобы пересчитались все rem-размеры */
 
 html:has(body.a11y-font-large)  { font-size: 18px; }
 html:has(body.a11y-font-xlarge) { font-size: 20px; }
 
-/* Контраст: высокий — усиливаем текст/границы поверх текущей темы */
+/* Контраст: высокий - усиливаем текст/границы поверх текущей темы */
 
 body.a11y-contrast-high {
   --color-text-primary:   #000000;
@@ -245,7 +245,7 @@ body.a11y-contrast-high {
 /* Инверсия и монохром компонуются через переменные --a11y-grayscale/--a11y-invert,
    чтобы оба режима можно было включить независимо без конфликта правил.
    filter применяется к #app, а не к body: filter на предке создаёт новый containing
-   block для position:fixed потомков — если повесить его на body, сама кнопка
+   block для position:fixed потомков - если повесить его на body, сама кнопка
    виджета (тоже потомок body) перестанет быть "приклеенной" к вьюпорту при скролле. */
 
 body {
@@ -264,14 +264,14 @@ body.a11y-contrast-invert #app {
     hue-rotate(calc(var(--a11y-invert) * 180deg));
 }
 
-/* Читаемый шрифт — везде системный sans-serif без засечек */
+/* Читаемый шрифт - везде системный sans-serif без засечек */
 
 body.a11y-readable-font,
 body.a11y-readable-font * {
   font-family: Arial, Helvetica, sans-serif !important;
 }
 
-/* Подчёркивание ссылок — принудительно для слабовидящих */
+/* Подчёркивание ссылок - принудительно для слабовидящих */
 
 body.a11y-underline-links a {
   text-decoration: underline !important;

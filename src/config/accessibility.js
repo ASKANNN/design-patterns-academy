@@ -1,6 +1,3 @@
-// Хранилище и применение настроек виджета доступности.
-// Все опции живут в одном объекте в localStorage и применяются как классы на <body>.
-
 export const STORAGE_KEY = 'dpa-a11y';
 
 export const FONT_SIZES     = ['normal', 'large', 'xlarge'];
@@ -20,7 +17,6 @@ export function getA11yState() {
   return { ..._state };
 }
 
-// Вызывается один раз при старте приложения — читает сохранённые настройки и применяет их.
 export function restoreA11y() {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {

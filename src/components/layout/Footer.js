@@ -7,7 +7,7 @@ export function Footer() {
 
         <!-- Brand -->
         <div class="footer__brand">
-          <a href="#/" class="footer__logo" aria-label="Design Patterns Academy — Home" data-i18n-aria-label="a11y.logo_home">
+          <a href="#/" class="footer__logo" aria-label="Design Patterns Academy - Home" data-i18n-aria-label="a11y.logo_home">
             <svg width="24" height="24" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
               <polygon points="14 2 26 8 26 20 14 26 2 20 2 8"/>
               <line x1="14" y1="2" x2="14" y2="26"/>

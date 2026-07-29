@@ -1,9 +1,3 @@
-/* ============================================================
-   MODULE REGISTRY — Design Patterns Academy
-   Multi-domain knowledge module definitions.
-   Add new domains here without touching any other file.
-   ============================================================ */
-
 export const MODULES = [
   {
     id:       'design-patterns',

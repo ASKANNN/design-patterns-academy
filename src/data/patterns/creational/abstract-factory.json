@@ -18,52 +18,52 @@
     "ru": "Абстрактная фабрика объединяет создание нескольких связанных объектов за одним интерфейсом, чтобы все объекты, которые собирает программа, всегда принадлежали одному согласованному набору."
   },
   "problem": {
-    "en": "A UI library needs to render buttons, checkboxes, and text fields that look native on Windows, macOS, and Linux. Each platform has its own widget classes, and a screen only looks right if every widget on it comes from the same platform's set — mixing a Windows-style button with a macOS-style checkbox breaks the illusion immediately.\n\nIf the screen-building code instantiates `WindowsButton`, `MacCheckbox`, and so on directly, two things go wrong. First, the code that assembles a screen is littered with `if (platform === 'mac')` branches wherever a widget is created. Second, nothing stops a careless call from grabbing a widget from the wrong platform's set — the compiler has no concept of \"these classes belong together.\"",
-    "ru": "UI-библиотеке нужно отрисовывать кнопки, флажки и текстовые поля, которые выглядят нативно на Windows, macOS и Linux. У каждой платформы свои классы виджетов, и экран выглядит правильно только тогда, когда все виджеты на нём взяты из набора одной платформы — смешение кнопки в стиле Windows с флажком в стиле macOS сразу разрушает иллюзию нативности.\n\nЕсли код построения экрана создаёт `WindowsButton`, `MacCheckbox` и подобные классы напрямую, возникают две проблемы. Во-первых, код сборки экрана заполняется условиями вида `if (platform === 'mac')` в каждом месте создания виджета. Во-вторых, ничто не мешает по ошибке взять виджет из набора чужой платформы — компилятор не знает, что эти классы должны использоваться вместе."
+    "en": "A UI library needs to render buttons, checkboxes, and text fields that look native on Windows, macOS, and Linux. Each platform has its own widget classes, and a screen only looks right if every widget on it comes from the same platform's set - mixing a Windows-style button with a macOS-style checkbox breaks the illusion immediately.\n\nIf the screen-building code instantiates `WindowsButton`, `MacCheckbox`, and so on directly, two things go wrong. First, the code that assembles a screen is littered with `if (platform === 'mac')` branches wherever a widget is created. Second, nothing stops a careless call from grabbing a widget from the wrong platform's set - the compiler has no concept of \"these classes belong together.\"",
+    "ru": "UI-библиотеке нужно отрисовывать кнопки, флажки и текстовые поля, которые выглядят нативно на Windows, macOS и Linux. У каждой платформы свои классы виджетов, и экран выглядит правильно только тогда, когда все виджеты на нём взяты из набора одной платформы - смешение кнопки в стиле Windows с флажком в стиле macOS сразу разрушает иллюзию нативности.\n\nЕсли код построения экрана создаёт `WindowsButton`, `MacCheckbox` и подобные классы напрямую, возникают две проблемы. Во-первых, код сборки экрана заполняется условиями вида `if (platform === 'mac')` в каждом месте создания виджета. Во-вторых, ничто не мешает по ошибке взять виджет из набора чужой платформы - компилятор не знает, что эти классы должны использоваться вместе."
   },
   "solution": {
-    "en": "Give every product type in the family its own interface (`Button`, `Checkbox`) and write one implementation class per platform per product. Then introduce a factory interface with one creation method per product type — `createButton()`, `createCheckbox()` — and implement it once per platform: `WindowsFactory`, `MacFactory`, `LinuxFactory`. Each concrete factory only ever knows how to build its own platform's widgets, so it physically cannot hand out a mismatched pair.\n\nThe screen-assembly code receives a factory instance (chosen once, e.g., at startup, based on the detected OS) and calls its creation methods without ever naming a concrete widget class. Switching platforms means swapping which factory gets injected — nothing else in the code changes.",
-    "ru": "Каждому типу продукта в семействе даётся собственный интерфейс (`Button`, `Checkbox`), и под него пишется по одному классу реализации на платформу. Затем вводится интерфейс фабрики с одним методом создания на каждый тип продукта — `createButton()`, `createCheckbox()` — и реализуется отдельно для каждой платформы: `WindowsFactory`, `MacFactory`, `LinuxFactory`. Каждая конкретная фабрика умеет создавать виджеты только своей платформы, поэтому физически не может выдать несовместимую пару.\n\nКод сборки экрана получает готовый экземпляр фабрики (выбранный один раз, например при старте приложения, по определённой ОС) и вызывает её методы создания, ни разу не упоминая конкретный класс виджета. Переход на другую платформу сводится к подмене внедряемой фабрики — остальной код не меняется."
+    "en": "Give every product type in the family its own interface (`Button`, `Checkbox`) and write one implementation class per platform per product. Then introduce a factory interface with one creation method per product type - `createButton()`, `createCheckbox()` - and implement it once per platform: `WindowsFactory`, `MacFactory`, `LinuxFactory`. Each concrete factory only ever knows how to build its own platform's widgets, so it physically cannot hand out a mismatched pair.\n\nThe screen-assembly code receives a factory instance (chosen once, e.g., at startup, based on the detected OS) and calls its creation methods without ever naming a concrete widget class. Switching platforms means swapping which factory gets injected - nothing else in the code changes.",
+    "ru": "Каждому типу продукта в семействе даётся собственный интерфейс (`Button`, `Checkbox`), и под него пишется по одному классу реализации на платформу. Затем вводится интерфейс фабрики с одним методом создания на каждый тип продукта - `createButton()`, `createCheckbox()` - и реализуется отдельно для каждой платформы: `WindowsFactory`, `MacFactory`, `LinuxFactory`. Каждая конкретная фабрика умеет создавать виджеты только своей платформы, поэтому физически не может выдать несовместимую пару.\n\nКод сборки экрана получает готовый экземпляр фабрики (выбранный один раз, например при старте приложения, по определённой ОС) и вызывает её методы создания, ни разу не упоминая конкретный класс виджета. Переход на другую платформу сводится к подмене внедряемой фабрики - остальной код не меняется."
   },
   "structure": {
     "description": {
       "en": "A factory interface exposes one creation method per product type in the family. Each concrete factory implements every method to produce one consistent variant of the whole family, while each product type has its own interface implemented separately per variant. Client code depends only on the factory and product interfaces, never on the concrete classes behind them.",
-      "ru": "Интерфейс фабрики объявляет по одному методу создания на каждый тип продукта в семействе. Каждая конкретная фабрика реализует все эти методы так, чтобы производить один согласованный вариант всего семейства, а у каждого типа продукта есть свой интерфейс, реализуемый отдельно под каждый вариант. Клиентский код зависит только от интерфейсов фабрики и продуктов, но никогда — от скрытых за ними конкретных классов."
+      "ru": "Интерфейс фабрики объявляет по одному методу создания на каждый тип продукта в семействе. Каждая конкретная фабрика реализует все эти методы так, чтобы производить один согласованный вариант всего семейства, а у каждого типа продукта есть свой интерфейс, реализуемый отдельно под каждый вариант. Клиентский код зависит только от интерфейсов фабрики и продуктов, но никогда - от скрытых за ними конкретных классов."
     },
     "participants": [
       {
         "name": "AbstractFactory",
         "role": {
-          "en": "Interface listing one creation method per product type the family needs, e.g. createButton() and createCheckbox().",
-          "ru": "Интерфейс, перечисляющий по одному методу создания на каждый нужный семейству тип продукта, например createButton() и createCheckbox()."
+          "en": "Interface listing one creation method per product type the family needs, e.g. createButton() and createCheckbox(). In the diagram: AbstractFactory.",
+          "ru": "Интерфейс, перечисляющий по одному методу создания на каждый нужный семейству тип продукта, например createButton() и createCheckbox(). На диаграмме: AbstractFactory."
         }
       },
       {
         "name": "ConcreteFactory",
         "role": {
-          "en": "One class per platform, implementing every creation method so it only ever returns widgets belonging to that single platform.",
-          "ru": "Отдельный класс на каждую платформу, реализующий все методы создания так, чтобы возвращать виджеты только одной этой платформы."
+          "en": "One class per platform, implementing every creation method so it only ever returns widgets belonging to that single platform. In the diagram: MacFactory.",
+          "ru": "Отдельный класс на каждую платформу, реализующий все методы создания так, чтобы возвращать виджеты только одной этой платформы. На диаграмме: MacFactory."
         }
       },
       {
         "name": "AbstractProduct",
         "role": {
-          "en": "Interface shared by every platform's version of one widget type, letting client code treat them interchangeably.",
-          "ru": "Интерфейс, общий для всех платформенных вариантов одного типа виджета, позволяющий клиентскому коду работать с ними взаимозаменяемо."
+          "en": "Interface shared by every platform's version of one widget type, letting client code treat them interchangeably. In the diagram: AbstractProduct (Button, Checkbox).",
+          "ru": "Интерфейс, общий для всех платформенных вариантов одного типа виджета, позволяющий клиентскому коду работать с ними взаимозаменяемо. На диаграмме: AbstractProduct (Кнопка, Флажок)."
         }
       },
       {
         "name": "ConcreteProduct",
         "role": {
-          "en": "A specific platform's implementation of a widget interface, instantiated only by the matching ConcreteFactory.",
-          "ru": "Реализация интерфейса виджета для конкретной платформы, создаваемая только соответствующей ConcreteFactory."
+          "en": "A specific platform's implementation of a widget interface, instantiated only by the matching ConcreteFactory. In the diagram: MacButton, MacCheckbox.",
+          "ru": "Реализация интерфейса виджета для конкретной платформы, создаваемая только соответствующей ConcreteFactory. На диаграмме: MacButton, MacCheckbox."
         }
       },
       {
         "name": "Client",
         "role": {
-          "en": "Receives one factory instance and builds every widget through it, never referencing a concrete widget or factory class by name.",
-          "ru": "Получает один экземпляр фабрики и строит через него все виджеты, ни разу не обращаясь напрямую к конкретному классу виджета или фабрики."
+          "en": "Receives one factory instance and builds every widget through it, never referencing a concrete widget or factory class by name. In the diagram: Client.",
+          "ru": "Получает один экземпляр фабрики и строит через него все виджеты, ни разу не обращаясь напрямую к конкретному классу виджета или фабрики. На диаграмме: Клиент."
         }
       }
     ]
@@ -85,8 +85,8 @@
       "ru": "Клиентский код зависит только от интерфейсов, поэтому ему не нужно знать, какие конкретные классы стоят за ними."
     },
     {
-      "en": "Adding an entirely new variant (a new platform, theme, or region) means adding one new factory class — existing code that consumes the abstraction stays untouched.",
-      "ru": "Добавление целого нового варианта (новой платформы, темы, региона) сводится к добавлению одного нового класса фабрики — существующий код, использующий абстракцию, не меняется."
+      "en": "Adding an entirely new variant (a new platform, theme, or region) means adding one new factory class - existing code that consumes the abstraction stays untouched.",
+      "ru": "Добавление целого нового варианта (новой платформы, темы, региона) сводится к добавлению одного нового класса фабрики - существующий код, использующий абстракцию, не меняется."
     },
     {
       "en": "Object-creation logic for a whole family lives in one place instead of being scattered across the codebase as conditionals.",
@@ -103,8 +103,8 @@
       "ru": "Небольшие приложения с единственным семейством продуктов почти ничего не выигрывают от дополнительного слоя интерфейсов и классов фабрик."
     },
     {
-      "en": "Following the strict flow — factory interface, product interfaces, one implementation per cell of the matrix — front-loads a fair amount of boilerplate before any real logic is written.",
-      "ru": "Строгое следование схеме — интерфейс фабрики, интерфейсы продуктов, по реализации на каждую ячейку матрицы — требует заметного объёма шаблонного кода ещё до появления реальной логики."
+      "en": "Following the strict flow - factory interface, product interfaces, one implementation per cell of the matrix - front-loads a fair amount of boilerplate before any real logic is written.",
+      "ru": "Строгое следование схеме - интерфейс фабрики, интерфейсы продуктов, по реализации на каждую ячейку матрицы - требует заметного объёма шаблонного кода ещё до появления реальной логики."
     }
   ],
   "when_to_use": [
@@ -123,16 +123,16 @@
   ],
   "real_world_examples": [
     {
-      "en": "**Java AWT/Swing `UIManager`** — swapping the look-and-feel (Metal, Nimbus, or a platform-native one) swaps out an entire factory that produces matching buttons, scrollbars, and menus.",
-      "ru": "**`UIManager` в Java AWT/Swing** — смена look-and-feel (Metal, Nimbus или платформенно-нативный) заменяет целую фабрику, производящую согласованные кнопки, полосы прокрутки и меню."
+      "en": "**Java AWT/Swing `UIManager`** - swapping the look-and-feel (Metal, Nimbus, or a platform-native one) swaps out an entire factory that produces matching buttons, scrollbars, and menus.",
+      "ru": "**`UIManager` в Java AWT/Swing** - смена look-and-feel (Metal, Nimbus или платформенно-нативный) заменяет целую фабрику, производящую согласованные кнопки, полосы прокрутки и меню."
     },
     {
-      "en": "**`document.createElement` behind DOM implementations** — different rendering engines (jsdom vs. a real browser) act as interchangeable factories producing element objects that all satisfy the same DOM interfaces.",
-      "ru": "**`document.createElement` в разных реализациях DOM** — разные движки рендеринга (jsdom и настоящий браузер) выступают как взаимозаменяемые фабрики, создающие объекты элементов, удовлетворяющие одним и тем же интерфейсам DOM."
+      "en": "**`document.createElement` behind DOM implementations** - different rendering engines (jsdom vs. a real browser) act as interchangeable factories producing element objects that all satisfy the same DOM interfaces.",
+      "ru": "**`document.createElement` в разных реализациях DOM** - разные движки рендеринга (jsdom и настоящий браузер) выступают как взаимозаменяемые фабрики, создающие объекты элементов, удовлетворяющие одним и тем же интерфейсам DOM."
     },
     {
-      "en": "**Database driver packages in ORMs (e.g., TypeORM, Sequelize)** — selecting `postgres` vs. `mysql` in the config swaps in a whole family of dialect-specific connection, query, and transaction objects.",
-      "ru": "**Пакеты драйверов баз данных в ORM (например, TypeORM, Sequelize)** — выбор `postgres` или `mysql` в конфигурации подменяет целое семейство диалект-специфичных объектов соединения, запросов и транзакций."
+      "en": "**Database driver packages in ORMs (e.g., TypeORM, Sequelize)** - selecting `postgres` vs. `mysql` in the config swaps in a whole family of dialect-specific connection, query, and transaction objects.",
+      "ru": "**Пакеты драйверов баз данных в ORM (например, TypeORM, Sequelize)** - выбор `postgres` или `mysql` в конфигурации подменяет целое семейство диалект-специфичных объектов соединения, запросов и транзакций."
     }
   ],
   "related_patterns": [
@@ -153,8 +153,8 @@
           "ru": "Что все они создаются лениво при первом обращении"
         },
         {
-          "en": "That they all belong to the same matching variant (e.g. the same platform)",
-          "ru": "Что все они принадлежат одному согласованному варианту (например, одной платформе)"
+          "en": "That they all belong to the same variant",
+          "ru": "Что все они принадлежат одному варианту"
         },
         {
           "en": "That they share a single instance across the whole program",
@@ -182,8 +182,8 @@
           "ru": "Код работает медленнее из-за лишних слоёв абстракции"
         },
         {
-          "en": "Nothing stops widgets from the wrong platform's set being mixed together, and the code fills up with platform conditionals",
-          "ru": "Ничто не мешает смешать виджеты из наборов разных платформ, а код заполняется условиями по платформам"
+          "en": "Widgets from different platforms can get mixed together",
+          "ru": "Виджеты разных платформ можно случайно смешать"
         },
         {
           "en": "The widgets can no longer be rendered on screen",
@@ -197,7 +197,7 @@
       "correct": 1,
       "explanation": {
         "en": "Direct instantiation litters the code with platform if/else branches and gives the compiler no concept that certain classes belong together, so mismatched widgets can slip in.",
-        "ru": "Прямое создание заполняет код условиями по платформам, а компилятор не знает, что определённые классы должны использоваться вместе, — поэтому могут проскочить несовместимые виджеты."
+        "ru": "Прямое создание заполняет код условиями по платформам, а компилятор не знает, что определённые классы должны использоваться вместе, - поэтому могут проскочить несовместимые виджеты."
       }
     },
     {
@@ -207,8 +207,8 @@
       },
       "options": [
         {
-          "en": "Only on interfaces (Button, Checkbox, the factory interface) — never a concrete class name",
-          "ru": "Только от интерфейсов (Button, Checkbox, интерфейса фабрики) — никогда от имени конкретного класса"
+          "en": "Only on interfaces, never a concrete class name",
+          "ru": "Только от интерфейсов, никогда от конкретного класса"
         },
         {
           "en": "On every concrete widget class for every platform",
@@ -226,7 +226,7 @@
       "correct": 0,
       "explanation": {
         "en": "The client receives a factory instance and calls its creation methods without ever naming a concrete widget class; switching platforms just means injecting a different factory.",
-        "ru": "Клиент получает экземпляр фабрики и вызывает её методы создания, ни разу не называя конкретный класс виджета; переход на другую платформу — это просто внедрение другой фабрики."
+        "ru": "Клиент получает экземпляр фабрики и вызывает её методы создания, ни разу не называя конкретный класс виджета; переход на другую платформу - это просто внедрение другой фабрики."
       }
     },
     {
@@ -236,12 +236,12 @@
       },
       "options": [
         {
-          "en": "Nothing changes — it's purely additive like adding a new variant",
-          "ru": "Ничего не меняется — это чисто аддитивная операция, как добавление нового варианта"
+          "en": "Nothing changes - it's purely additive like adding a new variant",
+          "ru": "Ничего не меняется - это чисто аддитивная операция, как добавление нового варианта"
         },
         {
-          "en": "You must touch the factory interface and every concrete factory that implements it",
-          "ru": "Нужно менять интерфейс фабрики и каждую реализующую его конкретную фабрику"
+          "en": "You must touch the factory interface and every concrete factory",
+          "ru": "Нужно менять интерфейс фабрики и все конкретные фабрики"
         },
         {
           "en": "Only the base Button interface needs to change",
@@ -254,8 +254,8 @@
       ],
       "correct": 1,
       "explanation": {
-        "en": "Adding a new variant (a new platform) is cheap — one new factory class — but a new product type forces edits to the factory interface and every existing concrete factory.",
-        "ru": "Добавить новый вариант (новую платформу) дёшево — одна новая фабрика, — а вот новый тип продукта требует правки интерфейса фабрики и каждой существующей конкретной фабрики."
+        "en": "Adding a new variant (a new platform) is cheap - one new factory class - but a new product type forces edits to the factory interface and every existing concrete factory.",
+        "ru": "Добавить новый вариант (новую платформу) дёшево - одна новая фабрика, - а вот новый тип продукта требует правки интерфейса фабрики и каждой существующей конкретной фабрики."
       }
     },
     {
@@ -301,16 +301,16 @@
         "ru": "Как работает Абстрактная фабрика"
       },
       "description": {
-        "en": "The Client asks the AbstractFactory for a UI family. MacFactory is the ConcreteFactory currently plugged in, so its two creation methods branch out to build an entire matching family at once — a Button and a Checkbox that both belong to the same variant. A different ConcreteFactory would branch out to a different family instead, but the Client's code would stay exactly the same.",
-        "ru": "Клиент запрашивает у AbstractFactory семейство UI. MacFactory — это ConcreteFactory, подключённая в данный момент, поэтому её два метода создания одновременно строят целое согласованное семейство — Кнопку и Флажок одного варианта. Другая ConcreteFactory построила бы другое семейство, а код Клиента при этом не изменился бы."
+        "en": "The Client asks the AbstractFactory for a UI family. MacFactory is the ConcreteFactory currently plugged in, so its two creation methods branch out to build an entire matching family at once - a Button and a Checkbox that both belong to the same variant. A different ConcreteFactory would branch out to a different family instead, but the Client's code would stay exactly the same.",
+        "ru": "Клиент запрашивает у AbstractFactory семейство UI. MacFactory - это ConcreteFactory, подключённая в данный момент, поэтому её два метода создания одновременно строят целое согласованное семейство - Кнопку и Флажок одного варианта. Другая ConcreteFactory построила бы другое семейство, а код Клиента при этом не изменился бы."
       },
       "caption": {
-        "en": "One factory branches into several product types at once — all from the same matching family.",
-        "ru": "Одна фабрика разветвляется сразу на несколько типов продуктов — и все из одного согласованного семейства."
+        "en": "One factory branches into several product types at once - all from the same matching family.",
+        "ru": "Одна фабрика разветвляется сразу на несколько типов продуктов - и все из одного согласованного семейства."
       },
       "familyLabel": {
-        "en": "same family — always matching",
-        "ru": "одно семейство — всегда согласовано"
+        "en": "same family - always matching",
+        "ru": "одно семейство - всегда согласовано"
       },
       "nodes": [
         {
