@@ -126,6 +126,10 @@
         "en": "What does Memento capture, and where does it store it?",
         "ru": "Что Снимок фиксирует и где хранит?"
       },
+      "hint": {
+        "en": "Think about what needs to be saved to undo a change later, and who should be allowed to see it.",
+        "ru": "Подумайте, что нужно сохранить, чтобы позже отменить изменение, и кому вообще можно видеть эти данные."
+      },
       "options": [
         {
           "en": "An object's internal state, into a separate snapshot object",
@@ -154,6 +158,10 @@
       "question": {
         "en": "What goes wrong if an undo manager reaches directly into a shape and copies out its fields?",
         "ru": "Что идёт не так, если менеджер отмены напрямую залезает в фигуру и копирует её поля?"
+      },
+      "hint": {
+        "en": "If the undo manager needs to read every field, what does that force the shape's class to do with them?",
+        "ru": "Если менеджеру отмены нужно читать каждое поле, что это вынуждает делать сам класс фигуры с этими полями?"
       },
       "options": [
         {
@@ -184,6 +192,10 @@
         "en": "Who is responsible for taking the snapshot in Memento, and why?",
         "ru": "Кто отвечает за создание снимка в паттерне Снимок и почему?"
       },
+      "hint": {
+        "en": "Who already has direct, natural access to the fields that need to be copied?",
+        "ru": "У кого уже есть прямой и естественный доступ к полям, которые нужно скопировать?"
+      },
       "options": [
         {
           "en": "The originator - it already has access to its own fields",
@@ -213,6 +225,10 @@
         "en": "What does the caretaker need to know about the state stored in a memento?",
         "ru": "Что опекуну нужно знать о состоянии, хранящемся в снимке?"
       },
+      "hint": {
+        "en": "The caretaker only manages a history list - does it ever need to open the box it's storing?",
+        "ru": "Опекун лишь ведёт список истории - приходится ли ему вообще открывать коробку, которую он хранит?"
+      },
       "options": [
         {
           "en": "Nothing - it just archives snapshots and returns them on request",
@@ -241,6 +257,10 @@
       "question": {
         "en": "What is a stated drawback of keeping a long history of full snapshots?",
         "ru": "Какой недостаток указан для хранения длинной истории полных снимков?"
+      },
+      "hint": {
+        "en": "Each snapshot holds a full copy of state - what resource adds up as that pile grows?",
+        "ru": "Каждый снимок содержит полную копию состояния - какой ресурс накапливается по мере роста этой кучи?"
       },
       "options": [
         {

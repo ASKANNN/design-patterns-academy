@@ -139,6 +139,10 @@
         "en": "What two things does Bridge split a class along?",
         "ru": "По каким двум осям Мост разделяет класс?"
       },
+      "hint": {
+        "en": "Think about two axes of change that vary independently, not about public vs. private or sync vs. async.",
+        "ru": "Подумайте о двух осях изменения, меняющихся независимо друг от друга, а не о публичном/приватном или синхронном/асинхронном."
+      },
       "options": [
         {
           "en": "What it does and how, via composition not inheritance",
@@ -167,6 +171,10 @@
       "question": {
         "en": "What happens to the remote-control hierarchy if TV and Radio support is added purely through inheritance?",
         "ru": "Что происходит с иерархией пультов, если поддержку TV и Radio добавлять только через наследование?"
+      },
+      "hint": {
+        "en": "If you have two remote variants and two device types, how many subclasses would inheritance force you to write?",
+        "ru": "Если у вас два варианта пульта и два типа устройств, сколько подклассов заставит вас написать наследование?"
       },
       "options": [
         {
@@ -197,6 +205,10 @@
         "en": "In the Bridge solution, how does RemoteControl relate to a Device?",
         "ru": "В решении Моста - как RemoteControl связан с Device?"
       },
+      "hint": {
+        "en": "Composition over inheritance - what does RemoteControl store to reach the device's behavior?",
+        "ru": "Композиция вместо наследования - что хранит RemoteControl, чтобы добраться до поведения устройства?"
+      },
       "options": [
         {
           "en": "It holds a device reference and forwards operations to it",
@@ -226,6 +238,10 @@
         "en": "What benefit does Bridge give regarding runtime behavior?",
         "ru": "Какое преимущество даёт Мост в отношении поведения во время выполнения?"
       },
+      "hint": {
+        "en": "Since the implementation is just a held reference, what can you do with that reference after construction?",
+        "ru": "Раз реализация - это просто хранимая ссылка, что с этой ссылкой можно сделать уже после создания объекта?"
+      },
       "options": [
         {
           "en": "The implementation can be swapped at runtime",
@@ -254,6 +270,10 @@
       "question": {
         "en": "When is applying Bridge said to add indirection with no real payoff?",
         "ru": "Когда, согласно паттерну, применение Моста добавляет косвенность без реальной пользы?"
+      },
+      "hint": {
+        "en": "The pattern earns its keep when implementations vary - what if there's only ever going to be one?",
+        "ru": "Паттерн окупается, когда реализации варьируются - а что если реализация всегда будет одна-единственная?"
       },
       "options": [
         {

@@ -136,6 +136,10 @@
         "en": "What does Adapter fundamentally do?",
         "ru": "Что фундаментально делает Адаптер?"
       },
+      "hint": {
+        "en": "Focus on the verb - is it merging, restricting, adding, or translating?",
+        "ru": "Обратите внимание на суть действия - это слияние, ограничение, добавление или перевод?"
+      },
       "options": [
         {
           "en": "Wraps a mismatched interface behind a translator object",
@@ -164,6 +168,10 @@
       "question": {
         "en": "In the payment example, why can't you just rename the new provider's `submitTransaction` method to `charge`?",
         "ru": "В примере с оплатой - почему нельзя просто переименовать метод `submitTransaction` нового провайдера в `charge`?"
+      },
+      "hint": {
+        "en": "Who owns that SDK's code, and who controls its releases?",
+        "ru": "Кому принадлежит код этого SDK и кто контролирует его релизы?"
       },
       "options": [
         {
@@ -194,6 +202,10 @@
         "en": "Where does the translation logic (renaming fields, converting units, reordering parameters) live in the solution?",
         "ru": "Где в решении находится логика перевода (переименование полей, конвертация единиц, изменение порядка параметров)?"
       },
+      "hint": {
+        "en": "The whole point of the pattern is to avoid spreading that logic across every caller - so where does it collect instead?",
+        "ru": "Смысл паттерна в том, чтобы не размазывать эту логику по каждому вызывающему месту - тогда где она собирается вместо этого?"
+      },
       "options": [
         {
           "en": "In one isolated wrapper class, not smeared across the code",
@@ -223,6 +235,10 @@
         "en": "What is a stated limitation of Adapter?",
         "ru": "Какое ограничение Адаптера указано явно?"
       },
+      "hint": {
+        "en": "The Adapter only forwards calls - can it add abilities the wrapped object never had?",
+        "ru": "Адаптер лишь передаёт вызовы дальше - может ли он добавить возможности, которых у оборачиваемого объекта изначально не было?"
+      },
       "options": [
         {
           "en": "It can only translate what the interface exposes",
@@ -251,6 +267,10 @@
       "question": {
         "en": "What downside comes from stacking several adapters on top of one another?",
         "ru": "Какой недостаток возникает при наложении нескольких адаптеров друг на друга?"
+      },
+      "hint": {
+        "en": "If you had to trace a bug through three layers of wrapping, what would get harder?",
+        "ru": "Если бы пришлось искать баг через три слоя обёрток, что стало бы сложнее?"
       },
       "options": [
         {

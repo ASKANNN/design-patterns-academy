@@ -132,6 +132,10 @@
         "en": "What does Composite let client code do?",
         "ru": "Что позволяет делать Компоновщик клиентскому коду?"
       },
+      "hint": {
+        "en": "Think about a tree of files and folders - does the client need to know which kind it's holding?",
+        "ru": "Подумайте о дереве файлов и папок - должен ли клиент знать, с чем именно он имеет дело?"
+      },
       "options": [
         {
           "en": "Treat individual objects and groups through one interface",
@@ -160,6 +164,10 @@
       "question": {
         "en": "What goes wrong with the naive `if (item.type === 'file')` / `if (item.type === 'directory')` approach to computing sizes?",
         "ru": "Что идёт не так с наивным подходом `if (item.type === 'file')` / `if (item.type === 'directory')` при вычислении размеров?"
+      },
+      "hint": {
+        "en": "Imagine this check appearing in a dozen different places in the codebase - what happens when a third item type shows up?",
+        "ru": "Представьте, что эта проверка встречается в десятке разных мест кода - что случится, когда появится третий тип элемента?"
       },
       "options": [
         {
@@ -190,6 +198,10 @@
         "en": "How does a directory's `getSize()` handle arbitrary nesting in the solution?",
         "ru": "Как метод `getSize()` директории обрабатывает произвольную вложенность в решении?"
       },
+      "hint": {
+        "en": "A directory's children can themselves be directories - what pattern of self-calling handles that naturally?",
+        "ru": "Потомки директории сами могут быть директориями - какой приём с самовызовом естественно решает эту задачу?"
+      },
       "options": [
         {
           "en": "By summing each child's getSize() - recursion comes for free",
@@ -219,6 +231,10 @@
         "en": "What is a stated drawback of forcing leaves and containers to share one interface?",
         "ru": "Какой недостаток указан для принуждения листьев и контейнеров к общему интерфейсу?"
       },
+      "hint": {
+        "en": "A file doesn't have children to manage, yet it shares the interface with a directory - what does that leave it with?",
+        "ru": "У файла нет потомков для управления, но интерфейс у него общий с директорией - что это ему навязывает?"
+      },
       "options": [
         {
           "en": "It can leave leaves with methods that make no sense for them",
@@ -247,6 +263,10 @@
       "question": {
         "en": "What can happen with very deep or very large trees under Composite?",
         "ru": "Что может произойти с очень глубокими или очень большими деревьями при использовании Компоновщика?"
+      },
+      "hint": {
+        "en": "One call to getSize() on the root can trigger how many recursive calls total?",
+        "ru": "К скольким рекурсивным вызовам в итоге может привести один вызов getSize() на корне дерева?"
       },
       "options": [
         {

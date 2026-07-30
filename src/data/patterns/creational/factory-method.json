@@ -131,6 +131,10 @@
         "en": "What does Factory Method delegate to a subclass-overridable method?",
         "ru": "Что Фабричный метод передаёт методу, переопределяемому подклассами?"
       },
+      "hint": {
+        "en": "The pattern's name is a strong clue - what kind of work does a \"factory\" normally do?",
+        "ru": "Название паттерна само подсказывает ответ - чем обычно занимается «фабрика»?"
+      },
       "options": [
         {
           "en": "Object creation, delegated to a subclass method",
@@ -159,6 +163,10 @@
       "question": {
         "en": "What goes wrong when Logistics.planDelivery() constructs a Truck directly and sea shipping is later added?",
         "ru": "Что идёт не так, если Logistics.planDelivery() создаёт Truck напрямую, а затем добавляется морская доставка?"
+      },
+      "hint": {
+        "en": "If the concrete class is hardcoded in one place, what has to happen at every call site once a second transport mode exists?",
+        "ru": "Если конкретный класс жёстко прописан в одном месте, что придётся сделать в каждом месте вызова, когда появится второй вид транспорта?"
       },
       "options": [
         {
@@ -189,6 +197,10 @@
         "en": "In the solution, how does RoadLogistics differ from SeaLogistics?",
         "ru": "В решении - чем RoadLogistics отличается от SeaLogistics?"
       },
+      "hint": {
+        "en": "Ask yourself how much of planDelivery() actually depends on the transport mode versus how much is shared.",
+        "ru": "Подумайте, какая часть planDelivery() реально зависит от вида транспорта, а какая - общая для всех."
+      },
       "options": [
         {
           "en": "They override only the factory method: one returns a Truck, the other a Ship",
@@ -218,6 +230,10 @@
         "en": "What is a stated benefit of adding a new product variant with Factory Method?",
         "ru": "Какое преимущество Фабричного метода указано при добавлении нового варианта продукта?"
       },
+      "hint": {
+        "en": "Does supporting a new variant touch the existing subclasses at all, or does it just add something alongside them?",
+        "ru": "Затрагивает ли поддержка нового варианта существующие подклассы - или просто добавляется что-то рядом с ними?"
+      },
       "options": [
         {
           "en": "It's purely additive - one new Creator/Product pair",
@@ -246,6 +262,10 @@
       "question": {
         "en": "What is a stated drawback of Factory Method?",
         "ru": "Какой недостаток Фабричного метода указан явно?"
+      },
+      "hint": {
+        "en": "Every new variant so far has meant one more subclass - what happens as the number of variants keeps growing?",
+        "ru": "Каждый новый вариант до сих пор означал ещё один подкласс - что происходит, когда вариантов становится всё больше?"
       },
       "options": [
         {

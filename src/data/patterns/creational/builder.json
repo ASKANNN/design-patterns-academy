@@ -145,6 +145,10 @@
         "en": "What is the core idea of the Builder pattern?",
         "ru": "В чём заключается основная идея паттерна Строитель?"
       },
+      "hint": {
+        "en": "Think about where the assembly logic ends up living, not about how many instances exist or how objects get copied.",
+        "ru": "Подумайте, где в итоге оказывается логика сборки, а не о количестве экземпляров или копировании объектов."
+      },
       "options": [
         {
           "en": "It pulls step-by-step assembly into a separate object",
@@ -173,6 +177,10 @@
       "question": {
         "en": "What problem does a House constructor covering every combination of walls, doors, windows, roof, and garage run into?",
         "ru": "С какой проблемой сталкивается конструктор House, покрывающий все комбинации стен, дверей, окон, крыши и гаража?"
+      },
+      "hint": {
+        "en": "Try imagining both ways of handling all those optional parts through a plain constructor - what do they turn into?",
+        "ru": "Представьте оба способа обработать все эти опциональные части через обычный конструктор - во что они превращаются?"
       },
       "options": [
         {
@@ -203,6 +211,10 @@
         "en": "Why do the builder's step methods (buildWalls, buildDoors, etc.) return the builder itself?",
         "ru": "Почему методы-шаги строителя (buildWalls, buildDoors и т.д.) возвращают сам строитель?"
       },
+      "hint": {
+        "en": "What does returning `this` let you do with a sequence of method calls?",
+        "ru": "Что даёт возврат `this` при последовательных вызовах методов?"
+      },
       "options": [
         {
           "en": "So calls can be chained, using only the steps needed",
@@ -232,6 +244,10 @@
         "en": "What role does the Director play in the Builder pattern?",
         "ru": "Какую роль играет Директор в паттерне Строитель?"
       },
+      "hint": {
+        "en": "Consider what a fixed recipe like \"simple house\" needs versus a one-off custom house built ad hoc.",
+        "ru": "Подумайте, что нужно для фиксированного рецепта вроде «простой дом» и что - для разового кастомного дома."
+      },
       "options": [
         {
           "en": "It encodes standard layouts as fixed builder-call sequences",
@@ -260,6 +276,10 @@
       "question": {
         "en": "What is a stated drawback of forgetting to call a required builder step?",
         "ru": "В чём заключается указанный недостаток, связанный с забытым обязательным шагом строителя?"
+      },
+      "hint": {
+        "en": "Compare this to a constructor that forces every argument - what enforcement does the builder lose by contrast?",
+        "ru": "Сравните с конструктором, который требует все аргументы сразу, - какой контроль строитель при этом теряет?"
       },
       "options": [
         {

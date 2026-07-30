@@ -117,6 +117,10 @@
         "en": "What does Template Method fix in the base class, while leaving to subclasses?",
         "ru": "Что Шаблонный метод закрепляет в базовом классе, оставляя подклассам?"
       },
+      "hint": {
+        "en": "Separate the order operations happen in from what each operation actually does.",
+        "ru": "Отделите порядок выполнения операций от того, что каждая операция делает на самом деле."
+      },
       "options": [
         {
           "en": "The overall shape of an algorithm, leaving steps to subclasses",
@@ -145,6 +149,10 @@
       "question": {
         "en": "What goes wrong if the report-generation algorithm is copied entirely into each format's class (HTML, Markdown)?",
         "ru": "Что идёт не так, если алгоритм генерации отчёта полностью копируется в класс каждого формата (HTML, Markdown)?"
+      },
+      "hint": {
+        "en": "If you needed to insert a new section into every report format, how many places would you have to touch with this design?",
+        "ru": "Если бы понадобилось добавить новую секцию во все форматы отчёта, сколько мест пришлось бы менять при таком подходе?"
       },
       "options": [
         {
@@ -175,6 +183,10 @@
         "en": "What is the difference between an abstract step and a hook in Template Method?",
         "ru": "В чём разница между абстрактным шагом и хуком в Шаблонном методе?"
       },
+      "hint": {
+        "en": "Is a step mandatory for every subclass to fill in, or does it already work fine without anyone touching it?",
+        "ru": "Обязан ли каждый подкласс заполнить этот шаг сам, или он и так прекрасно работает, даже если его никто не трогал?"
+      },
       "options": [
         {
           "en": "Abstract steps must be implemented; hooks have a default",
@@ -204,6 +216,10 @@
         "en": "What does Template Method guarantee about the algorithm's structure?",
         "ru": "Что Шаблонный метод гарантирует в отношении структуры алгоритма?"
       },
+      "hint": {
+        "en": "Subclasses override individual steps - does that ever require touching the method that calls them in order?",
+        "ru": "Подклассы переопределяют отдельные шаги - требует ли это когда-нибудь правки метода, который вызывает их по порядку?"
+      },
       "options": [
         {
           "en": "It stays the same while individual steps remain customizable",
@@ -232,6 +248,10 @@
       "question": {
         "en": "When is Strategy said to be a better fit than Template Method?",
         "ru": "Когда, согласно паттерну, Стратегия подходит лучше, чем Шаблонный метод?"
+      },
+      "hint": {
+        "en": "Template Method locks in the algorithm's shape through inheritance at compile time - what if you need to swap behavior after the program is already running?",
+        "ru": "Шаблонный метод фиксирует форму алгоритма через наследование на этапе компиляции - а что если поведение нужно менять уже во время выполнения программы?"
       },
       "options": [
         {

@@ -147,6 +147,10 @@
         "en": "What does Decorator add to an object, and how?",
         "ru": "Что Декоратор добавляет объекту и как?"
       },
+      "hint": {
+        "en": "Does this touch the class definition, or just one specific object?",
+        "ru": "Это затрагивает определение класса или только один конкретный объект?"
+      },
       "options": [
         {
           "en": "Behavior, by wrapping the object in layers with the same interface",
@@ -175,6 +179,10 @@
       "question": {
         "en": "What goes wrong modeling every coffee add-on combination (milk, shot, cream) as its own subclass?",
         "ru": "Что идёт не так при моделировании каждой комбинации добавок к кофе (молоко, шот, сливки) отдельным подклассом?"
+      },
+      "hint": {
+        "en": "With three optional add-ons, how many possible combinations would need their own class?",
+        "ru": "При трёх опциональных добавках сколько возможных сочетаний потребовало бы отдельного класса?"
       },
       "options": [
         {
@@ -205,6 +213,10 @@
         "en": "How does calling `cost()` on a decorator wrapper work?",
         "ru": "Как работает вызов `cost()` у обёртки-декоратора?"
       },
+      "hint": {
+        "en": "For a stack of wrappers to add up correctly, does each one need to know the total, or just its own piece plus what's inside it?",
+        "ru": "Чтобы стек обёрток правильно суммировался, должна ли каждая из них знать итог целиком, или только свою часть плюс то, что внутри?"
+      },
       "options": [
         {
           "en": "It first asks the wrapped object for its cost, then adds its own charge on top",
@@ -234,6 +246,10 @@
         "en": "What is a stated benefit of Decorator regarding attaching behavior?",
         "ru": "Какое преимущество Декоратора указано в отношении подключения поведения?"
       },
+      "hint": {
+        "en": "Contrast this with subclassing, which locks behavior in before any object even exists - when can a decorator be applied instead?",
+        "ru": "Сравните с наследованием, которое фиксирует поведение ещё до появления объекта, - а когда можно применить декоратор?"
+      },
       "options": [
         {
           "en": "Behavior can be attached to one object at runtime, no class changes",
@@ -262,6 +278,10 @@
       "question": {
         "en": "What is a stated drawback of pulling one specific wrapper out of the middle of an existing decorator stack?",
         "ru": "Какой недостаток указан для извлечения конкретной обёртки из середины уже собранного стека декораторов?"
+      },
+      "hint": {
+        "en": "Each layer only knows the layer directly inside it - what does that imply about removing one from the middle?",
+        "ru": "Каждый слой знает только о слое непосредственно внутри себя - что это значит для удаления одного слоя из середины?"
       },
       "options": [
         {

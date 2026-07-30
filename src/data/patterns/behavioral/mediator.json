@@ -133,6 +133,10 @@
         "en": "What does Mediator pull out of a group of interacting objects?",
         "ru": "Что Посредник выносит из группы взаимодействующих объектов?"
       },
+      "hint": {
+        "en": "After the pattern is applied, the objects no longer need to know about each other directly - so what exactly moved out of them?",
+        "ru": "После применения паттерна объектам больше не нужно знать друг о друге напрямую - так что именно из них вынесли?"
+      },
       "options": [
         {
           "en": "Their interactions, into a separate go-between object",
@@ -161,6 +165,10 @@
       "question": {
         "en": "What goes wrong in a group chat where every user object calls every other user directly?",
         "ru": "Что идёт не так в групповом чате, где каждый пользователь напрямую вызывает всех остальных?"
+      },
+      "hint": {
+        "en": "Picture the number of direct connections between users as the group grows - what has to change when one more person joins?",
+        "ru": "Представьте число прямых связей между пользователями по мере роста группы - что придётся менять при добавлении ещё одного человека?"
       },
       "options": [
         {
@@ -191,6 +199,10 @@
         "en": "In the solution, how does a user send a message?",
         "ru": "В решении - как пользователь отправляет сообщение?"
       },
+      "hint": {
+        "en": "Who now knows the full list of participants - the individual user, or the chat room itself?",
+        "ru": "Кто теперь знает полный список участников - отдельный пользователь или сам чат?"
+      },
       "options": [
         {
           "en": "It sends the message through one method, and the chat room delivers it",
@@ -220,6 +232,10 @@
         "en": "What is a stated risk of concentrating coordination logic in the mediator?",
         "ru": "Какой риск указан для сосредоточения координационной логики в посреднике?"
       },
+      "hint": {
+        "en": "The complexity you removed from every component has to end up somewhere - where does it pile up?",
+        "ru": "Сложность, убранная из каждого компонента, должна куда-то деться - где она в итоге накапливается?"
+      },
       "options": [
         {
           "en": "The mediator can balloon into a class that knows and does too much",
@@ -248,6 +264,10 @@
       "question": {
         "en": "What is a stated benefit of Mediator for testing components?",
         "ru": "Какое преимущество Посредника указано для тестирования компонентов?"
+      },
+      "hint": {
+        "en": "If a component holds no references to its peers, what does that mean for setting it up in isolation for a test?",
+        "ru": "Если компонент не хранит ссылок на своих соседей, что это значит для его изолированной настройки в тесте?"
       },
       "options": [
         {

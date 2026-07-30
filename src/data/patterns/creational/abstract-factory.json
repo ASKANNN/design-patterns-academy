@@ -147,6 +147,10 @@
         "en": "What does Abstract Factory guarantee about the objects a single factory instance produces?",
         "ru": "Что гарантирует Абстрактная фабрика в отношении объектов, создаваемых одним экземпляром фабрики?"
       },
+      "hint": {
+        "en": "Each concrete factory knows how to build widgets for only one platform - what does that limit rule out?",
+        "ru": "Каждая конкретная фабрика умеет строить виджеты только одной платформы - что это исключает?"
+      },
       "options": [
         {
           "en": "That they are all created lazily on first use",
@@ -175,6 +179,10 @@
       "question": {
         "en": "In the UI library example, what problem arises if screen-assembly code instantiates WindowsButton and MacCheckbox directly?",
         "ru": "В примере с UI-библиотекой, какая проблема возникает, если код сборки экрана напрямую создаёт WindowsButton и MacCheckbox?"
+      },
+      "hint": {
+        "en": "Notice that the two class names come from different platforms - what does that combination look like on screen?",
+        "ru": "Обратите внимание, что эти два класса относятся к разным платформам - как такое сочетание будет выглядеть на экране?"
       },
       "options": [
         {
@@ -205,6 +213,10 @@
         "en": "What does the screen-assembly code depend on once Abstract Factory is applied?",
         "ru": "От чего зависит код сборки экрана после применения Абстрактной фабрики?"
       },
+      "hint": {
+        "en": "Look at what type the factory parameter has, not what concrete object gets passed in at runtime.",
+        "ru": "Обратите внимание на тип параметра фабрики, а не на то, какой конкретный объект передаётся в него во время выполнения."
+      },
       "options": [
         {
           "en": "Only on interfaces, never a concrete class name",
@@ -234,6 +246,10 @@
         "en": "According to the pattern's drawbacks, what happens when you need to add a brand-new product type (not just a new variant)?",
         "ru": "Согласно недостаткам паттерна, что происходит при необходимости добавить совершенно новый тип продукта (а не просто новый вариант)?"
       },
+      "hint": {
+        "en": "A new product type needs a new creation method - which pieces of code have to declare or implement that method?",
+        "ru": "Новому типу продукта нужен новый метод создания - какие части кода должны его объявить или реализовать?"
+      },
       "options": [
         {
           "en": "Nothing changes - it's purely additive like adding a new variant",
@@ -262,6 +278,10 @@
       "question": {
         "en": "When is applying Abstract Factory said to bring little benefit?",
         "ru": "Когда, согласно паттерну, применение Абстрактной фабрики приносит мало пользы?"
+      },
+      "hint": {
+        "en": "The whole point of the pattern is keeping several product families from mixing - what if there's only ever one family?",
+        "ru": "Весь смысл паттерна - не дать смешаться нескольким семействам продуктов. А что, если семейство всего одно?"
       },
       "options": [
         {

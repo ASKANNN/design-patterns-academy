@@ -140,6 +140,10 @@
         "en": "What does Iterator provide, without revealing the collection's underlying storage?",
         "ru": "Что предоставляет Итератор, не раскрывая внутреннее хранилище коллекции?"
       },
+      "hint": {
+        "en": "The client code doesn't know or care if it's walking an array or a tree - what's the one thing it can still do?",
+        "ru": "Клиентский код не знает и не заботится о том, обходит ли он массив или дерево - что он всё же может делать?"
+      },
       "options": [
         {
           "en": "A uniform way to step through the elements of a collection one at a time",
@@ -168,6 +172,10 @@
       "question": {
         "en": "What problem arises if traversal logic is written straight into each collection class?",
         "ru": "Какая проблема возникает, если логика обхода прописана прямо в каждом классе коллекции?"
+      },
+      "hint": {
+        "en": "Count the responsibilities that end up living inside a single collection class here.",
+        "ru": "Сосчитайте, сколько обязанностей в итоге оказывается внутри одного класса коллекции."
       },
       "options": [
         {
@@ -198,6 +206,10 @@
         "en": "What small interface does every iterator expose, regardless of what it walks?",
         "ru": "Какой небольшой интерфейс предоставляет каждый итератор, что бы он ни обходил?"
       },
+      "hint": {
+        "en": "What are the bare minimum two questions client code needs to ask to walk through anything, one element at a time?",
+        "ru": "Какие всего два вопроса минимально нужно задавать клиентскому коду, чтобы пройти по чему угодно поэлементно?"
+      },
       "options": [
         {
           "en": "Something like \"is there a next\" and \"give me the next\"",
@@ -227,6 +239,10 @@
         "en": "Can a collection hand out several iterators at once?",
         "ru": "Может ли коллекция выдать сразу несколько итераторов?"
       },
+      "hint": {
+        "en": "Where does an iterator keep track of its current position - inside itself, or inside the collection it walks?",
+        "ru": "Где итератор хранит информацию о текущей позиции - в себе самом или в коллекции, которую обходит?"
+      },
       "options": [
         {
           "en": "Yes - several independent iterators can run at once",
@@ -255,6 +271,10 @@
       "question": {
         "en": "What is a stated risk of mutating a collection while an iterator is traversing it?",
         "ru": "Какой риск указан при изменении коллекции во время обхода её итератором?"
+      },
+      "hint": {
+        "en": "The iterator's notion of position was captured before the change - what happens once the underlying elements shift under it?",
+        "ru": "Представление итератора о позиции сформировалось до изменения - что происходит, когда элементы под ним сдвигаются?"
       },
       "options": [
         {

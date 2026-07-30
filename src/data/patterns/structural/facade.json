@@ -123,6 +123,10 @@
         "en": "What does Facade do for client code?",
         "ru": "Что Фасад делает для клиентского кода?"
       },
+      "hint": {
+        "en": "Think about what the client sees instead of the subsystem's many classes.",
+        "ru": "Подумайте, что видит клиент вместо множества классов подсистемы."
+      },
       "options": [
         {
           "en": "Hides interacting classes behind one clean entry point",
@@ -151,6 +155,10 @@
       "question": {
         "en": "In the home-theater example, what goes wrong if the multi-step setup logic lives directly in client code?",
         "ru": "В примере с домашним кинотеатром - что идёт не так, если многошаговая логика настройки живёт прямо в клиентском коде?"
+      },
+      "hint": {
+        "en": "Picture every screen that wants to watch a movie writing out that same sequence itself.",
+        "ru": "Представьте, что каждый экран, желающий показать фильм, сам заново пишет эту последовательность."
       },
       "options": [
         {
@@ -181,6 +189,10 @@
         "en": "Does the Facade pattern remove direct access to the subsystem entirely?",
         "ru": "Полностью ли паттерн Фасад устраняет прямой доступ к подсистеме?"
       },
+      "hint": {
+        "en": "Recall whether the facade is described as an added layer or as a wall.",
+        "ru": "Вспомните, описывается ли фасад как дополнительный слой или как непроницаемая стена."
+      },
       "options": [
         {
           "en": "No - direct access still exists; the facade just adds convenience",
@@ -210,6 +222,10 @@
         "en": "What is a stated benefit of Facade regarding refactoring the subsystem?",
         "ru": "Какое преимущество Фасада указано в отношении рефакторинга подсистемы?"
       },
+      "hint": {
+        "en": "Ask yourself who else depends on the subsystem's internal API surface besides the facade.",
+        "ru": "Спросите себя, кто ещё, кроме фасада, зависит от внутреннего API подсистемы."
+      },
       "options": [
         {
           "en": "The subsystem can be refactored with fewer ripple effects",
@@ -238,6 +254,10 @@
       "question": {
         "en": "What is a stated risk of a facade left unchecked?",
         "ru": "Какой риск указан для фасада, оставленного без контроля?"
+      },
+      "hint": {
+        "en": "Think about what happens if a facade keeps absorbing entry points for every subsystem in the app.",
+        "ru": "Подумайте, что произойдёт, если фасад продолжит вбирать в себя точки входа для всех подсистем приложения."
       },
       "options": [
         {

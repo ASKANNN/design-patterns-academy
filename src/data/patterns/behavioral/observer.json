@@ -127,6 +127,10 @@
         "en": "What does Observer let objects do?",
         "ru": "Что Наблюдатель позволяет делать объектам?"
       },
+      "hint": {
+        "en": "Think about how many parties can react to one object's change, not just one fixed pair.",
+        "ru": "Подумайте, сколько сторон может реагировать на изменение одного объекта - не только фиксированная пара."
+      },
       "options": [
         {
           "en": "Any number of objects can register and get notified of changes",
@@ -155,6 +159,10 @@
       "question": {
         "en": "What is wrong with polling as a fix for the weather-station problem?",
         "ru": "В чём недостаток опроса как решения проблемы метеостанции?"
+      },
+      "hint": {
+        "en": "If a consumer repeatedly checks for changes that haven't happened yet, what does that cost, and how fresh is the data it eventually sees?",
+        "ru": "Если потребитель постоянно проверяет, не произошли ли изменения, чего это стоит и насколько свежими окажутся данные, которые он в итоге увидит?"
       },
       "options": [
         {
@@ -185,6 +193,10 @@
         "en": "What does the publisher need to know about its subscribers in advance?",
         "ru": "Что издателю нужно заранее знать о своих подписчиках?"
       },
+      "hint": {
+        "en": "What's the smallest, most generic shape a subscriber list could take, from the publisher's point of view?",
+        "ru": "Какую самую скромную и обобщённую форму может иметь список подписчиков с точки зрения издателя?"
+      },
       "options": [
         {
           "en": "Nothing - it keeps a generic list of listeners",
@@ -214,6 +226,10 @@
         "en": "What is a stated benefit of Observer for adding new subscriber types?",
         "ru": "Какое преимущество Наблюдателя указано для добавления новых типов подписчиков?"
       },
+      "hint": {
+        "en": "Since the publisher only relies on a small notification interface, what does that free new subscriber classes from having to touch?",
+        "ru": "Раз издатель полагается лишь на небольшой интерфейс уведомления, от чего это освобождает новые классы подписчиков?"
+      },
       "options": [
         {
           "en": "New subscriber types can be added at runtime with zero changes to the publisher",
@@ -242,6 +258,10 @@
       "question": {
         "en": "What is a stated risk of a subscriber that forgets to unsubscribe?",
         "ru": "Какой риск указан для подписчика, забывшего отписаться?"
+      },
+      "hint": {
+        "en": "The publisher's list holds a live reference to every subscriber - what happens to a reference nobody ever removes?",
+        "ru": "Список издателя хранит живую ссылку на каждого подписчика - что происходит со ссылкой, которую никто не удаляет?"
       },
       "options": [
         {

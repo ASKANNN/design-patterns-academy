@@ -140,6 +140,10 @@
         "en": "What does Proxy do behind an identical interface?",
         "ru": "Что делает Заместитель за идентичным интерфейсом?"
       },
+      "hint": {
+        "en": "Think about who the caller believes it's talking to, versus who actually intercepts the call.",
+        "ru": "Подумайте, с кем, по мнению вызывающего кода, он общается - и кто на самом деле перехватывает вызов."
+      },
       "options": [
         {
           "en": "Stands in for another object, intercepting every call",
@@ -168,6 +172,10 @@
       "question": {
         "en": "Why can't the reporting service's caching logic just be added directly inside the generated service class?",
         "ru": "Почему логику кэширования сервиса отчётов нельзя просто добавить прямо внутрь сгенерированного класса сервиса?"
+      },
+      "hint": {
+        "en": "Consider what happens to hand-written edits the next time that class gets regenerated.",
+        "ru": "Подумайте, что случится с вручную внесёнными правками при следующей перегенерации этого класса."
       },
       "options": [
         {
@@ -198,6 +206,10 @@
         "en": "Why doesn't the calling code need to change when a Proxy is substituted for the real service?",
         "ru": "Почему вызывающему коду не нужно меняться при подстановке Заместителя вместо реального сервиса?"
       },
+      "hint": {
+        "en": "Ask what the client's code actually depends on - a concrete class, or something more general.",
+        "ru": "Подумайте, от чего на самом деле зависит код клиента - от конкретного класса или от чего-то более общего."
+      },
       "options": [
         {
           "en": "The proxy implements the same interface, so callers don't notice",
@@ -227,6 +239,10 @@
         "en": "What is a stated benefit of a virtual proxy specifically?",
         "ru": "Какое преимущество указано именно для виртуального заместителя?"
       },
+      "hint": {
+        "en": "Think about timing - when does the expensive object actually need to exist?",
+        "ru": "Подумайте про момент времени - когда дорогой объект действительно должен появиться?"
+      },
       "options": [
         {
           "en": "It can defer creating an expensive object until needed",
@@ -255,6 +271,10 @@
       "question": {
         "en": "What is a stated risk of caching inside a proxy?",
         "ru": "Какой риск указан для кэширования внутри заместителя?"
+      },
+      "hint": {
+        "en": "Think about what a cached value might no longer reflect after enough time passes.",
+        "ru": "Подумайте, чему кэшированное значение может перестать соответствовать спустя время."
       },
       "options": [
         {

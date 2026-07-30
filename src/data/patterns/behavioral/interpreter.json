@@ -141,6 +141,10 @@
         "en": "What does Interpreter turn a sentence in a small language into?",
         "ru": "Во что Интерпретатор превращает предложение маленького языка?"
       },
+      "hint": {
+        "en": "If evaluating just means calling one method on a root object that recurses into its parts, what shape must that structure have?",
+        "ru": "Если вычисление сводится к вызову одного метода на корневом объекте, который рекурсивно спускается по частям, - какую форму должна иметь эта структура?"
+      },
       "options": [
         {
           "en": "A tree of objects, one class per grammar rule",
@@ -169,6 +173,10 @@
       "question": {
         "en": "What goes wrong with a single big if/else function for evaluating expressions like `x + 5 - 2`?",
         "ru": "Что идёт не так с единой большой функцией if/else для вычисления выражений вроде `x + 5 - 2`?"
+      },
+      "hint": {
+        "en": "Imagine adding a third level of nesting or a brand-new operator - what has to happen inside that one function?",
+        "ru": "Представьте, что нужно добавить третий уровень вложенности или совсем новый оператор - что должно произойти внутри этой единственной функции?"
       },
       "options": [
         {
@@ -199,6 +207,10 @@
         "en": "What is the difference between terminal and nonterminal expression classes?",
         "ru": "В чём разница между терминальными и нетерминальными классами выражений?"
       },
+      "hint": {
+        "en": "Think of a leaf of the tree versus a branch - which one needs children to produce a result, and which doesn't?",
+        "ru": "Сравните лист дерева и ветку - кому из них нужны дети, чтобы получить результат, а кому нет?"
+      },
       "options": [
         {
           "en": "Terminal classes know their value; nonterminal classes combine them",
@@ -228,6 +240,10 @@
         "en": "What does adding a new operator like multiplication require in this design?",
         "ru": "Что требуется для добавления нового оператора, например умножения, в этом дизайне?"
       },
+      "hint": {
+        "en": "Multiplication is just another compound rule - what kind of class did compound rules map to earlier in the pattern?",
+        "ru": "Умножение - это просто ещё одно составное правило. К какому виду классов раньше в паттерне относились составные правила?"
+      },
       "options": [
         {
           "en": "Adding one new nonterminal class - nothing else in the tree changes",
@@ -256,6 +272,10 @@
       "question": {
         "en": "What is a stated drawback of Interpreter as the number of grammar rules grows?",
         "ru": "Какой недостаток Интерпретатора указан по мере роста числа правил грамматики?"
+      },
+      "hint": {
+        "en": "If every single rule in the grammar needs its own class, what happens to the class count as a language grows real-world-sized?",
+        "ru": "Если под каждое правило грамматики нужен отдельный класс, что происходит с их числом по мере роста языка до реального масштаба?"
       },
       "options": [
         {

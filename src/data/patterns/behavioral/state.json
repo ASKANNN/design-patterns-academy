@@ -125,6 +125,10 @@
         "en": "What does State let an object do at runtime?",
         "ru": "Что Состояние позволяет объекту делать во время выполнения?"
       },
+      "hint": {
+        "en": "Think about what changes when an object hands off to a different helper object rather than branching internally.",
+        "ru": "Подумайте, что меняется, когда объект передаёт работу другому вспомогательному объекту, а не ветвится сам внутри себя."
+      },
       "options": [
         {
           "en": "Switch its behavior via one of several state objects",
@@ -153,6 +157,10 @@
       "question": {
         "en": "What goes wrong with a single `tick()` method using if/else on the traffic light's color?",
         "ru": "Что идёт не так с единым методом `tick()`, использующим if/else по цвету светофора?"
+      },
+      "hint": {
+        "en": "Imagine adding a fifth color to that chain - what does each existing branch need to be aware of?",
+        "ru": "Представьте, что в эту цепочку добавляют пятый цвет - о чём должна знать каждая уже существующая ветка?"
       },
       "options": [
         {
@@ -183,6 +191,10 @@
         "en": "What does the context (TrafficLight) do once State is applied?",
         "ru": "Что делает контекст (TrafficLight) после применения Состояния?"
       },
+      "hint": {
+        "en": "Where did the if/else logic go, and what single thing does the context now call instead?",
+        "ru": "Куда делась логика if/else и что теперь вызывает контекст вместо неё?"
+      },
       "options": [
         {
           "en": "It stops asking its color and forwards tick() to its state object",
@@ -212,6 +224,10 @@
         "en": "Where does the decision about the next state live in the solution?",
         "ru": "Где в решении находится решение о следующем состоянии?"
       },
+      "hint": {
+        "en": "If the context no longer knows about colors, who else is left to decide what comes next?",
+        "ru": "Если контекст больше не знает о цветах, кто ещё остаётся, чтобы решать, что будет дальше?"
+      },
       "options": [
         {
           "en": "Inside the state classes - handle() sets the next state",
@@ -240,6 +256,10 @@
       "question": {
         "en": "When is applying State said to be more machinery than the problem calls for?",
         "ru": "Когда, согласно паттерну, применение Состояния - это больше механики, чем требует задача?"
+      },
+      "hint": {
+        "en": "Think about the smallest possible state machine - how many states and transitions would make a whole class hierarchy feel like overkill?",
+        "ru": "Подумайте о простейшей возможной машине состояний - при каком минимуме состояний и переходов целая иерархия классов покажется избыточной?"
       },
       "options": [
         {

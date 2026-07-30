@@ -139,6 +139,10 @@
         "en": "What does Strategy package into their own classes?",
         "ru": "Что Стратегия оформляет в виде отдельных классов?"
       },
+      "hint": {
+        "en": "Think about what varies between the different ways of doing the same job, and what stays fixed.",
+        "ru": "Подумайте, что различается между разными способами выполнить одну и ту же работу, а что остаётся неизменным."
+      },
       "options": [
         {
           "en": "A group of interchangeable algorithms behind a shared interface",
@@ -167,6 +171,10 @@
       "question": {
         "en": "What problem does a giant if/else block inside Navigator cause as travel modes are added?",
         "ru": "Какую проблему создаёт гигантский блок if/else внутри Navigator по мере добавления способов передвижения?"
+      },
+      "hint": {
+        "en": "Each new travel mode needs a new branch - what does that mean for a class that's supposed to be closed for modification?",
+        "ru": "Каждому новому способу передвижения нужна новая ветка - что это значит для класса, который должен быть закрыт для изменений?"
       },
       "options": [
         {
@@ -197,6 +205,10 @@
         "en": "Who selects the appropriate strategy in the Strategy pattern?",
         "ru": "Кто выбирает подходящую стратегию в паттерне Стратегия?"
       },
+      "hint": {
+        "en": "The context just runs whatever strategy it's handed - so who's outside it, making that choice?",
+        "ru": "Контекст просто выполняет ту стратегию, которую ему передали - кто же тогда снаружи делает этот выбор?"
+      },
       "options": [
         {
           "en": "The client - the context is not responsible for selecting the algorithm",
@@ -226,6 +238,10 @@
         "en": "How does the context interact with strategies?",
         "ru": "Как контекст взаимодействует со стратегиями?"
       },
+      "hint": {
+        "en": "For the context to stay independent of concrete strategy classes, how many different call shapes can it afford to know about?",
+        "ru": "Чтобы контекст оставался независимым от конкретных классов стратегий, сколько разных форм вызова он вообще может себе позволить знать?"
+      },
       "options": [
         {
           "en": "Through one shared method - it doesn't need to know the strategy",
@@ -254,6 +270,10 @@
       "question": {
         "en": "What is a stated alternative to a single-method strategy interface in languages with first-class functions?",
         "ru": "Какая альтернатива интерфейсу стратегии с одним методом указана для языков с функциями первого класса?"
+      },
+      "hint": {
+        "en": "If an interface only ever needs one method, what lighter-weight language feature could stand in for a whole class?",
+        "ru": "Если интерфейсу нужен всего один метод, какая более лёгкая языковая возможность могла бы заменить целый класс?"
       },
       "options": [
         {

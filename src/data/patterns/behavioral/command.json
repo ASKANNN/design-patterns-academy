@@ -147,6 +147,10 @@
         "en": "What does Command wrap into a self-contained object?",
         "ru": "Что Команда упаковывает в самостоятельный объект?"
       },
+      "hint": {
+        "en": "For a command to be storable and replayable later, what pieces of information does it need to carry with it?",
+        "ru": "Чтобы команду можно было сохранить и позже выполнить заново, какие сведения ей нужно нести с собой?"
+      },
       "options": [
         {
           "en": "One object holding the receiver, action, and arguments",
@@ -175,6 +179,10 @@
       "question": {
         "en": "What goes wrong when a toolbar button, keyboard shortcut, and menu item each call the delete-shape logic directly?",
         "ru": "Что идёт не так, если кнопка панели, горячая клавиша и пункт меню каждый напрямую вызывают логику удаления фигуры?"
+      },
+      "hint": {
+        "en": "If you later wanted to undo that delete, where would you even look for what happened?",
+        "ru": "Если бы потом понадобилось отменить это удаление, где вообще искать сведения о том, что произошло?"
       },
       "options": [
         {
@@ -205,6 +213,10 @@
         "en": "In the solution, what does the UI element that triggers the action do?",
         "ru": "В решении - что делает элемент интерфейса, инициирующий действие?"
       },
+      "hint": {
+        "en": "The whole point was to stop the button from knowing the receiver directly - what does it talk to instead?",
+        "ru": "Вся суть в том, чтобы кнопка перестала напрямую знать получателя - с чем она взаимодействует вместо этого?"
+      },
       "options": [
         {
           "en": "It holds a command object and calls execute() on it",
@@ -234,6 +246,10 @@
         "en": "What is a stated benefit of Command regarding undo/redo?",
         "ru": "Какое преимущество Команды указано в отношении отмены/повтора?"
       },
+      "hint": {
+        "en": "A plain function call vanishes once it returns - what's different about an object that represents the same action?",
+        "ru": "Обычный вызов функции исчезает, как только она завершится - чем в этом смысле отличается объект, представляющий то же действие?"
+      },
       "options": [
         {
           "en": "A command is a real object, so it can be stored in a history list",
@@ -262,6 +278,10 @@
       "question": {
         "en": "What is a stated drawback of properly supporting undo with Command?",
         "ru": "Какой недостаток указан для корректной поддержки отмены в Команде?"
+      },
+      "hint": {
+        "en": "To reverse an action, a command needs more than just the logic to run it once - what else must it hang on to?",
+        "ru": "Чтобы откатить действие, команде мало логики его однократного выполнения - что ещё ей приходится хранить?"
       },
       "options": [
         {

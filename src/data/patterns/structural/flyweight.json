@@ -132,6 +132,10 @@
         "en": "What does Flyweight optimize for, and how?",
         "ru": "Что оптимизирует Легковес и как?"
       },
+      "hint": {
+        "en": "Think about what resource gets scarce when you have huge numbers of similar objects.",
+        "ru": "Подумайте, какой ресурс становится дефицитным при огромном числе похожих объектов."
+      },
       "options": [
         {
           "en": "Memory usage, by sharing data across similar objects",
@@ -160,6 +164,10 @@
       "question": {
         "en": "In the million-trees example, what specifically consumes excessive memory if each Tree stores its own mesh and texture?",
         "ru": "В примере с миллионом деревьев - что именно расходует избыточную память, если каждое дерево хранит собственный меш и текстуру?"
+      },
+      "hint": {
+        "en": "Ask which of a tree's fields actually differ between two oaks of the same species.",
+        "ru": "Спросите себя, какие поля дерева на самом деле отличаются у двух дубов одного вида."
       },
       "options": [
         {
@@ -190,6 +198,10 @@
         "en": "What is intrinsic state versus extrinsic state in Flyweight?",
         "ru": "Что такое внутреннее и внешнее состояние в Легковесе?"
       },
+      "hint": {
+        "en": "One of the two lives inside the shared flyweight, the other travels with each call - which is which?",
+        "ru": "Одно из двух живёт внутри разделяемого легковеса, другое передаётся при каждом вызове - какое где?"
+      },
       "options": [
         {
           "en": "Intrinsic is shared across instances; extrinsic is unique and passed in",
@@ -219,6 +231,10 @@
         "en": "What role does the factory play in Flyweight?",
         "ru": "Какую роль играет фабрика в Легковесе?"
       },
+      "hint": {
+        "en": "Consider what should happen when a request asks for a combination that already exists in the pool.",
+        "ru": "Подумайте, что должно происходить, когда запрос требует комбинацию, уже имеющуюся в пуле."
+      },
       "options": [
         {
           "en": "It returns an existing instance if one matches, else builds new",
@@ -247,6 +263,10 @@
       "question": {
         "en": "What is a stated risk of mutating a flyweight?",
         "ru": "Какой риск указан для изменения легковеса?"
+      },
+      "hint": {
+        "en": "Remember how many different contexts can be pointing at the very same flyweight instance.",
+        "ru": "Вспомните, сколько разных контекстов могут указывать на один и тот же экземпляр легковеса."
       },
       "options": [
         {

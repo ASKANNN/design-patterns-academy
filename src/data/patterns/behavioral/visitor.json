@@ -141,6 +141,10 @@
         "en": "What does Visitor move out of the classes it acts on?",
         "ru": "Что Посетитель выносит из классов, над которыми он выполняется?"
       },
+      "hint": {
+        "en": "Think about what a new export format or calculation needs to live in, if it shouldn't live inside the shape classes themselves.",
+        "ru": "Подумайте, где должен жить новый формат экспорта или вычисление, если не внутри самих классов фигур."
+      },
       "options": [
         {
           "en": "An operation, into its own class",
@@ -169,6 +173,10 @@
       "question": {
         "en": "What goes wrong if you add an exportToXml method directly to every shape class, and then need JSON export and area calculation too?",
         "ru": "Что идёт не так, если добавить метод exportToXml прямо в каждый класс фигуры, а затем понадобится ещё экспорт в JSON и вычисление площади?"
+      },
+      "hint": {
+        "en": "Count how many classes you'd have to open up for every single new kind of operation you bolt on this way.",
+        "ru": "Посчитайте, сколько классов пришлось бы открывать заново под каждую новую операцию, добавляемую таким способом."
       },
       "options": [
         {
@@ -199,6 +207,10 @@
         "en": "What is double dispatch in the Visitor pattern?",
         "ru": "Что такое двойная диспетчеризация в паттерне Посетитель?"
       },
+      "hint": {
+        "en": "accept() picks the element's own type, and then it calls back into the visitor - how many types end up deciding which code actually runs?",
+        "ru": "accept() учитывает тип самого элемента, а затем вызывает посетителя в ответ - сколько типов в итоге определяют, какой код выполнится?"
+      },
       "options": [
         {
           "en": "The operation depends on both element type and visitor type",
@@ -228,6 +240,10 @@
         "en": "What does adding a new operation require once Visitor is applied?",
         "ru": "Что требуется для добавления новой операции после применения Посетителя?"
       },
+      "hint": {
+        "en": "The element hierarchy is supposed to stay closed for modification - so where does the new logic have to go instead?",
+        "ru": "Иерархия элементов должна оставаться закрытой для изменений - куда же тогда должна попасть новая логика?"
+      },
       "options": [
         {
           "en": "Writing one new visitor class, without touching any element",
@@ -256,6 +272,10 @@
       "question": {
         "en": "What is a stated drawback of Visitor regarding adding a new element type?",
         "ru": "Какой недостаток Посетителя указан в отношении добавления нового типа элемента?"
+      },
+      "hint": {
+        "en": "This is the flip side of the previous benefit - what happens to every existing visitor when a brand-new element type shows up?",
+        "ru": "Это обратная сторона предыдущего преимущества - что происходит с каждым существующим посетителем, когда появляется совершенно новый тип элемента?"
       },
       "options": [
         {

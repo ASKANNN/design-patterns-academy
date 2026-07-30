@@ -133,6 +133,10 @@
         "en": "How does Prototype create new objects?",
         "ru": "Как Прототип создаёт новые объекты?"
       },
+      "hint": {
+        "en": "The pattern's name itself is a clue - what do you need on hand before you can make a prototype-based copy?",
+        "ru": "Само название паттерна подсказывает - что должно быть под рукой, чтобы сделать копию через прототип?"
+      },
       "options": [
         {
           "en": "By copying an existing instance rather than instantiating a class directly",
@@ -161,6 +165,10 @@
       "question": {
         "en": "Why does calling `new Circle(x, y, color, radius)` to copy a shape become brittle?",
         "ru": "Почему вызов `new Circle(x, y, color, radius)` для копирования фигуры оказывается хрупким?"
+      },
+      "hint": {
+        "en": "Think about what the caller needs to know about the object's internals just to reconstruct it field by field.",
+        "ru": "Подумайте, что вызывающему коду нужно знать о внутреннем устройстве объекта, чтобы воссоздать его поле за полем."
       },
       "options": [
         {
@@ -191,6 +199,10 @@
         "en": "In the solution, where does the clone() method live, and why does that matter?",
         "ru": "В решении - где находится метод clone() и почему это важно?"
       },
+      "hint": {
+        "en": "Who already knows every field a class has - the object itself, or code sitting somewhere outside it?",
+        "ru": "Кто уже знает все поля класса - сам объект или код, находящийся где-то снаружи?"
+      },
       "options": [
         {
           "en": "Inside the class being copied, so each class copies its own fields",
@@ -220,6 +232,10 @@
         "en": "What is a stated benefit of Prototype regarding expensive setup work?",
         "ru": "Какое преимущество Прототипа указано в отношении затратной настройки?"
       },
+      "hint": {
+        "en": "If building an object from scratch is costly, what does copying an already-built one save you from redoing?",
+        "ru": "Если построение объекта с нуля обходится дорого, от повторения чего избавляет копирование уже готового?"
+      },
       "options": [
         {
           "en": "Expensive setup is paid once and then copied for new instances",
@@ -248,6 +264,10 @@
       "question": {
         "en": "What is a stated risk of cloning objects with shared nested structures?",
         "ru": "Какой риск указан при клонировании объектов с общими вложенными структурами?"
+      },
+      "hint": {
+        "en": "If a clone still points at the very same nested object as the original, what happens when one of them mutates it?",
+        "ru": "Если клон по-прежнему указывает на тот же самый вложенный объект, что и оригинал, что произойдёт при изменении этого объекта одной из сторон?"
       },
       "options": [
         {

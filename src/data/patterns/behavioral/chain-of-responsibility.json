@@ -141,6 +141,10 @@
         "en": "What does Chain of Responsibility do with a request?",
         "ru": "Что Цепочка обязанностей делает с запросом?"
       },
+      "hint": {
+        "en": "Think about how many objects get a chance to look at the same request, one after another.",
+        "ru": "Подумайте, сколько объектов по очереди получают шанс рассмотреть один и тот же запрос."
+      },
       "options": [
         {
           "en": "Wraps it into a self-contained command object that can be stored, queued, and replayed later",
@@ -169,6 +173,10 @@
       "question": {
         "en": "What goes wrong with a single dispatcher function full of nested conditionals for support-ticket routing?",
         "ru": "Что идёт не так с единой функцией-диспетчером, полной вложенных условий, для маршрутизации тикетов поддержки?"
+      },
+      "hint": {
+        "en": "Imagine you need to insert a brand-new tier between two existing ones - where would that logic have to go?",
+        "ru": "Представьте, что нужно вставить новый уровень между двумя существующими - куда придётся лезть с этой логикой?"
       },
       "options": [
         {
@@ -199,6 +207,10 @@
         "en": "How does a handler decide what to do with a request it receives?",
         "ru": "Как обработчик решает, что делать с полученным запросом?"
       },
+      "hint": {
+        "en": "Each handler only knows about itself and its immediate successor - what does that limit it to doing?",
+        "ru": "Каждый обработчик знает только о себе и своём непосредственном преемнике - что это ему позволяет делать?"
+      },
       "options": [
         {
           "en": "It always forwards the request to every other handler in the chain simultaneously",
@@ -228,6 +240,10 @@
         "en": "What is a stated benefit of Chain of Responsibility regarding chain assembly?",
         "ru": "Какое преимущество Цепочки обязанностей указано в отношении сборки цепочки?"
       },
+      "hint": {
+        "en": "The chain is just a list of links connected at runtime - what does that buy you compared to a hardcoded sequence?",
+        "ru": "Цепочка - это просто список звеньев, связанных во время выполнения. Что это даёт по сравнению с жёстко заданной последовательностью?"
+      },
       "options": [
         {
           "en": "The chain's order is fixed forever once the first handler class is written",
@@ -256,6 +272,10 @@
       "question": {
         "en": "What is a stated risk of Chain of Responsibility?",
         "ru": "Какой риск указан для Цепочки обязанностей?"
+      },
+      "hint": {
+        "en": "What happens if the request reaches the last handler and even that one declines it?",
+        "ru": "Что произойдёт, если запрос дойдёт до последнего обработчика, а тот тоже откажется его обрабатывать?"
       },
       "options": [
         {
