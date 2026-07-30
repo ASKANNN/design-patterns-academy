@@ -42,7 +42,7 @@ reload after boot.
 | `src/utils/`         | Cross-cutting helpers (`i18n`, `data-loader`)            |
 | `src/data/patterns/` | Pattern content as JSON, grouped by category             |
 | `src/data/locales/`  | UI + pattern translation strings (`en`, `ru`)            |
-| `src/styles/`        | CSS split into `base`, `components`, `themes`            |
+| `src/styles/`        | CSS split into `base` and `components`; themes are token overrides in `base/tokens.css`, applied via `data-theme` |
 
 ---
 
@@ -63,7 +63,9 @@ This keeps the mental model simple: `data → string → innerHTML`.
 # Routing
 
 Routing is hash-based (`#/patterns/:category/:slug`) so it works on any static
-host without server rewrites. See `src/scripts/router.js`:
+host without server rewrites. The route table (path patterns → page loaders)
+is declared in `src/config/routes.js` and registered with the router in
+`src/scripts/main.js`. See `src/scripts/router.js`:
 
 - `defineRoute(pattern, handler)` — register a route.
 - `initRouter(outlet)` — resolve the current hash and listen for `hashchange`.

@@ -110,7 +110,7 @@ and reviewed merge.
 
 Development of one isolated feature or pattern visual.
 
-Examples (real branches used in this repository):
+Examples (branches used prior to the 2026-07-20 history reset):
 
 * `feature/phase-11-gof-expansion`
 * `feature/flyweight-visual`
@@ -120,7 +120,7 @@ Examples (real branches used in this repository):
 
 A scoped bug fix or content correction.
 
-Examples (real branches used in this repository):
+Examples (branches used prior to the 2026-07-20 history reset):
 
 * `fix/proxy-diagram-centering`
 * `fix/ru-translation-calques`

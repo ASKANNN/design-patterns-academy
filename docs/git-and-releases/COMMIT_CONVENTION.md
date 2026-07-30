@@ -102,6 +102,7 @@ fixed search
 ```text
 feat
 fix
+content
 docs
 refactor
 chore

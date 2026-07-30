@@ -423,8 +423,8 @@ Light theme is the **default** (`:root`).
 
 | Role | Token | Value |
 |------|-------|-------|
-| Page background | `--color-bg-base` | `#F9FAFB` |
-| Card / Surface | `--color-bg-surface` | `#FFFFFF` |
+| Page background | `--color-bg-base` | `#F8F8FC` |
+| Card / Surface | `--color-bg-surface` | `#FFFDF9` |
 | Elevated (modal) | `--color-bg-elevated` | `#FFFFFF` |
 | Subtle inset | `--color-bg-subtle` | `#F3F4F6` |
 | Primary text | `--color-text-primary` | `#111827` |
@@ -451,7 +451,7 @@ Applied via `[data-theme="dark"]` on `<html>`.
 | Role | Token | Value |
 |------|-------|-------|
 | Page background | `--color-bg-base` | `#0A0C10` |
-| Card / Surface | `--color-bg-surface` | `#111318` |
+| Card / Surface | `--color-bg-surface` | `#15161D` |
 | Elevated (modal) | `--color-bg-elevated` | `#1A1D24` |
 | Subtle inset | `--color-bg-subtle` | `#0F1117` |
 | Primary text | `--color-text-primary` | `#F9FAFB` |
@@ -471,14 +471,13 @@ Applied via `[data-theme="dark"]` on `<html>`.
 
 ### Dark Theme Surface Elevation System
 
-Dark theme uses opacity layering (not lightness) for depth.
+Dark theme uses distinct surface colors (not opacity layering) for depth.
 
-| Level | bg-color opacity | Usage |
-|-------|-----------------|-------|
+| Level | bg-color | Usage |
+|-------|----------|-------|
 | 0 (base) | `#0A0C10` | Page |
-| 1 (surface) | `#111318` | Cards |
-| 2 (elevated) | `#1A1D24` | Modals |
-| 3 (overlay) | `#21252E` | Dropdowns, tooltips |
+| 1 (surface) | `#15161D` | Cards |
+| 2 (elevated) | `#1A1D24` | Modals, dropdowns, tooltips |
 
 ---
 

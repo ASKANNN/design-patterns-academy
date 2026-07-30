@@ -1,6 +1,6 @@
 # Project State
 
-Last Updated: 2026-07-26
+Last Updated: 2026-07-30
 
 ---
 
@@ -356,6 +356,11 @@ only and may lag between updates.
 - All code comments stripped from every pattern's `implementation` code
   samples (23 patterns × 5 languages) to match the project's minimal-
   comments standard.
+- Previous/next pattern navigation added to the pattern detail page
+  (`src/pages/PatternDetailPage.js`), shown below Related Patterns,
+  computed from list order in `src/data/patterns/index.json`, hides
+  gracefully at the first/last pattern, fully localized (EN/RU), styled
+  in `src/styles/components/page-pattern-detail.css`.
 
 ---
 

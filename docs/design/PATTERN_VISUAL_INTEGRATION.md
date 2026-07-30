@@ -165,23 +165,26 @@ keys, so it is consistent with every other localized field in pattern JSON.
 
 **Principle: additive-only, zero breaking changes.**
 
-- `visuals` is **optional**. The current 23 pattern JSON files contain no
-  `visuals` field and therefore **remain valid and unchanged**. No migration,
-  rewrite, or regeneration of existing content is performed or required.
+> Update: adoption is now complete. All 23 pattern JSON files carry a
+> `visuals` field; the migration path below is preserved as historical
+> record of how the rollout stayed non-breaking.
+
+- `visuals` is **optional** at the schema level. At the time this contract was
+  written, the 23 pattern JSON files contained no `visuals` field and
+  therefore remained valid and unchanged; visuals were adopted incrementally
+  afterward without any migration, rewrite, or regeneration of existing
+  content.
 - **Absence = no visuals.** A pattern without `visuals` renders exactly as
-  today; the visual section simply does not appear (visual learning is fully
+  before; the visual section simply does not appear (visual learning is fully
   optional and progressively enhanced — `VISUAL_LEARNING_SPEC §1`).
-- **Adoption is incremental and per-pattern.** Visuals are added one pattern at
-  a time in later Phase-12 implementation tasks (starting from the Gold
+- **Adoption was incremental and per-pattern.** Visuals were added one pattern
+  at a time in later Phase-12 implementation tasks (starting from the Gold
   Standard reference), never in bulk, never touching unrelated files.
 - **No schema versioning break.** Because the change is a new optional sibling
   field, existing consumers that ignore unknown fields keep working; the JSON
   "shape" is unchanged for every field they already read.
 - **Rollback-safe.** Removing a `visuals` array returns a pattern to its exact
   prior behavior.
-
-> This task itself modifies **no** JSON. It only defines where visuals will
-> live when a future task adds them.
 
 ---
 

@@ -23,7 +23,7 @@ Inspired by the design language of Apple, Linear, and Stripe.
 
 - Complete library of all 23 GoF Design Patterns
 - Structured pattern pages: intent, problem, solution, structure, code, pros & cons
-- Interactive diagrams and animated visualizations, expanding across all 23 patterns (bespoke visuals shipped pattern by pattern — see [MASTER_PLAN.md](docs/project-management/MASTER_PLAN.md) for current coverage)
+- Interactive diagrams and animated visualizations for all 23 patterns (bespoke visuals shipped pattern by pattern — see [MASTER_PLAN.md](docs/project-management/MASTER_PLAN.md) for details)
 - English and Russian localization
 - Light and Dark themes with smooth transitions
 - Accessibility-focused (targets WCAG 2.1 AA)
@@ -68,14 +68,13 @@ Requires Node.js ≥ 18.
 
 ```
 src/
-├── assets/       Static assets (fonts, icons, images)
-├── components/   Reusable UI components
+├── components/   Reusable UI components (layout, patterns, ui, visual)
 ├── config/       App configuration (routes, theme, i18n)
-├── data/         Pattern content and localization JSON
+├── data/         Pattern content and localization JSON (locales, patterns)
 ├── layouts/      Page layout wrappers
 ├── pages/        Individual page modules
 ├── scripts/      App entry and initialization
-├── styles/       Global styles, themes, design tokens
+├── styles/       Global styles, themes, design tokens (base, components)
 └── utils/        Pure utility functions
 ```
 

@@ -50,6 +50,7 @@ src/data/patterns/
 | `real_world_examples` | `{en,ru}[]`   | Markdown-flavored examples                                |
 | `related_patterns`    | string[]      | Slugs of related patterns                                 |
 | `visuals`             | object[]      | Diagram / timeline definitions (see below)                |
+| `quiz`                | object[]      | Exactly 5 questions, sourced only from this pattern's own content (see below) |
 
 ---
 
@@ -102,13 +103,35 @@ a new visualization.
 
 ---
 
+# Quiz
+
+`quiz` is an array of exactly 5 questions per pattern. Each question has a
+localized `question`, localized `options`, a `correct` option index, and a
+localized `explanation`. Questions must be sourced only from facts already
+present in that pattern's own JSON — no outside trivia.
+
+---
+
+# Pattern Detail Page
+
+The detail page (`src/pages/PatternDetailPage.js`) renders intent, structure
+(with diagram and participants), implementation, pros/cons, and quiz as tabs,
+followed by a "Related Patterns" section and, below it, a prev/next pattern
+nav computed from list order in `src/data/patterns/index.json` (hidden at the
+first/last pattern).
+
+---
+
 # Adding a New Pattern
 
 1. Create `src/data/patterns/<category>/<slug>.json`.
 2. Copy the shape of an existing pattern in the same category.
 3. Fill every localized field in both `en` and `ru`.
 4. Provide implementation code for each supported language.
-5. Run `npm run dev` and open `#/patterns/<category>/<slug>` to verify rendering.
+5. Register the pattern in `src/data/patterns/index.json` (the central registry
+   that lists slug, name, category, complexity, popularity, status, tags, and
+   a short summary for every pattern).
+6. Run `npm run dev` and open `#/patterns/<category>/<slug>` to verify rendering.
 
 ---
 

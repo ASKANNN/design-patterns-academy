@@ -6,6 +6,9 @@ All notable changes to Design Patterns Academy are documented in this file.
 
 ### Added
 
+- Previous/next pattern navigation on the pattern detail page, rendered below
+  Related Patterns; computed from list order in `src/data/patterns/index.json`,
+  hides gracefully at the first/last pattern, full ru/en i18n
 - Completed all 23 GoF pattern content pages (Creational 5/5, Structural 7/7,
   Behavioral 11/11), English and Russian
 - Phase 12 Visual Learning infrastructure: Diagram Engine, Timeline Engine,
