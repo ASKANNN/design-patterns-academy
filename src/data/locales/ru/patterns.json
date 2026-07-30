@@ -82,13 +82,17 @@
       "next": "Следующий вопрос",
       "see_results": "Посмотреть результат",
       "retry": "Пройти ещё раз",
-      "score": "Ваш результат: {{correct}} из {{total}}."
+      "score": "Ваш результат: {{correct}} из {{total}}.",
+      "hint_show": "Показать подсказку",
+      "hint_hide": "Скрыть подсказку",
+      "report_issue": "Заметили ошибку в тесте? Сообщите нам"
     },
 
     "walkthrough": {
       "step_progress": "Шаг {{current}} из {{total}}",
       "prev": "Предыдущий шаг",
       "next": "Следующий шаг",
+      "restart": "Начать сначала",
       "available": "Есть пошаговый разбор кода"
     },
     "coming_soon_title": "Скоро",

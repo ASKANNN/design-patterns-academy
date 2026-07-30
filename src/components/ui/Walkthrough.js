@@ -23,7 +23,7 @@ export function Walkthrough({ id, steps = [], lang } = {}) {
       <div class="walkthrough__nav">
         <button type="button" class="btn btn--secondary btn--sm walkthrough__prev" data-walkthrough-prev disabled>${t('patterns.walkthrough.prev')}</button>
         <span class="walkthrough__dots" data-walkthrough-dots aria-hidden="true">${dots}</span>
-        <button type="button" class="btn btn--primary btn--sm walkthrough__next" data-walkthrough-next>${t('patterns.walkthrough.next')}</button>
+        <button type="button" class="btn btn--primary btn--sm walkthrough__next" data-walkthrough-next data-label-next="${t('patterns.walkthrough.next')}" data-label-restart="${t('patterns.walkthrough.restart')}">${t('patterns.walkthrough.next')}</button>
       </div>
     </div>
   `;

@@ -122,6 +122,9 @@ function handleClick(e) {
   const quizRetry = e.target.closest('[data-quiz-retry]');
   if (quizRetry) { handleQuizRetry(quizRetry); return; }
 
+  const quizHintBtn = e.target.closest('[data-quiz-hint-btn]');
+  if (quizHintBtn) { handleQuizHint(quizHintBtn); return; }
+
   const walkthroughNav = e.target.closest('[data-walkthrough-prev], [data-walkthrough-next]');
   if (walkthroughNav) { handleWalkthroughNav(walkthroughNav); return; }
 
@@ -399,11 +402,29 @@ function handleQuizRetry(btn) {
     if (feedback) feedback.hidden = true;
     const next = question.querySelector('[data-quiz-next]');
     if (next) next.hidden = true;
+    const hintWrap = question.querySelector('[data-quiz-hint]');
+    const hintBtn = question.querySelector('[data-quiz-hint-btn]');
+    if (hintWrap) { hintWrap.classList.remove('is-open'); hintWrap.setAttribute('aria-hidden', 'true'); }
+    if (hintBtn) hintBtn.setAttribute('aria-expanded', 'false');
   });
 
   const results = quiz.querySelector('[data-quiz-results]');
   if (results) results.hidden = true;
 }
+
+function handleQuizHint(btn) {
+  const question = btn.closest('[data-quiz-question]');
+  const hintWrap = question?.querySelector('[data-quiz-hint]');
+  if (!hintWrap) return;
+
+  const show = hintWrap.getAttribute('aria-hidden') === 'true';
+  hintWrap.classList.toggle('is-open', show);
+  hintWrap.setAttribute('aria-hidden', String(!show));
+  btn.setAttribute('aria-expanded', String(show));
+  btn.setAttribute('aria-label', t(show ? 'patterns.quiz.hint_hide' : 'patterns.quiz.hint_show'));
+}
+
+const WALKTHROUGH_RESTART_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.4 9.4 0 0 0-4.5 1.15"/><polyline points="3 3 3 8 8 8"/></svg>`;
 
 function handleWalkthroughNav(btn) {
   const walkthrough = btn.closest('[data-walkthrough]');
@@ -412,9 +433,11 @@ function handleWalkthroughNav(btn) {
 
   const steps   = [...walkthrough.querySelectorAll('[data-walkthrough-step]')];
   const dots    = [...walkthrough.querySelectorAll('[data-walkthrough-dot]')];
-  const current = steps.findIndex(s => !s.hidden);
-  const delta   = btn.matches('[data-walkthrough-next]') ? 1 : -1;
-  const next    = Math.max(0, Math.min(steps.length - 1, current + delta));
+  const nextBtn = walkthrough.querySelector('[data-walkthrough-next]');
+  const current  = steps.findIndex(s => !s.hidden);
+  const isRestart = btn === nextBtn && current === steps.length - 1;
+  const delta    = btn.matches('[data-walkthrough-prev]') ? -1 : 1;
+  const next     = isRestart ? 0 : Math.max(0, Math.min(steps.length - 1, current + delta));
   if (next === current) return;
 
   steps[current].hidden = true;
@@ -422,7 +445,12 @@ function handleWalkthroughNav(btn) {
   dots.forEach((dot, i) => dot.classList.toggle('is-active', i === next));
 
   walkthrough.querySelector('[data-walkthrough-prev]').disabled = next === 0;
-  walkthrough.querySelector('[data-walkthrough-next]').disabled = next === steps.length - 1;
+
+  const isLast = next === steps.length - 1;
+  nextBtn.classList.toggle('walkthrough__next--restart', isLast);
+  nextBtn.innerHTML = isLast
+    ? `${WALKTHROUGH_RESTART_ICON}${nextBtn.dataset.labelRestart}`
+    : nextBtn.dataset.labelNext;
 
   const [start, end] = steps[next].dataset.walkthroughLines.split('-').map(Number);
   wrap.querySelectorAll('[data-line]').forEach(line => {
@@ -432,6 +460,7 @@ function handleWalkthroughNav(btn) {
 
   const firstActiveLine = wrap.querySelector('.is-active-line');
   if (firstActiveLine) firstActiveLine.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  steps[next].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 let _searchTimer = null;

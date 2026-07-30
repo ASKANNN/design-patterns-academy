@@ -261,11 +261,14 @@ function _quizPanel(p, lang) {
     options:     q.options.map(o => localise(o, lang)),
     correct:     q.correct,
     explanation: localise(q.explanation, lang),
+    hint:        q.hint ? localise(q.hint, lang) : '',
   }));
+
+  const reportUrl = `https://github.com/ASKANNN/design-patterns-academy/issues/new?title=${encodeURIComponent(`Quiz issue: ${p.name}`)}&labels=bug`;
 
   return `
     <div class="detail-section">
-      ${Quiz({ id: `quiz-${p.slug}`, questions })}
+      ${Quiz({ id: `quiz-${p.slug}`, questions, reportUrl })}
     </div>
   `;
 }

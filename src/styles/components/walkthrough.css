@@ -89,3 +89,7 @@
 .walkthrough__dot.is-active {
   background-color: var(--color-accent);
 }
+
+.walkthrough__next--restart svg {
+  flex-shrink: 0;
+}

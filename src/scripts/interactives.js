@@ -10,13 +10,11 @@ const _SINGLETON_STEPS = [
       { set: { id: 'clientC', state: 'dim' } },
     ] },
 
-  { id: 'req-a',    duration: 1600,
-    actions: [{ do: 'request', index: 0 }] },
-
-  { id: 'creation', duration: 2400,
+  { id: 'creation', duration: 1800,
     actions: [
       { set: { id: 'instance', state: 'active' } },
       { glow: 'instance' },
+      { do: 'request',  index: 0 },
       { do: 'creation', node: 'instance' },
     ] },
 
@@ -26,11 +24,11 @@ const _SINGLETON_STEPS = [
       { set: { id: 'clientB', state: 'active' } },
     ] },
 
-  { id: 'req-b',    duration: 1600,
-    actions: [{ do: 'request', index: 1 }] },
-
   { id: 'reuse-b',  duration: 1800,
-    actions: [{ do: 'reuse', node: 'instance' }] },
+    actions: [
+      { do: 'request', index: 1 },
+      { do: 'reuse',   node: 'instance' },
+    ] },
 
   { id: 'focus-c',  duration: 500,
     actions: [
@@ -38,11 +36,11 @@ const _SINGLETON_STEPS = [
       { set: { id: 'clientC', state: 'active' } },
     ] },
 
-  { id: 'req-c',    duration: 1600,
-    actions: [{ do: 'request', index: 2 }] },
-
   { id: 'reuse-c',  duration: 1600,
-    actions: [{ do: 'reuse', node: 'instance' }] },
+    actions: [
+      { do: 'request', index: 2 },
+      { do: 'reuse',   node: 'instance' },
+    ] },
 
   { id: 'final',    duration: 5000,
     actions: [

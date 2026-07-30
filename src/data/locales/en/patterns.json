@@ -82,13 +82,17 @@
       "next": "Next question",
       "see_results": "See results",
       "retry": "Retry quiz",
-      "score": "You scored {{correct}} out of {{total}}."
+      "score": "You scored {{correct}} out of {{total}}.",
+      "hint_show": "Show hint",
+      "hint_hide": "Hide hint",
+      "report_issue": "Something wrong with this quiz? Report it"
     },
 
     "walkthrough": {
       "step_progress": "Step {{current}} of {{total}}",
       "prev": "Previous step",
       "next": "Next step",
+      "restart": "Start over",
       "available": "Includes a step-by-step code walkthrough"
     },
     "coming_soon_title": "Coming Soon",

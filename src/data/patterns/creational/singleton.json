@@ -229,6 +229,10 @@
         "en": "What does Singleton guarantee about a class?",
         "ru": "Что гарантирует Одиночка в отношении класса?"
       },
+      "hint": {
+        "en": "Think about how many objects of this class can exist at once.",
+        "ru": "Подумайте, сколько объектов этого класса может существовать одновременно."
+      },
       "options": [
         {
           "en": "That the class can never be subclassed",
@@ -257,6 +261,10 @@
       "question": {
         "en": "Why is the constructor made private (or hidden) in a Singleton?",
         "ru": "Почему в Одиночке конструктор делают приватным (или скрытым)?"
+      },
+      "hint": {
+        "en": "What would stop outside code from calling `new` directly?",
+        "ru": "Что должно помешать внешнему коду вызвать `new` напрямую?"
       },
       "options": [
         {
@@ -287,6 +295,10 @@
         "en": "What is a common drawback of using Singleton?",
         "ru": "В чём типичный недостаток использования Одиночки?"
       },
+      "hint": {
+        "en": "Consider what happens when you try to unit-test code that depends on it.",
+        "ru": "Подумайте, что происходит, когда вы пытаетесь юнит-тестировать код, зависящий от него."
+      },
       "options": [
         {
           "en": "It makes object creation slower in every case",
@@ -316,6 +328,10 @@
         "en": "In the lazy-initialization version of Singleton, when is the one instance actually created?",
         "ru": "В версии Одиночки с ленивой инициализацией - когда фактически создаётся единственный экземпляр?"
       },
+      "hint": {
+        "en": "\"Lazy\" means the work is postponed until it's actually needed.",
+        "ru": "\"Ленивая\" означает, что работа откладывается до момента, когда она действительно понадобится."
+      },
       "options": [
         {
           "en": "As soon as the program starts, before anything else runs",
@@ -344,6 +360,10 @@
       "question": {
         "en": "Why can naive lazy initialization be unsafe in a multithreaded environment?",
         "ru": "Почему наивная ленивая инициализация может быть небезопасна в многопоточной среде?"
+      },
+      "hint": {
+        "en": "The null-check and the instance creation are two separate steps - what if another thread runs between them?",
+        "ru": "Проверка на null и создание экземпляра - это два отдельных шага. Что если другой поток выполнится между ними?"
       },
       "options": [
         {

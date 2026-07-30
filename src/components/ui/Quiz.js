@@ -1,7 +1,10 @@
 import { t } from '../../utils/i18n.js';
+import { IconButton } from './IconButton.js';
 
 let _uid = 0;
 const uid = (prefix = 'quiz') => `${prefix}-${++_uid}`;
+
+const HINT_ICON = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2Z"/></svg>`;
 
 function shuffled(array) {
   const result = array.slice();
@@ -12,7 +15,7 @@ function shuffled(array) {
   return result;
 }
 
-export function Quiz({ id = uid(), questions = [] } = {}) {
+export function Quiz({ id = uid(), questions = [], reportUrl = '' } = {}) {
   if (!questions.length) return '';
 
   const randomized = shuffled(questions).map(q => {
@@ -29,7 +32,17 @@ export function Quiz({ id = uid(), questions = [] } = {}) {
   const questionBlocks = randomized.map((q, qi) => `
     <div class="quiz__question" data-quiz-question ${qi === 0 ? '' : 'hidden'}>
       <p class="quiz__progress">${t('patterns.quiz.question_progress', { current: qi + 1, total })}</p>
-      <p class="quiz__prompt">${q.question}</p>
+      <div class="quiz__prompt-row">
+        <p class="quiz__prompt">${q.question}</p>
+        ${q.hint ? `
+          ${IconButton({ icon: HINT_ICON, label: t('patterns.quiz.hint_show'), variant: 'ghost', size: 'sm', round: true, attrs: `data-quiz-hint-btn aria-expanded="false"` })}
+        ` : ''}
+      </div>
+      ${q.hint ? `
+        <div class="quiz__hint-wrap" data-quiz-hint aria-hidden="true">
+          <p class="quiz__hint">${q.hint}</p>
+        </div>
+      ` : ''}
       <div class="quiz__options" role="radiogroup" aria-label="${t('patterns.quiz.options_aria')}">
         ${q.options.map((opt, oi) => `
           <button type="button" class="quiz__option" data-quiz-option data-quiz-correct="${oi === q.correct}">
@@ -59,6 +72,12 @@ export function Quiz({ id = uid(), questions = [] } = {}) {
         <p class="quiz__score" data-quiz-score-text></p>
         <button type="button" class="btn btn--secondary btn--md quiz__retry" data-quiz-retry>${t('patterns.quiz.retry')}</button>
       </div>
+      ${reportUrl ? `
+        <a class="quiz__report" href="${reportUrl}" target="_blank" rel="noopener noreferrer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+          ${t('patterns.quiz.report_issue')}
+        </a>
+      ` : ''}
     </div>
   `;
 }
