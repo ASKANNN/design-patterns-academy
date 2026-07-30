@@ -243,8 +243,7 @@ body.is-loaded #router-outlet.is-transitioning {
   transition:
     background-color 320ms var(--ease-in-out),
     color            320ms var(--ease-in-out),
-    border-color     320ms var(--ease-in-out),
-    box-shadow       320ms var(--ease-in-out) !important;
+    border-color     320ms var(--ease-in-out) !important;
 }
 
 [data-lang-transitioning] #router-outlet {
