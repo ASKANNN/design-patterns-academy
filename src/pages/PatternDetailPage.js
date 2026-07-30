@@ -37,6 +37,12 @@ export async function PatternDetailPage({ category, slug } = {}) {
     .map(s => index.patterns.find(p => p.slug === s))
     .filter(Boolean);
 
+  const currentIndex = index.patterns.findIndex(p => p.slug === slug);
+  const prevPattern = currentIndex > 0 ? index.patterns[currentIndex - 1] : null;
+  const nextPattern = currentIndex >= 0 && currentIndex < index.patterns.length - 1
+    ? index.patterns[currentIndex + 1]
+    : null;
+
   return `
     <div class="pattern-detail">
       <div class="container">
@@ -85,6 +91,14 @@ export async function PatternDetailPage({ category, slug } = {}) {
               ${relatedPatterns.map(rp => _relatedCard(rp)).join('')}
             </div>
           </div>
+        ` : ''}
+
+        <!-- Prev / Next -->
+        ${(prevPattern || nextPattern) ? `
+          <nav class="pattern-adjacent-nav" aria-label="${t('patterns.adjacent_nav_aria')}">
+            ${prevPattern ? _adjacentLink(prevPattern, 'prev') : '<span></span>'}
+            ${nextPattern ? _adjacentLink(nextPattern, 'next') : '<span></span>'}
+          </nav>
         ` : ''}
 
       </div>
@@ -313,6 +327,25 @@ function _relatedCard(p) {
     <a href="#/patterns/${p.category}/${p.slug}" class="related-card">
       ${icon || `<span class="pip is-filled" aria-hidden="true" style="background:var(--palette-category-${p.category})"></span>`}
       ${p.name}
+    </a>
+  `;
+}
+
+function _adjacentLink(p, dir) {
+  const icon = PatternIcon({ pattern: p.slug, category: p.category, size: 'sm' });
+  const label = t(dir === 'prev' ? 'patterns.prev_pattern' : 'patterns.next_pattern');
+  const arrow = dir === 'prev'
+    ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="10 3 5 8 10 13"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>';
+
+  return `
+    <a href="#/patterns/${p.category}/${p.slug}" class="adjacent-nav-link adjacent-nav-link--${dir}">
+      ${dir === 'prev' ? arrow : ''}
+      <span class="adjacent-nav-link__body">
+        <span class="adjacent-nav-link__label">${label}</span>
+        <span class="adjacent-nav-link__name">${icon || ''}${p.name}</span>
+      </span>
+      ${dir === 'next' ? arrow : ''}
     </a>
   `;
 }

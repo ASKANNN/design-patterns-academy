@@ -67,6 +67,9 @@
 
     "tabs_aria": "Pattern sections",
     "related_patterns": "Related Patterns",
+    "prev_pattern": "Previous pattern",
+    "next_pattern": "Next pattern",
+    "adjacent_nav_aria": "Pattern navigation",
     "select_language": "Select programming language",
     "impl_coming_soon": "Implementation examples coming soon.",
     "quiz_coming_soon": "Quiz coming soon.",
