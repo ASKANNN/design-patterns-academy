@@ -45,6 +45,122 @@
     "csharp": "public sealed class Singleton\n{\n    private static readonly Lazy<Singleton> lazy =\n        new Lazy<Singleton>(() => new Singleton());\n\n    private Singleton() { }\n\n    public static Singleton Instance => lazy.Value;\n\n    public void DoSomething()\n    {\n        Console.WriteLine(\"Singleton: doing something...\");\n    }\n}\n\nSingleton s1 = Singleton.Instance;\nSingleton s2 = Singleton.Instance;\n\nConsole.WriteLine(s1 == s2);",
     "python": "from threading import Lock\n\nclass SingletonMeta(type):\n    _instances = {}\n    _lock: Lock = Lock()\n\n    def __call__(cls, *args, **kwargs):\n        with cls._lock:\n            if cls not in cls._instances:\n                instance = super().__call__(*args, **kwargs)\n                cls._instances[cls] = instance\n        return cls._instances[cls]\n\n\nclass Singleton(metaclass=SingletonMeta):\n    def do_something(self) -> None:\n        print('Singleton: doing something...')\n\n\ns1 = Singleton()\ns2 = Singleton()\nprint(s1 is s2)"
   },
+  "walkthrough": {
+    "javascript": [
+    {
+      "lines": [2, 2],
+      "title": {
+        "en": "The static field that will hold the instance",
+        "ru": "Статическое поле, которое будет хранить экземпляр"
+      },
+      "explanation": {
+        "en": "A private static field starts out empty. It's the one place the class will stash its single permitted instance once one gets created.",
+        "ru": "Приватное статическое поле изначально пусто. Это единственное место, где класс сохранит свой единственный разрешённый экземпляр, когда тот будет создан."
+      }
+    },
+    {
+      "lines": [4, 9],
+      "title": {
+        "en": "The constructor guards against a second instance",
+        "ru": "Конструктор защищает от появления второго экземпляра"
+      },
+      "explanation": {
+        "en": "If the static field is already set, the constructor throws instead of finishing - so calling `new Singleton()` a second time can't silently produce a second object.",
+        "ru": "Если статическое поле уже заполнено, конструктор выбрасывает исключение вместо завершения работы - поэтому повторный вызов `new Singleton()` не может незаметно создать второй объект."
+      }
+    },
+    {
+      "lines": [11, 16],
+      "title": {
+        "en": "getInstance() builds the instance once, then reuses it",
+        "ru": "getInstance() создаёт экземпляр один раз, а затем переиспользует его"
+      },
+      "explanation": {
+        "en": "The first call finds the static field empty and creates the instance. Every call after that skips creation entirely and just returns the same stashed reference.",
+        "ru": "При первом вызове статическое поле оказывается пустым, и метод создаёт экземпляр. Каждый следующий вызов вообще пропускает создание и просто возвращает ту же сохранённую ссылку."
+      }
+    },
+    {
+      "lines": [18, 20],
+      "title": {
+        "en": "doSomething() is the instance's actual behavior",
+        "ru": "doSomething() - это фактическое поведение экземпляра"
+      },
+      "explanation": {
+        "en": "This method has nothing to do with the single-instance guarantee itself - it's just an example of the ordinary work a Singleton instance can do once obtained.",
+        "ru": "Этот метод никак не связан с самой гарантией единственности - это просто пример обычной работы, которую может выполнять экземпляр Одиночки после того, как он получен."
+      }
+    },
+    {
+      "lines": [23, 26],
+      "title": {
+        "en": "Two calls, one shared instance",
+        "ru": "Два вызова - один общий экземпляр"
+      },
+      "explanation": {
+        "en": "Both `s1` and `s2` come from calling `getInstance()`, and `s1 === s2` prints `true` - confirming that every caller reaches the exact same object, not a copy.",
+        "ru": "И `s1`, и `s2` получены вызовом `getInstance()`, и `s1 === s2` печатает `true` - это подтверждает, что каждый вызывающий код получает один и тот же объект, а не его копию."
+      }
+    }
+    ],
+    "python": [
+      {
+        "lines": [4, 5],
+        "title": {
+          "en": "The metaclass holds the shared cache and the lock",
+          "ru": "Метакласс хранит общий кэш и блокировку"
+        },
+        "explanation": {
+          "en": "`_instances` is a dict that will cache one instance per class using this metaclass, and `_lock` is what will make building that instance safe when multiple threads call in at once.",
+          "ru": "`_instances` - словарь, который будет хранить по одному экземпляру для каждого класса с этим метаклассом, а `_lock` обеспечит безопасное создание экземпляра, если несколько потоков обратятся одновременно."
+        }
+      },
+      {
+        "lines": [7, 12],
+        "title": {
+          "en": "__call__ intercepts every Singleton() call",
+          "ru": "__call__ перехватывает каждый вызов Singleton()"
+        },
+        "explanation": {
+          "en": "Because `SingletonMeta` is a metaclass, calling `Singleton()` actually runs this `__call__` method instead of going straight to normal object construction - so the class can decide whether to build a new instance or hand back the cached one.",
+          "ru": "Поскольку `SingletonMeta` - метакласс, вызов `Singleton()` на самом деле запускает этот метод `__call__` вместо обычного создания объекта - поэтому класс может сам решить, создавать новый экземпляр или вернуть уже сохранённый."
+        }
+      },
+      {
+        "lines": [8, 8],
+        "title": {
+          "en": "The lock makes lazy creation thread-safe",
+          "ru": "Блокировка делает ленивое создание потокобезопасным"
+        },
+        "explanation": {
+          "en": "`with cls._lock` makes the check-then-create step atomic across threads, closing the race where two threads could both see no cached instance and each create their own.",
+          "ru": "`with cls._lock` делает шаг «проверить и создать» атомарным для потоков, закрывая состояние гонки, при котором два потока могли бы одновременно не увидеть закэшированный экземпляр и создать каждый свой."
+        }
+      },
+      {
+        "lines": [15, 17],
+        "title": {
+          "en": "Singleton itself just opts into the metaclass",
+          "ru": "Сам класс Singleton просто подключает метакласс"
+        },
+        "explanation": {
+          "en": "`Singleton` declares `metaclass=SingletonMeta` and otherwise looks like an ordinary class - `do_something()` is regular instance behavior, unrelated to the creation guarantee.",
+          "ru": "`Singleton` объявляет `metaclass=SingletonMeta` и в остальном выглядит как обычный класс - `do_something()` - это обычное поведение экземпляра, не связанное с гарантией единственности."
+        }
+      },
+      {
+        "lines": [20, 22],
+        "title": {
+          "en": "Two calls, one shared instance",
+          "ru": "Два вызова - один общий экземпляр"
+        },
+        "explanation": {
+          "en": "`s1` and `s2` both come from calling `Singleton()`, and `s1 is s2` prints `True` - confirming both names point at the one cached instance, not separate copies.",
+          "ru": "И `s1`, и `s2` получены вызовом `Singleton()`, и `s1 is s2` печатает `True` - это подтверждает, что оба имени указывают на один и тот же закэшированный экземпляр, а не на отдельные копии."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "The single-instance guarantee is enforced by the class itself, not by every caller remembering to reuse an existing object.",

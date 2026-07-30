@@ -216,7 +216,16 @@ No new features are implemented during this sprint — only bug fixing and stabi
       alone (fixed 2026-07-28 after an owner review caught both issues).
 - [ ] Interactive code walkthroughs — step-by-step line highlighting +
       explanation layered over the existing `CodeBlock` component; step
-      data lives in a new field on the pattern JSON, not a separate file
+      data lives in a new `walkthrough` field on the pattern JSON, keyed
+      per language (`{javascript: [...], python: [...]}`), not a separate
+      file. **Pilot shipped on Singleton (2026-07-31, JavaScript +
+      Python):** `src/components/ui/Walkthrough.js` (step navigator) +
+      `CodeBlock.js` line-highlighting support + a side-by-side sticky
+      layout (code left, step panel right, collapses to a stacked column
+      under 860px) + language-tab badges marking which languages have a
+      walkthrough. Still open before the remaining 22-pattern rollout:
+      whether TypeScript/Java/C# walkthroughs are needed or JS+Python
+      stays the standard.
 - [ ] Pattern playgrounds — **scope decision (2026-07-28):** executable
       only for JavaScript/TypeScript, via a sandboxed iframe +
       `Function()` (no real TS type-checking, just transpile-free

@@ -122,6 +122,9 @@ function handleClick(e) {
   const quizRetry = e.target.closest('[data-quiz-retry]');
   if (quizRetry) { handleQuizRetry(quizRetry); return; }
 
+  const walkthroughNav = e.target.closest('[data-walkthrough-prev], [data-walkthrough-next]');
+  if (walkthroughNav) { handleWalkthroughNav(walkthroughNav); return; }
+
   const searchBtn = e.target.closest('[data-action="search"]');
   if (searchBtn) { _triggerSearch(); return; }
 
@@ -400,6 +403,35 @@ function handleQuizRetry(btn) {
 
   const results = quiz.querySelector('[data-quiz-results]');
   if (results) results.hidden = true;
+}
+
+function handleWalkthroughNav(btn) {
+  const walkthrough = btn.closest('[data-walkthrough]');
+  const wrap        = btn.closest('[data-walkthrough-wrap]');
+  if (!walkthrough || !wrap) return;
+
+  const steps   = [...walkthrough.querySelectorAll('[data-walkthrough-step]')];
+  const dots    = [...walkthrough.querySelectorAll('[data-walkthrough-dot]')];
+  const current = steps.findIndex(s => !s.hidden);
+  const delta   = btn.matches('[data-walkthrough-next]') ? 1 : -1;
+  const next    = Math.max(0, Math.min(steps.length - 1, current + delta));
+  if (next === current) return;
+
+  steps[current].hidden = true;
+  steps[next].hidden = false;
+  dots.forEach((dot, i) => dot.classList.toggle('is-active', i === next));
+
+  walkthrough.querySelector('[data-walkthrough-prev]').disabled = next === 0;
+  walkthrough.querySelector('[data-walkthrough-next]').disabled = next === steps.length - 1;
+
+  const [start, end] = steps[next].dataset.walkthroughLines.split('-').map(Number);
+  wrap.querySelectorAll('[data-line]').forEach(line => {
+    const n = Number(line.dataset.line);
+    line.classList.toggle('is-active-line', n >= start && n <= end);
+  });
+
+  const firstActiveLine = wrap.querySelector('.is-active-line');
+  if (firstActiveLine) firstActiveLine.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 let _searchTimer = null;

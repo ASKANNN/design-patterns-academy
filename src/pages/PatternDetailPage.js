@@ -6,6 +6,7 @@ import { Tabs }                                          from '../components/ui/
 import { Breadcrumb }                                    from '../components/ui/Breadcrumb.js';
 import { Alert }                                         from '../components/ui/Alert.js';
 import { Quiz }                                          from '../components/ui/Quiz.js';
+import { Walkthrough }                                   from '../components/ui/Walkthrough.js';
 import { PatternCard }                                   from '../components/patterns/PatternCard.js';
 import { Diagram }                                       from '../components/visual/Diagram.js';
 import { PatternIcon }                                   from '../components/visual/PatternIcon.js';
@@ -77,7 +78,7 @@ export async function PatternDetailPage({ category, slug } = {}) {
           tabs: [
             { label: t('patterns.sections.intent'),        panel: _intentPanel(pattern, lang) },
             { label: t('patterns.sections.structure'),     panel: _structurePanel(pattern, lang) },
-            { label: t('patterns.sections.implementation'), panel: _implementationPanel(pattern) },
+            { label: t('patterns.sections.implementation'), panel: _implementationPanel(pattern, lang) },
             { label: t('patterns.sections.pros_cons'),     panel: _prosConsPanel(pattern, lang) },
             { label: t('patterns.sections.quiz'),          panel: _quizPanel(pattern, lang) },
           ],
@@ -173,7 +174,7 @@ function _structurePanel(p, lang) {
   `;
 }
 
-function _implementationPanel(p) {
+function _implementationPanel(p, lang) {
   const impl  = p.implementation ?? {};
   const langs = Object.keys(impl);
   if (!langs.length) {
@@ -181,16 +182,25 @@ function _implementationPanel(p) {
   }
 
   const langLabels = { javascript: 'JavaScript', typescript: 'TypeScript', python: 'Python', java: 'Java', csharp: 'C#' };
+  const walkthrough = p.walkthrough ?? {};
 
-  const buttons = langs.map((l, i) =>
-    `<button class="lang-btn${i === 0 ? ' is-active' : ''}" type="button" data-lang-btn="${l}">${langLabels[l] ?? l}</button>`
-  ).join('');
+  const buttons = langs.map((l, i) => {
+    const hasWalkthrough = (walkthrough[l] ?? []).length > 0;
+    return `<button class="lang-btn${i === 0 ? ' is-active' : ''}" type="button" data-lang-btn="${l}"${hasWalkthrough ? ` title="${t('patterns.walkthrough.available')}"` : ''}>${langLabels[l] ?? l}${hasWalkthrough ? `<span class="lang-btn__badge" aria-hidden="true"></span><span class="sr-only">${t('patterns.walkthrough.available')}</span>` : ''}</button>`;
+  }).join('');
 
-  const panels = langs.map((l, i) =>
-    `<div class="lang-panel${i === 0 ? ' is-visible' : ''}" data-lang-panel="${l}">
-      ${CodeBlock({ code: impl[l], language: l })}
-    </div>`
-  ).join('');
+  const panels = langs.map((l, i) => {
+    const steps = walkthrough[l] ?? [];
+    return `
+    <div class="lang-panel${i === 0 ? ' is-visible' : ''}" data-lang-panel="${l}">
+      ${steps.length ? `
+        <div class="walkthrough-wrap" data-walkthrough-wrap>
+          ${CodeBlock({ code: impl[l], language: l, activeLines: steps[0].lines, attrs: 'data-walkthrough-code' })}
+          ${Walkthrough({ id: `walkthrough-${p.slug}-${l}`, steps, lang })}
+        </div>
+      ` : CodeBlock({ code: impl[l], language: l })}
+    </div>`;
+  }).join('');
 
   return `
     <div class="detail-section">

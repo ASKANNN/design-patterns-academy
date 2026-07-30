@@ -274,9 +274,9 @@ only and may lag between updates.
 
 ## Phase 13 — Interactive Learning
 
-**Status:** Quizzes shipped for all 23 patterns; code walkthroughs and playgrounds not started
+**Status:** Quizzes shipped for all 23 patterns; code walkthroughs pilot shipped on Singleton, rollout to remaining 22 pending; playgrounds not started
 
-- Interactive code walkthroughs
+- [~] Interactive code walkthroughs — pilot done on Singleton, see below
 - Pattern playgrounds
 - [x] Quizzes — all 23 patterns done (5 questions each, verified via
       Playwright end to end for representative patterns from each
@@ -285,6 +285,22 @@ only and may lag between updates.
       order on every render, so the correct answer's position and the
       first question shown are never predictable.
 - Practical exercises
+
+> **Code walkthroughs pilot (Singleton, 2026-07-31):** a new `walkthrough`
+> field on the pattern JSON, keyed per language
+> (`{javascript: [...], python: [...]}`, each step
+> `{lines:[start,end], title:{en,ru}, explanation:{en,ru}}`). New
+> `src/components/ui/Walkthrough.js` step-navigator component; `CodeBlock.js`
+> extended to wrap output in per-line spans and highlight an active line
+> range. Layout is a side-by-side sticky panel (code left with its own
+> scroll region, step panel right, pinned under the header) that collapses
+> to a single stacked column under 860px. Language-select tabs show a small
+> accent-dot badge on any language that has walkthrough content (currently
+> JavaScript and Python only). Verified via Playwright across desktop/
+> mobile viewports and both themes, zero console errors. **Shipped and
+> reviewed on Singleton only — stopped before writing walkthrough content
+> for the remaining 22 patterns**; also open whether TypeScript/Java/C#
+> walkthroughs are in scope or JS+Python remains the standard.
 
 > **Build order and scope (agreed with owner, 2026-07-28):** the checklist
 > above is the target state, not the build order. Actual sequencing is

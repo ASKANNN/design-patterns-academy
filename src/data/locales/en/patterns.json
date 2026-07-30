@@ -84,6 +84,13 @@
       "retry": "Retry quiz",
       "score": "You scored {{correct}} out of {{total}}."
     },
+
+    "walkthrough": {
+      "step_progress": "Step {{current}} of {{total}}",
+      "prev": "Previous step",
+      "next": "Next step",
+      "available": "Includes a step-by-step code walkthrough"
+    },
     "coming_soon_title": "Coming Soon",
     "coming_soon_message": "We are working on the full content for this pattern. Check back soon.",
     "no_patterns_filter": "No patterns found",

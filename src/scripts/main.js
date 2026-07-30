@@ -20,6 +20,7 @@ import '../styles/components/pagination.css';
 import '../styles/components/code-block.css';
 import '../styles/components/alert.css';
 import '../styles/components/quiz.css';
+import '../styles/components/walkthrough.css';
 import '../styles/components/empty-state.css';
 import '../styles/components/feedback.css';
 import '../styles/components/diagram.css';

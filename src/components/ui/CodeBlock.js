@@ -1,12 +1,13 @@
 import { t } from '../../utils/i18n.js';
 
 export function CodeBlock({
-  code      = '',
-  language  = 'js',
-  filename  = '',
-  showDots  = true,
-  numbered  = false,
-  attrs     = '',
+  code        = '',
+  language    = 'js',
+  filename    = '',
+  showDots    = true,
+  numbered    = false,
+  activeLines = null,
+  attrs       = '',
 } = {}) {
   const label = filename || language.toUpperCase();
 
@@ -32,7 +33,7 @@ export function CodeBlock({
         </button>
       </div>
       <div class="code-block__body">
-        <pre class="code-block__pre"><code class="code-block__code language-${language}">${highlight(code, language)}</code></pre>
+        <pre class="code-block__pre"><code class="code-block__code language-${language}">${highlight(code, language, activeLines)}</code></pre>
       </div>
     </div>
   `;
@@ -46,12 +47,18 @@ const _KW = {
   csharp:     new Set(['abstract','as','base','bool','break','byte','case','catch','char','class','const','continue','decimal','default','delegate','do','double','else','enum','event','explicit','extern','false','finally','fixed','float','for','foreach','goto','if','implicit','in','int','interface','internal','is','lock','long','namespace','new','null','object','operator','out','override','params','private','protected','public','readonly','ref','return','sbyte','sealed','short','sizeof','stackalloc','static','string','struct','switch','this','throw','true','try','typeof','uint','ulong','unchecked','unsafe','ushort','using','var','virtual','void','volatile','while']),
 };
 
-function highlight(code, lang) {
+function highlight(code, lang, activeLines) {
   const keywords = _KW[lang] || _KW.javascript;
   const isPython = lang === 'python';
-  const out = [];
+  const lines = [''];
   let i = 0;
   const n = code.length;
+
+  const out = (html) => {
+    const parts = html.split('\n');
+    lines[lines.length - 1] += parts[0];
+    for (let k = 1; k < parts.length; k++) lines.push(parts[k]);
+  };
 
   while (i < n) {
     if (
@@ -60,7 +67,7 @@ function highlight(code, lang) {
     ) {
       const end = code.indexOf('\n', i);
       const tok = end === -1 ? code.slice(i) : code.slice(i, end);
-      out.push(`<span class="token-comment">${_esc(tok)}</span>`);
+      out(`<span class="token-comment">${_esc(tok)}</span>`);
       i += tok.length;
       continue;
     }
@@ -68,7 +75,7 @@ function highlight(code, lang) {
     if (code[i] === '/' && code[i + 1] === '*') {
       const end = code.indexOf('*/', i + 2);
       const tok = end === -1 ? code.slice(i) : code.slice(i, end + 2);
-      out.push(`<span class="token-comment">${_esc(tok)}</span>`);
+      out(`<span class="token-comment">${_esc(tok)}</span>`);
       i += tok.length;
       continue;
     }
@@ -81,7 +88,7 @@ function highlight(code, lang) {
         if (code[j] === q)    { j++;    break; }
         j++;
       }
-      out.push(`<span class="token-string">${_esc(code.slice(i, j))}</span>`);
+      out(`<span class="token-string">${_esc(code.slice(i, j))}</span>`);
       i = j;
       continue;
     }
@@ -89,14 +96,14 @@ function highlight(code, lang) {
     if (code[i] >= '0' && code[i] <= '9') {
       let j = i + 1;
       while (j < n && (code[j] >= '0' && code[j] <= '9' || code[j] === '.' || code[j] === '_')) j++;
-      out.push(`<span class="token-number">${_esc(code.slice(i, j))}</span>`);
+      out(`<span class="token-number">${_esc(code.slice(i, j))}</span>`);
       i = j;
       continue;
     }
 
     if (/[a-zA-Z_$@]/.test(code[i])) {
       if (code[i] === '@') {
-        out.push(`<span class="token-punctuation">@</span>`);
+        out(`<span class="token-punctuation">@</span>`);
         i++;
         continue;
       }
@@ -106,16 +113,16 @@ function highlight(code, lang) {
       const word = code.slice(i, j);
 
       if (keywords.has(word.toLowerCase()) && keywords.has(word)) {
-        out.push(`<span class="token-keyword">${_esc(word)}</span>`);
+        out(`<span class="token-keyword">${_esc(word)}</span>`);
       } else if (/^[A-Z]/.test(word)) {
-        out.push(`<span class="token-class">${_esc(word)}</span>`);
+        out(`<span class="token-class">${_esc(word)}</span>`);
       } else {
         let k = j;
         while (k < n && (code[k] === ' ' || code[k] === '\t')) k++;
         if (code[k] === '(') {
-          out.push(`<span class="token-function">${_esc(word)}</span>`);
+          out(`<span class="token-function">${_esc(word)}</span>`);
         } else {
-          out.push(_esc(word));
+          out(_esc(word));
         }
       }
       i = j;
@@ -123,16 +130,20 @@ function highlight(code, lang) {
     }
 
     if ('{}[]();,.<>!&|+-*/%^~=:?'.includes(code[i])) {
-      out.push(`<span class="token-punctuation">${_esc(code[i])}</span>`);
+      out(`<span class="token-punctuation">${_esc(code[i])}</span>`);
       i++;
       continue;
     }
 
-    out.push(_esc(code[i]));
+    out(_esc(code[i]));
     i++;
   }
 
-  return out.join('');
+  return lines.map((html, idx) => {
+    const lineNo = idx + 1;
+    const isActive = Array.isArray(activeLines) && lineNo >= activeLines[0] && lineNo <= activeLines[1];
+    return `<span class="code-block__line${isActive ? ' is-active-line' : ''}" data-line="${lineNo}">${html}</span>`;
+  }).join('\n');
 }
 
 function _esc(str) {

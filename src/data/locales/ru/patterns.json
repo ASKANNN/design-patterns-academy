@@ -84,6 +84,13 @@
       "retry": "Пройти ещё раз",
       "score": "Ваш результат: {{correct}} из {{total}}."
     },
+
+    "walkthrough": {
+      "step_progress": "Шаг {{current}} из {{total}}",
+      "prev": "Предыдущий шаг",
+      "next": "Следующий шаг",
+      "available": "Есть пошаговый разбор кода"
+    },
     "coming_soon_title": "Скоро",
     "coming_soon_message": "Мы работаем над полным содержанием этого паттерна. Загляните позже.",
     "no_patterns_filter": "Паттерны не найдены",

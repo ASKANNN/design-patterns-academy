@@ -171,6 +171,16 @@
   box-shadow: var(--shadow-accent);
 }
 
+.lang-btn__badge {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: var(--space-1);
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+  vertical-align: middle;
+}
+
 .lang-panel { display: none; }
 .lang-panel.is-visible { display: block; }
 
