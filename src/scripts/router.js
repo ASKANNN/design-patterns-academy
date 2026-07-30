@@ -28,9 +28,8 @@ export function initRouter(outletEl) {
     const path              = getCurrentPath();
     const { handler, params } = _match(path);
 
-    window.scrollTo({ top: 0, behavior: 'instant' });
-
     await pageLeave(_outlet);
+    window.scrollTo({ top: 0, behavior: 'instant' });
     _showLoading();
 
     try {
