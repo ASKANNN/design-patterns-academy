@@ -60,6 +60,180 @@
     "csharp": "abstract class Shape\n{\n    public double X { get; set; }\n    public double Y { get; set; }\n    public string Color { get; set; }\n\n    protected Shape(double x, double y, string color)\n    { X = x; Y = y; Color = color; }\n\n    public virtual Shape Clone() => (Shape) MemberwiseClone();\n}\n\nclass Circle : Shape\n{\n    public double Radius { get; set; }\n    public Circle(double x, double y, string color, double radius)\n        : base(x, y, color) => Radius = radius;\n}\n\nclass Rectangle : Shape\n{\n    public double Width  { get; set; }\n    public double Height { get; set; }\n    public Rectangle(double x, double y, string color, double width, double height)\n        : base(x, y, color) { Width = width; Height = height; }\n}\n\nvar original = new Circle(10, 20, \"red\", 15);\nvar copy     = (Circle) original.Clone();\n\ncopy.Color = \"blue\";\n\nConsole.WriteLine(original.Color);\nConsole.WriteLine(copy.Color);\nConsole.WriteLine(copy is Circle);",
     "python": "from __future__ import annotations\nimport copy\n\nclass Shape:\n    def __init__(self, x: float = 0, y: float = 0, color: str = 'black') -> None:\n        self.x = x\n        self.y = y\n        self.color = color\n\n    def clone(self) -> Shape:\n        return copy.copy(self)\n\n\nclass Circle(Shape):\n    def __init__(self, x: float, y: float, color: str, radius: float = 0) -> None:\n        super().__init__(x, y, color)\n        self.radius = radius\n\n\nclass Rectangle(Shape):\n    def __init__(self, x: float, y: float, color: str,\n                 width: float = 0, height: float = 0) -> None:\n        super().__init__(x, y, color)\n        self.width = width\n        self.height = height\n\n\noriginal = Circle(x=10, y=20, color='red', radius=15)\ncopy_ = original.clone()\n\ncopy_.color = 'blue'\n\nprint(original.color)\nprint(copy_.color)\nprint(type(copy_).__name__)"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          6
+        ],
+        "title": {
+          "en": "Shape holds the fields every clone will copy",
+          "ru": "Shape хранит поля, которые скопирует любой клон"
+        },
+        "explanation": {
+          "en": "The constructor sets `x`, `y`, and `color` from a destructured options object - these are the fields `clone()` will need to duplicate onto the new object.",
+          "ru": "Конструктор устанавливает `x`, `y` и `color` из деструктурированного объекта параметров - именно эти поля `clone()` должен будет продублировать в новом объекте."
+        }
+      },
+      {
+        "lines": [
+          8,
+          10
+        ],
+        "title": {
+          "en": "clone() copies the current instance instead of asking the caller to rebuild it",
+          "ru": "clone() копирует текущий экземпляр, а не заставляет вызывающий код собирать его заново"
+        },
+        "explanation": {
+          "en": "`new this.constructor({ ...this })` spreads all of the current object's own fields into a new instance of the same concrete class - the caller never has to know or repeat which fields exist.",
+          "ru": "`new this.constructor({ ...this })` разворачивает все собственные поля текущего объекта в новый экземпляр того же конкретного класса - вызывающему коду не нужно знать или повторять, какие поля вообще существуют."
+        }
+      },
+      {
+        "lines": [
+          13,
+          18
+        ],
+        "title": {
+          "en": "Circle extends Shape with its own field, clone() is inherited unchanged",
+          "ru": "Circle расширяет Shape своим полем, clone() наследуется без изменений"
+        },
+        "explanation": {
+          "en": "`Circle` only adds `radius` in its constructor - it doesn't redefine `clone()`, yet `this.constructor` inside the inherited `clone()` still resolves to `Circle`, so `radius` gets copied too.",
+          "ru": "`Circle` лишь добавляет `radius` в своём конструкторе - он не переопределяет `clone()`, но `this.constructor` внутри унаследованного `clone()` всё равно указывает на `Circle`, поэтому `radius` тоже копируется."
+        }
+      },
+      {
+        "lines": [
+          20,
+          26
+        ],
+        "title": {
+          "en": "Rectangle shows the same reuse with different extra fields",
+          "ru": "Rectangle демонстрирует то же переиспользование с другими дополнительными полями"
+        },
+        "explanation": {
+          "en": "Like `Circle`, `Rectangle` adds its own fields (`width`, `height`) and relies entirely on `Shape.clone()` - no subclass needs to implement cloning itself.",
+          "ru": "Как и `Circle`, `Rectangle` добавляет свои поля (`width`, `height`) и полностью полагается на `Shape.clone()` - ни одному подклассу не нужно самому реализовывать клонирование."
+        }
+      },
+      {
+        "lines": [
+          28,
+          29
+        ],
+        "title": {
+          "en": "Cloning an existing Circle produces a second, independent Circle",
+          "ru": "Клонирование существующего Circle создаёт второй, независимый Circle"
+        },
+        "explanation": {
+          "en": "`original.clone()` returns a new object built from `original`'s current field values, without re-running any custom setup logic or knowing `Circle`'s constructor signature.",
+          "ru": "`original.clone()` возвращает новый объект, построенный из текущих значений полей `original`, без повторного выполнения какой-либо кастомной логики настройки и без знания сигнатуры конструктора `Circle`."
+        }
+      },
+      {
+        "lines": [
+          31,
+          35
+        ],
+        "title": {
+          "en": "The clone is independent, and it kept its concrete type",
+          "ru": "Клон независим и сохранил свой конкретный тип"
+        },
+        "explanation": {
+          "en": "Changing `copy.color` doesn't affect `original.color`, proving the fields were copied rather than shared - and `copy instanceof Circle` prints `true`, showing the clone is a real `Circle`, not a generic `Shape`.",
+          "ru": "Изменение `copy.color` не влияет на `original.color`, что доказывает: поля были скопированы, а не разделены - а `copy instanceof Circle` печатает `true`, показывая, что клон - настоящий `Circle`, а не обобщённый `Shape`."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          4,
+          8
+        ],
+        "title": {
+          "en": "Shape holds the fields every clone will copy",
+          "ru": "Shape хранит поля, которые скопирует любой клон"
+        },
+        "explanation": {
+          "en": "`__init__` sets `x`, `y`, and `color` as plain instance attributes - exactly the state that `clone()` needs to duplicate.",
+          "ru": "`__init__` устанавливает `x`, `y` и `color` как обычные атрибуты экземпляра - именно то состояние, которое должен продублировать `clone()`."
+        }
+      },
+      {
+        "lines": [
+          10,
+          11
+        ],
+        "title": {
+          "en": "clone() delegates to Python's own copy machinery",
+          "ru": "clone() делегирует копирование встроенному механизму copy"
+        },
+        "explanation": {
+          "en": "`copy.copy(self)` produces a new object of the same class with the same attribute values, using the standard library's shallow-copy support instead of a hand-written field-by-field constructor call.",
+          "ru": "`copy.copy(self)` создаёт новый объект того же класса с теми же значениями атрибутов, используя механизм поверхностного копирования стандартной библиотеки вместо ручного вызова конструктора с перечислением полей."
+        }
+      },
+      {
+        "lines": [
+          14,
+          17
+        ],
+        "title": {
+          "en": "Circle extends Shape with its own field, clone() is inherited unchanged",
+          "ru": "Circle расширяет Shape своим полем, clone() наследуется без изменений"
+        },
+        "explanation": {
+          "en": "`Circle.__init__` adds `radius` and calls `super().__init__()` for the rest - it never redefines `clone()`, and `copy.copy()` still preserves the concrete `Circle` type along with `radius`.",
+          "ru": "`Circle.__init__` добавляет `radius` и вызывает `super().__init__()` для остального - он ни разу не переопределяет `clone()`, а `copy.copy()` по-прежнему сохраняет конкретный тип `Circle` вместе с `radius`."
+        }
+      },
+      {
+        "lines": [
+          20,
+          25
+        ],
+        "title": {
+          "en": "Rectangle shows the same reuse with different extra fields",
+          "ru": "Rectangle демонстрирует то же переиспользование с другими дополнительными полями"
+        },
+        "explanation": {
+          "en": "`Rectangle` adds `width` and `height` in its own `__init__` and, like `Circle`, relies entirely on the inherited `Shape.clone()` - no subclass reimplements cloning.",
+          "ru": "`Rectangle` добавляет `width` и `height` в собственном `__init__` и, как и `Circle`, полностью полагается на унаследованный `Shape.clone()` - ни один подкласс не переопределяет клонирование."
+        }
+      },
+      {
+        "lines": [
+          28,
+          29
+        ],
+        "title": {
+          "en": "Cloning an existing Circle produces a second, independent Circle",
+          "ru": "Клонирование существующего Circle создаёт второй, независимый Circle"
+        },
+        "explanation": {
+          "en": "`original.clone()` returns a new object with `original`'s current attribute values, without calling `Circle.__init__` again or needing to know its constructor signature.",
+          "ru": "`original.clone()` возвращает новый объект с текущими значениями атрибутов `original`, не вызывая повторно `Circle.__init__` и не требуя знания его сигнатуры конструктора."
+        }
+      },
+      {
+        "lines": [
+          31,
+          35
+        ],
+        "title": {
+          "en": "The clone is independent, and it kept its concrete type",
+          "ru": "Клон независим и сохранил свой конкретный тип"
+        },
+        "explanation": {
+          "en": "Changing `copy_.color` leaves `original.color` untouched, showing the values were copied rather than shared - and `type(copy_).__name__` prints `Circle`, confirming the clone kept its concrete class.",
+          "ru": "Изменение `copy_.color` не затрагивает `original.color`, показывая, что значения были скопированы, а не разделены - а `type(copy_).__name__` печатает `Circle`, подтверждая, что клон сохранил свой конкретный класс."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Code that duplicates an object never has to name its concrete class - it only relies on the shared cloning interface.",

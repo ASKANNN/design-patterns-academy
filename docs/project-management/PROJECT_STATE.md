@@ -274,9 +274,9 @@ only and may lag between updates.
 
 ## Phase 13 — Interactive Learning
 
-**Status:** Quizzes shipped for all 23 patterns; code walkthroughs pilot shipped on Singleton, rollout to remaining 22 pending; playgrounds not started
+**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for Creational (5/23: Singleton pilot + Abstract Factory, Builder, Factory Method, Prototype), Structural and Behavioral still pending; playgrounds not started
 
-- [~] Interactive code walkthroughs — pilot done on Singleton, see below
+- [~] Interactive code walkthroughs — Creational category done, see below
 - Pattern playgrounds
 - [x] Quizzes — all 23 patterns done (5 questions each, verified via
       Playwright end to end for representative patterns from each
@@ -297,10 +297,14 @@ only and may lag between updates.
 > to a single stacked column under 860px. Language-select tabs show a small
 > accent-dot badge on any language that has walkthrough content (currently
 > JavaScript and Python only). Verified via Playwright across desktop/
-> mobile viewports and both themes, zero console errors. **Shipped and
-> reviewed on Singleton only — stopped before writing walkthrough content
-> for the remaining 22 patterns**; also open whether TypeScript/Java/C#
-> walkthroughs are in scope or JS+Python remains the standard.
+> mobile viewports and both themes, zero console errors. **Language scope
+> decision (2026-07-31):** JS+Python is the confirmed standard for every
+> pattern — no TypeScript/Java/C# walkthroughs. **Rollout (2026-07-31):**
+> Creational category complete (Abstract Factory, Builder, Factory Method,
+> Prototype added alongside the Singleton pilot, 5/23), each step's
+> explanation grounded in that pattern's own `implementation` code,
+> verified via Playwright screenshots (line highlighting, per-step
+> content, autoscroll). Structural (7) and Behavioral (11) remain.
 
 > **Build order and scope (agreed with owner, 2026-07-28):** the checklist
 > above is the target state, not the build order. Actual sequencing is

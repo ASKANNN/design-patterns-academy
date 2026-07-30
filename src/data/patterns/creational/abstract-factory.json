@@ -75,6 +75,208 @@
     "csharp": "interface IButton { void Render(); }\ninterface ICheckbox { void Render(); }\n\nclass WindowsButton : IButton { public void Render() => Console.WriteLine(\"Rendering a Windows-style button.\"); }\nclass WindowsCheckbox : ICheckbox { public void Render() => Console.WriteLine(\"Rendering a Windows-style checkbox.\"); }\n\nclass MacButton : IButton { public void Render() => Console.WriteLine(\"Rendering a macOS-style button.\"); }\nclass MacCheckbox : ICheckbox { public void Render() => Console.WriteLine(\"Rendering a macOS-style checkbox.\"); }\n\ninterface IUIFactory { IButton CreateButton(); ICheckbox CreateCheckbox(); }\n\nclass WindowsFactory : IUIFactory\n{\n    public IButton CreateButton() => new WindowsButton();\n    public ICheckbox CreateCheckbox() => new WindowsCheckbox();\n}\n\nclass MacFactory : IUIFactory\n{\n    public IButton CreateButton() => new MacButton();\n    public ICheckbox CreateCheckbox() => new MacCheckbox();\n}\n\nstatic void RenderScreen(IUIFactory factory)\n{\n    factory.CreateButton().Render();\n    factory.CreateCheckbox().Render();\n}\n\nRenderScreen(new WindowsFactory());\n\nRenderScreen(new MacFactory());",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass Button(ABC):\n    @abstractmethod\n    def render(self) -> None: ...\n\n\nclass Checkbox(ABC):\n    @abstractmethod\n    def render(self) -> None: ...\n\n\nclass WindowsButton(Button):\n    def render(self) -> None:\n        print('Rendering a Windows-style button.')\n\n\nclass WindowsCheckbox(Checkbox):\n    def render(self) -> None:\n        print('Rendering a Windows-style checkbox.')\n\n\nclass MacButton(Button):\n    def render(self) -> None:\n        print('Rendering a macOS-style button.')\n\n\nclass MacCheckbox(Checkbox):\n    def render(self) -> None:\n        print('Rendering a macOS-style checkbox.')\n\n\nclass UIFactory(ABC):\n    @abstractmethod\n    def create_button(self) -> Button: ...\n\n    @abstractmethod\n    def create_checkbox(self) -> Checkbox: ...\n\n\nclass WindowsFactory(UIFactory):\n    def create_button(self) -> Button:\n        return WindowsButton()\n\n    def create_checkbox(self) -> Checkbox:\n        return WindowsCheckbox()\n\n\nclass MacFactory(UIFactory):\n    def create_button(self) -> Button:\n        return MacButton()\n\n    def create_checkbox(self) -> Checkbox:\n        return MacCheckbox()\n\n\ndef render_screen(factory: UIFactory) -> None:\n    button = factory.create_button()\n    checkbox = factory.create_checkbox()\n    button.render()\n    checkbox.render()\n\n\nrender_screen(WindowsFactory())\n\nrender_screen(MacFactory())"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          7
+        ],
+        "title": {
+          "en": "Two abstract product interfaces",
+          "ru": "Два абстрактных интерфейса продуктов"
+        },
+        "explanation": {
+          "en": "`Button` and `Checkbox` each declare a `render()` that throws if not overridden - they define what every concrete widget must implement, without saying how.",
+          "ru": "`Button` и `Checkbox` объявляют `render()`, который выбрасывает исключение, если его не переопределить - они определяют, что должен реализовать каждый конкретный виджет, но не как именно."
+        }
+      },
+      {
+        "lines": [
+          9,
+          15
+        ],
+        "title": {
+          "en": "Windows-family concrete products",
+          "ru": "Конкретные продукты семейства Windows"
+        },
+        "explanation": {
+          "en": "`WindowsButton` and `WindowsCheckbox` both implement `render()` with Windows-specific output - together they form one consistent visual family.",
+          "ru": "`WindowsButton` и `WindowsCheckbox` реализуют `render()` с выводом в стиле Windows - вместе они образуют одно согласованное визуальное семейство."
+        }
+      },
+      {
+        "lines": [
+          17,
+          23
+        ],
+        "title": {
+          "en": "Mac-family concrete products",
+          "ru": "Конкретные продукты семейства macOS"
+        },
+        "explanation": {
+          "en": "`MacButton` and `MacCheckbox` mirror the Windows pair but render macOS-style output instead - a second, independent family of the same two product types.",
+          "ru": "`MacButton` и `MacCheckbox` зеркалят пару Windows-виджетов, но выводят элементы в стиле macOS - второе, независимое семейство тех же двух типов продуктов."
+        }
+      },
+      {
+        "lines": [
+          25,
+          28
+        ],
+        "title": {
+          "en": "UIFactory declares one creation method per product",
+          "ru": "UIFactory объявляет по методу создания на каждый продукт"
+        },
+        "explanation": {
+          "en": "The abstract factory lists `createButton()` and `createCheckbox()` side by side, guaranteeing that any concrete factory produces a matching pair rather than one widget type alone.",
+          "ru": "Абстрактная фабрика перечисляет `createButton()` и `createCheckbox()` рядом друг с другом, гарантируя, что любая конкретная фабрика создаёт согласованную пару, а не только один тип виджета."
+        }
+      },
+      {
+        "lines": [
+          30,
+          38
+        ],
+        "title": {
+          "en": "Concrete factories each build one whole family",
+          "ru": "Каждая конкретная фабрика собирает целое семейство"
+        },
+        "explanation": {
+          "en": "`WindowsFactory` returns only Windows widgets and `MacFactory` returns only Mac widgets - each factory is committed to one family across both `createButton()` and `createCheckbox()`.",
+          "ru": "`WindowsFactory` возвращает только Windows-виджеты, а `MacFactory` - только Mac-виджеты - каждая фабрика привязана к одному семейству и в `createButton()`, и в `createCheckbox()`."
+        }
+      },
+      {
+        "lines": [
+          40,
+          45
+        ],
+        "title": {
+          "en": "renderScreen() works through the abstract factory only",
+          "ru": "renderScreen() работает только через абстрактную фабрику"
+        },
+        "explanation": {
+          "en": "This function calls `factory.createButton()` and `factory.createCheckbox()` without knowing which concrete factory it received - it never mentions `WindowsButton` or `MacButton` by name.",
+          "ru": "Эта функция вызывает `factory.createButton()` и `factory.createCheckbox()`, не зная, какую конкретную фабрику она получила - она ни разу не упоминает `WindowsButton` или `MacButton` по имени."
+        }
+      },
+      {
+        "lines": [
+          47,
+          49
+        ],
+        "title": {
+          "en": "Swapping the factory swaps the entire family",
+          "ru": "Замена фабрики меняет всё семейство целиком"
+        },
+        "explanation": {
+          "en": "Passing `new WindowsFactory()` then `new MacFactory()` into the same `renderScreen()` call produces two fully different, internally consistent sets of widgets from identical calling code.",
+          "ru": "Передача сначала `new WindowsFactory()`, а затем `new MacFactory()` в один и тот же вызов `renderScreen()` даёт два полностью разных, но внутренне согласованных набора виджетов - при идентичном вызывающем коде."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          12
+        ],
+        "title": {
+          "en": "Abstract products defined with ABC",
+          "ru": "Абстрактные продукты объявлены через ABC"
+        },
+        "explanation": {
+          "en": "`Button` and `Checkbox` are `ABC` subclasses with an `@abstractmethod render()` - Python refuses to instantiate any subclass that doesn't override it.",
+          "ru": "`Button` и `Checkbox` - подклассы `ABC` с `@abstractmethod render()` - Python откажется создавать экземпляр любого подкласса, который его не переопределит."
+        }
+      },
+      {
+        "lines": [
+          15,
+          22
+        ],
+        "title": {
+          "en": "Windows-family concrete products",
+          "ru": "Конкретные продукты семейства Windows"
+        },
+        "explanation": {
+          "en": "`WindowsButton` and `WindowsCheckbox` both override `render()` with Windows-specific text, forming one matched family.",
+          "ru": "`WindowsButton` и `WindowsCheckbox` переопределяют `render()` текстом в стиле Windows, образуя одно согласованное семейство."
+        }
+      },
+      {
+        "lines": [
+          25,
+          32
+        ],
+        "title": {
+          "en": "Mac-family concrete products",
+          "ru": "Конкретные продукты семейства macOS"
+        },
+        "explanation": {
+          "en": "`MacButton` and `MacCheckbox` implement the same two abstract classes with macOS-specific text instead - a second, independent family.",
+          "ru": "`MacButton` и `MacCheckbox` реализуют те же два абстрактных класса, но с текстом в стиле macOS - второе, независимое семейство."
+        }
+      },
+      {
+        "lines": [
+          35,
+          40
+        ],
+        "title": {
+          "en": "UIFactory declares one creation method per product",
+          "ru": "UIFactory объявляет по методу создания на каждый продукт"
+        },
+        "explanation": {
+          "en": "`create_button()` and `create_checkbox()` are declared together as abstract methods, so any concrete factory must supply both halves of the family.",
+          "ru": "`create_button()` и `create_checkbox()` объявлены вместе как абстрактные методы, поэтому любая конкретная фабрика обязана предоставить обе половины семейства."
+        }
+      },
+      {
+        "lines": [
+          43,
+          56
+        ],
+        "title": {
+          "en": "Concrete factories each build one whole family",
+          "ru": "Каждая конкретная фабрика собирает целое семейство"
+        },
+        "explanation": {
+          "en": "`WindowsFactory` returns only `Windows*` products and `MacFactory` returns only `Mac*` products - each factory commits to one consistent family.",
+          "ru": "`WindowsFactory` возвращает только продукты `Windows*`, а `MacFactory` - только `Mac*` - каждая фабрика привязана к одному согласованному семейству."
+        }
+      },
+      {
+        "lines": [
+          59,
+          63
+        ],
+        "title": {
+          "en": "render_screen() works through the abstract factory only",
+          "ru": "render_screen() работает только через абстрактную фабрику"
+        },
+        "explanation": {
+          "en": "The function receives a `UIFactory` and calls its two creation methods without ever naming a concrete class like `WindowsButton`.",
+          "ru": "Функция получает `UIFactory` и вызывает два его метода создания, ни разу не называя конкретный класс вроде `WindowsButton`."
+        }
+      },
+      {
+        "lines": [
+          66,
+          68
+        ],
+        "title": {
+          "en": "Swapping the factory swaps the entire family",
+          "ru": "Замена фабрики меняет всё семейство целиком"
+        },
+        "explanation": {
+          "en": "Calling `render_screen(WindowsFactory())` then `render_screen(MacFactory())` produces two consistent, fully different widget sets from the same function.",
+          "ru": "Вызов `render_screen(WindowsFactory())`, а затем `render_screen(MacFactory())` даёт два согласованных, но полностью разных набора виджетов из одной и той же функции."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Every object a factory produces is guaranteed to belong to the same variant, so mismatched combinations become structurally impossible.",

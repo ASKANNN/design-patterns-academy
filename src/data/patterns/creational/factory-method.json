@@ -67,6 +67,180 @@
     "csharp": "interface ITransport { string Deliver(); }\n\nclass Truck : ITransport { public string Deliver() => \"Deliver by land in a box\"; }\nclass Ship  : ITransport { public string Deliver() => \"Deliver by sea in a container\"; }\n\nabstract class Logistics\n{\n    public abstract ITransport CreateTransport();\n\n    public string PlanDelivery() => $\"Planning: {CreateTransport().Deliver()}\";\n}\n\nclass RoadLogistics : Logistics { public override ITransport CreateTransport() => new Truck(); }\nclass SeaLogistics  : Logistics { public override ITransport CreateTransport() => new Ship(); }\n\nLogistics road = new RoadLogistics();\nConsole.WriteLine(road.PlanDelivery());\n\nLogistics sea = new SeaLogistics();\nConsole.WriteLine(sea.PlanDelivery());",
     "python": "from abc import ABC, abstractmethod\n\nclass Transport(ABC):\n    @abstractmethod\n    def deliver(self) -> str:\n        pass\n\nclass Truck(Transport):\n    def deliver(self) -> str:\n        return 'Deliver by land in a box'\n\nclass Ship(Transport):\n    def deliver(self) -> str:\n        return 'Deliver by sea in a container'\n\nclass Logistics(ABC):\n    @abstractmethod\n    def create_transport(self) -> Transport:\n        pass\n\n    def plan_delivery(self) -> str:\n        transport = self.create_transport()\n        return f'Planning: {transport.deliver()}'\n\nclass RoadLogistics(Logistics):\n    def create_transport(self) -> Transport:\n        return Truck()\n\nclass SeaLogistics(Logistics):\n    def create_transport(self) -> Transport:\n        return Ship()\n\nroad = RoadLogistics()\nprint(road.plan_delivery())\n\nsea = SeaLogistics()\nprint(sea.plan_delivery())"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          5
+        ],
+        "title": {
+          "en": "Transport is the abstract product",
+          "ru": "Transport - абстрактный продукт"
+        },
+        "explanation": {
+          "en": "`deliver()` throws unless a subclass overrides it - this defines what every concrete transport must be able to do, without saying which vehicle it is.",
+          "ru": "`deliver()` выбрасывает исключение, если подкласс его не переопределит - так задаётся, что должен уметь каждый конкретный транспорт, без указания, какой именно это вид транспорта."
+        }
+      },
+      {
+        "lines": [
+          7,
+          17
+        ],
+        "title": {
+          "en": "Truck and Ship are concrete products",
+          "ru": "Truck и Ship - конкретные продукты"
+        },
+        "explanation": {
+          "en": "Each subclass overrides `deliver()` with its own description - `Truck` delivers by land, `Ship` delivers by sea. Both satisfy the same `Transport` contract.",
+          "ru": "Каждый подкласс переопределяет `deliver()` своим описанием - `Truck` доставляет по суше, `Ship` - по морю. Оба соответствуют одному контракту `Transport`."
+        }
+      },
+      {
+        "lines": [
+          19,
+          28
+        ],
+        "title": {
+          "en": "Logistics declares the factory method and uses its result",
+          "ru": "Logistics объявляет фабричный метод и использует его результат"
+        },
+        "explanation": {
+          "en": "`createTransport()` is left unimplemented here, but `planDelivery()` already calls `this.createTransport()` and works with whatever it gets back - the creator class depends only on the abstract `Transport` type.",
+          "ru": "`createTransport()` здесь не реализован, но `planDelivery()` уже вызывает `this.createTransport()` и работает с тем, что получит в ответ - класс-создатель зависит только от абстрактного типа `Transport`."
+        }
+      },
+      {
+        "lines": [
+          30,
+          34
+        ],
+        "title": {
+          "en": "RoadLogistics overrides the factory method to produce a Truck",
+          "ru": "RoadLogistics переопределяет фабричный метод, создавая Truck"
+        },
+        "explanation": {
+          "en": "`createTransport()` here returns `new Truck()` - this single override is what makes `planDelivery()` (inherited unchanged from `Logistics`) deliver by land.",
+          "ru": "Здесь `createTransport()` возвращает `new Truck()` - именно это переопределение заставляет унаследованный без изменений `planDelivery()` доставлять по суше."
+        }
+      },
+      {
+        "lines": [
+          36,
+          40
+        ],
+        "title": {
+          "en": "SeaLogistics overrides the factory method to produce a Ship",
+          "ru": "SeaLogistics переопределяет фабричный метод, создавая Ship"
+        },
+        "explanation": {
+          "en": "`createTransport()` here returns `new Ship()` instead - `planDelivery()` is identical code in both subclasses, but each override sends it down a different delivery path.",
+          "ru": "Здесь `createTransport()` возвращает `new Ship()` - код `planDelivery()` в обоих подклассах идентичен, но каждое переопределение направляет его по своему пути доставки."
+        }
+      },
+      {
+        "lines": [
+          42,
+          46
+        ],
+        "title": {
+          "en": "planDelivery() behaves differently depending only on the subclass",
+          "ru": "planDelivery() ведёт себя по-разному в зависимости только от подкласса"
+        },
+        "explanation": {
+          "en": "`road.planDelivery()` and `sea.planDelivery()` run the exact same inherited method body, yet print different results - the only thing that changed is which `createTransport()` override got called.",
+          "ru": "`road.planDelivery()` и `sea.planDelivery()` выполняют один и тот же унаследованный код метода, но выводят разные результаты - изменилось лишь то, какое переопределение `createTransport()` было вызвано."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          3,
+          6
+        ],
+        "title": {
+          "en": "Transport is the abstract product",
+          "ru": "Transport - абстрактный продукт"
+        },
+        "explanation": {
+          "en": "`Transport(ABC)` declares `deliver()` as `@abstractmethod`, so it defines a contract every concrete transport must fulfill without dictating which vehicle it is.",
+          "ru": "`Transport(ABC)` объявляет `deliver()` как `@abstractmethod`, задавая контракт, который обязан выполнить каждый конкретный транспорт, не диктуя, каким именно транспортом он будет."
+        }
+      },
+      {
+        "lines": [
+          8,
+          14
+        ],
+        "title": {
+          "en": "Truck and Ship are concrete products",
+          "ru": "Truck и Ship - конкретные продукты"
+        },
+        "explanation": {
+          "en": "Each subclass implements `deliver()` with its own text - `Truck` delivers by land, `Ship` delivers by sea - both satisfying the same `Transport` contract.",
+          "ru": "Каждый подкласс реализует `deliver()` своим текстом - `Truck` доставляет по суше, `Ship` - по морю - оба соответствуют одному контракту `Transport`."
+        }
+      },
+      {
+        "lines": [
+          16,
+          23
+        ],
+        "title": {
+          "en": "Logistics declares the factory method and uses its result",
+          "ru": "Logistics объявляет фабричный метод и использует его результат"
+        },
+        "explanation": {
+          "en": "`create_transport()` is abstract here, but `plan_delivery()` already calls `self.create_transport()` and formats whatever it returns - `Logistics` depends only on the abstract `Transport` type.",
+          "ru": "`create_transport()` здесь абстрактен, но `plan_delivery()` уже вызывает `self.create_transport()` и форматирует то, что он вернёт - `Logistics` зависит только от абстрактного типа `Transport`."
+        }
+      },
+      {
+        "lines": [
+          25,
+          27
+        ],
+        "title": {
+          "en": "RoadLogistics overrides the factory method to produce a Truck",
+          "ru": "RoadLogistics переопределяет фабричный метод, создавая Truck"
+        },
+        "explanation": {
+          "en": "This subclass's `create_transport()` returns `Truck()` - the one override that makes the inherited `plan_delivery()` deliver by land.",
+          "ru": "`create_transport()` этого подкласса возвращает `Truck()` - единственное переопределение, из-за которого унаследованный `plan_delivery()` доставляет по суше."
+        }
+      },
+      {
+        "lines": [
+          29,
+          31
+        ],
+        "title": {
+          "en": "SeaLogistics overrides the factory method to produce a Ship",
+          "ru": "SeaLogistics переопределяет фабричный метод, создавая Ship"
+        },
+        "explanation": {
+          "en": "This subclass's `create_transport()` returns `Ship()` instead - `plan_delivery()` is unchanged, only the product it builds on differs.",
+          "ru": "`create_transport()` этого подкласса возвращает `Ship()` - `plan_delivery()` не меняется, различается только продукт, на котором он строится."
+        }
+      },
+      {
+        "lines": [
+          33,
+          37
+        ],
+        "title": {
+          "en": "plan_delivery() behaves differently depending only on the subclass",
+          "ru": "plan_delivery() ведёт себя по-разному в зависимости только от подкласса"
+        },
+        "explanation": {
+          "en": "`road.plan_delivery()` and `sea.plan_delivery()` run the same inherited method, but print different results because each instance's `create_transport()` override supplied a different `Transport`.",
+          "ru": "`road.plan_delivery()` и `sea.plan_delivery()` выполняют один и тот же унаследованный метод, но выводят разные результаты, потому что переопределение `create_transport()` у каждого экземпляра подставило свой `Transport`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "The base class's workflow never names a concrete product class, so it stays valid no matter how many product types get added later.",

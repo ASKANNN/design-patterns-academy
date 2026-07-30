@@ -73,6 +73,194 @@
     "csharp": "class House\n{\n    public int Walls, Doors, Windows;\n    public bool HasRoof, HasGarage;\n\n    public override string ToString() =>\n        $\"House: {Walls} walls, {Doors} doors, {Windows} windows, \" +\n        $\"roof: {HasRoof}, garage: {HasGarage}\";\n}\n\nclass HouseBuilder\n{\n    private House _house = new();\n\n    public HouseBuilder BuildWalls(int n)   { _house.Walls     = n;    return this; }\n    public HouseBuilder BuildDoors(int n)   { _house.Doors     = n;    return this; }\n    public HouseBuilder BuildWindows(int n) { _house.Windows   = n;    return this; }\n    public HouseBuilder BuildRoof()         { _house.HasRoof   = true; return this; }\n    public HouseBuilder BuildGarage()       { _house.HasGarage = true; return this; }\n\n    public House GetResult() { var r = _house; _house = new House(); return r; }\n}\n\nclass Director\n{\n    private HouseBuilder _builder = null!;\n    public void SetBuilder(HouseBuilder b) => _builder = b;\n\n    public void BuildSimpleHouse() =>\n        _builder.BuildWalls(4).BuildDoors(1).BuildWindows(2).BuildRoof();\n\n    public void BuildFamilyHouse() =>\n        _builder.BuildWalls(6).BuildDoors(3).BuildWindows(8).BuildRoof().BuildGarage();\n}\n\nvar builder  = new HouseBuilder();\nvar director = new Director();\ndirector.SetBuilder(builder);\n\ndirector.BuildSimpleHouse();\nConsole.WriteLine(builder.GetResult());\n\ndirector.BuildFamilyHouse();\nConsole.WriteLine(builder.GetResult());\n\nConsole.WriteLine(new HouseBuilder().BuildWalls(4).BuildDoors(2).BuildWindows(4).GetResult());",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass House:\n    def __init__(self) -> None:\n        self.walls: int = 0\n        self.doors: int = 0\n        self.windows: int = 0\n        self.has_roof: bool = False\n        self.has_garage: bool = False\n\n    def __str__(self) -> str:\n        return (\n            f\"House: {self.walls} walls, {self.doors} doors, \"\n            f\"{self.windows} windows, roof: {self.has_roof}, garage: {self.has_garage}\"\n        )\n\n\nclass Builder(ABC):\n    @abstractmethod\n    def build_walls(self, count: int) -> Builder: ...\n    @abstractmethod\n    def build_doors(self, count: int) -> Builder: ...\n    @abstractmethod\n    def build_windows(self, count: int) -> Builder: ...\n    @abstractmethod\n    def build_roof(self) -> Builder: ...\n    @abstractmethod\n    def build_garage(self) -> Builder: ...\n\n\nclass HouseBuilder(Builder):\n    def __init__(self) -> None:\n        self._house = House()\n\n    def build_walls(self, count: int) -> HouseBuilder:\n        self._house.walls = count\n        return self\n\n    def build_doors(self, count: int) -> HouseBuilder:\n        self._house.doors = count\n        return self\n\n    def build_windows(self, count: int) -> HouseBuilder:\n        self._house.windows = count\n        return self\n\n    def build_roof(self) -> HouseBuilder:\n        self._house.has_roof = True\n        return self\n\n    def build_garage(self) -> HouseBuilder:\n        self._house.has_garage = True\n        return self\n\n    def get_result(self) -> House:\n        result = self._house\n        self._house = House()\n        return result\n\n\nclass Director:\n    def __init__(self, builder: HouseBuilder) -> None:\n        self._builder = builder\n\n    def build_simple_house(self) -> None:\n        self._builder.build_walls(4).build_doors(1).build_windows(2).build_roof()\n\n    def build_family_house(self) -> None:\n        (self._builder\n            .build_walls(6)\n            .build_doors(3)\n            .build_windows(8)\n            .build_roof()\n            .build_garage())\n\n\nbuilder = HouseBuilder()\ndirector = Director(builder)\n\ndirector.build_simple_house()\nprint(builder.get_result())\n\ndirector.build_family_house()\nprint(builder.get_result())"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          14
+        ],
+        "title": {
+          "en": "House is a plain product with no construction logic",
+          "ru": "House - обычный продукт без логики построения"
+        },
+        "explanation": {
+          "en": "The class just holds fields (`walls`, `doors`, `windows`, `hasRoof`, `hasGarage`) and a `toString()` - it knows nothing about how it gets assembled step by step.",
+          "ru": "Класс просто хранит поля (`walls`, `doors`, `windows`, `hasRoof`, `hasGarage`) и `toString()` - он ничего не знает о том, как его собирают по шагам."
+        }
+      },
+      {
+        "lines": [
+          16,
+          19
+        ],
+        "title": {
+          "en": "HouseBuilder starts with a fresh, empty House",
+          "ru": "HouseBuilder начинает с нового, пустого House"
+        },
+        "explanation": {
+          "en": "The builder's constructor immediately creates a `new House()` and stores it as `this.house`, ready to be filled in by later calls.",
+          "ru": "Конструктор строителя сразу создаёт `new House()` и сохраняет его в `this.house`, готовый к заполнению последующими вызовами."
+        }
+      },
+      {
+        "lines": [
+          21,
+          25
+        ],
+        "title": {
+          "en": "Each build step mutates one part and returns `this`",
+          "ru": "Каждый шаг построения меняет одну часть и возвращает `this`"
+        },
+        "explanation": {
+          "en": "`buildWalls`, `buildDoors`, `buildWindows`, `buildRoof`, and `buildGarage` each set one field on `this.house`, then return `this` - that's what lets the calls be chained like `builder.buildWalls(4).buildDoors(1)`.",
+          "ru": "`buildWalls`, `buildDoors`, `buildWindows`, `buildRoof` и `buildGarage` каждый устанавливает одно поле в `this.house`, а затем возвращает `this` - именно это позволяет объединять вызовы в цепочку вида `builder.buildWalls(4).buildDoors(1)`."
+        }
+      },
+      {
+        "lines": [
+          27,
+          31
+        ],
+        "title": {
+          "en": "getResult() hands over the house and resets for the next one",
+          "ru": "getResult() отдаёт дом и сбрасывается для следующего"
+        },
+        "explanation": {
+          "en": "It saves a reference to the current `this.house`, replaces `this.house` with a brand-new empty one, then returns the saved reference - so the same builder can be reused to build another house from scratch.",
+          "ru": "Метод сохраняет ссылку на текущий `this.house`, заменяет `this.house` новым пустым домом, а затем возвращает сохранённую ссылку - так один и тот же строитель можно переиспользовать для сборки следующего дома с нуля."
+        }
+      },
+      {
+        "lines": [
+          34,
+          44
+        ],
+        "title": {
+          "en": "Director encodes two fixed build recipes",
+          "ru": "Director кодирует два фиксированных рецепта сборки"
+        },
+        "explanation": {
+          "en": "`buildSimpleHouse()` and `buildFamilyHouse()` each call a specific sequence of builder methods - the director knows *what steps in what order*, while the builder knows *how each step works*.",
+          "ru": "`buildSimpleHouse()` и `buildFamilyHouse()` каждый вызывает свою определённую последовательность методов строителя - директор знает *какие шаги и в каком порядке*, а строитель знает *как выполняется каждый шаг*."
+        }
+      },
+      {
+        "lines": [
+          46,
+          54
+        ],
+        "title": {
+          "en": "The same builder produces two different houses via the director",
+          "ru": "Один и тот же строитель через директора создаёт два разных дома"
+        },
+        "explanation": {
+          "en": "`director.buildSimpleHouse()` then `builder.getResult()` yields a small house; `director.buildFamilyHouse()` then `getResult()` yields a bigger one - both built by the same `builder` instance, one recipe at a time.",
+          "ru": "`director.buildSimpleHouse()`, а затем `builder.getResult()` даёт маленький дом; `director.buildFamilyHouse()`, а затем `getResult()` - дом побольше - оба построены одним и тем же экземпляром `builder`, по одному рецепту за раз."
+        }
+      },
+      {
+        "lines": [
+          56,
+          61
+        ],
+        "title": {
+          "en": "The builder can also be driven directly, without a director",
+          "ru": "Строителем можно управлять и напрямую, без директора"
+        },
+        "explanation": {
+          "en": "This chain calls `buildWalls`, `buildDoors`, `buildWindows`, and `getResult()` straight on a new `HouseBuilder`, skipping `Director` entirely for a one-off custom house.",
+          "ru": "Эта цепочка вызывает `buildWalls`, `buildDoors`, `buildWindows` и `getResult()` напрямую на новом `HouseBuilder`, полностью пропуская `Director` - для разового дома с произвольной конфигурацией."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          17
+        ],
+        "title": {
+          "en": "House is a plain product with no construction logic",
+          "ru": "House - обычный продукт без логики построения"
+        },
+        "explanation": {
+          "en": "The class just holds fields (`walls`, `doors`, `windows`, `has_roof`, `has_garage`) and a `__str__` - it has no idea how it gets assembled.",
+          "ru": "Класс просто хранит поля (`walls`, `doors`, `windows`, `has_roof`, `has_garage`) и `__str__` - он понятия не имеет, как его собирают."
+        }
+      },
+      {
+        "lines": [
+          20,
+          30
+        ],
+        "title": {
+          "en": "Builder is an abstract interface for the build steps",
+          "ru": "Builder - абстрактный интерфейс шагов построения"
+        },
+        "explanation": {
+          "en": "Every step (`build_walls`, `build_doors`, `build_windows`, `build_roof`, `build_garage`) is declared `@abstractmethod`, so any concrete builder must supply all five before it can be instantiated.",
+          "ru": "Каждый шаг (`build_walls`, `build_doors`, `build_windows`, `build_roof`, `build_garage`) объявлен как `@abstractmethod`, поэтому любой конкретный строитель обязан реализовать все пять, прежде чем его можно будет создать."
+        }
+      },
+      {
+        "lines": [
+          33,
+          39
+        ],
+        "title": {
+          "en": "HouseBuilder starts with a fresh, empty House",
+          "ru": "HouseBuilder начинает с нового, пустого House"
+        },
+        "explanation": {
+          "en": "`__init__` immediately creates `self._house = House()`, and `build_walls` sets one field on it before returning `self` - the pattern that makes chaining like `.build_walls(4).build_doors(1)` possible.",
+          "ru": "`__init__` сразу создаёт `self._house = House()`, а `build_walls` устанавливает на нём одно поле и возвращает `self` - именно это делает возможной цепочку вида `.build_walls(4).build_doors(1)`."
+        }
+      },
+      {
+        "lines": [
+          57,
+          60
+        ],
+        "title": {
+          "en": "get_result() hands over the house and resets for the next one",
+          "ru": "get_result() отдаёт дом и сбрасывается для следующего"
+        },
+        "explanation": {
+          "en": "It saves the current `self._house`, replaces it with a new empty `House()`, then returns the saved one - so the same builder instance can start building the next house immediately.",
+          "ru": "Метод сохраняет текущий `self._house`, заменяет его новым пустым `House()`, а затем возвращает сохранённый - так тот же экземпляр строителя может сразу начать сборку следующего дома."
+        }
+      },
+      {
+        "lines": [
+          63,
+          76
+        ],
+        "title": {
+          "en": "Director encodes two fixed build recipes",
+          "ru": "Director кодирует два фиксированных рецепта сборки"
+        },
+        "explanation": {
+          "en": "`build_simple_house()` and `build_family_house()` each drive the builder through a specific, fixed sequence of calls - the director owns the recipe, the builder owns each step's mechanics.",
+          "ru": "`build_simple_house()` и `build_family_house()` каждый проводит строителя через свою фиксированную последовательность вызовов - директор владеет рецептом, строитель - механикой каждого шага."
+        }
+      },
+      {
+        "lines": [
+          79,
+          86
+        ],
+        "title": {
+          "en": "The same builder produces two different houses via the director",
+          "ru": "Один и тот же строитель через директора создаёт два разных дома"
+        },
+        "explanation": {
+          "en": "`director.build_simple_house()` then `builder.get_result()` yields a small house; `build_family_house()` then `get_result()` yields a bigger one - both from the one `builder` object passed into `Director`.",
+          "ru": "`director.build_simple_house()`, а затем `builder.get_result()` даёт маленький дом; `build_family_house()`, а затем `get_result()` - дом побольше - оба из одного объекта `builder`, переданного в `Director`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Object creation reads as a sequence of intent-revealing method calls instead of a wall of positional arguments.",

@@ -223,9 +223,13 @@ No new features are implemented during this sprint — only bug fixing and stabi
       `CodeBlock.js` line-highlighting support + a side-by-side sticky
       layout (code left, step panel right, collapses to a stacked column
       under 860px) + language-tab badges marking which languages have a
-      walkthrough. Still open before the remaining 22-pattern rollout:
-      whether TypeScript/Java/C# walkthroughs are needed or JS+Python
-      stays the standard.
+      walkthrough. **Language scope decision (2026-07-31, agreed with
+      owner):** JS+Python stays the standard for every pattern — no
+      TypeScript/Java/C# walkthroughs. **Rollout progress:** Creational
+      category done (2026-07-31) — Abstract Factory, Builder, Factory
+      Method, Prototype added alongside the Singleton pilot (5/23).
+      Structural (7) and Behavioral (11) categories remain, each
+      stopping for an owner review after the category is written.
 - [ ] Pattern playgrounds — **scope decision (2026-07-28):** executable
       only for JavaScript/TypeScript, via a sandboxed iframe +
       `Function()` (no real TS type-checking, just transpile-free
