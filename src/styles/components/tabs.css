@@ -46,6 +46,7 @@
   white-space: nowrap;
   flex-shrink: 0;
   margin-bottom: -1px;
+  touch-action: pan-x;
   transition:
     color var(--duration-fast) var(--ease-in-out),
     border-color var(--duration-fast) var(--ease-in-out);
