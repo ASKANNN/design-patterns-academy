@@ -522,6 +522,10 @@ function handlePlaygroundMessage(e) {
 
 function _playgroundSandboxDoc(code) {
   const escaped = code.replace(/<\/script>/g, '<\\/script>');
+  const disabledMsgs = ['print', 'alert', 'confirm', 'prompt', 'open'].reduce((acc, fn) => {
+    acc[fn] = t('patterns.playground.sandbox_disabled', { fn: `window.${fn}()` });
+    return acc;
+  }, {});
   return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><script>
 (function () {
   function send(type, args) {
@@ -536,6 +540,10 @@ function _playgroundSandboxDoc(code) {
   }
   ['log', 'info', 'warn', 'error'].forEach(function (m) {
     console[m] = function () { send(m, Array.prototype.slice.call(arguments)); };
+  });
+  var disabledMsgs = ${JSON.stringify(disabledMsgs)};
+  Object.keys(disabledMsgs).forEach(function (m) {
+    window[m] = function () { send('warn', [disabledMsgs[m]]); };
   });
   window.onerror = function (msg) { send('error', [String(msg)]); return true; };
   try {

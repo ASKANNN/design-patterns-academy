@@ -204,6 +204,7 @@
   --code-btn-hover-border: var(--palette-gray-400);
   --code-scrollbar:        var(--palette-gray-300);
   --code-shadow:           var(--shadow-sm);
+  --code-selection-bg:     rgba(99, 102, 241, 0.25);
 }
 
 :root {
@@ -296,6 +297,7 @@
   --code-btn-hover-border: rgba(255, 255, 255, 0.15);
   --code-scrollbar:        rgba(255, 255, 255, 0.1);
   --code-shadow:           none;
+  --code-selection-bg:     rgba(99, 102, 241, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {

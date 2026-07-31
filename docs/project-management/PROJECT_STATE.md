@@ -274,10 +274,10 @@ only and may lag between updates.
 
 ## Phase 13 — Interactive Learning
 
-**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for all 23 patterns (Creational, Structural, Behavioral); playgrounds piloted on Singleton (1/23), rollout to the rest not started
+**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for all 23 patterns (Creational, Structural, Behavioral); playgrounds shipped and verified for all 23 patterns
 
 - [x] Interactive code walkthroughs — all 23 patterns done, see below
-- Pattern playgrounds — Singleton pilot shipped 2026-07-31, see below
+- [x] Pattern playgrounds — all 23 patterns done, see below
 - [x] Quizzes — all 23 patterns done (5 questions each, verified via
       Playwright end to end for representative patterns from each
       category; dark-theme visual review passed). The `Quiz` engine
@@ -342,8 +342,27 @@ only and may lag between updates.
 > restores the original code byte-for-byte, thrown errors render with the
 > error style, the TypeScript sample runs correctly after stripping, and
 > there are zero browser console errors throughout. Owner reviewed in the
-> browser and approved. Rollout to the remaining 22 patterns (creational →
-> structural → behavioral) has not started.
+> browser and approved.
+>
+> **Rollout (2026-07-31):** a headless Playwright sweep across all 23
+> patterns' JS+TS tabs found real gaps in `stripTypes()` that Singleton's
+> simple sample never exercised: no handling for `interface`/`abstract`/
+> `implements`, unstripped generic type args (`new Map<string, T>()`,
+> `accept<T>()`), unstripped non-null `!`, and — most significantly — TS
+> constructor parameter-property shorthand (`constructor(private x:
+> number)`) silently dropping its implicit `this.x = x` assignment,
+> leaving `this.x` `undefined` at runtime across roughly a third of
+> patterns. All fixed in `strip-types.js` only (`Playground.js` and the
+> sandbox/execution model in `ui.js` were untouched); zero console errors
+> across all 23 patterns afterward. Manual owner testing in the browser
+> also caught two UX gaps fixed the same session: the sandbox has no
+> `allow-modals`, so `print()`/`alert()`/`confirm()`/`prompt()`/
+> `window.open()` called from user code were silently swallowed — they now
+> relay a localized warning to the console pane instead; and text
+> selection on code surfaces was nearly invisible in both themes — fixed
+> with a dedicated `--code-selection-bg` token and a `::selection` rule
+> scoped to `.code-block`/`.playground__textarea`. Pattern playgrounds are
+> now complete for every GoF pattern.
 
 > **Build order and scope (agreed with owner, 2026-07-28):** the checklist
 > above is the target state, not the build order. Actual sequencing is

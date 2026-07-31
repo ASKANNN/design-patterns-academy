@@ -235,7 +235,7 @@ No new features are implemented during this sprint — only bug fixing and stabi
       Playwright script (Implementation tab opens, JS+Python badges present
       with no TypeScript leakage, "Next step" changes the highlighted
       range, zero console errors) and owner-reviewed by eye in the browser.
-- [ ] Pattern playgrounds — **scope decision (2026-07-28):** executable
+- [x] Pattern playgrounds — **scope decision (2026-07-28):** executable
       only for JavaScript/TypeScript, via a sandboxed iframe +
       `Function()` (no real TS type-checking, just transpile-free
       execution). Java/C#/Python stay read-only `CodeBlock` display,
@@ -258,8 +258,22 @@ No new features are implemented during this sprint — only bug fixing and stabi
       parser. Verified with a headless Playwright script (run, edit +
       re-run, reset restores the original byte-for-byte, thrown errors
       render in red, TypeScript sample runs after stripping, zero console
-      errors) and owner-reviewed in the browser. Rollout to the remaining
-      22 patterns (creational → structural → behavioral) not started yet.
+      errors) and owner-reviewed in the browser. **Rollout complete
+      (2026-07-31):** a headless Playwright sweep across all 23 patterns'
+      JS+TS tabs surfaced real gaps in `stripTypes()` that Singleton's
+      simple sample never exercised — missing `interface`/`abstract`/
+      `implements` handling, unstripped generic type args (`new
+      Map<string, T>()`), and (most notably) TS constructor
+      parameter-property shorthand (`constructor(private x: number)`)
+      silently dropping its implicit `this.x = x` assignment. All fixed
+      in `strip-types.js` only, with zero console errors across all 23
+      patterns afterward. Manual owner testing also caught two UX gaps
+      fixed the same session: `print()`/`alert()`/`confirm()`/`prompt()`/
+      `window.open()` inside the sandbox were silently swallowed (no
+      `allow-modals`) — now relay a localized warning to the console pane
+      instead; and code-surface text selection was nearly invisible in
+      both themes — added a dedicated `--code-selection-bg` token and a
+      `::selection` rule scoped to `.code-block`/`.playground__textarea`.
 - [ ] Practical exercises
 
 ---

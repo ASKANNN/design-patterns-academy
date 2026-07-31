@@ -10,6 +10,12 @@
   box-shadow: var(--code-shadow);
 }
 
+.code-block ::selection,
+.playground__textarea::selection {
+  background-color: var(--code-selection-bg);
+  color: var(--code-text);
+}
+
 .code-block__header {
   display: flex;
   align-items: center;

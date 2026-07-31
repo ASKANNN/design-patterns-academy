@@ -103,7 +103,8 @@
       "reset": "Reset",
       "clear": "Clear",
       "run_hint": "Click \"Run\" to execute this code in a sandboxed frame and see console output here.",
-      "typescript_note": "TypeScript runs as plain JavaScript here - type annotations are stripped, not type-checked."
+      "typescript_note": "TypeScript runs as plain JavaScript here - type annotations are stripped, not type-checked.",
+      "sandbox_disabled": "{{fn}} is disabled in this sandbox."
     },
     "playground_coming_soon": "Playground coming soon.",
     "coming_soon_title": "Coming Soon",
