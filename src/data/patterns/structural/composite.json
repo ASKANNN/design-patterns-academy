@@ -68,6 +68,180 @@
     "csharp": "interface IFileSystemItem\n{\n    string GetName();\n    int    GetSize();\n    void   Print(string indent = \"\");\n}\n\nclass File : IFileSystemItem\n{\n    private readonly string _name;\n    private readonly int    _size;\n\n    public File(string name, int size) { _name = name; _size = size; }\n\n    public string GetName() => _name;\n    public int    GetSize() => _size;\n    public void   Print(string indent = \"\") =>\n        Console.WriteLine($\"{indent}[file] {_name} ({_size} KB)\");\n}\n\nclass Directory : IFileSystemItem\n{\n    private readonly string _name;\n    private readonly List<IFileSystemItem> _children = new();\n\n    public Directory(string name) => _name = name;\n\n    public Directory Add(IFileSystemItem item) { _children.Add(item); return this; }\n    public void Remove(IFileSystemItem item)   => _children.Remove(item);\n\n    public string GetName() => _name;\n    public int    GetSize() => _children.Sum(c => c.GetSize());\n\n    public void Print(string indent = \"\")\n    {\n        Console.WriteLine($\"{indent}[dir] {_name}/\");\n        foreach (var child in _children) child.Print(indent + \"  \");\n    }\n}\n\nvar root  = new Directory(\"project\");\nvar src   = new Directory(\"src\");\nvar tests = new Directory(\"tests\");\n\nsrc.Add(new File(\"index.cs\", 12)).Add(new File(\"App.cs\", 34));\ntests.Add(new File(\"AppTest.cs\", 8));\nroot.Add(src).Add(tests).Add(new File(\"project.csproj\", 2));\n\nroot.Print();\n\nConsole.WriteLine($\"Total size: {root.GetSize()} KB\");",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass FileSystemItem(ABC):\n    @abstractmethod\n    def get_name(self) -> str:\n        pass\n\n    @abstractmethod\n    def get_size(self) -> int:\n        pass\n\n    @abstractmethod\n    def print(self, indent: str = '') -> None:\n        pass\n\n\nclass File(FileSystemItem):\n    def __init__(self, name: str, size: int) -> None:\n        self._name = name\n        self._size = size\n\n    def get_name(self) -> str:\n        return self._name\n\n    def get_size(self) -> int:\n        return self._size\n\n    def print(self, indent: str = '') -> None:\n        print(f\"{indent}[file] {self._name} ({self._size} KB)\")\n\n\nclass Directory(FileSystemItem):\n    def __init__(self, name: str) -> None:\n        self._name = name\n        self._children: list[FileSystemItem] = []\n\n    def add(self, item: FileSystemItem) -> 'Directory':\n        self._children.append(item)\n        return self\n\n    def remove(self, item: FileSystemItem) -> None:\n        self._children.remove(item)\n\n    def get_name(self) -> str:\n        return self._name\n\n    def get_size(self) -> int:\n        return sum(c.get_size() for c in self._children)\n\n    def print(self, indent: str = '') -> None:\n        print(f\"{indent}[dir] {self._name}/\")\n        for child in self._children:\n            child.print(indent + '  ')\n\n\nroot = Directory('project')\nsrc = Directory('src')\ntests = Directory('tests')\n\nsrc.add(File('main.py', 12)).add(File('app.py', 34))\ntests.add(File('test_app.py', 8))\nroot.add(src).add(tests).add(File('requirements.txt', 2))\n\nroot.print()\n\nprint(f\"Total size: {root.get_size()} KB\")"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          5
+        ],
+        "title": {
+          "en": "FileSystemItem is the shared component interface",
+          "ru": "FileSystemItem - общий интерфейс компонента"
+        },
+        "explanation": {
+          "en": "`getName`, `getSize`, `print` are declared with no logic - both leaf files and composite directories must implement the same three methods.",
+          "ru": "`getName`, `getSize`, `print` объявлены без логики - и листовые файлы, и составные директории обязаны реализовать эти три метода."
+        }
+      },
+      {
+        "lines": [
+          7,
+          20
+        ],
+        "title": {
+          "en": "File is a leaf - it has no children",
+          "ru": "File - лист, у него нет потомков"
+        },
+        "explanation": {
+          "en": "`getSize()` just returns `this.size` directly, and `print()` logs one line - a leaf handles the request itself, with nothing to delegate to.",
+          "ru": "`getSize()` просто возвращает `this.size` напрямую, а `print()` выводит одну строку - лист обрабатывает запрос сам, ему некому его передавать."
+        }
+      },
+      {
+        "lines": [
+          22,
+          31
+        ],
+        "title": {
+          "en": "Directory is a composite that stores children",
+          "ru": "Directory - составной объект, хранящий потомков"
+        },
+        "explanation": {
+          "en": "The private `#children` array holds any mix of `File` or `Directory` items, and `add()`/`remove()` manage that collection - a directory can contain other directories.",
+          "ru": "Приватный массив `#children` хранит любую комбинацию `File` или `Directory` - `add()`/`remove()` управляют этой коллекцией, поэтому директория может содержать другие директории."
+        }
+      },
+      {
+        "lines": [
+          33,
+          34
+        ],
+        "title": {
+          "en": "getSize() delegates to children and sums the results",
+          "ru": "getSize() делегирует потомкам и суммирует результаты"
+        },
+        "explanation": {
+          "en": "`this.#children.reduce((sum, c) => sum + c.getSize(), 0)` calls `getSize()` on every child regardless of whether it's a `File` or another `Directory` - the composite doesn't need to know which.",
+          "ru": "`this.#children.reduce((sum, c) => sum + c.getSize(), 0)` вызывает `getSize()` у каждого потомка независимо от того, `File` это или другая `Directory` - составному объекту не нужно знать, что именно."
+        }
+      },
+      {
+        "lines": [
+          36,
+          39
+        ],
+        "title": {
+          "en": "print() recurses through the whole subtree",
+          "ru": "print() рекурсивно проходит всё поддерево"
+        },
+        "explanation": {
+          "en": "After logging its own line, `Directory.print()` calls `c.print(indent + '  ')` on every child - each child prints itself (and its own children, if any) with deeper indentation.",
+          "ru": "После вывода своей строки `Directory.print()` вызывает `c.print(indent + '  ')` у каждого потомка - каждый потомок выводит себя (и своих потомков, если есть) с большим отступом."
+        }
+      },
+      {
+        "lines": [
+          42,
+          52
+        ],
+        "title": {
+          "en": "Client code treats files and directories uniformly",
+          "ru": "Клиентский код обращается с файлами и директориями одинаково"
+        },
+        "explanation": {
+          "en": "`root.add(src).add(tests).add(new File(...))` mixes `Directory` and `File` objects through the same `add()` call, and `root.getSize()` returns the total across the whole nested tree without any type checks.",
+          "ru": "`root.add(src).add(tests).add(new File(...))` смешивает объекты `Directory` и `File` через один и тот же вызов `add()`, а `root.getSize()` возвращает итог по всему вложенному дереву без каких-либо проверок типа."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          16
+        ],
+        "title": {
+          "en": "FileSystemItem is the shared component interface",
+          "ru": "FileSystemItem - общий интерфейс компонента"
+        },
+        "explanation": {
+          "en": "`get_name`, `get_size`, `print` are all `@abstractmethod` - both `File` and `Directory` must implement the same three methods to be instantiated.",
+          "ru": "`get_name`, `get_size`, `print` объявлены как `@abstractmethod` - и `File`, и `Directory` обязаны реализовать эти три метода, чтобы их можно было создать."
+        }
+      },
+      {
+        "lines": [
+          19,
+          31
+        ],
+        "title": {
+          "en": "File is a leaf - it has no children",
+          "ru": "File - лист, у него нет потомков"
+        },
+        "explanation": {
+          "en": "`get_size()` just returns `self._size` directly, and `print()` prints one formatted line - nothing to recurse into.",
+          "ru": "`get_size()` просто возвращает `self._size` напрямую, а `print()` выводит одну отформатированную строку - рекурсировать некуда."
+        }
+      },
+      {
+        "lines": [
+          34,
+          44
+        ],
+        "title": {
+          "en": "Directory is a composite that stores children",
+          "ru": "Directory - составной объект, хранящий потомков"
+        },
+        "explanation": {
+          "en": "`self._children: list[FileSystemItem]` can hold any mix of `File` or `Directory` objects, and `add()` appends to it, returning `self` for chaining.",
+          "ru": "`self._children: list[FileSystemItem]` может содержать любую комбинацию объектов `File` или `Directory`, а `add()` добавляет в этот список и возвращает `self` для цепочки вызовов."
+        }
+      },
+      {
+        "lines": [
+          49,
+          50
+        ],
+        "title": {
+          "en": "get_size() delegates to children and sums the results",
+          "ru": "get_size() делегирует потомкам и суммирует результаты"
+        },
+        "explanation": {
+          "en": "`sum(c.get_size() for c in self._children)` calls `get_size()` on every child, whether it's a `File` or another `Directory` - the composite treats them identically.",
+          "ru": "`sum(c.get_size() for c in self._children)` вызывает `get_size()` у каждого потомка, будь то `File` или другая `Directory` - составной объект обращается с ними одинаково."
+        }
+      },
+      {
+        "lines": [
+          52,
+          55
+        ],
+        "title": {
+          "en": "print() recurses through the whole subtree",
+          "ru": "print() рекурсивно проходит всё поддерево"
+        },
+        "explanation": {
+          "en": "After printing its own line, `Directory.print()` loops over `self._children` and calls `child.print(indent + '  ')` on each - the recursion unwinds the entire nested tree.",
+          "ru": "После вывода своей строки `Directory.print()` проходит по `self._children` и вызывает `child.print(indent + '  ')` для каждого - рекурсия разворачивает всё вложенное дерево."
+        }
+      },
+      {
+        "lines": [
+          58,
+          68
+        ],
+        "title": {
+          "en": "Client code treats files and directories uniformly",
+          "ru": "Клиентский код обращается с файлами и директориями одинаково"
+        },
+        "explanation": {
+          "en": "`root.add(src).add(tests).add(File(...))` mixes `Directory` and `File` through the same `add()` call, and `root.get_size()` sums the entire nested tree with no type checks.",
+          "ru": "`root.add(src).add(tests).add(File(...))` смешивает `Directory` и `File` через один и тот же вызов `add()`, а `root.get_size()` суммирует всё вложенное дерево без проверок типа."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Eliminates type-checking branches for tree traversal entirely - recursion through a shared interface handles any depth automatically.",

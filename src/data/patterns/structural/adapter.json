@@ -68,6 +68,180 @@
     "csharp": "interface IPaymentProcessor\n{\n    bool Charge(int amountCents, string cardToken);\n}\n\nclass NewProviderSdk\n{\n    public string SubmitTransaction(int total, string currency, string source)\n    {\n        Console.WriteLine($\"NewProviderSDK: charged {total / 100.0} {currency} via {source}\");\n        return \"ok\";\n    }\n}\n\nclass PaymentAdapter : IPaymentProcessor\n{\n    private readonly NewProviderSdk _sdk;\n    public PaymentAdapter(NewProviderSdk sdk) => _sdk = sdk;\n\n    public bool Charge(int amountCents, string cardToken)\n    {\n        string status = _sdk.SubmitTransaction(amountCents, \"USD\", cardToken);\n        return status == \"ok\";\n    }\n}\n\nstatic void Checkout(IPaymentProcessor processor, int amountCents, string cardToken) =>\n    Console.WriteLine(processor.Charge(amountCents, cardToken) ? \"Payment accepted\" : \"Payment failed\");\n\nCheckout(new PaymentAdapter(new NewProviderSdk()), 2599, \"tok_visa_4242\");",
     "python": "from abc import ABC, abstractmethod\n\n\nclass PaymentProcessor(ABC):\n    @abstractmethod\n    def charge(self, amount_cents: int, card_token: str) -> bool: ...\n\n\nclass NewProviderSDK:\n    def submit_transaction(self, total: int, currency: str, source: str) -> str:\n        print(f\"NewProviderSDK: charged {total / 100} {currency} via {source}\")\n        return \"ok\"\n\n\nclass PaymentAdapter(PaymentProcessor):\n    def __init__(self, sdk: NewProviderSDK) -> None:\n        self._sdk = sdk\n\n    def charge(self, amount_cents: int, card_token: str) -> bool:\n        status = self._sdk.submit_transaction(\n            total=amount_cents, currency=\"USD\", source=card_token\n        )\n        return status == \"ok\"\n\n\ndef checkout(processor: PaymentProcessor, amount_cents: int, card_token: str) -> None:\n    success = processor.charge(amount_cents, card_token)\n    print(\"Payment accepted\" if success else \"Payment failed\")\n\n\nadapter = PaymentAdapter(NewProviderSDK())\ncheckout(adapter, 2599, \"tok_visa_4242\")"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          5
+        ],
+        "title": {
+          "en": "PaymentProcessor is the target interface",
+          "ru": "PaymentProcessor - целевой интерфейс"
+        },
+        "explanation": {
+          "en": "`charge()` just throws - this is the contract every payment processor the client code talks to must implement.",
+          "ru": "`charge()` просто бросает исключение - это контракт, который должен реализовать любой обработчик платежей, с которым работает клиентский код."
+        }
+      },
+      {
+        "lines": [
+          7,
+          12
+        ],
+        "title": {
+          "en": "NewProviderSDK is the incompatible existing class",
+          "ru": "NewProviderSDK - несовместимый существующий класс"
+        },
+        "explanation": {
+          "en": "Its method is called `submitTransaction()`, not `charge()`, and it takes one options object (`{ total, currency, source }`) instead of two separate arguments - it doesn't match `PaymentProcessor` at all.",
+          "ru": "Его метод называется `submitTransaction()`, а не `charge()`, и принимает один объект с опциями (`{ total, currency, source }`) вместо двух отдельных аргументов - он вообще не соответствует `PaymentProcessor`."
+        }
+      },
+      {
+        "lines": [
+          14,
+          20
+        ],
+        "title": {
+          "en": "PaymentAdapter extends the target and wraps the SDK",
+          "ru": "PaymentAdapter расширяет целевой интерфейс и оборачивает SDK"
+        },
+        "explanation": {
+          "en": "`PaymentAdapter` `extends PaymentProcessor` so it satisfies the target interface, and its constructor stores the incompatible `sdk` in the private field `#sdk`.",
+          "ru": "`PaymentAdapter` через `extends PaymentProcessor` удовлетворяет целевому интерфейсу, а его конструктор сохраняет несовместимый `sdk` в приватном поле `#sdk`."
+        }
+      },
+      {
+        "lines": [
+          22,
+          29
+        ],
+        "title": {
+          "en": "charge() translates the call into submitTransaction's shape",
+          "ru": "charge() переводит вызов в форму submitTransaction"
+        },
+        "explanation": {
+          "en": "It builds the `{ total, currency, source }` object `submitTransaction` expects from `amountCents`/`cardToken`, then converts the result back into the boolean `charge()` promises to return.",
+          "ru": "Метод собирает объект `{ total, currency, source }`, который ожидает `submitTransaction`, из `amountCents`/`cardToken`, а затем превращает результат обратно в булево значение, которое обещает вернуть `charge()`."
+        }
+      },
+      {
+        "lines": [
+          32,
+          35
+        ],
+        "title": {
+          "en": "checkout() only knows PaymentProcessor",
+          "ru": "checkout() знает только PaymentProcessor"
+        },
+        "explanation": {
+          "en": "It calls `processor.charge(amountCents, cardToken)` - nothing here mentions `NewProviderSDK`, so `checkout` works with any `PaymentProcessor` implementation.",
+          "ru": "Функция вызывает `processor.charge(amountCents, cardToken)` - здесь нигде не упоминается `NewProviderSDK`, поэтому `checkout` работает с любой реализацией `PaymentProcessor`."
+        }
+      },
+      {
+        "lines": [
+          37,
+          38
+        ],
+        "title": {
+          "en": "The client plugs the SDK in through the adapter",
+          "ru": "Клиент подключает SDK через адаптер"
+        },
+        "explanation": {
+          "en": "`new PaymentAdapter(new NewProviderSDK())` is passed straight into `checkout` - the incompatible SDK now fits without `checkout` or `NewProviderSDK` changing at all.",
+          "ru": "`new PaymentAdapter(new NewProviderSDK())` передаётся прямо в `checkout` - несовместимый SDK теперь подходит, при этом ни `checkout`, ни `NewProviderSDK` не менялись."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          4,
+          6
+        ],
+        "title": {
+          "en": "PaymentProcessor is the target interface",
+          "ru": "PaymentProcessor - целевой интерфейс"
+        },
+        "explanation": {
+          "en": "`charge()` is declared `@abstractmethod` - this is the contract every processor the client depends on must fulfil.",
+          "ru": "`charge()` объявлен как `@abstractmethod` - это контракт, который должен выполнять любой обработчик, от которого зависит клиент."
+        }
+      },
+      {
+        "lines": [
+          9,
+          12
+        ],
+        "title": {
+          "en": "NewProviderSDK is the incompatible existing class",
+          "ru": "NewProviderSDK - несовместимый существующий класс"
+        },
+        "explanation": {
+          "en": "Its method `submit_transaction()` takes keyword arguments `total`/`currency`/`source` and returns a plain string status, not the `charge(amount_cents, card_token) -> bool` shape `PaymentProcessor` needs.",
+          "ru": "Его метод `submit_transaction()` принимает именованные аргументы `total`/`currency`/`source` и возвращает обычную строку статуса, а не форму `charge(amount_cents, card_token) -> bool`, которая нужна `PaymentProcessor`."
+        }
+      },
+      {
+        "lines": [
+          15,
+          17
+        ],
+        "title": {
+          "en": "PaymentAdapter subclasses the target and stores the SDK",
+          "ru": "PaymentAdapter наследует целевой класс и хранит SDK"
+        },
+        "explanation": {
+          "en": "`PaymentAdapter(PaymentProcessor)` satisfies the abstract base, and `__init__` stores the wrapped `sdk` on `self._sdk`.",
+          "ru": "`PaymentAdapter(PaymentProcessor)` удовлетворяет абстрактному базовому классу, а `__init__` сохраняет обёрнутый `sdk` в `self._sdk`."
+        }
+      },
+      {
+        "lines": [
+          19,
+          23
+        ],
+        "title": {
+          "en": "charge() adapts arguments and return value",
+          "ru": "charge() адаптирует аргументы и возвращаемое значение"
+        },
+        "explanation": {
+          "en": "It calls `self._sdk.submit_transaction(total=..., currency=\"USD\", source=...)` and turns the returned string back into the `bool` that `charge()`'s callers expect via `status == \"ok\"`.",
+          "ru": "Метод вызывает `self._sdk.submit_transaction(total=..., currency=\"USD\", source=...)` и превращает возвращённую строку обратно в `bool`, который ожидают вызывающие `charge()`, через `status == \"ok\"`."
+        }
+      },
+      {
+        "lines": [
+          26,
+          28
+        ],
+        "title": {
+          "en": "checkout() depends only on PaymentProcessor",
+          "ru": "checkout() зависит только от PaymentProcessor"
+        },
+        "explanation": {
+          "en": "Its parameter is typed `processor: PaymentProcessor` and it only calls `processor.charge(...)` - `NewProviderSDK` never appears here.",
+          "ru": "Параметр типизирован как `processor: PaymentProcessor`, и вызывается только `processor.charge(...)` - `NewProviderSDK` здесь вообще не упоминается."
+        }
+      },
+      {
+        "lines": [
+          31,
+          32
+        ],
+        "title": {
+          "en": "The client wires the SDK in through the adapter",
+          "ru": "Клиент подключает SDK через адаптер"
+        },
+        "explanation": {
+          "en": "`PaymentAdapter(NewProviderSDK())` is created and passed straight into `checkout` - the incompatible SDK works without touching `checkout` or `NewProviderSDK`.",
+          "ru": "Создаётся `PaymentAdapter(NewProviderSDK())` и передаётся прямо в `checkout` - несовместимый SDK работает без изменений в `checkout` или `NewProviderSDK`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Keeps translation logic out of your business code - each adapter is a small, focused unit that only knows how to speak to one external interface.",

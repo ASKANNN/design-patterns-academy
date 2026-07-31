@@ -228,7 +228,10 @@ No new features are implemented during this sprint — only bug fixing and stabi
       TypeScript/Java/C# walkthroughs. **Rollout progress:** Creational
       category done (2026-07-31) — Abstract Factory, Builder, Factory
       Method, Prototype added alongside the Singleton pilot (5/23).
-      Structural (7) and Behavioral (11) categories remain, each
+      Structural category done (2026-07-31) — Adapter, Bridge, Composite,
+      Decorator, Facade, Flyweight, Proxy (12/23), owner-reviewed in the
+      browser (Implementation tab, JS+Python highlighting, badges, "Next
+      step" navigation all confirmed working). Behavioral (11) remains,
       stopping for an owner review after the category is written.
 - [ ] Pattern playgrounds — **scope decision (2026-07-28):** executable
       only for JavaScript/TypeScript, via a sandboxed iframe +

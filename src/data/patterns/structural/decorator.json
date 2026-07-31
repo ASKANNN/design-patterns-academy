@@ -75,6 +75,180 @@
     "csharp": "interface INotifier { void Send(string message); }\n\nclass EmailNotifier : INotifier\n{\n    private readonly string _email;\n    public EmailNotifier(string email) => _email = email;\n    public void Send(string message) =>\n        Console.WriteLine($\"Email to {_email}: {message}\");\n}\n\nabstract class NotifierDecorator : INotifier\n{\n    protected readonly INotifier Wrapped;\n    protected NotifierDecorator(INotifier notifier) => Wrapped = notifier;\n    public virtual void Send(string message) => Wrapped.Send(message);\n}\n\nclass SMSDecorator : NotifierDecorator\n{\n    private readonly string _phone;\n    public SMSDecorator(INotifier n, string phone) : base(n) => _phone = phone;\n    public override void Send(string message)\n    { base.Send(message); Console.WriteLine($\"SMS to {_phone}: {message}\"); }\n}\n\nclass SlackDecorator : NotifierDecorator\n{\n    private readonly string _channel;\n    public SlackDecorator(INotifier n, string channel) : base(n) => _channel = channel;\n    public override void Send(string message)\n    { base.Send(message); Console.WriteLine($\"Slack #{_channel}: {message}\"); }\n}\n\nINotifier notifier = new EmailNotifier(\"user@example.com\");\nnotifier = new SMSDecorator(notifier, \"+1234567890\");\nnotifier = new SlackDecorator(notifier, \"alerts\");\n\nnotifier.Send(\"Server is down!\");",
     "python": "from abc import ABC, abstractmethod\n\n\nclass Notifier(ABC):\n    @abstractmethod\n    def send(self, message: str) -> None:\n        pass\n\n\nclass EmailNotifier(Notifier):\n    def __init__(self, email: str) -> None:\n        self._email = email\n\n    def send(self, message: str) -> None:\n        print(f\"Email to {self._email}: {message}\")\n\n\nclass NotifierDecorator(Notifier):\n    def __init__(self, wrapped: Notifier) -> None:\n        self._wrapped = wrapped\n\n    def send(self, message: str) -> None:\n        self._wrapped.send(message)\n\n\nclass SMSDecorator(NotifierDecorator):\n    def __init__(self, notifier: Notifier, phone: str) -> None:\n        super().__init__(notifier)\n        self._phone = phone\n\n    def send(self, message: str) -> None:\n        super().send(message)\n        print(f\"SMS to {self._phone}: {message}\")\n\n\nclass SlackDecorator(NotifierDecorator):\n    def __init__(self, notifier: Notifier, channel: str) -> None:\n        super().__init__(notifier)\n        self._channel = channel\n\n    def send(self, message: str) -> None:\n        super().send(message)\n        print(f\"Slack #{self._channel}: {message}\")\n\n\nnotifier: Notifier = EmailNotifier(\"user@example.com\")\nnotifier = SMSDecorator(notifier, \"+1234567890\")\nnotifier = SlackDecorator(notifier, \"alerts\")\n\nnotifier.send(\"Server is down!\")"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          5
+        ],
+        "title": {
+          "en": "Notifier is the common component interface",
+          "ru": "Notifier - общий интерфейс компонента"
+        },
+        "explanation": {
+          "en": "`send()` just throws - both the base notifier and every decorator around it must implement this one method.",
+          "ru": "`send()` просто бросает исключение - и базовый нотификатор, и каждый декоратор вокруг него обязаны реализовать этот единственный метод."
+        }
+      },
+      {
+        "lines": [
+          7,
+          16
+        ],
+        "title": {
+          "en": "EmailNotifier is the concrete component being wrapped",
+          "ru": "EmailNotifier - конкретный компонент, который оборачивают"
+        },
+        "explanation": {
+          "en": "It implements `send()` directly, with no wrapping - this is the base object decorators will add behavior around.",
+          "ru": "Он реализует `send()` напрямую, без обёртки - это базовый объект, вокруг которого декораторы будут добавлять поведение."
+        }
+      },
+      {
+        "lines": [
+          18,
+          29
+        ],
+        "title": {
+          "en": "NotifierDecorator wraps a Notifier and forwards by default",
+          "ru": "NotifierDecorator оборачивает Notifier и по умолчанию делегирует ему"
+        },
+        "explanation": {
+          "en": "It also `extends Notifier`, stores the wrapped instance in `#wrapped`, and its own `send()` just calls `this.#wrapped.send(message)` - a decorator is itself a `Notifier`, so decorators can be stacked.",
+          "ru": "Он тоже `extends Notifier`, хранит обёрнутый экземпляр в `#wrapped`, а его собственный `send()` просто вызывает `this.#wrapped.send(message)` - декоратор сам является `Notifier`, поэтому декораторы можно накладывать друг на друга."
+        }
+      },
+      {
+        "lines": [
+          31,
+          41
+        ],
+        "title": {
+          "en": "SMSDecorator adds behavior after delegating",
+          "ru": "SMSDecorator добавляет поведение после делегирования"
+        },
+        "explanation": {
+          "en": "Its `send()` calls `super.send(message)` first (running whatever's wrapped), then adds its own `console.log` for the SMS - extending behavior without modifying the wrapped object.",
+          "ru": "Его `send()` сначала вызывает `super.send(message)` (запуская то, что обёрнуто), а затем добавляет свой `console.log` для SMS - поведение расширяется без изменения обёрнутого объекта."
+        }
+      },
+      {
+        "lines": [
+          43,
+          53
+        ],
+        "title": {
+          "en": "SlackDecorator does the same, independently",
+          "ru": "SlackDecorator делает то же самое, независимо"
+        },
+        "explanation": {
+          "en": "It follows the identical `super.send()` then extra `console.log` shape as `SMSDecorator` - each decorator only knows about adding its own behavior, not about the others.",
+          "ru": "Он повторяет ту же схему `super.send()`, а затем дополнительный `console.log`, что и `SMSDecorator` - каждый декоратор знает только о добавлении собственного поведения, а не о других декораторах."
+        }
+      },
+      {
+        "lines": [
+          55,
+          59
+        ],
+        "title": {
+          "en": "Decorators are stacked at runtime, one call at a time",
+          "ru": "Декораторы накладываются во время выполнения, вызов за вызовом"
+        },
+        "explanation": {
+          "en": "`notifier` is reassigned twice - first wrapped in `SMSDecorator`, then in `SlackDecorator` - so `notifier.send(...)` ends up triggering email, SMS, and Slack, in that nested order, without changing `EmailNotifier` at all.",
+          "ru": "`notifier` переприсваивается дважды - сначала оборачивается в `SMSDecorator`, затем в `SlackDecorator` - поэтому `notifier.send(...)` в итоге запускает email, SMS и Slack, в этом вложенном порядке, вообще не меняя `EmailNotifier`."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          4,
+          7
+        ],
+        "title": {
+          "en": "Notifier is the common component interface",
+          "ru": "Notifier - общий интерфейс компонента"
+        },
+        "explanation": {
+          "en": "`send()` is `@abstractmethod` - both the base notifier and every decorator must implement this same method to be usable.",
+          "ru": "`send()` объявлен как `@abstractmethod` - и базовый нотификатор, и каждый декоратор обязаны реализовать этот метод, чтобы ими можно было пользоваться."
+        }
+      },
+      {
+        "lines": [
+          10,
+          15
+        ],
+        "title": {
+          "en": "EmailNotifier is the concrete component being wrapped",
+          "ru": "EmailNotifier - конкретный компонент, который оборачивают"
+        },
+        "explanation": {
+          "en": "It implements `send()` directly with a `print` call - this is the base object decorators will add behavior around.",
+          "ru": "Он реализует `send()` напрямую через `print` - это базовый объект, вокруг которого декораторы будут добавлять поведение."
+        }
+      },
+      {
+        "lines": [
+          18,
+          23
+        ],
+        "title": {
+          "en": "NotifierDecorator wraps a Notifier and forwards by default",
+          "ru": "NotifierDecorator оборачивает Notifier и по умолчанию делегирует ему"
+        },
+        "explanation": {
+          "en": "It also subclasses `Notifier`, stores the wrapped instance as `self._wrapped`, and its `send()` just calls `self._wrapped.send(message)` - being a `Notifier` itself is what lets decorators stack.",
+          "ru": "Он тоже наследует `Notifier`, хранит обёрнутый экземпляр в `self._wrapped`, а его `send()` просто вызывает `self._wrapped.send(message)` - то, что декоратор сам является `Notifier`, и позволяет накладывать декораторы друг на друга."
+        }
+      },
+      {
+        "lines": [
+          26,
+          33
+        ],
+        "title": {
+          "en": "SMSDecorator adds behavior after delegating",
+          "ru": "SMSDecorator добавляет поведение после делегирования"
+        },
+        "explanation": {
+          "en": "`send()` calls `super().send(message)` first, then prints its own SMS line - the wrapped object's behavior always runs, plus something extra.",
+          "ru": "`send()` сначала вызывает `super().send(message)`, а затем выводит свою строку про SMS - поведение обёрнутого объекта всегда выполняется, плюс что-то дополнительно."
+        }
+      },
+      {
+        "lines": [
+          36,
+          43
+        ],
+        "title": {
+          "en": "SlackDecorator does the same, independently",
+          "ru": "SlackDecorator делает то же самое, независимо"
+        },
+        "explanation": {
+          "en": "It follows the same `super().send()` then extra `print` shape as `SMSDecorator` - neither decorator knows about the other.",
+          "ru": "Он повторяет ту же схему `super().send()`, а затем дополнительный `print`, что и `SMSDecorator` - ни один декоратор не знает о существовании другого."
+        }
+      },
+      {
+        "lines": [
+          46,
+          50
+        ],
+        "title": {
+          "en": "Decorators are stacked at runtime, one call at a time",
+          "ru": "Декораторы накладываются во время выполнения, вызов за вызовом"
+        },
+        "explanation": {
+          "en": "`notifier` is reassigned first to `SMSDecorator(notifier, ...)`, then to `SlackDecorator(notifier, ...)` - `notifier.send(...)` ends up running email, SMS, and Slack behavior in that nested order, with `EmailNotifier` untouched.",
+          "ru": "`notifier` сначала переприсваивается на `SMSDecorator(notifier, ...)`, затем на `SlackDecorator(notifier, ...)` - `notifier.send(...)` в итоге запускает поведение email, SMS и Slack в этом вложенном порядке, не трогая `EmailNotifier`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "New optional behavior becomes a small independent wrapper class instead of another branch in an ever-growing subclass tree.",

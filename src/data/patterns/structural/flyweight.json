@@ -69,6 +69,152 @@
     "csharp": "class TreeType\n{\n    public readonly string Name, Color, Texture;\n    public TreeType(string name, string color, string texture)\n    { Name = name; Color = color; Texture = texture; }\n\n    public void Draw(int x, int y) =>\n        Console.WriteLine($\"Drawing {Name} [{Color}, {Texture}] at ({x}, {y})\");\n}\n\nclass TreeTypeFactory\n{\n    private static readonly Dictionary<string, TreeType> _types = new();\n\n    public static TreeType GetTreeType(string name, string color, string texture)\n    {\n        string key = $\"{name}_{color}_{texture}\";\n        if (!_types.ContainsKey(key))\n        {\n            _types[key] = new TreeType(name, color, texture);\n            Console.WriteLine($\"Factory: created new type '{name}'\");\n        }\n        return _types[key];\n    }\n\n    public static int GetCount() => _types.Count;\n}\n\nclass Tree\n{\n    private readonly int _x, _y;\n    private readonly TreeType _type;\n    public Tree(int x, int y, TreeType type) { _x = x; _y = y; _type = type; }\n    public void Draw() => _type.Draw(_x, _y);\n}\n\nclass Forest\n{\n    private readonly List<Tree> _trees = new();\n\n    public void PlantTree(int x, int y, string name, string color, string texture)\n        => _trees.Add(new Tree(x, y, TreeTypeFactory.GetTreeType(name, color, texture)));\n\n    public void Draw() => _trees.ForEach(t => t.Draw());\n}\n\nvar forest = new Forest();\nforest.PlantTree(1, 2, \"Oak\",  \"green\",      \"rough\");\nforest.PlantTree(5, 8, \"Oak\",  \"green\",      \"rough\");\nforest.PlantTree(3, 4, \"Pine\", \"dark-green\", \"smooth\");\nforest.PlantTree(7, 1, \"Pine\", \"dark-green\", \"smooth\");\n\nConsole.WriteLine($\"Trees: 4 | Unique types: {TreeTypeFactory.GetCount()}\");\nforest.Draw();",
     "python": "from __future__ import annotations\n\n\nclass TreeType:\n    def __init__(self, name: str, color: str, texture: str) -> None:\n        self.name    = name\n        self.color   = color\n        self.texture = texture\n\n    def draw(self, x: int, y: int) -> None:\n        print(f'Drawing {self.name} [{self.color}, {self.texture}] at ({x}, {y})')\n\n\nclass TreeTypeFactory:\n    _types: dict[str, TreeType] = {}\n\n    @classmethod\n    def get_tree_type(cls, name: str, color: str, texture: str) -> TreeType:\n        key = f'{name}_{color}_{texture}'\n        if key not in cls._types:\n            cls._types[key] = TreeType(name, color, texture)\n            print(f\"Factory: created new type '{name}'\")\n        return cls._types[key]\n\n    @classmethod\n    def get_count(cls) -> int:\n        return len(cls._types)\n\n\nclass Tree:\n    def __init__(self, x: int, y: int, tree_type: TreeType) -> None:\n        self.x    = x\n        self.y    = y\n        self.type = tree_type\n\n    def draw(self) -> None:\n        self.type.draw(self.x, self.y)\n\n\nclass Forest:\n    def __init__(self) -> None:\n        self._trees: list[Tree] = []\n\n    def plant_tree(self, x: int, y: int, name: str, color: str, texture: str) -> None:\n        tree_type = TreeTypeFactory.get_tree_type(name, color, texture)\n        self._trees.append(Tree(x, y, tree_type))\n\n    def draw(self) -> None:\n        for tree in self._trees:\n            tree.draw()\n\n\nforest = Forest()\nforest.plant_tree(1, 2, 'Oak',  'green',      'rough')\nforest.plant_tree(5, 8, 'Oak',  'green',      'rough')\nforest.plant_tree(3, 4, 'Pine', 'dark-green', 'smooth')\nforest.plant_tree(7, 1, 'Pine', 'dark-green', 'smooth')\n\nprint(f'Trees: 4 | Unique types: {TreeTypeFactory.get_count()}')\n\nforest.draw()"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          13
+        ],
+        "title": {
+          "en": "TreeType holds the shared, intrinsic state",
+          "ru": "TreeType хранит общее, внутреннее состояние"
+        },
+        "explanation": {
+          "en": "`name`, `color`, `texture` are the data that's identical for every tree of the same kind - `draw(x, y)` takes position as a parameter instead of storing it, since position differs per tree.",
+          "ru": "`name`, `color`, `texture` - это данные, одинаковые для каждого дерева одного вида - `draw(x, y)` принимает позицию как параметр вместо хранения, так как позиция у каждого дерева своя."
+        }
+      },
+      {
+        "lines": [
+          15,
+          28
+        ],
+        "title": {
+          "en": "TreeTypeFactory caches TreeType instances by key",
+          "ru": "TreeTypeFactory кэширует экземпляры TreeType по ключу"
+        },
+        "explanation": {
+          "en": "`getTreeType()` builds a key from `name_color_texture` and only calls `new TreeType(...)` if that key isn't already in the static `#types` map - otherwise it returns the existing shared instance.",
+          "ru": "`getTreeType()` строит ключ из `name_color_texture` и вызывает `new TreeType(...)` только если такого ключа ещё нет в статической карте `#types` - иначе возвращает уже существующий общий экземпляр."
+        }
+      },
+      {
+        "lines": [
+          30,
+          38
+        ],
+        "title": {
+          "en": "Tree stores per-instance extrinsic state plus a shared type",
+          "ru": "Tree хранит уникальное для экземпляра состояние плюс общий тип"
+        },
+        "explanation": {
+          "en": "Each `Tree` keeps its own `x`/`y` (extrinsic, unique per tree) but only a reference to a shared `type` object (intrinsic, reused across trees) - `draw()` passes its own coordinates into the shared type's `draw()`.",
+          "ru": "Каждое `Tree` хранит собственные `x`/`y` (внешнее состояние, уникальное для дерева), но только ссылку на общий объект `type` (внутреннее состояние, переиспользуемое между деревьями) - `draw()` передаёт свои координаты в `draw()` общего типа."
+        }
+      },
+      {
+        "lines": [
+          40,
+          49
+        ],
+        "title": {
+          "en": "Forest requests types from the factory, never constructs them",
+          "ru": "Forest запрашивает типы у фабрики, никогда не создаёт их сама"
+        },
+        "explanation": {
+          "en": "`plantTree()` calls `TreeTypeFactory.getTreeType(...)` rather than `new TreeType(...)` directly - the factory is the only place `TreeType` objects get created.",
+          "ru": "`plantTree()` вызывает `TreeTypeFactory.getTreeType(...)`, а не `new TreeType(...)` напрямую - фабрика является единственным местом, где создаются объекты `TreeType`."
+        }
+      },
+      {
+        "lines": [
+          51,
+          57
+        ],
+        "title": {
+          "en": "Four trees, only two shared TreeType instances",
+          "ru": "Четыре дерева, только два общих экземпляра TreeType"
+        },
+        "explanation": {
+          "en": "Two trees are planted as `'Oak', 'green', 'rough'` and two as `'Pine', 'dark-green', 'smooth'` - `TreeTypeFactory.getCount()` reports only 2 because the matching pairs reuse the same cached `TreeType`.",
+          "ru": "Два дерева высажены как `'Oak', 'green', 'rough'`, а два - как `'Pine', 'dark-green', 'smooth'` - `TreeTypeFactory.getCount()` показывает только 2, потому что совпадающие пары переиспользуют один и тот же закэшированный `TreeType`."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          4,
+          11
+        ],
+        "title": {
+          "en": "TreeType holds the shared, intrinsic state",
+          "ru": "TreeType хранит общее, внутреннее состояние"
+        },
+        "explanation": {
+          "en": "`name`, `color`, `texture` are identical for every tree of the same kind - `draw(x, y)` takes the position as a parameter rather than storing it, since that part differs per tree.",
+          "ru": "`name`, `color`, `texture` одинаковы для каждого дерева одного вида - `draw(x, y)` принимает позицию как параметр, а не хранит её, так как эта часть у каждого дерева своя."
+        }
+      },
+      {
+        "lines": [
+          14,
+          27
+        ],
+        "title": {
+          "en": "TreeTypeFactory caches TreeType instances by key",
+          "ru": "TreeTypeFactory кэширует экземпляры TreeType по ключу"
+        },
+        "explanation": {
+          "en": "`get_tree_type()` builds a key from `name_color_texture` and only creates a new `TreeType` if that key isn't already in the class-level `_types` dict - otherwise it returns the cached one.",
+          "ru": "`get_tree_type()` строит ключ из `name_color_texture` и создаёт новый `TreeType` только если такого ключа ещё нет в словаре `_types` уровня класса - иначе возвращает закэшированный."
+        }
+      },
+      {
+        "lines": [
+          30,
+          37
+        ],
+        "title": {
+          "en": "Tree stores per-instance extrinsic state plus a shared type",
+          "ru": "Tree хранит уникальное для экземпляра состояние плюс общий тип"
+        },
+        "explanation": {
+          "en": "Each `Tree` keeps its own `x`/`y` (unique per tree) but only a reference to a shared `tree_type` object - `draw()` passes its own coordinates into that shared object's `draw()`.",
+          "ru": "Каждое `Tree` хранит собственные `x`/`y` (уникальные для дерева), но только ссылку на общий объект `tree_type` - `draw()` передаёт свои координаты в `draw()` этого общего объекта."
+        }
+      },
+      {
+        "lines": [
+          40,
+          46
+        ],
+        "title": {
+          "en": "Forest requests types from the factory, never constructs them",
+          "ru": "Forest запрашивает типы у фабрики, никогда не создаёт их сама"
+        },
+        "explanation": {
+          "en": "`plant_tree()` calls `TreeTypeFactory.get_tree_type(...)` instead of instantiating `TreeType` directly - the factory is the only place that creates them.",
+          "ru": "`plant_tree()` вызывает `TreeTypeFactory.get_tree_type(...)` вместо создания `TreeType` напрямую - фабрика является единственным местом, где они создаются."
+        }
+      },
+      {
+        "lines": [
+          53,
+          59
+        ],
+        "title": {
+          "en": "Four trees, only two shared TreeType instances",
+          "ru": "Четыре дерева, только два общих экземпляра TreeType"
+        },
+        "explanation": {
+          "en": "Two trees share `'Oak', 'green', 'rough'` and two share `'Pine', 'dark-green', 'smooth'` - `TreeTypeFactory.get_count()` reports only 2 because matching pairs reuse the same cached `TreeType`.",
+          "ru": "Два дерева используют `'Oak', 'green', 'rough'`, а два - `'Pine', 'dark-green', 'smooth'` - `TreeTypeFactory.get_count()` показывает только 2, так как совпадающие пары переиспользуют один и тот же закэшированный `TreeType`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Memory footprint drops sharply once a large object population is dominated by a small number of distinct intrinsic-state combinations.",

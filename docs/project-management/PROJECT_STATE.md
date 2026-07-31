@@ -274,9 +274,9 @@ only and may lag between updates.
 
 ## Phase 13 — Interactive Learning
 
-**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for Creational (5/23: Singleton pilot + Abstract Factory, Builder, Factory Method, Prototype), Structural and Behavioral still pending; playgrounds not started
+**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for Creational + Structural (12/23: Singleton pilot, Abstract Factory, Builder, Factory Method, Prototype, Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy), Behavioral still pending; playgrounds not started
 
-- [~] Interactive code walkthroughs — Creational category done, see below
+- [~] Interactive code walkthroughs — Creational and Structural categories done, see below
 - Pattern playgrounds
 - [x] Quizzes — all 23 patterns done (5 questions each, verified via
       Playwright end to end for representative patterns from each
@@ -304,7 +304,13 @@ only and may lag between updates.
 > Prototype added alongside the Singleton pilot, 5/23), each step's
 > explanation grounded in that pattern's own `implementation` code,
 > verified via Playwright screenshots (line highlighting, per-step
-> content, autoscroll). Structural (7) and Behavioral (11) remain.
+> content, autoscroll). **Structural category complete (2026-07-31):**
+> Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy (12/23
+> total), same grounding rule, verified via a headless Playwright script
+> (Implementation tab opens the panel, exactly 2 language badges per
+> pattern, 0 leakage into TypeScript, "Next step" changes the highlighted
+> range, 0 console errors) and confirmed working by the owner directly in
+> the browser. Behavioral (11) remains.
 
 > **Build order and scope (agreed with owner, 2026-07-28):** the checklist
 > above is the target state, not the build order. Actual sequencing is

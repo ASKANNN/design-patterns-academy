@@ -59,6 +59,152 @@
     "csharp": "class Amplifier\n{\n    public void On()                => Console.WriteLine(\"Amplifier: powering on\");\n    public void SetVolume(int level) => Console.WriteLine($\"Amplifier: setting volume to {level}\");\n    public void Off()               => Console.WriteLine(\"Amplifier: powering off\");\n}\n\nclass Projector\n{\n    public void On()             => Console.WriteLine(\"Projector: powering on\");\n    public void WideScreenMode() => Console.WriteLine(\"Projector: switching to widescreen mode\");\n    public void Off()            => Console.WriteLine(\"Projector: powering off\");\n}\n\nclass DVDPlayer\n{\n    public void On()               => Console.WriteLine(\"DVD Player: powering on\");\n    public void Play(string movie) => Console.WriteLine($\"DVD Player: playing \\\"{movie}\\\"\");\n    public void Off()              => Console.WriteLine(\"DVD Player: powering off\");\n}\n\nclass Lights\n{\n    public void Dim(int level) => Console.WriteLine($\"Lights: dimming to {level}%\");\n    public void On()            => Console.WriteLine(\"Lights: turning on\");\n}\n\nclass HomeTheaterFacade\n{\n    private readonly Amplifier _amplifier = new();\n    private readonly Projector _projector = new();\n    private readonly DVDPlayer _dvdPlayer = new();\n    private readonly Lights    _lights    = new();\n\n    public void WatchMovie(string movie)\n    {\n        _lights.Dim(10);\n        _projector.On();\n        _projector.WideScreenMode();\n        _amplifier.On();\n        _amplifier.SetVolume(5);\n        _dvdPlayer.On();\n        _dvdPlayer.Play(movie);\n        Console.WriteLine(\"Enjoy the movie!\");\n    }\n\n    public void EndMovie()\n    {\n        _dvdPlayer.Off();\n        _amplifier.Off();\n        _projector.Off();\n        _lights.On();\n        Console.WriteLine(\"Home theater shut down.\");\n    }\n}\n\nvar homeTheater = new HomeTheaterFacade();\nhomeTheater.WatchMovie(\"Interstellar\");",
     "python": "class Amplifier:\n    def on(self) -> None:\n        print(\"Amplifier: powering on\")\n\n    def set_volume(self, level: int) -> None:\n        print(f\"Amplifier: setting volume to {level}\")\n\n    def off(self) -> None:\n        print(\"Amplifier: powering off\")\n\n\nclass Projector:\n    def on(self) -> None:\n        print(\"Projector: powering on\")\n\n    def wide_screen_mode(self) -> None:\n        print(\"Projector: switching to widescreen mode\")\n\n    def off(self) -> None:\n        print(\"Projector: powering off\")\n\n\nclass DVDPlayer:\n    def on(self) -> None:\n        print(\"DVD Player: powering on\")\n\n    def play(self, movie: str) -> None:\n        print(f'DVD Player: playing \"{movie}\"')\n\n    def off(self) -> None:\n        print(\"DVD Player: powering off\")\n\n\nclass Lights:\n    def dim(self, level: int) -> None:\n        print(f\"Lights: dimming to {level}%\")\n\n    def on(self) -> None:\n        print(\"Lights: turning on\")\n\n\nclass HomeTheaterFacade:\n    def __init__(self) -> None:\n        self._amplifier = Amplifier()\n        self._projector = Projector()\n        self._dvd_player = DVDPlayer()\n        self._lights = Lights()\n\n    def watch_movie(self, movie: str) -> None:\n        self._lights.dim(10)\n        self._projector.on()\n        self._projector.wide_screen_mode()\n        self._amplifier.on()\n        self._amplifier.set_volume(5)\n        self._dvd_player.on()\n        self._dvd_player.play(movie)\n        print(\"Enjoy the movie!\")\n\n    def end_movie(self) -> None:\n        self._dvd_player.off()\n        self._amplifier.off()\n        self._projector.off()\n        self._lights.on()\n        print(\"Home theater shut down.\")\n\n\nhome_theater = HomeTheaterFacade()\nhome_theater.watch_movie(\"Interstellar\")"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          22
+        ],
+        "title": {
+          "en": "Four subsystem classes, each with its own API",
+          "ru": "Четыре класса подсистемы, у каждого свой API"
+        },
+        "explanation": {
+          "en": "`Amplifier`, `Projector`, `DVDPlayer`, and `Lights` each expose different method names (`setVolume`, `wideScreenMode`, `play`, `dim`) - none of them know about each other.",
+          "ru": "`Amplifier`, `Projector`, `DVDPlayer` и `Lights` каждый предоставляет свои названия методов (`setVolume`, `wideScreenMode`, `play`, `dim`) - ни один из них не знает о существовании других."
+        }
+      },
+      {
+        "lines": [
+          24,
+          35
+        ],
+        "title": {
+          "en": "HomeTheaterFacade holds references to every subsystem",
+          "ru": "HomeTheaterFacade хранит ссылки на все подсистемы"
+        },
+        "explanation": {
+          "en": "The constructor creates and stores all four subsystem instances in private fields (`#amplifier`, `#projector`, `#dvdPlayer`, `#lights`) - the client will never construct these directly.",
+          "ru": "Конструктор создаёт и сохраняет все четыре экземпляра подсистем в приватных полях (`#amplifier`, `#projector`, `#dvdPlayer`, `#lights`) - клиент никогда не будет создавать их напрямую."
+        }
+      },
+      {
+        "lines": [
+          37,
+          46
+        ],
+        "title": {
+          "en": "watchMovie() sequences seven subsystem calls into one step",
+          "ru": "watchMovie() объединяет семь вызовов подсистем в один шаг"
+        },
+        "explanation": {
+          "en": "Dimming lights, powering the projector, switching to widescreen, powering the amp, setting volume, powering the DVD player, and playing the movie all happen inside one method - the client calls it once instead of coordinating four objects.",
+          "ru": "Приглушение света, включение проектора, переключение в широкоэкранный режим, включение усилителя, установка громкости, включение DVD-плеера и запуск фильма - всё происходит внутри одного метода: клиент вызывает его один раз вместо координации четырёх объектов."
+        }
+      },
+      {
+        "lines": [
+          48,
+          54
+        ],
+        "title": {
+          "en": "endMovie() encapsulates the reverse sequence",
+          "ru": "endMovie() инкапсулирует обратную последовательность"
+        },
+        "explanation": {
+          "en": "Shutdown order is different from startup order (DVD off, then amp, then projector, then lights on) - the facade hides that ordering knowledge from the client entirely.",
+          "ru": "Порядок выключения отличается от порядка включения (сначала DVD, затем усилитель, затем проектор, затем свет включается) - фасад полностью скрывает это знание о порядке от клиента."
+        }
+      },
+      {
+        "lines": [
+          57,
+          58
+        ],
+        "title": {
+          "en": "The client only ever talks to the facade",
+          "ru": "Клиент общается только с фасадом"
+        },
+        "explanation": {
+          "en": "`homeTheater.watchMovie('Interstellar')` is the entire client-side interaction - no `Amplifier`, `Projector`, `DVDPlayer`, or `Lights` object appears in the client code at all.",
+          "ru": "`homeTheater.watchMovie('Interstellar')` - это всё взаимодействие на стороне клиента - ни `Amplifier`, ни `Projector`, ни `DVDPlayer`, ни `Lights` вообще не появляются в клиентском коде."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          1,
+          39
+        ],
+        "title": {
+          "en": "Four subsystem classes, each with its own API",
+          "ru": "Четыре класса подсистемы, у каждого свой API"
+        },
+        "explanation": {
+          "en": "`Amplifier`, `Projector`, `DVDPlayer`, and `Lights` each expose different method names (`set_volume`, `wide_screen_mode`, `play`, `dim`) - none of them know about each other.",
+          "ru": "`Amplifier`, `Projector`, `DVDPlayer` и `Lights` каждый предоставляет свои названия методов (`set_volume`, `wide_screen_mode`, `play`, `dim`) - ни один из них не знает о существовании других."
+        }
+      },
+      {
+        "lines": [
+          42,
+          47
+        ],
+        "title": {
+          "en": "HomeTheaterFacade holds references to every subsystem",
+          "ru": "HomeTheaterFacade хранит ссылки на все подсистемы"
+        },
+        "explanation": {
+          "en": "`__init__` creates and stores all four subsystem instances (`self._amplifier`, `self._projector`, `self._dvd_player`, `self._lights`) - the client never constructs these directly.",
+          "ru": "`__init__` создаёт и сохраняет все четыре экземпляра подсистем (`self._amplifier`, `self._projector`, `self._dvd_player`, `self._lights`) - клиент никогда не создаёт их напрямую."
+        }
+      },
+      {
+        "lines": [
+          49,
+          57
+        ],
+        "title": {
+          "en": "watch_movie() sequences seven subsystem calls into one step",
+          "ru": "watch_movie() объединяет семь вызовов подсистем в один шаг"
+        },
+        "explanation": {
+          "en": "Dimming lights, powering the projector, switching to widescreen, powering the amp, setting volume, powering the DVD player, and playing the movie all happen inside one method call.",
+          "ru": "Приглушение света, включение проектора, переключение в широкоэкранный режим, включение усилителя, установка громкости, включение DVD-плеера и запуск фильма - всё происходит внутри одного вызова метода."
+        }
+      },
+      {
+        "lines": [
+          59,
+          64
+        ],
+        "title": {
+          "en": "end_movie() encapsulates the reverse sequence",
+          "ru": "end_movie() инкапсулирует обратную последовательность"
+        },
+        "explanation": {
+          "en": "Shutdown order (DVD off, amp off, projector off, then lights on) differs from startup order - the facade hides that ordering knowledge from the client.",
+          "ru": "Порядок выключения (DVD, усилитель, проектор, затем включение света) отличается от порядка включения - фасад скрывает это знание о порядке от клиента."
+        }
+      },
+      {
+        "lines": [
+          67,
+          68
+        ],
+        "title": {
+          "en": "The client only ever talks to the facade",
+          "ru": "Клиент общается только с фасадом"
+        },
+        "explanation": {
+          "en": "`home_theater.watch_movie(\"Interstellar\")` is the entire client-side interaction - no `Amplifier`, `Projector`, `DVDPlayer`, or `Lights` object appears in the client code.",
+          "ru": "`home_theater.watch_movie(\"Interstellar\")` - это всё взаимодействие на стороне клиента - ни `Amplifier`, ни `Projector`, ни `DVDPlayer`, ни `Lights` не появляются в клиентском коде."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Application code reads at the level of business intent (\"export the video\") instead of being cluttered with subsystem plumbing.",

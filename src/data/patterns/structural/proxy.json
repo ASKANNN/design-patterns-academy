@@ -69,6 +69,152 @@
     "csharp": "interface IDataService\n{\n    Dictionary<string, object> FetchData(string query);\n}\n\nclass DatabaseService : IDataService\n{\n    public Dictionary<string, object> FetchData(string query)\n    {\n        Console.WriteLine($\"DatabaseService: executing query \\\"{query}\\\"...\");\n        return new() { [\"query\"] = query, [\"result\"] = $\"data for \\\"{query}\\\"\" };\n    }\n}\n\nclass CachingProxy : IDataService\n{\n    private readonly IDataService _service;\n    private readonly Dictionary<string, Dictionary<string, object>> _cache = new();\n\n    public CachingProxy(IDataService service) => _service = service;\n\n    public Dictionary<string, object> FetchData(string query)\n    {\n        if (_cache.TryGetValue(query, out var cached))\n        {\n            Console.WriteLine($\"CachingProxy: returning cached result for \\\"{query}\\\"\");\n            return cached;\n        }\n        var result = _service.FetchData(query);\n        _cache[query] = result;\n        return result;\n    }\n}\n\nIDataService service = new CachingProxy(new DatabaseService());\n\nConsole.WriteLine(service.FetchData(\"users\"));\n\nConsole.WriteLine(service.FetchData(\"users\"));\n\nConsole.WriteLine(service.FetchData(\"orders\"));",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\nfrom typing import Any\n\n\nclass DataService(ABC):\n    @abstractmethod\n    def fetch_data(self, query: str) -> dict[str, Any]:\n        pass\n\n\nclass DatabaseService(DataService):\n    def fetch_data(self, query: str) -> dict[str, Any]:\n        print(f'DatabaseService: executing query \"{query}\"...')\n        return {\"query\": query, \"result\": f'data for \"{query}\"'}\n\n\nclass CachingProxy(DataService):\n    def __init__(self, service: DataService) -> None:\n        self._service = service\n        self._cache: dict[str, dict[str, Any]] = {}\n\n    def fetch_data(self, query: str) -> dict[str, Any]:\n        if query in self._cache:\n            print(f'CachingProxy: returning cached result for \"{query}\"')\n            return self._cache[query]\n\n        result = self._service.fetch_data(query)\n        self._cache[query] = result\n        return result\n\n\nservice: DataService = CachingProxy(DatabaseService())\n\nprint(service.fetch_data(\"users\"))\n\nprint(service.fetch_data(\"users\"))\n\nprint(service.fetch_data(\"orders\"))"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          5
+        ],
+        "title": {
+          "en": "DataService is the shared interface",
+          "ru": "DataService - общий интерфейс"
+        },
+        "explanation": {
+          "en": "`fetchData()` just throws - both the real service and the proxy standing in front of it must implement this same method.",
+          "ru": "`fetchData()` просто бросает исключение - и настоящий сервис, и прокси перед ним обязаны реализовать этот же метод."
+        }
+      },
+      {
+        "lines": [
+          7,
+          12
+        ],
+        "title": {
+          "en": "DatabaseService is the real, expensive object",
+          "ru": "DatabaseService - настоящий, дорогой объект"
+        },
+        "explanation": {
+          "en": "`fetchData()` logs that it's actually executing a query and returns a fresh result every single call - this is the work a proxy can intercept.",
+          "ru": "`fetchData()` логирует, что действительно выполняет запрос, и каждый раз возвращает новый результат - именно эту работу может перехватывать прокси."
+        }
+      },
+      {
+        "lines": [
+          14,
+          21
+        ],
+        "title": {
+          "en": "CachingProxy implements the same interface and wraps the real service",
+          "ru": "CachingProxy реализует тот же интерфейс и оборачивает настоящий сервис"
+        },
+        "explanation": {
+          "en": "It `extends DataService`, so it's interchangeable with `DatabaseService` from the caller's point of view, and its constructor stores both the wrapped `#service` and a private `#cache` map.",
+          "ru": "Он через `extends DataService` взаимозаменяем с `DatabaseService` с точки зрения вызывающего кода, а его конструктор сохраняет и обёрнутый `#service`, и приватную карту `#cache`."
+        }
+      },
+      {
+        "lines": [
+          23,
+          32
+        ],
+        "title": {
+          "en": "fetchData() checks the cache before touching the real service",
+          "ru": "fetchData() проверяет кэш перед обращением к настоящему сервису"
+        },
+        "explanation": {
+          "en": "If `#cache.has(query)` it returns the cached result immediately without calling `#service.fetchData()` at all; otherwise it fetches, stores the result in `#cache`, and returns it - controlling access to the real object.",
+          "ru": "Если `#cache.has(query)`, метод сразу возвращает закэшированный результат, вообще не вызывая `#service.fetchData()`; иначе он выполняет запрос, сохраняет результат в `#cache` и возвращает его - так контролируется доступ к настоящему объекту."
+        }
+      },
+      {
+        "lines": [
+          35,
+          41
+        ],
+        "title": {
+          "en": "The client uses the proxy exactly like the real service",
+          "ru": "Клиент использует прокси точно так же, как настоящий сервис"
+        },
+        "explanation": {
+          "en": "`service` is a `CachingProxy`, but every call is just `service.fetchData(...)` - the second call for `'users'` reuses the cache while `'orders'` triggers a fresh `DatabaseService` query, invisibly to the caller.",
+          "ru": "`service` - это `CachingProxy`, но каждый вызов выглядит просто как `service.fetchData(...)` - второй вызов для `'users'` переиспользует кэш, а `'orders'` вызывает новый запрос к `DatabaseService`, незаметно для вызывающего кода."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          6,
+          9
+        ],
+        "title": {
+          "en": "DataService is the shared interface",
+          "ru": "DataService - общий интерфейс"
+        },
+        "explanation": {
+          "en": "`fetch_data()` is `@abstractmethod` - both the real service and the proxy must implement this same method to satisfy the interface.",
+          "ru": "`fetch_data()` объявлен как `@abstractmethod` - и настоящий сервис, и прокси обязаны реализовать этот же метод, чтобы удовлетворять интерфейсу."
+        }
+      },
+      {
+        "lines": [
+          12,
+          15
+        ],
+        "title": {
+          "en": "DatabaseService is the real, expensive object",
+          "ru": "DatabaseService - настоящий, дорогой объект"
+        },
+        "explanation": {
+          "en": "`fetch_data()` prints that it's executing a query and builds a fresh result dict every call - this is the work a proxy can intercept.",
+          "ru": "`fetch_data()` печатает, что выполняет запрос, и каждый раз строит новый словарь результата - именно эту работу может перехватывать прокси."
+        }
+      },
+      {
+        "lines": [
+          18,
+          21
+        ],
+        "title": {
+          "en": "CachingProxy implements the same interface and wraps the real service",
+          "ru": "CachingProxy реализует тот же интерфейс и оборачивает настоящий сервис"
+        },
+        "explanation": {
+          "en": "`CachingProxy(DataService)` is interchangeable with `DatabaseService` from the caller's point of view, and `__init__` stores both the wrapped `self._service` and an empty `self._cache` dict.",
+          "ru": "`CachingProxy(DataService)` взаимозаменяем с `DatabaseService` с точки зрения вызывающего кода, а `__init__` сохраняет и обёрнутый `self._service`, и пустой словарь `self._cache`."
+        }
+      },
+      {
+        "lines": [
+          23,
+          30
+        ],
+        "title": {
+          "en": "fetch_data() checks the cache before touching the real service",
+          "ru": "fetch_data() проверяет кэш перед обращением к настоящему сервису"
+        },
+        "explanation": {
+          "en": "If `query in self._cache` it returns the cached result immediately without calling `self._service.fetch_data()`; otherwise it fetches, stores the result, and returns it.",
+          "ru": "Если `query in self._cache`, метод сразу возвращает закэшированный результат, не вызывая `self._service.fetch_data()`; иначе он выполняет запрос, сохраняет результат и возвращает его."
+        }
+      },
+      {
+        "lines": [
+          33,
+          39
+        ],
+        "title": {
+          "en": "The client uses the proxy exactly like the real service",
+          "ru": "Клиент использует прокси точно так же, как настоящий сервис"
+        },
+        "explanation": {
+          "en": "`service` is a `CachingProxy`, but every call is just `service.fetch_data(...)` - the repeated `\"users\"` call reuses the cache while `\"orders\"` triggers a fresh `DatabaseService` query, invisibly to the caller.",
+          "ru": "`service` - это `CachingProxy`, но каждый вызов выглядит просто как `service.fetch_data(...)` - повторный вызов для `\"users\"` переиспользует кэш, а `\"orders\"` вызывает новый запрос к `DatabaseService`, незаметно для вызывающего кода."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Cross-cutting concerns like caching, auditing, or throttling can be bolted onto a service without touching its source, keeping unrelated logic out of the business class.",

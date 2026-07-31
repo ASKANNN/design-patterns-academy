@@ -68,6 +68,180 @@
     "csharp": "interface IDevice\n{\n    bool IsEnabled();\n    void Enable();\n    void Disable();\n    int  GetVolume();\n    void SetVolume(int percent);\n}\n\nclass TV : IDevice\n{\n    private bool _enabled = false;\n    private int  _volume  = 30;\n\n    public bool IsEnabled() => _enabled;\n    public void Enable()  { _enabled = true;  Console.WriteLine(\"TV: powered on\"); }\n    public void Disable() { _enabled = false; Console.WriteLine(\"TV: powered off\"); }\n    public int  GetVolume() => _volume;\n    public void SetVolume(int p)\n    { _volume = Math.Clamp(p, 0, 100); Console.WriteLine($\"TV: volume set to {_volume}%\"); }\n}\n\nclass Radio : IDevice\n{\n    private bool _enabled = false;\n    private int  _volume  = 50;\n\n    public bool IsEnabled() => _enabled;\n    public void Enable()  { _enabled = true;  Console.WriteLine(\"Radio: powered on\"); }\n    public void Disable() { _enabled = false; Console.WriteLine(\"Radio: powered off\"); }\n    public int  GetVolume() => _volume;\n    public void SetVolume(int p)\n    { _volume = Math.Clamp(p, 0, 100); Console.WriteLine($\"Radio: volume set to {_volume}%\"); }\n}\n\nclass RemoteControl\n{\n    protected readonly IDevice Device;\n    public RemoteControl(IDevice device) => Device = device;\n\n    public void TogglePower() { if (Device.IsEnabled()) Device.Disable(); else Device.Enable(); }\n    public void VolumeUp()   => Device.SetVolume(Device.GetVolume() + 10);\n    public void VolumeDown() => Device.SetVolume(Device.GetVolume() - 10);\n}\n\nclass AdvancedRemote : RemoteControl\n{\n    public AdvancedRemote(IDevice device) : base(device) {}\n    public void Mute() { Device.SetVolume(0); Console.WriteLine(\"Remote: muted\"); }\n}\n\nvar tv     = new TV();\nvar remote = new AdvancedRemote(tv);\nremote.TogglePower();\nremote.VolumeUp();\nremote.Mute();\n\nnew RemoteControl(new Radio()).TogglePower();",
     "python": "from abc import ABC, abstractmethod\n\n\nclass Device(ABC):\n    @abstractmethod\n    def is_enabled(self) -> bool:\n        pass\n\n    @abstractmethod\n    def enable(self) -> None:\n        pass\n\n    @abstractmethod\n    def disable(self) -> None:\n        pass\n\n    @abstractmethod\n    def get_volume(self) -> int:\n        pass\n\n    @abstractmethod\n    def set_volume(self, percent: int) -> None:\n        pass\n\n\nclass TV(Device):\n    def __init__(self) -> None:\n        self._enabled = False\n        self._volume = 30\n\n    def is_enabled(self) -> bool: return self._enabled\n    def enable(self)  -> None: self._enabled = True;  print('TV: powered on')\n    def disable(self) -> None: self._enabled = False; print('TV: powered off')\n    def get_volume(self) -> int: return self._volume\n\n    def set_volume(self, percent: int) -> None:\n        self._volume = max(0, min(100, percent))\n        print(f'TV: volume set to {self._volume}%')\n\n\nclass Radio(Device):\n    def __init__(self) -> None:\n        self._enabled = False\n        self._volume = 50\n\n    def is_enabled(self) -> bool: return self._enabled\n    def enable(self)  -> None: self._enabled = True;  print('Radio: powered on')\n    def disable(self) -> None: self._enabled = False; print('Radio: powered off')\n    def get_volume(self) -> int: return self._volume\n\n    def set_volume(self, percent: int) -> None:\n        self._volume = max(0, min(100, percent))\n        print(f'Radio: volume set to {self._volume}%')\n\n\nclass RemoteControl:\n    def __init__(self, device: Device) -> None:\n        self._device = device\n\n    def toggle_power(self) -> None:\n        if self._device.is_enabled():\n            self._device.disable()\n        else:\n            self._device.enable()\n\n    def volume_up(self)   -> None: self._device.set_volume(self._device.get_volume() + 10)\n    def volume_down(self) -> None: self._device.set_volume(self._device.get_volume() - 10)\n\n\nclass AdvancedRemote(RemoteControl):\n    def mute(self) -> None:\n        self._device.set_volume(0)\n        print('Remote: muted')\n\n\ntv = TV()\nremote = AdvancedRemote(tv)\n\nremote.toggle_power()\nremote.volume_up()\nremote.mute()\n\nradio = Radio()\nbasic_remote = RemoteControl(radio)\nbasic_remote.toggle_power()\nbasic_remote.volume_down()"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          7
+        ],
+        "title": {
+          "en": "Device is the implementor interface",
+          "ru": "Device - интерфейс реализации"
+        },
+        "explanation": {
+          "en": "It declares `isEnabled`, `enable`, `disable`, `getVolume`, `setVolume` with no logic - any concrete device must supply all five.",
+          "ru": "Он объявляет `isEnabled`, `enable`, `disable`, `getVolume`, `setVolume` без логики - любое конкретное устройство обязано реализовать все пять."
+        }
+      },
+      {
+        "lines": [
+          9,
+          24
+        ],
+        "title": {
+          "en": "TV is one concrete implementation of Device",
+          "ru": "TV - одна конкретная реализация Device"
+        },
+        "explanation": {
+          "en": "It keeps its own `_enabled`/`_volume` state and implements every `Device` method its own way, e.g. logging `'TV: powered on'`.",
+          "ru": "Он хранит собственное состояние `_enabled`/`_volume` и реализует каждый метод `Device` по-своему, например логируя `'TV: powered on'`."
+        }
+      },
+      {
+        "lines": [
+          26,
+          41
+        ],
+        "title": {
+          "en": "Radio is a second, independent implementation",
+          "ru": "Radio - вторая, независимая реализация"
+        },
+        "explanation": {
+          "en": "It implements the same `Device` interface with a different starting volume (`50`) and its own log messages - `RemoteControl` won't need to know which one it's driving.",
+          "ru": "Он реализует тот же интерфейс `Device` с другой начальной громкостью (`50`) и своими сообщениями в лог - `RemoteControl` не будет знать, каким устройством он управляет."
+        }
+      },
+      {
+        "lines": [
+          43,
+          58
+        ],
+        "title": {
+          "en": "RemoteControl holds a Device reference, not a subclass",
+          "ru": "RemoteControl хранит ссылку на Device, а не подкласс"
+        },
+        "explanation": {
+          "en": "Its constructor stores `this.device` and every method (`togglePower`, `volumeUp`, `volumeDown`) calls back through that reference - this is the bridge between the abstraction and its implementor.",
+          "ru": "Конструктор сохраняет `this.device`, и каждый метод (`togglePower`, `volumeUp`, `volumeDown`) обращается через эту ссылку - это и есть мост между абстракцией и её реализацией."
+        }
+      },
+      {
+        "lines": [
+          60,
+          65
+        ],
+        "title": {
+          "en": "AdvancedRemote extends the abstraction, not the device",
+          "ru": "AdvancedRemote расширяет абстракцию, а не устройство"
+        },
+        "explanation": {
+          "en": "`mute()` is new remote-side behavior built from `this.device.setVolume(0)` - the abstraction hierarchy (remotes) grows independently of the implementor hierarchy (devices).",
+          "ru": "`mute()` - новое поведение на стороне пульта, построенное на `this.device.setVolume(0)` - иерархия абстракции (пультов) растёт независимо от иерархии реализации (устройств)."
+        }
+      },
+      {
+        "lines": [
+          67,
+          77
+        ],
+        "title": {
+          "en": "Any remote can drive any device",
+          "ru": "Любой пульт может управлять любым устройством"
+        },
+        "explanation": {
+          "en": "`AdvancedRemote` wraps a `TV` while a plain `RemoteControl` wraps a `Radio` - abstraction and implementor are combined freely at runtime, which is the whole point of the bridge.",
+          "ru": "`AdvancedRemote` оборачивает `TV`, а обычный `RemoteControl` - `Radio` - абстракция и реализация свободно комбинируются во время выполнения, в этом и есть смысл моста."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          4,
+          23
+        ],
+        "title": {
+          "en": "Device is the implementor interface",
+          "ru": "Device - интерфейс реализации"
+        },
+        "explanation": {
+          "en": "Every method (`is_enabled`, `enable`, `disable`, `get_volume`, `set_volume`) is `@abstractmethod` - any concrete device must implement all five before it can be instantiated.",
+          "ru": "Каждый метод (`is_enabled`, `enable`, `disable`, `get_volume`, `set_volume`) объявлен как `@abstractmethod` - любое конкретное устройство обязано реализовать все пять, прежде чем его можно будет создать."
+        }
+      },
+      {
+        "lines": [
+          26,
+          38
+        ],
+        "title": {
+          "en": "TV is one concrete implementation of Device",
+          "ru": "TV - одна конкретная реализация Device"
+        },
+        "explanation": {
+          "en": "It tracks its own `_enabled`/`_volume` and implements every `Device` method, e.g. printing `'TV: powered on'` from `enable`.",
+          "ru": "Он хранит собственные `_enabled`/`_volume` и реализует каждый метод `Device`, например выводя `'TV: powered on'` в `enable`."
+        }
+      },
+      {
+        "lines": [
+          41,
+          53
+        ],
+        "title": {
+          "en": "Radio is a second, independent implementation",
+          "ru": "Radio - вторая, независимая реализация"
+        },
+        "explanation": {
+          "en": "It fulfils the same `Device` contract with its own starting volume (`50`) and messages - interchangeable with `TV` from `RemoteControl`'s point of view.",
+          "ru": "Он выполняет тот же контракт `Device` со своей начальной громкостью (`50`) и сообщениями - взаимозаменяем с `TV` с точки зрения `RemoteControl`."
+        }
+      },
+      {
+        "lines": [
+          56,
+          67
+        ],
+        "title": {
+          "en": "RemoteControl holds a Device reference, not a subclass",
+          "ru": "RemoteControl хранит ссылку на Device, а не подкласс"
+        },
+        "explanation": {
+          "en": "`__init__` stores `self._device`, and `toggle_power`/`volume_up`/`volume_down` all delegate to it - this reference is the bridge between abstraction and implementor.",
+          "ru": "`__init__` сохраняет `self._device`, а `toggle_power`/`volume_up`/`volume_down` делегируют вызовы ему - эта ссылка и есть мост между абстракцией и реализацией."
+        }
+      },
+      {
+        "lines": [
+          70,
+          73
+        ],
+        "title": {
+          "en": "AdvancedRemote extends the abstraction, not the device",
+          "ru": "AdvancedRemote расширяет абстракцию, а не устройство"
+        },
+        "explanation": {
+          "en": "`mute()` is new remote-side behavior built on `self._device.set_volume(0)` - it adds to the abstraction hierarchy without touching `Device` or its subclasses.",
+          "ru": "`mute()` - новое поведение на стороне пульта, построенное на `self._device.set_volume(0)` - добавление в иерархию абстракции без изменения `Device` или его подклассов."
+        }
+      },
+      {
+        "lines": [
+          76,
+          86
+        ],
+        "title": {
+          "en": "Any remote can drive any device",
+          "ru": "Любой пульт может управлять любым устройством"
+        },
+        "explanation": {
+          "en": "`AdvancedRemote(tv)` and `RemoteControl(radio)` combine different abstraction/implementor pairs freely at runtime - the two hierarchies vary independently.",
+          "ru": "`AdvancedRemote(tv)` и `RemoteControl(radio)` свободно комбинируют разные пары абстракция/реализация во время выполнения - обе иерархии меняются независимо друг от друга."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "The two hierarchies genuinely stop interfering with each other - adding a new device type like Radio never touches RemoteControl or AdvancedRemote code, and adding a new remote variant never touches TV or Radio code.",
