@@ -332,10 +332,10 @@
 
 @media (max-width: 768px) {
   .diagram__viewport {
-    padding: var(--space-4);
+    padding: var(--space-5);
   }
   .diagram--concept .diagram__viewport {
-    padding: var(--space-5);
+    padding: var(--space-6);
   }
 }
 

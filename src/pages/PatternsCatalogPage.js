@@ -65,7 +65,12 @@ export async function PatternsCatalogPage({ category = '' } = {}) {
             content: `
               <p>${t('patterns.intro_p1')}</p>
               <p>${t('patterns.intro_authors')}</p>
-              <p>${t('patterns.intro_p2')}</p>
+              <p>${t('patterns.intro_p2_lead')}</p>
+              <ul class="patterns-intro__categories">
+                <li>${t('patterns.intro_p2_creational')}</li>
+                <li>${t('patterns.intro_p2_structural')}</li>
+                <li>${t('patterns.intro_p2_behavioral')}</li>
+              </ul>
               <div class="patterns-intro__groups">${introGroups}</div>
               <p>${t('patterns.intro_p3')}</p>
             `,
