@@ -274,7 +274,7 @@ only and may lag between updates.
 
 ## Phase 13 — Interactive Learning
 
-**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for all 23 patterns (Creational, Structural, Behavioral); playgrounds shipped and verified for all 23 patterns
+**Status:** Completed (2026-07-31)
 
 - [x] Interactive code walkthroughs — all 23 patterns done, see below
 - [x] Pattern playgrounds — all 23 patterns done, see below
@@ -284,7 +284,15 @@ only and may lag between updates.
       (`src/components/ui/Quiz.js`) shuffles question order and option
       order on every render, so the correct answer's position and the
       first question shown are never predictable.
-- Practical exercises
+- Owner manually tested quizzes, walkthroughs, and playgrounds across all
+  23 patterns and confirmed them working (2026-07-31).
+
+> **Practical exercises — deferred (2026-07-31, agreed with owner):** no
+> scope was ever agreed (task format, auto-check behavior, scoring), unlike
+> the other three sub-features which each started with an explicit scope
+> decision before implementation. Deferred, not discarded — same handling
+> as the deferred per-pattern illustrations idea (see Phase 14 note below).
+> Picking it up later needs its own scope discussion first.
 
 > **Code walkthroughs pilot (Singleton, 2026-07-31):** a new `walkthrough`
 > field on the pattern JSON, keyed per language
@@ -461,7 +469,9 @@ Version: **v1.1.0**
 
 Status: In active development
 
-Current focus: Phase 13 — Interactive Learning (Phase 12 closed 2026-07-28; all 23 patterns have bespoke diagrams and animated interactive scenes).
+Current focus: Phase 9 — verified live production deployment (Phase 13 closed
+2026-07-31; practical exercises deferred pending scope discussion). Phase 14
+— Platform Improvements is next after deployment is verified live.
 
 ---
 

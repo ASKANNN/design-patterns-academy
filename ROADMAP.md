@@ -194,7 +194,7 @@ No new features are implemented during this sprint — only bug fixing and stabi
 
 ---
 
-## Phase 13 — Interactive Learning
+## Phase 13 — Interactive Learning ✅
 
 > **Sequencing decision (2026-07-28, agreed with owner):** build order is
 > **Quizzes → Code walkthroughs → Pattern playgrounds**, not the order
@@ -291,7 +291,15 @@ No new features are implemented during this sprint — only bug fixing and stabi
       toggle transition: crossfading `color` alongside `background-color`
       produced an unreadable muddy-gray midpoint, so `color` now swaps
       instantly while background/border still transition smoothly.
-- [ ] Practical exercises
+> **Deferred (2026-07-31, agreed with owner):** "Practical exercises" has
+> no agreed spec (task format, auto-check behavior, scoring — none of it
+> was ever defined), unlike quizzes/walkthroughs/playgrounds which each
+> started with an explicit scope decision before build. Owner confirmed
+> quizzes, walkthroughs, and playgrounds are manually tested and approved
+> across all 23 patterns. **Phase 13 is closed on that basis** — practical
+> exercises is deferred, not discarded; picking it up later requires its
+> own scope discussion first, same handling as the deferred per-pattern
+> illustrations idea under Phase 14.
 
 ---
 
