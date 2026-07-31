@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://design-patterns-academy-gilt.vercel.app/sitemap.xml
+Sitemap: https://askan-de-pa-ac.vercel.app/sitemap.xml
