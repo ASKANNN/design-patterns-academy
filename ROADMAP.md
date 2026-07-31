@@ -276,6 +276,21 @@ No new features are implemented during this sprint — only bug fixing and stabi
       instead; and code-surface text selection was nearly invisible in
       both themes — added a dedicated `--code-selection-bg` token and a
       `::selection` rule scoped to `.code-block`/`.playground__textarea`.
+      **Owner visual-review fixes (2026-07-31):** disabled the
+      `.playground__textarea` resize handle (`resize: none`) — the drag
+      cursor appeared but did nothing useful, clipped by the pane's
+      `overflow: hidden`. Walkthrough step cards no longer jump in height
+      between steps (`.walkthrough__steps` uses CSS grid stacking so the
+      container's height tracks the tallest step, all hidden via
+      `visibility: hidden` not `display: none`). The active code range in
+      the Implementation tab walkthrough now auto-scrolls to stay
+      vertically centered on every step, scoped strictly to the
+      `.code-block__body` scroll container (`getBoundingClientRect()` +
+      `scrollTo`, not `scrollIntoView`, which was found to scroll the
+      whole page/header out of view). Also fixed the light/dark theme
+      toggle transition: crossfading `color` alongside `background-color`
+      produced an unreadable muddy-gray midpoint, so `color` now swaps
+      instantly while background/border still transition smoothly.
 - [ ] Practical exercises
 
 ---

@@ -19,7 +19,9 @@ export function Walkthrough({ id, steps = [], lang } = {}) {
 
   return `
     <div class="walkthrough" data-walkthrough="${id}" id="${id}">
-      ${stepBlocks}
+      <div class="walkthrough__steps">
+        ${stepBlocks}
+      </div>
       <div class="walkthrough__nav">
         <button type="button" class="btn btn--secondary btn--sm walkthrough__prev" data-walkthrough-prev disabled>${t('patterns.walkthrough.prev')}</button>
         <span class="walkthrough__dots" data-walkthrough-dots aria-hidden="true">${dots}</span>

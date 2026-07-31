@@ -413,9 +413,22 @@ function handleWalkthroughNav(btn) {
     line.classList.toggle('is-active-line', n >= start && n <= end);
   });
 
-  const firstActiveLine = wrap.querySelector('.is-active-line');
-  if (firstActiveLine) firstActiveLine.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  steps[next].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  if (getComputedStyle(walkthrough).position !== 'sticky') {
+    steps[next].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  const activeLines = wrap.querySelectorAll('.is-active-line');
+  const codeBody     = wrap.querySelector('.code-block__body');
+  if (activeLines.length && codeBody) {
+    const bodyRect    = codeBody.getBoundingClientRect();
+    const firstRect   = activeLines[0].getBoundingClientRect();
+    const lastRect    = activeLines[activeLines.length - 1].getBoundingClientRect();
+    const rangeTop    = firstRect.top - bodyRect.top + codeBody.scrollTop;
+    const rangeBottom = lastRect.bottom - bodyRect.top + codeBody.scrollTop;
+    const rangeCenter = (rangeTop + rangeBottom) / 2;
+    const target      = rangeCenter - (codeBody.clientHeight / 2);
+    codeBody.scrollTo({ top: Math.max(0, target), left: 0, behavior: 'smooth' });
+  }
 }
 
 function handlePlaygroundRun(btn) {

@@ -35,8 +35,18 @@
   }
 }
 
+.walkthrough__steps {
+  display: grid;
+}
+
+.walkthrough__step {
+  grid-area: 1 / 1;
+}
+
 .walkthrough__step[hidden] {
-  display: none;
+  display: block;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .walkthrough__progress {

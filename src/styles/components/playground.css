@@ -61,7 +61,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   line-height: var(--line-height-code);
-  resize: vertical;
+  resize: none;
 }
 
 .playground__textarea:focus-visible {
