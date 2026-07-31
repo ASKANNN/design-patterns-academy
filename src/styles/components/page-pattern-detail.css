@@ -142,6 +142,7 @@
 }
 
 .lang-btn {
+  position: relative;
   padding: var(--space-1) var(--space-3);
   font-family: var(--font-sans);
   font-size: var(--text-sm);
@@ -172,13 +173,13 @@
 }
 
 .lang-btn__badge {
-  display: inline-block;
+  position: absolute;
+  top: 2px;
+  right: 2px;
   width: 6px;
   height: 6px;
-  margin-left: var(--space-1);
   border-radius: var(--radius-full);
   background-color: var(--color-accent);
-  vertical-align: middle;
 }
 
 .lang-panel { display: none; }
