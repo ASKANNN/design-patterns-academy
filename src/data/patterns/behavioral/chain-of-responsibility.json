@@ -69,6 +69,180 @@
     "csharp": "abstract class Approver\n{\n    protected readonly string Name;\n    protected readonly int    Limit;\n    private Approver _next;\n\n    protected Approver(string name, int limit) { Name = name; Limit = limit; }\n\n    public Approver SetNext(Approver handler) { _next = handler; return handler; }\n\n    public void Approve(int amount)\n    {\n        if (amount <= Limit)\n            Console.WriteLine($\"{Name} approved ${amount}\");\n        else if (_next != null)\n            _next.Approve(amount);\n        else\n            Console.WriteLine($\"No one can approve ${amount}\");\n    }\n}\n\nclass TeamLead : Approver { public TeamLead() : base(\"Team Lead\",   1_000) {} }\nclass Manager  : Approver { public Manager()  : base(\"Manager\",    10_000) {} }\nclass Director : Approver { public Director() : base(\"Director\",  100_000) {} }\nclass Ceo      : Approver { public Ceo()      : base(\"CEO\", int.MaxValue) {} }\n\nvar lead     = new TeamLead();\nvar manager  = new Manager();\nvar director = new Director();\nvar ceo      = new Ceo();\n\nlead.SetNext(manager).SetNext(director).SetNext(ceo);\n\nlead.Approve(800);\nlead.Approve(5_000);\nlead.Approve(90_000);\nlead.Approve(500_000);",
     "python": "from __future__ import annotations\nfrom abc import ABC\n\n\nclass Approver(ABC):\n    def __init__(self, name: str, limit: int) -> None:\n        self.name = name\n        self.limit = limit\n        self._next: Approver | None = None\n\n    def set_next(self, handler: Approver) -> Approver:\n        self._next = handler\n        return handler\n\n    def approve(self, amount: int) -> None:\n        if amount <= self.limit:\n            print(f'{self.name} approved ${amount}')\n        elif self._next:\n            self._next.approve(amount)\n        else:\n            print(f'No one can approve ${amount}')\n\n\nclass TeamLead(Approver):\n    def __init__(self) -> None:\n        super().__init__('Team Lead', 1_000)\n\n\nclass Manager(Approver):\n    def __init__(self) -> None:\n        super().__init__('Manager', 10_000)\n\n\nclass Director(Approver):\n    def __init__(self) -> None:\n        super().__init__('Director', 100_000)\n\n\nclass Ceo(Approver):\n    def __init__(self) -> None:\n        super().__init__('CEO', float('inf'))\n\n\nlead = TeamLead()\nmanager = Manager()\ndirector = Director()\nceo = Ceo()\n\nlead.set_next(manager).set_next(director).set_next(ceo)\n\nlead.approve(800)\nlead.approve(5_000)\nlead.approve(90_000)\nlead.approve(500_000)"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          6
+        ],
+        "title": {
+          "en": "Approver stores its own limit and a link to the next handler",
+          "ru": "Approver хранит свой лимит и ссылку на следующего обработчика"
+        },
+        "explanation": {
+          "en": "The constructor takes `name` and `limit`, and initializes `this.next = null` - every handler in the chain is just an object with a threshold and an optional successor.",
+          "ru": "Конструктор принимает `name` и `limit`, а также инициализирует `this.next = null` - каждый обработчик в цепочке - это просто объект с порогом и опциональным преемником."
+        }
+      },
+      {
+        "lines": [
+          8,
+          11
+        ],
+        "title": {
+          "en": "setNext links handlers and returns the argument for chaining",
+          "ru": "setNext связывает обработчиков и возвращает аргумент для цепочки вызовов"
+        },
+        "explanation": {
+          "en": "`setNext(handler)` stores `handler` in `this.next` and returns that same `handler`, not `this` - that's what lets calls be chained fluently like `a.setNext(b).setNext(c)`.",
+          "ru": "`setNext(handler)` сохраняет `handler` в `this.next` и возвращает именно этот `handler`, а не `this` - именно это позволяет писать цепочку вызовов подряд, например `a.setNext(b).setNext(c)`."
+        }
+      },
+      {
+        "lines": [
+          13,
+          21
+        ],
+        "title": {
+          "en": "approve handles it locally or forwards down the chain",
+          "ru": "approve обрабатывает запрос сам или передаёт его дальше по цепочке"
+        },
+        "explanation": {
+          "en": "If `amount <= this.limit` the handler approves it itself; otherwise, if `this.next` exists, it delegates by calling `this.next.approve(amount)`; if there's no next handler left, it logs that no one could approve it.",
+          "ru": "Если `amount <= this.limit`, обработчик утверждает сумму сам; иначе, если есть `this.next`, он делегирует запрос вызовом `this.next.approve(amount)`; а если следующего обработчика нет, выводит сообщение, что утвердить некому."
+        }
+      },
+      {
+        "lines": [
+          24,
+          27
+        ],
+        "title": {
+          "en": "Four concrete handlers just fix a name and a limit",
+          "ru": "Четыре конкретных обработчика лишь задают имя и лимит"
+        },
+        "explanation": {
+          "en": "`TeamLead`, `Manager`, `Director` and `Ceo` each `extends Approver` and call `super(name, limit)` with an increasing threshold, up to `Infinity` for the CEO - none of them override `approve` or `setNext`.",
+          "ru": "`TeamLead`, `Manager`, `Director` и `Ceo` наследуют `Approver` и вызывают `super(name, limit)` с возрастающим порогом, вплоть до `Infinity` для CEO - ни один из них не переопределяет `approve` или `setNext`."
+        }
+      },
+      {
+        "lines": [
+          29,
+          34
+        ],
+        "title": {
+          "en": "The chain is wired together with one fluent statement",
+          "ru": "Цепочка собирается одной цепочкой вызовов"
+        },
+        "explanation": {
+          "en": "`lead.setNext(manager).setNext(director).setNext(ceo)` works because each `setNext` returns its argument, so the next `.setNext(...)` is called on the handler that was just linked in.",
+          "ru": "`lead.setNext(manager).setNext(director).setNext(ceo)` работает потому, что каждый `setNext` возвращает свой аргумент, и следующий `.setNext(...)` вызывается уже на только что подключённом обработчике."
+        }
+      },
+      {
+        "lines": [
+          36,
+          39
+        ],
+        "title": {
+          "en": "The client only ever talks to the first handler",
+          "ru": "Клиент обращается только к первому обработчику"
+        },
+        "explanation": {
+          "en": "Every call goes through `lead.approve(...)` - the caller doesn't know or care which handler in the chain ends up approving each amount.",
+          "ru": "Каждый вызов идёт через `lead.approve(...)` - вызывающий код не знает и не заботится о том, какой обработчик в цепочке в итоге утвердит конкретную сумму."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          9
+        ],
+        "title": {
+          "en": "Approver stores its own limit and a link to the next handler",
+          "ru": "Approver хранит свой лимит и ссылку на следующего обработчика"
+        },
+        "explanation": {
+          "en": "`__init__` takes `name` and `limit`, and sets `self._next: Approver | None = None` - every handler is just an object with a threshold and an optional successor.",
+          "ru": "`__init__` принимает `name` и `limit`, а также задаёт `self._next: Approver | None = None` - каждый обработчик - это просто объект с порогом и опциональным преемником."
+        }
+      },
+      {
+        "lines": [
+          11,
+          13
+        ],
+        "title": {
+          "en": "set_next links handlers and returns the argument for chaining",
+          "ru": "set_next связывает обработчиков и возвращает аргумент для цепочки вызовов"
+        },
+        "explanation": {
+          "en": "`set_next(handler)` stores `handler` in `self._next` and returns that same `handler`, not `self` - that's what lets calls be chained fluently like `a.set_next(b).set_next(c)`.",
+          "ru": "`set_next(handler)` сохраняет `handler` в `self._next` и возвращает именно этот `handler`, а не `self` - именно это позволяет писать цепочку вызовов подряд, например `a.set_next(b).set_next(c)`."
+        }
+      },
+      {
+        "lines": [
+          15,
+          21
+        ],
+        "title": {
+          "en": "approve handles it locally or forwards down the chain",
+          "ru": "approve обрабатывает запрос сам или передаёт его дальше по цепочке"
+        },
+        "explanation": {
+          "en": "If `amount <= self.limit` the handler prints its own approval; otherwise, if `self._next` is set, it delegates via `self._next.approve(amount)`; if not, it prints that no one could approve it.",
+          "ru": "Если `amount <= self.limit`, обработчик сам печатает подтверждение; иначе, если задан `self._next`, он делегирует запрос через `self._next.approve(amount)`; а если нет - печатает, что утвердить некому."
+        }
+      },
+      {
+        "lines": [
+          24,
+          41
+        ],
+        "title": {
+          "en": "Four concrete handlers just fix a name and a limit",
+          "ru": "Четыре конкретных обработчика лишь задают имя и лимит"
+        },
+        "explanation": {
+          "en": "`TeamLead`, `Manager`, `Director` and `Ceo` each subclass `Approver` and call `super().__init__(name, limit)` with an increasing threshold, up to `float('inf')` for the CEO - none of them override `approve` or `set_next`.",
+          "ru": "`TeamLead`, `Manager`, `Director` и `Ceo` наследуют `Approver` и вызывают `super().__init__(name, limit)` с возрастающим порогом, вплоть до `float('inf')` для CEO - ни один из них не переопределяет `approve` или `set_next`."
+        }
+      },
+      {
+        "lines": [
+          44,
+          49
+        ],
+        "title": {
+          "en": "The chain is wired together with one fluent statement",
+          "ru": "Цепочка собирается одной цепочкой вызовов"
+        },
+        "explanation": {
+          "en": "`lead.set_next(manager).set_next(director).set_next(ceo)` works because each `set_next` returns its argument, so the next `.set_next(...)` is called on the handler that was just linked in.",
+          "ru": "`lead.set_next(manager).set_next(director).set_next(ceo)` работает потому, что каждый `set_next` возвращает свой аргумент, и следующий `.set_next(...)` вызывается уже на только что подключённом обработчике."
+        }
+      },
+      {
+        "lines": [
+          51,
+          54
+        ],
+        "title": {
+          "en": "The client only ever talks to the first handler",
+          "ru": "Клиент обращается только к первому обработчику"
+        },
+        "explanation": {
+          "en": "Every call goes through `lead.approve(...)` - the caller doesn't know or care which handler in the chain ends up approving each amount.",
+          "ru": "Каждый вызов идёт через `lead.approve(...)` - вызывающий код не знает и не заботится о том, какой обработчик в цепочке в итоге утвердит конкретную сумму."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Callers stay ignorant of which handler ultimately does the work, so the code that issues a request and the code that fulfills it can evolve independently.",

@@ -53,6 +53,180 @@
     "csharp": "abstract class ReportGenerator\n{\n    public string Generate(string title, string[] rows)\n    {\n        var parts = new[] { Header(title), Body(rows), Footer() };\n        return string.Join(\"\\n\", parts.Where(p => !string.IsNullOrEmpty(p)));\n    }\n\n    protected virtual string Header(string title) => \"\";\n    protected virtual string Footer()             => \"\";\n\n    protected abstract string Body(string[] rows);\n}\n\nclass HtmlReport : ReportGenerator\n{\n    protected override string Header(string title) => $\"<h1>{title}</h1><ul>\";\n    protected override string Body(string[] rows)  =>\n        string.Join(\"\\n\", rows.Select(r => $\"  <li>{r}</li>\"));\n    protected override string Footer() => \"</ul>\";\n}\n\nclass MarkdownReport : ReportGenerator\n{\n    protected override string Header(string title) => $\"# {title}\\n\";\n    protected override string Body(string[] rows)  =>\n        string.Join(\"\\n\", rows.Select(r => $\"- {r}\"));\n}\n\nstring[] rows = { \"Design Patterns\", \"Clean Code\", \"SOLID\" };\n\nConsole.WriteLine(new HtmlReport().Generate(\"Books\", rows));\n\nConsole.WriteLine(new MarkdownReport().Generate(\"Books\", rows));",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass ReportGenerator(ABC):\n    def generate(self, title: str, rows: list[str]) -> str:\n        parts = [self.header(title), self.body(rows), self.footer()]\n        return '\\n'.join(p for p in parts if p)\n\n    def header(self, title: str) -> str: return ''\n    def footer(self) -> str:             return ''\n\n    @abstractmethod\n    def body(self, rows: list[str]) -> str: ...\n\n\nclass HtmlReport(ReportGenerator):\n    def header(self, title: str) -> str:\n        return f'<h1>{title}</h1><ul>'\n\n    def body(self, rows: list[str]) -> str:\n        return '\\n'.join(f'  <li>{r}</li>' for r in rows)\n\n    def footer(self) -> str:\n        return '</ul>'\n\n\nclass MarkdownReport(ReportGenerator):\n    def header(self, title: str) -> str:\n        return f'# {title}\\n'\n\n    def body(self, rows: list[str]) -> str:\n        return '\\n'.join(f'- {r}' for r in rows)\n\n\nrows = ['Design Patterns', 'Clean Code', 'SOLID']\n\nhtml = HtmlReport()\nprint(html.generate('Books', rows))\n\nmd = MarkdownReport()\nprint(md.generate('Books', rows))"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          9
+        ],
+        "title": {
+          "en": "generate() is the template method - it fixes the algorithm's skeleton",
+          "ru": "generate() - шаблонный метод, он фиксирует скелет алгоритма"
+        },
+        "explanation": {
+          "en": "`generate` always calls `this.header(title)`, `this.body(rows)`, `this.footer()` in that order, filters out empty strings, and joins them - subclasses can't reorder or skip these steps, only fill in what each one produces.",
+          "ru": "`generate` всегда вызывает `this.header(title)`, `this.body(rows)`, `this.footer()` именно в этом порядке, отфильтровывает пустые строки и склеивает результат - подклассы не могут изменить порядок или пропустить шаги, они могут лишь наполнить каждый шаг содержимым."
+        }
+      },
+      {
+        "lines": [
+          11,
+          16
+        ],
+        "title": {
+          "en": "header/footer are optional hooks, body is a required hook",
+          "ru": "header/footer - необязательные хуки, а body - обязательный"
+        },
+        "explanation": {
+          "en": "`header` and `footer` default to returning `''` (safe to skip), while `body` throws if not overridden - the base class distinguishes steps every report needs from steps that are merely optional.",
+          "ru": "`header` и `footer` по умолчанию возвращают `''` (их можно не переопределять), а `body` бросает исключение, если не переопределён - базовый класс различает шаги, обязательные для каждого отчёта, и шаги, которые можно опустить."
+        }
+      },
+      {
+        "lines": [
+          19,
+          23
+        ],
+        "title": {
+          "en": "HtmlReport overrides all three hooks",
+          "ru": "HtmlReport переопределяет все три хука"
+        },
+        "explanation": {
+          "en": "It supplies `header`, `body` and `footer` to wrap the rows in `<h1>`/`<ul>`/`<li>` tags - `generate` itself is never touched or repeated here.",
+          "ru": "Он предоставляет `header`, `body` и `footer`, чтобы обернуть строки в теги `<h1>`/`<ul>`/`<li>` - сам `generate` здесь не трогается и не дублируется."
+        }
+      },
+      {
+        "lines": [
+          25,
+          28
+        ],
+        "title": {
+          "en": "MarkdownReport only overrides header and body, inheriting the default footer",
+          "ru": "MarkdownReport переопределяет только header и body, наследуя footer по умолчанию"
+        },
+        "explanation": {
+          "en": "It skips overriding `footer`, so `generate` will call the base class's version that returns `''`, which then gets filtered out by `parts.filter(Boolean)`.",
+          "ru": "Он не переопределяет `footer`, поэтому `generate` вызывает версию базового класса, возвращающую `''`, которая затем отфильтровывается через `parts.filter(Boolean)`."
+        }
+      },
+      {
+        "lines": [
+          30,
+          33
+        ],
+        "title": {
+          "en": "html.generate() runs the fixed algorithm using HTML-specific steps",
+          "ru": "html.generate() выполняет фиксированный алгоритм, используя HTML-специфичные шаги"
+        },
+        "explanation": {
+          "en": "`html.generate('Books', rows)` calls the inherited `generate`, which invokes `HtmlReport`'s `header`, `body` and `footer` in sequence, producing a full `<h1>...</h1><ul>...</ul>` block.",
+          "ru": "`html.generate('Books', rows)` вызывает унаследованный `generate`, который последовательно вызывает `header`, `body` и `footer` из `HtmlReport`, формируя полный блок `<h1>...</h1><ul>...</ul>`."
+        }
+      },
+      {
+        "lines": [
+          35,
+          36
+        ],
+        "title": {
+          "en": "md.generate() runs the exact same algorithm, producing Markdown instead",
+          "ru": "md.generate() выполняет тот же самый алгоритм, но получая на выходе Markdown"
+        },
+        "explanation": {
+          "en": "`md.generate('Books', rows)` goes through the identical `header → body → footer → filter → join` sequence in `generate`, but since `MarkdownReport` fills the hooks differently, the output is a `# Books` heading with `- ` list items and no closing footer line.",
+          "ru": "`md.generate('Books', rows)` проходит ту же самую последовательность `header → body → footer → filter → join` внутри `generate`, но поскольку `MarkdownReport` заполняет хуки иначе, на выходе получается заголовок `# Books` со списком через `- ` и без завершающей строки footer."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          6,
+          8
+        ],
+        "title": {
+          "en": "generate() is the template method - it fixes the algorithm's skeleton",
+          "ru": "generate() - шаблонный метод, он фиксирует скелет алгоритма"
+        },
+        "explanation": {
+          "en": "`generate` always calls `self.header(title)`, `self.body(rows)`, `self.footer()` in that order, filters truthy parts, and joins them - subclasses can't reorder or skip these steps, only fill in what each one produces.",
+          "ru": "`generate` всегда вызывает `self.header(title)`, `self.body(rows)`, `self.footer()` именно в этом порядке, отфильтровывает непустые части и склеивает результат - подклассы не могут изменить порядок или пропустить шаги, они могут лишь наполнить каждый шаг содержимым."
+        }
+      },
+      {
+        "lines": [
+          10,
+          14
+        ],
+        "title": {
+          "en": "header/footer are optional hooks, body is a required hook",
+          "ru": "header/footer - необязательные хуки, а body - обязательный"
+        },
+        "explanation": {
+          "en": "`header` and `footer` default to returning `''` (safe to skip), while `body` is `@abstractmethod` - the base class distinguishes steps every report needs from steps that are merely optional.",
+          "ru": "`header` и `footer` по умолчанию возвращают `''` (их можно не переопределять), а `body` объявлен как `@abstractmethod` - базовый класс различает шаги, обязательные для каждого отчёта, и шаги, которые можно опустить."
+        }
+      },
+      {
+        "lines": [
+          17,
+          25
+        ],
+        "title": {
+          "en": "HtmlReport overrides all three hooks",
+          "ru": "HtmlReport переопределяет все три хука"
+        },
+        "explanation": {
+          "en": "It supplies `header`, `body` and `footer` to wrap the rows in `<h1>`/`<ul>`/`<li>` tags - `generate` itself is never touched or repeated here.",
+          "ru": "Он предоставляет `header`, `body` и `footer`, чтобы обернуть строки в теги `<h1>`/`<ul>`/`<li>` - сам `generate` здесь не трогается и не дублируется."
+        }
+      },
+      {
+        "lines": [
+          28,
+          33
+        ],
+        "title": {
+          "en": "MarkdownReport only overrides header and body, inheriting the default footer",
+          "ru": "MarkdownReport переопределяет только header и body, наследуя footer по умолчанию"
+        },
+        "explanation": {
+          "en": "It skips overriding `footer`, so `generate` will call the base class's version that returns `''`, which then gets filtered out by the `if p` condition in the join.",
+          "ru": "Он не переопределяет `footer`, поэтому `generate` вызывает версию базового класса, возвращающую `''`, которая затем отфильтровывается условием `if p` при склейке."
+        }
+      },
+      {
+        "lines": [
+          38,
+          39
+        ],
+        "title": {
+          "en": "html.generate() runs the fixed algorithm using HTML-specific steps",
+          "ru": "html.generate() выполняет фиксированный алгоритм, используя HTML-специфичные шаги"
+        },
+        "explanation": {
+          "en": "`html.generate('Books', rows)` calls the inherited `generate`, which invokes `HtmlReport`'s `header`, `body` and `footer` in sequence, producing a full `<h1>...</h1><ul>...</ul>` block.",
+          "ru": "`html.generate('Books', rows)` вызывает унаследованный `generate`, который последовательно вызывает `header`, `body` и `footer` из `HtmlReport`, формируя полный блок `<h1>...</h1><ul>...</ul>`."
+        }
+      },
+      {
+        "lines": [
+          41,
+          42
+        ],
+        "title": {
+          "en": "md.generate() runs the exact same algorithm, producing Markdown instead",
+          "ru": "md.generate() выполняет тот же самый алгоритм, но получая на выходе Markdown"
+        },
+        "explanation": {
+          "en": "`md.generate('Books', rows)` goes through the identical `header → body → footer → filter → join` sequence in `generate`, but since `MarkdownReport` fills the hooks differently, the output is a `# Books` heading with `- ` list items and no closing footer line.",
+          "ru": "`md.generate('Books', rows)` проходит ту же самую последовательность `header → body → footer → filter → join` внутри `generate`, но поскольку `MarkdownReport` заполняет хуки иначе, на выходе получается заголовок `# Books` со списком через `- ` и без завершающей строки footer."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Subclasses only need to fill in the steps that actually vary, instead of re-implementing the whole algorithm.",

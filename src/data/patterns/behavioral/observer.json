@@ -63,6 +63,152 @@
     "csharp": "interface ISubscriber\n{\n    void Update(double temperature);\n}\n\nclass WeatherStation\n{\n    private readonly HashSet<ISubscriber> subscribers = new();\n\n    public void Subscribe(ISubscriber subscriber) => subscribers.Add(subscriber);\n\n    public void Unsubscribe(ISubscriber subscriber) => subscribers.Remove(subscriber);\n\n    public void SetReading(double temperature)\n    {\n        foreach (var subscriber in subscribers) subscriber.Update(temperature);\n    }\n}\n\nclass PhoneApp : ISubscriber\n{\n    public void Update(double temperature) => Console.WriteLine($\"Phone app: new reading {temperature}°C\");\n}\n\nclass DesktopWidget : ISubscriber\n{\n    public void Update(double temperature) => Console.WriteLine($\"Desktop widget: new reading {temperature}°C\");\n}\n\nclass LoggingService : ISubscriber\n{\n    public void Update(double temperature) => Console.WriteLine($\"Logged reading: {temperature}°C\");\n}\n\nvar station = new WeatherStation();\nstation.Subscribe(new PhoneApp());\nstation.Subscribe(new DesktopWidget());\nstation.Subscribe(new LoggingService());\n\nstation.SetReading(21.5);",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass Subscriber(ABC):\n    @abstractmethod\n    def update(self, temperature: float) -> None: ...\n\n\nclass WeatherStation:\n    def __init__(self) -> None:\n        self._subscribers: set[Subscriber] = set()\n\n    def subscribe(self, subscriber: Subscriber) -> None:\n        self._subscribers.add(subscriber)\n\n    def unsubscribe(self, subscriber: Subscriber) -> None:\n        self._subscribers.discard(subscriber)\n\n    def set_reading(self, temperature: float) -> None:\n        for subscriber in self._subscribers:\n            subscriber.update(temperature)\n\n\nclass PhoneApp(Subscriber):\n    def update(self, temperature: float) -> None:\n        print(f'Phone app: new reading {temperature}°C')\n\n\nclass DesktopWidget(Subscriber):\n    def update(self, temperature: float) -> None:\n        print(f'Desktop widget: new reading {temperature}°C')\n\n\nclass LoggingService(Subscriber):\n    def update(self, temperature: float) -> None:\n        print(f'Logged reading: {temperature}°C')\n\n\nstation = WeatherStation()\nstation.subscribe(PhoneApp())\nstation.subscribe(DesktopWidget())\nstation.subscribe(LoggingService())\n\nstation.set_reading(21.5)"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          3
+        ],
+        "title": {
+          "en": "Subscriber is the interface every observer must implement",
+          "ru": "Subscriber - интерфейс, который обязан реализовать каждый наблюдатель"
+        },
+        "explanation": {
+          "en": "The base `update(temperature)` throws - it exists only to define the contract that `WeatherStation` will call on every subscriber.",
+          "ru": "Базовый `update(temperature)` бросает исключение - он существует только для того, чтобы задать контракт, который `WeatherStation` будет вызывать у каждого подписчика."
+        }
+      },
+      {
+        "lines": [
+          5,
+          19
+        ],
+        "title": {
+          "en": "WeatherStation is the subject - it tracks subscribers and notifies them",
+          "ru": "WeatherStation - субъект, он отслеживает подписчиков и уведомляет их"
+        },
+        "explanation": {
+          "en": "`#subscribers` is a `Set`, so `subscribe`/`unsubscribe` are just add/delete; `setReading` calls `subscriber.update(temperature)` on every current subscriber - the station never knows what kind of subscriber it's talking to.",
+          "ru": "`#subscribers` - это `Set`, поэтому `subscribe`/`unsubscribe` - это просто добавление/удаление; `setReading` вызывает `subscriber.update(temperature)` у каждого текущего подписчика - станция никогда не знает, с каким именно типом подписчика она взаимодействует."
+        }
+      },
+      {
+        "lines": [
+          21,
+          37
+        ],
+        "title": {
+          "en": "Three concrete subscribers react differently to the same update",
+          "ru": "Три конкретных подписчика по-разному реагируют на одно и то же обновление"
+        },
+        "explanation": {
+          "en": "`PhoneApp`, `DesktopWidget` and `LoggingService` all `extends Subscriber` and implement `update` with their own `console.log` - each decides independently what to do with the same `temperature` value.",
+          "ru": "`PhoneApp`, `DesktopWidget` и `LoggingService` наследуют `Subscriber` и реализуют `update` со своим собственным `console.log` - каждый независимо решает, что делать с одним и тем же значением `temperature`."
+        }
+      },
+      {
+        "lines": [
+          39,
+          42
+        ],
+        "title": {
+          "en": "Subscribers register themselves with the station",
+          "ru": "Подписчики регистрируются в станции"
+        },
+        "explanation": {
+          "en": "Three different `Subscriber` instances are added via `station.subscribe(...)` - the station just accumulates them into `#subscribers` without distinguishing their types.",
+          "ru": "Три разных экземпляра `Subscriber` добавляются через `station.subscribe(...)` - станция просто накапливает их в `#subscribers`, не различая их типы."
+        }
+      },
+      {
+        "lines": [
+          44,
+          44
+        ],
+        "title": {
+          "en": "One setReading() call fans out to all three subscribers",
+          "ru": "Один вызов setReading() рассылает обновление всем трём подписчикам"
+        },
+        "explanation": {
+          "en": "`station.setReading(21.5)` triggers the `forEach` in `setReading`, so `PhoneApp`, `DesktopWidget` and `LoggingService` each log their own message with the same `21.5` value.",
+          "ru": "`station.setReading(21.5)` запускает `forEach` внутри `setReading`, поэтому `PhoneApp`, `DesktopWidget` и `LoggingService` каждый выводит своё собственное сообщение с одним и тем же значением `21.5`."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          7
+        ],
+        "title": {
+          "en": "Subscriber is the interface every observer must implement",
+          "ru": "Subscriber - интерфейс, который обязан реализовать каждый наблюдатель"
+        },
+        "explanation": {
+          "en": "`update(temperature)` is `@abstractmethod` - it exists only to define the contract `WeatherStation` will call on every subscriber.",
+          "ru": "`update(temperature)` объявлен как `@abstractmethod` - он существует только для того, чтобы задать контракт, который `WeatherStation` будет вызывать у каждого подписчика."
+        }
+      },
+      {
+        "lines": [
+          10,
+          22
+        ],
+        "title": {
+          "en": "WeatherStation is the subject - it tracks subscribers and notifies them",
+          "ru": "WeatherStation - субъект, он отслеживает подписчиков и уведомляет их"
+        },
+        "explanation": {
+          "en": "`_subscribers` is a `set`, so `subscribe`/`unsubscribe` just add/`discard`; `set_reading` loops over `_subscribers` and calls `update(temperature)` on each - the station never knows what kind of subscriber it's talking to.",
+          "ru": "`_subscribers` - это `set`, поэтому `subscribe`/`unsubscribe` - это просто добавление/`discard`; `set_reading` проходит по `_subscribers` и вызывает у каждого `update(temperature)` - станция никогда не знает, с каким именно типом подписчика она взаимодействует."
+        }
+      },
+      {
+        "lines": [
+          25,
+          37
+        ],
+        "title": {
+          "en": "Three concrete subscribers react differently to the same update",
+          "ru": "Три конкретных подписчика по-разному реагируют на одно и то же обновление"
+        },
+        "explanation": {
+          "en": "`PhoneApp`, `DesktopWidget` and `LoggingService` all subclass `Subscriber` and implement `update` with their own `print` call - each decides independently what to do with the same `temperature` value.",
+          "ru": "`PhoneApp`, `DesktopWidget` и `LoggingService` наследуют `Subscriber` и реализуют `update` со своим собственным вызовом `print` - каждый независимо решает, что делать с одним и тем же значением `temperature`."
+        }
+      },
+      {
+        "lines": [
+          40,
+          43
+        ],
+        "title": {
+          "en": "Subscribers register themselves with the station",
+          "ru": "Подписчики регистрируются в станции"
+        },
+        "explanation": {
+          "en": "Three different `Subscriber` instances are added via `station.subscribe(...)` - the station just accumulates them into `_subscribers` without distinguishing their types.",
+          "ru": "Три разных экземпляра `Subscriber` добавляются через `station.subscribe(...)` - станция просто накапливает их в `_subscribers`, не различая их типы."
+        }
+      },
+      {
+        "lines": [
+          45,
+          45
+        ],
+        "title": {
+          "en": "One set_reading() call fans out to all three subscribers",
+          "ru": "Один вызов set_reading() рассылает обновление всем трём подписчикам"
+        },
+        "explanation": {
+          "en": "`station.set_reading(21.5)` triggers the loop in `set_reading`, so `PhoneApp`, `DesktopWidget` and `LoggingService` each print their own message with the same `21.5` value.",
+          "ru": "`station.set_reading(21.5)` запускает цикл внутри `set_reading`, поэтому `PhoneApp`, `DesktopWidget` и `LoggingService` каждый выводит своё собственное сообщение с одним и тем же значением `21.5`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "New kinds of subscribers can be added at any time without touching the publisher's source at all.",

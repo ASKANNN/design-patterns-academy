@@ -61,6 +61,180 @@
     "csharp": "interface ITrafficLightState\n{\n    void Handle(TrafficLight light);\n}\n\nclass RedState : ITrafficLightState\n{\n    public void Handle(TrafficLight light)\n    {\n        Console.WriteLine(\"Red: stop.\");\n        light.SetState(new YellowState());\n    }\n    public override string ToString() => \"RedState\";\n}\n\nclass YellowState : ITrafficLightState\n{\n    public void Handle(TrafficLight light)\n    {\n        Console.WriteLine(\"Yellow: get ready.\");\n        light.SetState(new GreenState());\n    }\n    public override string ToString() => \"YellowState\";\n}\n\nclass GreenState : ITrafficLightState\n{\n    public void Handle(TrafficLight light)\n    {\n        Console.WriteLine(\"Green: go.\");\n        light.SetState(new RedState());\n    }\n    public override string ToString() => \"GreenState\";\n}\n\nclass TrafficLight\n{\n    private ITrafficLightState _state = new RedState();\n\n    public void SetState(ITrafficLightState s) => _state = s;\n    public string GetState()                   => _state.ToString()!;\n\n    public void Tick() => _state.Handle(this);\n}\n\nvar light = new TrafficLight();\n\nlight.Tick();\nlight.Tick();\nlight.Tick();\nlight.Tick();\n\nConsole.WriteLine(light.GetState());",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass TrafficLightState(ABC):\n    @abstractmethod\n    def handle(self, light: TrafficLight) -> None: ...\n\n\nclass RedState(TrafficLightState):\n    def handle(self, light: TrafficLight) -> None:\n        print('Red: stop.')\n        light.set_state(YellowState())\n\n\nclass YellowState(TrafficLightState):\n    def handle(self, light: TrafficLight) -> None:\n        print('Yellow: get ready.')\n        light.set_state(GreenState())\n\n\nclass GreenState(TrafficLightState):\n    def handle(self, light: TrafficLight) -> None:\n        print('Green: go.')\n        light.set_state(RedState())\n\n\nclass TrafficLight:\n    def __init__(self) -> None:\n        self._state: TrafficLightState = RedState()\n\n    def set_state(self, state: TrafficLightState) -> None:\n        self._state = state\n\n    def get_state(self) -> str:\n        return type(self._state).__name__\n\n    def tick(self) -> None:\n        self._state.handle(self)\n\n\nlight = TrafficLight()\n\nlight.tick()\nlight.tick()\nlight.tick()\nlight.tick()\n\nprint(light.get_state())"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          4
+        ],
+        "title": {
+          "en": "TrafficLightState defines the interface every state implements",
+          "ru": "TrafficLightState задаёт интерфейс, который реализует каждое состояние"
+        },
+        "explanation": {
+          "en": "The base `handle(light)` throws, and `toString()` returns the concrete class name - `TrafficLight` will only ever call `handle` through this shared shape.",
+          "ru": "Базовый `handle(light)` бросает исключение, а `toString()` возвращает имя конкретного класса - `TrafficLight` будет вызывать `handle` только через эту общую форму."
+        }
+      },
+      {
+        "lines": [
+          6,
+          11
+        ],
+        "title": {
+          "en": "RedState handles its own behavior and picks the next state",
+          "ru": "RedState обрабатывает своё поведение и выбирает следующее состояние"
+        },
+        "explanation": {
+          "en": "`handle` logs `'Red: stop.'` and then calls `light.setState(new YellowState())` - the state itself decides what the next state is, not `TrafficLight`.",
+          "ru": "`handle` выводит `'Red: stop.'`, а затем вызывает `light.setState(new YellowState())` - именно само состояние решает, каким будет следующее, а не `TrafficLight`."
+        }
+      },
+      {
+        "lines": [
+          13,
+          25
+        ],
+        "title": {
+          "en": "YellowState and GreenState follow the identical shape, cycling the light",
+          "ru": "YellowState и GreenState устроены точно так же, замыкая цикл светофора"
+        },
+        "explanation": {
+          "en": "`YellowState` logs and transitions to `GreenState`; `GreenState` logs and transitions back to `RedState` - together the three states form a closed cycle: Red → Yellow → Green → Red.",
+          "ru": "`YellowState` выводит сообщение и переходит в `GreenState`; `GreenState` выводит сообщение и возвращается обратно в `RedState` - вместе эти три состояния образуют замкнутый цикл: Red → Yellow → Green → Red."
+        }
+      },
+      {
+        "lines": [
+          27,
+          34
+        ],
+        "title": {
+          "en": "TrafficLight delegates entirely to its current state object",
+          "ru": "TrafficLight полностью делегирует поведение своему текущему объекту состояния"
+        },
+        "explanation": {
+          "en": "`#state` starts as `new RedState()`; `tick()` just calls `this.#state.handle(this)` - the light itself contains no if/else about colors, all that logic lives inside the state classes.",
+          "ru": "`#state` изначально равен `new RedState()`; `tick()` просто вызывает `this.#state.handle(this)` - сам светофор не содержит никакой if/else-логики про цвета, вся эта логика находится внутри классов состояний."
+        }
+      },
+      {
+        "lines": [
+          36,
+          41
+        ],
+        "title": {
+          "en": "Four ticks cycle through Red, Yellow, Green, and back to Red",
+          "ru": "Четыре тика проходят цикл Red, Yellow, Green и снова возвращаются к Red"
+        },
+        "explanation": {
+          "en": "Each `light.tick()` calls `handle` on whatever `#state` currently is, which both logs a message and swaps in the next state via `setState` - after four ticks the light has completed one full Red→Yellow→Green→Red cycle.",
+          "ru": "Каждый вызов `light.tick()` вызывает `handle` у текущего `#state`, который и выводит сообщение, и подставляет следующее состояние через `setState` - после четырёх тиков светофор завершает полный цикл Red→Yellow→Green→Red."
+        }
+      },
+      {
+        "lines": [
+          43,
+          43
+        ],
+        "title": {
+          "en": "getState() reports the class name of whatever state is active now",
+          "ru": "getState() сообщает имя класса того состояния, которое активно сейчас"
+        },
+        "explanation": {
+          "en": "`light.getState()` calls `this.#state.toString()`, which resolves to `this.constructor.name` - after the four ticks above, this prints `'RedState'`.",
+          "ru": "`light.getState()` вызывает `this.#state.toString()`, который приводится к `this.constructor.name` - после четырёх тиков выше выводится `'RedState'`."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          7
+        ],
+        "title": {
+          "en": "TrafficLightState defines the interface every state implements",
+          "ru": "TrafficLightState задаёт интерфейс, который реализует каждое состояние"
+        },
+        "explanation": {
+          "en": "`handle(light)` is `@abstractmethod` - `TrafficLight` will only ever call `handle` through this shared interface, never checking the concrete state type.",
+          "ru": "`handle(light)` объявлен как `@abstractmethod` - `TrafficLight` будет вызывать `handle` только через этот общий интерфейс, никогда не проверяя конкретный тип состояния."
+        }
+      },
+      {
+        "lines": [
+          10,
+          13
+        ],
+        "title": {
+          "en": "RedState handles its own behavior and picks the next state",
+          "ru": "RedState обрабатывает своё поведение и выбирает следующее состояние"
+        },
+        "explanation": {
+          "en": "`handle` prints `'Red: stop.'` and then calls `light.set_state(YellowState())` - the state itself decides what the next state is, not `TrafficLight`.",
+          "ru": "`handle` печатает `'Red: stop.'`, а затем вызывает `light.set_state(YellowState())` - именно само состояние решает, каким будет следующее, а не `TrafficLight`."
+        }
+      },
+      {
+        "lines": [
+          16,
+          25
+        ],
+        "title": {
+          "en": "YellowState and GreenState follow the identical shape, cycling the light",
+          "ru": "YellowState и GreenState устроены точно так же, замыкая цикл светофора"
+        },
+        "explanation": {
+          "en": "`YellowState` prints and transitions to `GreenState`; `GreenState` prints and transitions back to `RedState` - together the three states form a closed cycle: Red → Yellow → Green → Red.",
+          "ru": "`YellowState` выводит сообщение и переходит в `GreenState`; `GreenState` выводит сообщение и возвращается обратно в `RedState` - вместе эти три состояния образуют замкнутый цикл: Red → Yellow → Green → Red."
+        }
+      },
+      {
+        "lines": [
+          28,
+          39
+        ],
+        "title": {
+          "en": "TrafficLight delegates entirely to its current state object",
+          "ru": "TrafficLight полностью делегирует поведение своему текущему объекту состояния"
+        },
+        "explanation": {
+          "en": "`_state` starts as `RedState()`; `tick()` just calls `self._state.handle(self)` - the light itself contains no if/else about colors, all that logic lives inside the state classes.",
+          "ru": "`_state` изначально равен `RedState()`; `tick()` просто вызывает `self._state.handle(self)` - сам светофор не содержит никакой if/else-логики про цвета, вся эта логика находится внутри классов состояний."
+        }
+      },
+      {
+        "lines": [
+          42,
+          47
+        ],
+        "title": {
+          "en": "Four ticks cycle through Red, Yellow, Green, and back to Red",
+          "ru": "Четыре тика проходят цикл Red, Yellow, Green и снова возвращаются к Red"
+        },
+        "explanation": {
+          "en": "Each `light.tick()` calls `handle` on whatever `_state` currently is, which both prints a message and swaps in the next state via `set_state` - after four ticks the light has completed one full Red→Yellow→Green→Red cycle.",
+          "ru": "Каждый вызов `light.tick()` вызывает `handle` у текущего `_state`, который и печатает сообщение, и подставляет следующее состояние через `set_state` - после четырёх тиков светофор завершает полный цикл Red→Yellow→Green→Red."
+        }
+      },
+      {
+        "lines": [
+          49,
+          49
+        ],
+        "title": {
+          "en": "get_state() reports the class name of whatever state is active now",
+          "ru": "get_state() сообщает имя класса того состояния, которое активно сейчас"
+        },
+        "explanation": {
+          "en": "`light.get_state()` calls `type(self._state).__name__` - after the four ticks above, this prints `'RedState'`.",
+          "ru": "`light.get_state()` вызывает `type(self._state).__name__` - после четырёх тиков выше выводится `'RedState'`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Each state's rules live in their own class, so understanding what happens in \"Paused\" means reading one small file instead of tracing a case through a giant method.",

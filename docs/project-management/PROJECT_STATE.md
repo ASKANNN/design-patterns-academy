@@ -1,6 +1,6 @@
 # Project State
 
-Last Updated: 2026-07-30
+Last Updated: 2026-07-31
 
 ---
 
@@ -274,9 +274,9 @@ only and may lag between updates.
 
 ## Phase 13 — Interactive Learning
 
-**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for Creational + Structural (12/23: Singleton pilot, Abstract Factory, Builder, Factory Method, Prototype, Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy), Behavioral still pending; playgrounds not started
+**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for all 23 patterns (Creational, Structural, Behavioral); playgrounds not started
 
-- [~] Interactive code walkthroughs — Creational and Structural categories done, see below
+- [x] Interactive code walkthroughs — all 23 patterns done, see below
 - Pattern playgrounds
 - [x] Quizzes — all 23 patterns done (5 questions each, verified via
       Playwright end to end for representative patterns from each
@@ -310,7 +310,12 @@ only and may lag between updates.
 > (Implementation tab opens the panel, exactly 2 language badges per
 > pattern, 0 leakage into TypeScript, "Next step" changes the highlighted
 > range, 0 console errors) and confirmed working by the owner directly in
-> the browser. Behavioral (11) remains.
+> the browser. **Behavioral category complete (2026-07-31):** Chain of
+> Responsibility, Command, Interpreter, Iterator, Mediator, Memento,
+> Observer, State, Strategy, Template Method, Visitor (23/23 total, all
+> patterns), same grounding rule and same Playwright verification, owner
+> confirmed working in the browser. Code walkthroughs are now complete for
+> every GoF pattern.
 
 > **Build order and scope (agreed with owner, 2026-07-28):** the checklist
 > above is the target state, not the build order. Actual sequencing is

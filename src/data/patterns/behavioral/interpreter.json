@@ -73,6 +73,180 @@
     "csharp": "interface IExpression\n{\n    int Interpret(Dictionary<string, int> context);\n}\n\nclass NumberExpression : IExpression\n{\n    private readonly int _value;\n    public NumberExpression(int value) => _value = value;\n    public int Interpret(Dictionary<string, int> context) => _value;\n}\n\nclass VariableExpression : IExpression\n{\n    private readonly string _name;\n    public VariableExpression(string name) => _name = name;\n    public int Interpret(Dictionary<string, int> context)\n    {\n        if (!context.TryGetValue(_name, out int value))\n            throw new ArgumentException($\"Unknown variable: {_name}\");\n        return value;\n    }\n}\n\nclass AddExpression : IExpression\n{\n    private readonly IExpression _left, _right;\n    public AddExpression(IExpression l, IExpression r) { _left = l; _right = r; }\n    public int Interpret(Dictionary<string, int> ctx) =>\n        _left.Interpret(ctx) + _right.Interpret(ctx);\n}\n\nclass SubtractExpression : IExpression\n{\n    private readonly IExpression _left, _right;\n    public SubtractExpression(IExpression l, IExpression r) { _left = l; _right = r; }\n    public int Interpret(Dictionary<string, int> ctx) =>\n        _left.Interpret(ctx) - _right.Interpret(ctx);\n}\n\nIExpression tree = new SubtractExpression(\n    new AddExpression(\n        new VariableExpression(\"x\"),\n        new NumberExpression(5)\n    ),\n    new NumberExpression(2)\n);\n\nvar context = new Dictionary<string, int> { [\"x\"] = 10 };\nConsole.WriteLine(tree.Interpret(context));",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\nContext = dict[str, int]\n\n\nclass Expression(ABC):\n    @abstractmethod\n    def interpret(self, context: Context) -> int: ...\n\n\nclass NumberExpression(Expression):\n    def __init__(self, value: int) -> None:\n        self.value = value\n\n    def interpret(self, context: Context) -> int:\n        return self.value\n\n\nclass VariableExpression(Expression):\n    def __init__(self, name: str) -> None:\n        self.name = name\n\n    def interpret(self, context: Context) -> int:\n        if self.name not in context:\n            raise ValueError(f'Unknown variable: {self.name}')\n        return context[self.name]\n\n\nclass AddExpression(Expression):\n    def __init__(self, left: Expression, right: Expression) -> None:\n        self.left, self.right = left, right\n\n    def interpret(self, context: Context) -> int:\n        return self.left.interpret(context) + self.right.interpret(context)\n\n\nclass SubtractExpression(Expression):\n    def __init__(self, left: Expression, right: Expression) -> None:\n        self.left, self.right = left, right\n\n    def interpret(self, context: Context) -> int:\n        return self.left.interpret(context) - self.right.interpret(context)\n\n\ntree = SubtractExpression(\n    AddExpression(VariableExpression('x'), NumberExpression(5)),\n    NumberExpression(2),\n)\n\nprint(tree.interpret({'x': 10}))"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          4
+        ],
+        "title": {
+          "en": "NumberExpression is a terminal expression - it just returns a literal",
+          "ru": "NumberExpression - терминальное выражение, оно просто возвращает литерал"
+        },
+        "explanation": {
+          "en": "`interpret(_context)` ignores the context entirely and returns `this.value` - a leaf of the expression tree that needs no further evaluation.",
+          "ru": "`interpret(_context)` полностью игнорирует контекст и возвращает `this.value` - это лист дерева выражений, который не требует дальнейшего вычисления."
+        }
+      },
+      {
+        "lines": [
+          6,
+          14
+        ],
+        "title": {
+          "en": "VariableExpression is also terminal, but reads from the context",
+          "ru": "VariableExpression тоже терминальное, но читает значение из контекста"
+        },
+        "explanation": {
+          "en": "`interpret(context)` looks up `this.name` in `context` and throws if it's missing - variables only resolve to a value at interpretation time, using whatever context is passed in.",
+          "ru": "`interpret(context)` ищет `this.name` в `context` и бросает исключение, если переменной там нет - переменные превращаются в значение только во время интерпретации, используя переданный контекст."
+        }
+      },
+      {
+        "lines": [
+          16,
+          21
+        ],
+        "title": {
+          "en": "AddExpression is a nonterminal - it combines two subexpressions",
+          "ru": "AddExpression - нетерминальное выражение, оно объединяет два подвыражения"
+        },
+        "explanation": {
+          "en": "It stores `left` and `right` expressions, and `interpret(context)` recursively calls `this.left.interpret(context) + this.right.interpret(context)` - it doesn't care whether `left`/`right` are numbers, variables, or other expressions.",
+          "ru": "Оно хранит подвыражения `left` и `right`, а `interpret(context)` рекурсивно вызывает `this.left.interpret(context) + this.right.interpret(context)` - ему не важно, являются ли `left`/`right` числами, переменными или другими выражениями."
+        }
+      },
+      {
+        "lines": [
+          23,
+          28
+        ],
+        "title": {
+          "en": "SubtractExpression follows the exact same recursive shape",
+          "ru": "SubtractExpression устроено точно так же, рекурсивно"
+        },
+        "explanation": {
+          "en": "It's structurally identical to `AddExpression`, just subtracting `right`'s result from `left`'s - each grammar rule gets its own expression class.",
+          "ru": "Оно структурно идентично `AddExpression`, только вычитает результат `right` из `left` - каждое правило грамматики получает свой собственный класс выражения."
+        }
+      },
+      {
+        "lines": [
+          30,
+          36
+        ],
+        "title": {
+          "en": "The client composes an expression tree matching (x + 5) - 2",
+          "ru": "Клиент собирает дерево выражений, соответствующее (x + 5) - 2"
+        },
+        "explanation": {
+          "en": "`SubtractExpression` wraps an `AddExpression` (itself wrapping `VariableExpression('x')` and `NumberExpression(5)`) and `NumberExpression(2)` - nesting expression objects is literally how the grammar's syntax tree is built.",
+          "ru": "`SubtractExpression` оборачивает `AddExpression` (который сам оборачивает `VariableExpression('x')` и `NumberExpression(5)`) и `NumberExpression(2)` - вложенность объектов-выражений и есть способ построения синтаксического дерева грамматики."
+        }
+      },
+      {
+        "lines": [
+          38,
+          39
+        ],
+        "title": {
+          "en": "interpret() walks the whole tree with one context",
+          "ru": "interpret() обходит всё дерево с одним контекстом"
+        },
+        "explanation": {
+          "en": "`tree.interpret(context)` with `context = { x: 10 }` triggers the recursive calls set up above, resolving to `(10 + 5) - 2 = 13`.",
+          "ru": "`tree.interpret(context)` с `context = { x: 10 }` запускает описанную выше цепочку рекурсивных вызовов и в итоге вычисляет `(10 + 5) - 2 = 13`."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          7,
+          9
+        ],
+        "title": {
+          "en": "Expression is the abstract interface every node implements",
+          "ru": "Expression - абстрактный интерфейс, который реализует каждый узел"
+        },
+        "explanation": {
+          "en": "`interpret(context)` is `@abstractmethod` - both terminal and nonterminal expressions share this one method, so they can be nested interchangeably.",
+          "ru": "`interpret(context)` объявлен как `@abstractmethod` - и терминальные, и нетерминальные выражения используют этот единый метод, поэтому их можно вкладывать друг в друга без ограничений."
+        }
+      },
+      {
+        "lines": [
+          12,
+          17
+        ],
+        "title": {
+          "en": "NumberExpression is a terminal expression - it just returns a literal",
+          "ru": "NumberExpression - терминальное выражение, оно просто возвращает литерал"
+        },
+        "explanation": {
+          "en": "`interpret` ignores `context` and returns `self.value` - a leaf of the expression tree that needs no further evaluation.",
+          "ru": "`interpret` игнорирует `context` и возвращает `self.value` - это лист дерева выражений, который не требует дальнейшего вычисления."
+        }
+      },
+      {
+        "lines": [
+          20,
+          27
+        ],
+        "title": {
+          "en": "VariableExpression is also terminal, but reads from the context",
+          "ru": "VariableExpression тоже терминальное, но читает значение из контекста"
+        },
+        "explanation": {
+          "en": "`interpret` looks up `self.name` in `context` and raises `ValueError` if it's missing - variables only resolve to a value at interpretation time.",
+          "ru": "`interpret` ищет `self.name` в `context` и бросает `ValueError`, если переменной там нет - переменные превращаются в значение только во время интерпретации."
+        }
+      },
+      {
+        "lines": [
+          30,
+          35
+        ],
+        "title": {
+          "en": "AddExpression is a nonterminal - it combines two subexpressions",
+          "ru": "AddExpression - нетерминальное выражение, оно объединяет два подвыражения"
+        },
+        "explanation": {
+          "en": "It stores `left` and `right`, and `interpret` recursively calls `self.left.interpret(context) + self.right.interpret(context)` - it doesn't care what kind of `Expression` `left`/`right` actually are.",
+          "ru": "Оно хранит `left` и `right`, а `interpret` рекурсивно вызывает `self.left.interpret(context) + self.right.interpret(context)` - ему не важно, какого именно типа `Expression` являются `left`/`right`."
+        }
+      },
+      {
+        "lines": [
+          38,
+          43
+        ],
+        "title": {
+          "en": "SubtractExpression follows the exact same recursive shape",
+          "ru": "SubtractExpression устроено точно так же, рекурсивно"
+        },
+        "explanation": {
+          "en": "It's structurally identical to `AddExpression`, just subtracting `right`'s result from `left`'s - each grammar rule gets its own `Expression` subclass.",
+          "ru": "Оно структурно идентично `AddExpression`, только вычитает результат `right` из `left` - каждое правило грамматики получает свой собственный подкласс `Expression`."
+        }
+      },
+      {
+        "lines": [
+          46,
+          51
+        ],
+        "title": {
+          "en": "The client builds and interprets the tree for (x + 5) - 2",
+          "ru": "Клиент строит и интерпретирует дерево для (x + 5) - 2"
+        },
+        "explanation": {
+          "en": "`tree` nests `AddExpression(VariableExpression('x'), NumberExpression(5))` inside `SubtractExpression(..., NumberExpression(2))`, and `tree.interpret({'x': 10})` walks it to `(10 + 5) - 2 = 13`.",
+          "ru": "`tree` вкладывает `AddExpression(VariableExpression('x'), NumberExpression(5))` внутрь `SubtractExpression(..., NumberExpression(2))`, а `tree.interpret({'x': 10})` обходит дерево и вычисляет `(10 + 5) - 2 = 13`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "The grammar lives in code as a set of classes, so adding a rule is as local as adding one more expression class rather than touching a central parser.",

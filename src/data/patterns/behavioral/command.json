@@ -75,6 +75,152 @@
     "csharp": "class TextEditor\n{\n    private string _content = \"\";\n\n    public void Insert(string text, int position) =>\n        _content = _content[..position] + text + _content[position..];\n\n    public void Delete(int position, int length) =>\n        _content = _content[..position] + _content[(position + length)..];\n\n    public string GetContent() => _content;\n}\n\ninterface ICommand { void Execute(); void Undo(); }\n\nclass InsertCommand : ICommand\n{\n    private readonly TextEditor _editor;\n    private readonly string _text;\n    private readonly int _position;\n\n    public InsertCommand(TextEditor editor, string text, int position)\n    { _editor = editor; _text = text; _position = position; }\n\n    public void Execute() => _editor.Insert(_text, _position);\n    public void Undo()    => _editor.Delete(_position, _text.Length);\n}\n\nclass CommandHistory\n{\n    private readonly Stack<ICommand> _history = new();\n\n    public void Execute(ICommand cmd) { cmd.Execute(); _history.Push(cmd); }\n    public void Undo() { if (_history.Count > 0) _history.Pop().Undo(); }\n}\n\nvar editor  = new TextEditor();\nvar history = new CommandHistory();\n\nhistory.Execute(new InsertCommand(editor, \"Hello\", 0));\nhistory.Execute(new InsertCommand(editor, \" World\", 5));\nConsole.WriteLine(editor.GetContent());\n\nhistory.Undo();\nConsole.WriteLine(editor.GetContent());",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass TextEditor:\n    def __init__(self) -> None:\n        self._content = ''\n\n    def insert(self, text: str, position: int) -> None:\n        self._content = (\n            self._content[:position] + text + self._content[position:]\n        )\n\n    def delete(self, position: int, length: int) -> None:\n        self._content = (\n            self._content[:position] + self._content[position + length:]\n        )\n\n    def get_content(self) -> str:\n        return self._content\n\n\nclass Command(ABC):\n    @abstractmethod\n    def execute(self) -> None: ...\n\n    @abstractmethod\n    def undo(self) -> None: ...\n\n\nclass InsertCommand(Command):\n    def __init__(self, editor: TextEditor, text: str, position: int) -> None:\n        self._editor = editor\n        self._text = text\n        self._position = position\n\n    def execute(self) -> None:\n        self._editor.insert(self._text, self._position)\n\n    def undo(self) -> None:\n        self._editor.delete(self._position, len(self._text))\n\n\nclass CommandHistory:\n    def __init__(self) -> None:\n        self._history: list[Command] = []\n\n    def execute(self, command: Command) -> None:\n        command.execute()\n        self._history.append(command)\n\n    def undo(self) -> None:\n        if self._history:\n            self._history.pop().undo()\n\n\neditor = TextEditor()\nhistory = CommandHistory()\n\nhistory.execute(InsertCommand(editor, 'Hello', 0))\nhistory.execute(InsertCommand(editor, ' World', 5))\nprint(editor.get_content())\n\nhistory.undo()\nprint(editor.get_content())"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          18
+        ],
+        "title": {
+          "en": "TextEditor is the receiver - it does the actual work",
+          "ru": "TextEditor - получатель, именно он выполняет работу"
+        },
+        "explanation": {
+          "en": "`insert` and `delete` mutate the private `#content` string directly - the editor knows nothing about commands or undo, it just performs edits when asked.",
+          "ru": "`insert` и `delete` напрямую изменяют приватную строку `#content` - редактор ничего не знает о командах или отмене, он просто выполняет правки по запросу."
+        }
+      },
+      {
+        "lines": [
+          20,
+          34
+        ],
+        "title": {
+          "en": "InsertCommand bundles a request and knows how to reverse it",
+          "ru": "InsertCommand упаковывает запрос и знает, как его отменить"
+        },
+        "explanation": {
+          "en": "The constructor captures the `editor`, `text` and `position` it needs; `execute()` calls `editor.insert(...)`, and `undo()` calls the inverse operation `editor.delete(...)` with the same position and text length.",
+          "ru": "Конструктор сохраняет `editor`, `text` и `position`, которые ему понадобятся; `execute()` вызывает `editor.insert(...)`, а `undo()` вызывает обратную операцию `editor.delete(...)` с той же позицией и длиной текста."
+        }
+      },
+      {
+        "lines": [
+          36,
+          47
+        ],
+        "title": {
+          "en": "CommandHistory is the invoker that keeps a stack of executed commands",
+          "ru": "CommandHistory - инициатор, который хранит стек выполненных команд"
+        },
+        "explanation": {
+          "en": "`execute(command)` calls `command.execute()` and then pushes it onto `#history`; `undo()` pops the last command off that stack and calls its `undo()` - the invoker never needs to know what kind of command it's running.",
+          "ru": "`execute(command)` вызывает `command.execute()`, а затем кладёт команду в `#history`; `undo()` снимает последнюю команду со стека и вызывает её `undo()` - инициатору никогда не нужно знать, какая именно это команда."
+        }
+      },
+      {
+        "lines": [
+          49,
+          54
+        ],
+        "title": {
+          "en": "The client builds commands and hands them to the history",
+          "ru": "Клиент создаёт команды и передаёт их истории"
+        },
+        "explanation": {
+          "en": "Two `InsertCommand` objects are created and passed to `history.execute(...)` - the client decides what request to make, while the history decides when it actually runs.",
+          "ru": "Создаются два объекта `InsertCommand` и передаются в `history.execute(...)` - клиент решает, какой запрос сделать, а история решает, когда он реально выполнится."
+        }
+      },
+      {
+        "lines": [
+          56,
+          57
+        ],
+        "title": {
+          "en": "undo() reverses the last command without the editor being involved",
+          "ru": "undo() отменяет последнюю команду без участия редактора"
+        },
+        "explanation": {
+          "en": "`history.undo()` pops the second `InsertCommand` and calls its own `undo()`, which deletes exactly what it inserted - the editor's content reverts even though the editor exposes no undo logic itself.",
+          "ru": "`history.undo()` снимает второй `InsertCommand` и вызывает его собственный `undo()`, который удаляет именно то, что было вставлено - содержимое редактора откатывается, хотя сам редактор не содержит никакой логики отмены."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          20
+        ],
+        "title": {
+          "en": "TextEditor is the receiver - it does the actual work",
+          "ru": "TextEditor - получатель, именно он выполняет работу"
+        },
+        "explanation": {
+          "en": "`insert` and `delete` mutate `self._content` directly - the editor knows nothing about commands or undo, it just performs edits when asked.",
+          "ru": "`insert` и `delete` напрямую изменяют `self._content` - редактор ничего не знает о командах или отмене, он просто выполняет правки по запросу."
+        }
+      },
+      {
+        "lines": [
+          23,
+          28
+        ],
+        "title": {
+          "en": "Command is the abstract interface every command implements",
+          "ru": "Command - абстрактный интерфейс, который реализует каждая команда"
+        },
+        "explanation": {
+          "en": "`execute()` and `undo()` are both `@abstractmethod` - the history only ever depends on this shared interface, never on a concrete command class.",
+          "ru": "И `execute()`, и `undo()` объявлены как `@abstractmethod` - история зависит только от этого общего интерфейса, а не от конкретного класса команды."
+        }
+      },
+      {
+        "lines": [
+          31,
+          41
+        ],
+        "title": {
+          "en": "InsertCommand bundles a request and knows how to reverse it",
+          "ru": "InsertCommand упаковывает запрос и знает, как его отменить"
+        },
+        "explanation": {
+          "en": "`__init__` captures `_editor`, `_text` and `_position`; `execute()` calls `self._editor.insert(...)`, and `undo()` calls the inverse `self._editor.delete(...)` using the same position and `len(self._text)`.",
+          "ru": "`__init__` сохраняет `_editor`, `_text` и `_position`; `execute()` вызывает `self._editor.insert(...)`, а `undo()` вызывает обратную операцию `self._editor.delete(...)`, используя ту же позицию и `len(self._text)`."
+        }
+      },
+      {
+        "lines": [
+          44,
+          54
+        ],
+        "title": {
+          "en": "CommandHistory is the invoker that keeps a stack of executed commands",
+          "ru": "CommandHistory - инициатор, который хранит стек выполненных команд"
+        },
+        "explanation": {
+          "en": "`execute(command)` calls `command.execute()` then appends it to `self._history`; `undo()` pops the last entry and calls its `undo()` - the invoker only ever calls methods from the `Command` interface.",
+          "ru": "`execute(command)` вызывает `command.execute()`, а затем добавляет команду в `self._history`; `undo()` снимает последнюю команду и вызывает её `undo()` - инициатор вызывает только методы из интерфейса `Command`."
+        }
+      },
+      {
+        "lines": [
+          57,
+          65
+        ],
+        "title": {
+          "en": "The client creates commands; undo reverses them without touching the editor directly",
+          "ru": "Клиент создаёт команды; undo отменяет их, не обращаясь к редактору напрямую"
+        },
+        "explanation": {
+          "en": "Two `InsertCommand` objects go through `history.execute(...)`, then `history.undo()` pops the second one and calls its `undo()`, which deletes exactly what it inserted.",
+          "ru": "Два объекта `InsertCommand` проходят через `history.execute(...)`, затем `history.undo()` снимает второй и вызывает его `undo()`, который удаляет именно то, что было вставлено."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "UI or trigger code no longer needs to know how a request is fulfilled - it just holds a command object, which keeps the two sides free to change independently.",

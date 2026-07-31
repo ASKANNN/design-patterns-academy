@@ -61,6 +61,152 @@
     "csharp": "interface IChatMediator\n{\n    void Register(User user);\n    void SendMessage(string message, User sender);\n}\n\nclass ChatRoom : IChatMediator\n{\n    private readonly List<User> users = new();\n\n    public void Register(User user) => users.Add(user);\n\n    public void SendMessage(string message, User sender)\n    {\n        foreach (var user in users)\n        {\n            if (user != sender) user.Receive(message, sender);\n        }\n    }\n}\n\nclass User\n{\n    public string Name;\n    private readonly IChatMediator mediator;\n\n    public User(string name, IChatMediator mediator)\n    {\n        Name = name;\n        this.mediator = mediator;\n        mediator.Register(this);\n    }\n\n    public void Send(string message)\n    {\n        Console.WriteLine($\"{Name} sends: {message}\");\n        mediator.SendMessage(message, this);\n    }\n\n    public void Receive(string message, User sender)\n    {\n        Console.WriteLine($\"{Name} receives from {sender.Name}: {message}\");\n    }\n}\n\nvar room = new ChatRoom();\nvar alice = new User(\"Alice\", room);\nvar bob = new User(\"Bob\", room);\nvar charlie = new User(\"Charlie\", room);\nvar diana = new User(\"Diana\", room);\n\nalice.Send(\"Hello everyone!\");",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass ChatMediator(ABC):\n    @abstractmethod\n    def register(self, user: 'User') -> None: ...\n\n    @abstractmethod\n    def send_message(self, message: str, sender: 'User') -> None: ...\n\n\nclass ChatRoom(ChatMediator):\n    def __init__(self) -> None:\n        self._users: list['User'] = []\n\n    def register(self, user: 'User') -> None:\n        self._users.append(user)\n\n    def send_message(self, message: str, sender: 'User') -> None:\n        for user in self._users:\n            if user is not sender:\n                user.receive(message, sender)\n\n\nclass User:\n    def __init__(self, name: str, mediator: ChatMediator) -> None:\n        self.name = name\n        self.mediator = mediator\n        mediator.register(self)\n\n    def send(self, message: str) -> None:\n        print(f'{self.name} sends: {message}')\n        self.mediator.send_message(message, self)\n\n    def receive(self, message: str, sender: 'User') -> None:\n        print(f'{self.name} receives from {sender.name}: {message}')\n\n\nroom = ChatRoom()\nalice = User('Alice', room)\nbob = User('Bob', room)\ncharlie = User('Charlie', room)\ndiana = User('Diana', room)\n\nalice.send('Hello everyone!')"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          4
+        ],
+        "title": {
+          "en": "ChatMediator declares the interface colleagues talk through",
+          "ru": "ChatMediator задаёт интерфейс, через который общаются коллеги"
+        },
+        "explanation": {
+          "en": "`register(user)` and `sendMessage(message, sender)` are empty stubs here - concrete mediators implement the actual routing, but users only ever depend on this shared shape.",
+          "ru": "`register(user)` и `sendMessage(message, sender)` здесь - пустые заглушки; фактическую маршрутизацию реализуют конкретные посредники, но пользователи зависят только от этой общей формы."
+        }
+      },
+      {
+        "lines": [
+          6,
+          18
+        ],
+        "title": {
+          "en": "ChatRoom is the concrete mediator holding all the coupling",
+          "ru": "ChatRoom - конкретный посредник, в котором сосредоточена вся связность"
+        },
+        "explanation": {
+          "en": "`#users` is the only place that knows about every participant; `sendMessage` loops over `#users` and calls `user.receive(...)` on everyone except `sender` - users never call each other directly.",
+          "ru": "`#users` - единственное место, которое знает обо всех участниках; `sendMessage` проходит по `#users` и вызывает `user.receive(...)` у всех, кроме `sender` - пользователи никогда не вызывают друг друга напрямую."
+        }
+      },
+      {
+        "lines": [
+          20,
+          35
+        ],
+        "title": {
+          "en": "User only knows its mediator, not the other users",
+          "ru": "User знает только своего посредника, но не других пользователей"
+        },
+        "explanation": {
+          "en": "The constructor calls `mediator.register(this)` to join the room; `send` calls `this.mediator.sendMessage(message, this)` instead of contacting anyone directly; `receive` just logs what arrives - all cross-user communication is routed through `mediator`.",
+          "ru": "Конструктор вызывает `mediator.register(this)`, чтобы присоединиться к комнате; `send` вызывает `this.mediator.sendMessage(message, this)` вместо обращения к кому-либо напрямую; `receive` просто логирует полученное сообщение - вся связь между пользователями идёт через `mediator`."
+        }
+      },
+      {
+        "lines": [
+          37,
+          41
+        ],
+        "title": {
+          "en": "Four users register with the same mediator instance",
+          "ru": "Четыре пользователя регистрируются в одном экземпляре посредника"
+        },
+        "explanation": {
+          "en": "Each `new User(name, room)` call passes the same `room`, and each constructor immediately registers itself - `room.#users` ends up with all four, without any user referencing another.",
+          "ru": "Каждый вызов `new User(name, room)` передаёт один и тот же `room`, и каждый конструктор сразу регистрируется в нём - в итоге `room.#users` содержит всех четверых, при этом ни один пользователь не ссылается на другого."
+        }
+      },
+      {
+        "lines": [
+          43,
+          43
+        ],
+        "title": {
+          "en": "One send() fans out to everyone else through the mediator",
+          "ru": "Один вызов send() рассылает сообщение всем остальным через посредника"
+        },
+        "explanation": {
+          "en": "`alice.send(...)` triggers `room.sendMessage(...)`, which calls `receive` on Bob, Charlie and Diana but skips Alice herself - Alice never had to know who else was in the room.",
+          "ru": "`alice.send(...)` запускает `room.sendMessage(...)`, который вызывает `receive` у Bob, Charlie и Diana, но пропускает саму Alice - ей не пришлось знать, кто ещё находится в комнате."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          10
+        ],
+        "title": {
+          "en": "ChatMediator declares the interface colleagues talk through",
+          "ru": "ChatMediator задаёт интерфейс, через который общаются коллеги"
+        },
+        "explanation": {
+          "en": "`register` and `send_message` are both `@abstractmethod` - concrete mediators implement the actual routing, but `User` only ever depends on this shared interface.",
+          "ru": "И `register`, и `send_message` объявлены как `@abstractmethod` - фактическую маршрутизацию реализуют конкретные посредники, но `User` зависит только от этого общего интерфейса."
+        }
+      },
+      {
+        "lines": [
+          13,
+          23
+        ],
+        "title": {
+          "en": "ChatRoom is the concrete mediator holding all the coupling",
+          "ru": "ChatRoom - конкретный посредник, в котором сосредоточена вся связность"
+        },
+        "explanation": {
+          "en": "`_users` is the only place that knows about every participant; `send_message` loops over `_users` and calls `user.receive(...)` on everyone except `sender` - users never call each other directly.",
+          "ru": "`_users` - единственное место, которое знает обо всех участниках; `send_message` проходит по `_users` и вызывает `user.receive(...)` у всех, кроме `sender` - пользователи никогда не вызывают друг друга напрямую."
+        }
+      },
+      {
+        "lines": [
+          26,
+          37
+        ],
+        "title": {
+          "en": "User only knows its mediator, not the other users",
+          "ru": "User знает только своего посредника, но не других пользователей"
+        },
+        "explanation": {
+          "en": "`__init__` calls `mediator.register(self)` to join the room; `send` calls `self.mediator.send_message(message, self)` instead of contacting anyone directly; `receive` just prints what arrives.",
+          "ru": "`__init__` вызывает `mediator.register(self)`, чтобы присоединиться к комнате; `send` вызывает `self.mediator.send_message(message, self)` вместо обращения к кому-либо напрямую; `receive` просто печатает полученное сообщение."
+        }
+      },
+      {
+        "lines": [
+          40,
+          44
+        ],
+        "title": {
+          "en": "Four users register with the same mediator instance",
+          "ru": "Четыре пользователя регистрируются в одном экземпляре посредника"
+        },
+        "explanation": {
+          "en": "Each `User(name, room)` call passes the same `room`, and each constructor immediately registers itself - `room._users` ends up with all four, without any user referencing another.",
+          "ru": "Каждый вызов `User(name, room)` передаёт один и тот же `room`, и каждый конструктор сразу регистрируется в нём - в итоге `room._users` содержит всех четверых, при этом ни один пользователь не ссылается на другого."
+        }
+      },
+      {
+        "lines": [
+          46,
+          46
+        ],
+        "title": {
+          "en": "One send() fans out to everyone else through the mediator",
+          "ru": "Один вызов send() рассылает сообщение всем остальным через посредника"
+        },
+        "explanation": {
+          "en": "`alice.send(...)` triggers `room.send_message(...)`, which calls `receive` on Bob, Charlie and Diana but skips Alice herself - Alice never had to know who else was in the room.",
+          "ru": "`alice.send(...)` запускает `room.send_message(...)`, который вызывает `receive` у Bob, Charlie и Diana, но пропускает саму Alice - ей не пришлось знать, кто ещё находится в комнате."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Cross-component logic lives in one class instead of being smeared across every participant, so you can read the whole reaction chain in one place.",

@@ -214,7 +214,7 @@ No new features are implemented during this sprint — only bug fixing and stabi
       render, so the correct answer never sits in a fixed slot and the
       first question isn't reliably answerable from the hero paragraph
       alone (fixed 2026-07-28 after an owner review caught both issues).
-- [ ] Interactive code walkthroughs — step-by-step line highlighting +
+- [x] Interactive code walkthroughs — step-by-step line highlighting +
       explanation layered over the existing `CodeBlock` component; step
       data lives in a new `walkthrough` field on the pattern JSON, keyed
       per language (`{javascript: [...], python: [...]}`), not a separate
@@ -225,14 +225,16 @@ No new features are implemented during this sprint — only bug fixing and stabi
       under 860px) + language-tab badges marking which languages have a
       walkthrough. **Language scope decision (2026-07-31, agreed with
       owner):** JS+Python stays the standard for every pattern — no
-      TypeScript/Java/C# walkthroughs. **Rollout progress:** Creational
-      category done (2026-07-31) — Abstract Factory, Builder, Factory
-      Method, Prototype added alongside the Singleton pilot (5/23).
-      Structural category done (2026-07-31) — Adapter, Bridge, Composite,
-      Decorator, Facade, Flyweight, Proxy (12/23), owner-reviewed in the
-      browser (Implementation tab, JS+Python highlighting, badges, "Next
-      step" navigation all confirmed working). Behavioral (11) remains,
-      stopping for an owner review after the category is written.
+      TypeScript/Java/C# walkthroughs. **Rollout complete (2026-07-31):**
+      Creational (Abstract Factory, Builder, Factory Method, Prototype
+      alongside the Singleton pilot, 5/23), Structural (Adapter, Bridge,
+      Composite, Decorator, Facade, Flyweight, Proxy, 12/23), and
+      Behavioral (Chain of Responsibility, Command, Interpreter, Iterator,
+      Mediator, Memento, Observer, State, Strategy, Template Method,
+      Visitor, 23/23) all done. Every category was verified with a headless
+      Playwright script (Implementation tab opens, JS+Python badges present
+      with no TypeScript leakage, "Next step" changes the highlighted
+      range, zero console errors) and owner-reviewed by eye in the browser.
 - [ ] Pattern playgrounds — **scope decision (2026-07-28):** executable
       only for JavaScript/TypeScript, via a sandboxed iframe +
       `Function()` (no real TS type-checking, just transpile-free

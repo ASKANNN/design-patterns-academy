@@ -62,6 +62,180 @@
     "csharp": "sealed record EditorMemento(string Content, int Cursor);\n\nclass Editor\n{\n    private string _content = \"\";\n    private int    _cursor  = 0;\n\n    public void Type(string text) { _content += text; _cursor = _content.Length; }\n    public string GetContent() => _content;\n\n    public EditorMemento Save() => new(_content, _cursor);\n\n    public void Restore(EditorMemento m) { _content = m.Content; _cursor = m.Cursor; }\n}\n\nclass History\n{\n    private readonly Stack<EditorMemento> _stack = new();\n    public void Push(EditorMemento m) => _stack.Push(m);\n    public EditorMemento? Pop()       => _stack.Count > 0 ? _stack.Pop() : null;\n}\n\nvar editor  = new Editor();\nvar history = new History();\n\neditor.Type(\"Hello\");\nhistory.Push(editor.Save());\n\neditor.Type(\", world\");\nConsole.WriteLine(editor.GetContent());\n\nvar snapshot = history.Pop();\nif (snapshot is not null) editor.Restore(snapshot);\nConsole.WriteLine(editor.GetContent());",
     "python": "from __future__ import annotations\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass EditorMemento:\n    content: str\n    cursor: int\n\n\nclass Editor:\n    def __init__(self) -> None:\n        self._content = ''\n        self._cursor = 0\n\n    def type(self, text: str) -> None:\n        self._content += text\n        self._cursor = len(self._content)\n\n    def get_content(self) -> str:\n        return self._content\n\n    def save(self) -> EditorMemento:\n        return EditorMemento(self._content, self._cursor)\n\n    def restore(self, memento: EditorMemento) -> None:\n        self._content = memento.content\n        self._cursor = memento.cursor\n\n\nclass History:\n    def __init__(self) -> None:\n        self._mementos: list[EditorMemento] = []\n\n    def push(self, memento: EditorMemento) -> None:\n        self._mementos.append(memento)\n\n    def pop(self) -> EditorMemento | None:\n        return self._mementos.pop() if self._mementos else None\n\n\neditor = Editor()\nhistory = History()\n\neditor.type('Hello')\nhistory.push(editor.save())\n\neditor.type(', world')\nprint(editor.get_content())\n\nsnapshot = history.pop()\nif snapshot:\n    editor.restore(snapshot)\nprint(editor.get_content())"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          12
+        ],
+        "title": {
+          "en": "EditorMemento is an opaque, read-only snapshot",
+          "ru": "EditorMemento - непрозрачный, только для чтения снимок состояния"
+        },
+        "explanation": {
+          "en": "`#content` and `#cursor` are private fields set once in the constructor, exposed only through getters - nothing outside `EditorMemento` can mutate a snapshot once it's created.",
+          "ru": "`#content` и `#cursor` - приватные поля, устанавливаемые один раз в конструкторе и доступные только через геттеры - никто снаружи `EditorMemento` не может изменить снимок после его создания."
+        }
+      },
+      {
+        "lines": [
+          14,
+          33
+        ],
+        "title": {
+          "en": "Editor is the originator - it creates and restores its own mementos",
+          "ru": "Editor - создатель, он сам создаёт и восстанавливает свои снимки"
+        },
+        "explanation": {
+          "en": "`save()` packs its own private `#content`/`#cursor` into a new `EditorMemento`; `restore(memento)` reads them back out via the memento's getters - only the originator ever reaches into its own private state.",
+          "ru": "`save()` упаковывает свои приватные `#content`/`#cursor` в новый `EditorMemento`; `restore(memento)` считывает их обратно через геттеры снимка - только создатель когда-либо обращается к своему приватному состоянию."
+        }
+      },
+      {
+        "lines": [
+          35,
+          40
+        ],
+        "title": {
+          "en": "History is the caretaker - it stores mementos without looking inside them",
+          "ru": "History - опекун, он хранит снимки, не заглядывая внутрь"
+        },
+        "explanation": {
+          "en": "`push` and `pop` just move `EditorMemento` objects in and out of `#mementos` - `History` never calls `getContent()` or `getCursor()`, it treats each memento as a black box.",
+          "ru": "`push` и `pop` просто перемещают объекты `EditorMemento` в `#mementos` и обратно - `History` никогда не вызывает `getContent()` или `getCursor()`, он относится к каждому снимку как к чёрному ящику."
+        }
+      },
+      {
+        "lines": [
+          42,
+          46
+        ],
+        "title": {
+          "en": "A snapshot is taken right after typing 'Hello'",
+          "ru": "Снимок делается сразу после ввода 'Hello'"
+        },
+        "explanation": {
+          "en": "`editor.type('Hello')` mutates the editor's private state, then `editor.save()` freezes that exact state into a memento which `history.push(...)` stores.",
+          "ru": "`editor.type('Hello')` изменяет приватное состояние редактора, затем `editor.save()` фиксирует это состояние в снимке, который сохраняется через `history.push(...)`."
+        }
+      },
+      {
+        "lines": [
+          48,
+          49
+        ],
+        "title": {
+          "en": "Further typing changes state that the saved memento doesn't know about",
+          "ru": "Дальнейший ввод меняет состояние, о котором сохранённый снимок ничего не знает"
+        },
+        "explanation": {
+          "en": "`editor.type(', world')` appends more text, so `getContent()` now logs `'Hello, world'` - but the memento pushed earlier still holds only `'Hello'`.",
+          "ru": "`editor.type(', world')` дописывает текст, поэтому `getContent()` теперь выводит `'Hello, world'` - но снимок, отправленный ранее в историю, всё ещё хранит только `'Hello'`."
+        }
+      },
+      {
+        "lines": [
+          51,
+          52
+        ],
+        "title": {
+          "en": "restore() rolls the editor back to the pushed snapshot",
+          "ru": "restore() откатывает редактор к сохранённому снимку"
+        },
+        "explanation": {
+          "en": "`history.pop()` returns the earlier memento, and `editor.restore(...)` overwrites `#content`/`#cursor` with its values - the log now prints `'Hello'` again, undoing the second `type` call.",
+          "ru": "`history.pop()` возвращает более ранний снимок, а `editor.restore(...)` перезаписывает `#content`/`#cursor` его значениями - теперь снова выводится `'Hello'`, второй вызов `type` оказывается отменён."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          8
+        ],
+        "title": {
+          "en": "EditorMemento is an opaque, read-only snapshot",
+          "ru": "EditorMemento - непрозрачный, только для чтения снимок состояния"
+        },
+        "explanation": {
+          "en": "`@dataclass(frozen=True)` makes `content` and `cursor` immutable after construction - once created, a snapshot can't be modified by anyone, including `History`.",
+          "ru": "`@dataclass(frozen=True)` делает `content` и `cursor` неизменяемыми после создания - никто, включая `History`, не может изменить снимок после его создания."
+        }
+      },
+      {
+        "lines": [
+          11,
+          28
+        ],
+        "title": {
+          "en": "Editor is the originator - it creates and restores its own mementos",
+          "ru": "Editor - создатель, он сам создаёт и восстанавливает свои снимки"
+        },
+        "explanation": {
+          "en": "`save()` packs its own `_content`/`_cursor` into a new `EditorMemento`; `restore(memento)` reads `memento.content`/`memento.cursor` back into its own fields - only the originator reaches into its own private state.",
+          "ru": "`save()` упаковывает свои `_content`/`_cursor` в новый `EditorMemento`; `restore(memento)` считывает `memento.content`/`memento.cursor` обратно в свои поля - только создатель обращается к своему приватному состоянию."
+        }
+      },
+      {
+        "lines": [
+          31,
+          39
+        ],
+        "title": {
+          "en": "History is the caretaker - it stores mementos without looking inside them",
+          "ru": "History - опекун, он хранит снимки, не заглядывая внутрь"
+        },
+        "explanation": {
+          "en": "`push` and `pop` just move `EditorMemento` objects in and out of `_mementos`, returning `None` if empty - `History` never reads `content` or `cursor` itself.",
+          "ru": "`push` и `pop` просто перемещают объекты `EditorMemento` в `_mementos` и обратно, возвращая `None`, если история пуста - `History` сам никогда не читает `content` или `cursor`."
+        }
+      },
+      {
+        "lines": [
+          42,
+          46
+        ],
+        "title": {
+          "en": "A snapshot is taken right after typing 'Hello'",
+          "ru": "Снимок делается сразу после ввода 'Hello'"
+        },
+        "explanation": {
+          "en": "`editor.type('Hello')` mutates the editor's state, then `editor.save()` freezes that exact state into a memento which `history.push(...)` stores.",
+          "ru": "`editor.type('Hello')` изменяет состояние редактора, затем `editor.save()` фиксирует это состояние в снимке, который сохраняется через `history.push(...)`."
+        }
+      },
+      {
+        "lines": [
+          48,
+          49
+        ],
+        "title": {
+          "en": "Further typing changes state that the saved memento doesn't know about",
+          "ru": "Дальнейший ввод меняет состояние, о котором сохранённый снимок ничего не знает"
+        },
+        "explanation": {
+          "en": "`editor.type(', world')` appends more text, so `get_content()` now prints `'Hello, world'` - but the memento pushed earlier still holds only `'Hello'`.",
+          "ru": "`editor.type(', world')` дописывает текст, поэтому `get_content()` теперь печатает `'Hello, world'` - но снимок, отправленный ранее в историю, всё ещё хранит только `'Hello'`."
+        }
+      },
+      {
+        "lines": [
+          51,
+          54
+        ],
+        "title": {
+          "en": "restore() rolls the editor back to the popped snapshot",
+          "ru": "restore() откатывает редактор к извлечённому снимку"
+        },
+        "explanation": {
+          "en": "`history.pop()` returns the earlier memento as `snapshot`; the `if snapshot` guard handles the empty-history case, and `editor.restore(snapshot)` overwrites `_content`/`_cursor` - the print now shows `'Hello'` again.",
+          "ru": "`history.pop()` возвращает более ранний снимок в `snapshot`; проверка `if snapshot` обрабатывает случай пустой истории, а `editor.restore(snapshot)` перезаписывает `_content`/`_cursor` - вывод снова показывает `'Hello'`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "The originator's internal layout stays private - no field, getter, or setter needs to be exposed just so external code can take a snapshot.",

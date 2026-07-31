@@ -67,6 +67,152 @@
     "csharp": "interface IRouteStrategy\n{\n    string Calculate(string from, string to);\n}\n\nclass WalkingRoute : IRouteStrategy\n{\n    public string Calculate(string from, string to) => $\"Walking route from {from} to {to} via footpaths\";\n}\n\nclass RoadRoute : IRouteStrategy\n{\n    public string Calculate(string from, string to) => $\"Driving route from {from} to {to} via roads\";\n}\n\nclass Navigator\n{\n    private IRouteStrategy strategy;\n\n    public Navigator(IRouteStrategy strategy) => this.strategy = strategy;\n\n    public void SetStrategy(IRouteStrategy strategy) => this.strategy = strategy;\n\n    public string BuildRoute(string from, string to) => strategy.Calculate(from, to);\n}\n\nvar navigator = new Navigator(new WalkingRoute());\nConsole.WriteLine(navigator.BuildRoute(\"Home\", \"Park\"));\n\nnavigator.SetStrategy(new RoadRoute());\nConsole.WriteLine(navigator.BuildRoute(\"Home\", \"Park\"));",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\n\n\nclass RouteStrategy(ABC):\n    @abstractmethod\n    def calculate(self, start: str, end: str) -> str: ...\n\n\nclass WalkingRoute(RouteStrategy):\n    def calculate(self, start: str, end: str) -> str:\n        return f'Walking route from {start} to {end} via footpaths'\n\n\nclass RoadRoute(RouteStrategy):\n    def calculate(self, start: str, end: str) -> str:\n        return f'Driving route from {start} to {end} via roads'\n\n\nclass Navigator:\n    def __init__(self, strategy: RouteStrategy) -> None:\n        self._strategy = strategy\n\n    def set_strategy(self, strategy: RouteStrategy) -> None:\n        self._strategy = strategy\n\n    def build_route(self, start: str, end: str) -> str:\n        return self._strategy.calculate(start, end)\n\n\nnavigator = Navigator(WalkingRoute())\nprint(navigator.build_route('Home', 'Park'))\n\nnavigator.set_strategy(RoadRoute())\nprint(navigator.build_route('Home', 'Park'))"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          5
+        ],
+        "title": {
+          "en": "RouteStrategy declares the interchangeable algorithm's interface",
+          "ru": "RouteStrategy задаёт интерфейс взаимозаменяемого алгоритма"
+        },
+        "explanation": {
+          "en": "The base `calculate(from, to)` throws - it exists only so `Navigator` has one method signature to call, regardless of which concrete strategy is plugged in.",
+          "ru": "Базовый `calculate(from, to)` бросает исключение - он существует лишь для того, чтобы у `Navigator` была одна сигнатура метода для вызова, независимо от того, какая конкретная стратегия подключена."
+        }
+      },
+      {
+        "lines": [
+          7,
+          17
+        ],
+        "title": {
+          "en": "WalkingRoute and RoadRoute are two interchangeable algorithms",
+          "ru": "WalkingRoute и RoadRoute - два взаимозаменяемых алгоритма"
+        },
+        "explanation": {
+          "en": "Both `extends RouteStrategy` and implement `calculate` with different wording, but the exact same signature - `Navigator` can hold either one without knowing which.",
+          "ru": "Оба наследуют `RouteStrategy` и реализуют `calculate` с разным текстом, но с одинаковой сигнатурой - `Navigator` может хранить любой из них, не зная, какой именно."
+        }
+      },
+      {
+        "lines": [
+          19,
+          33
+        ],
+        "title": {
+          "en": "Navigator is the context - it delegates to whatever strategy it holds",
+          "ru": "Navigator - контекст, он делегирует работу той стратегии, которую хранит"
+        },
+        "explanation": {
+          "en": "`#strategy` is set in the constructor and can be swapped via `setStrategy`; `buildRoute` just calls `this.#strategy.calculate(from, to)` - the navigator itself has no routing logic at all.",
+          "ru": "`#strategy` устанавливается в конструкторе и может быть заменена через `setStrategy`; `buildRoute` просто вызывает `this.#strategy.calculate(from, to)` - у самого навигатора вообще нет логики построения маршрута."
+        }
+      },
+      {
+        "lines": [
+          35,
+          36
+        ],
+        "title": {
+          "en": "The navigator starts with WalkingRoute and produces a walking route",
+          "ru": "Навигатор изначально использует WalkingRoute и строит пеший маршрут"
+        },
+        "explanation": {
+          "en": "`new Navigator(new WalkingRoute())` injects the strategy at construction time, so `buildRoute('Home', 'Park')` resolves to `WalkingRoute.calculate`'s footpath message.",
+          "ru": "`new Navigator(new WalkingRoute())` внедряет стратегию уже при создании, поэтому `buildRoute('Home', 'Park')` вызывает `WalkingRoute.calculate` и возвращает сообщение про пешеходные дорожки."
+        }
+      },
+      {
+        "lines": [
+          38,
+          39
+        ],
+        "title": {
+          "en": "setStrategy swaps the algorithm without touching buildRoute",
+          "ru": "setStrategy меняет алгоритм, не затрагивая buildRoute"
+        },
+        "explanation": {
+          "en": "`navigator.setStrategy(new RoadRoute())` replaces `#strategy`, so the very same `buildRoute('Home', 'Park')` call now returns `RoadRoute.calculate`'s driving message instead.",
+          "ru": "`navigator.setStrategy(new RoadRoute())` заменяет `#strategy`, поэтому тот же самый вызов `buildRoute('Home', 'Park')` теперь возвращает сообщение про автомобильный маршрут из `RoadRoute.calculate`."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          7
+        ],
+        "title": {
+          "en": "RouteStrategy declares the interchangeable algorithm's interface",
+          "ru": "RouteStrategy задаёт интерфейс взаимозаменяемого алгоритма"
+        },
+        "explanation": {
+          "en": "`calculate(start, end)` is `@abstractmethod` - it exists only so `Navigator` has one method signature to call, regardless of which concrete strategy is plugged in.",
+          "ru": "`calculate(start, end)` объявлен как `@abstractmethod` - он существует лишь для того, чтобы у `Navigator` была одна сигнатура метода для вызова, независимо от того, какая конкретная стратегия подключена."
+        }
+      },
+      {
+        "lines": [
+          10,
+          17
+        ],
+        "title": {
+          "en": "WalkingRoute and RoadRoute are two interchangeable algorithms",
+          "ru": "WalkingRoute и RoadRoute - два взаимозаменяемых алгоритма"
+        },
+        "explanation": {
+          "en": "Both subclass `RouteStrategy` and implement `calculate` with different wording, but the exact same signature - `Navigator` can hold either one without knowing which.",
+          "ru": "Оба наследуют `RouteStrategy` и реализуют `calculate` с разным текстом, но с одинаковой сигнатурой - `Navigator` может хранить любой из них, не зная, какой именно."
+        }
+      },
+      {
+        "lines": [
+          20,
+          28
+        ],
+        "title": {
+          "en": "Navigator is the context - it delegates to whatever strategy it holds",
+          "ru": "Navigator - контекст, он делегирует работу той стратегии, которую хранит"
+        },
+        "explanation": {
+          "en": "`_strategy` is set in `__init__` and can be swapped via `set_strategy`; `build_route` just calls `self._strategy.calculate(start, end)` - the navigator itself has no routing logic at all.",
+          "ru": "`_strategy` устанавливается в `__init__` и может быть заменена через `set_strategy`; `build_route` просто вызывает `self._strategy.calculate(start, end)` - у самого навигатора вообще нет логики построения маршрута."
+        }
+      },
+      {
+        "lines": [
+          31,
+          32
+        ],
+        "title": {
+          "en": "The navigator starts with WalkingRoute and produces a walking route",
+          "ru": "Навигатор изначально использует WalkingRoute и строит пеший маршрут"
+        },
+        "explanation": {
+          "en": "`Navigator(WalkingRoute())` injects the strategy at construction time, so `build_route('Home', 'Park')` resolves to `WalkingRoute.calculate`'s footpath message.",
+          "ru": "`Navigator(WalkingRoute())` внедряет стратегию уже при создании, поэтому `build_route('Home', 'Park')` вызывает `WalkingRoute.calculate` и возвращает сообщение про пешеходные дорожки."
+        }
+      },
+      {
+        "lines": [
+          34,
+          35
+        ],
+        "title": {
+          "en": "set_strategy swaps the algorithm without touching build_route",
+          "ru": "set_strategy меняет алгоритм, не затрагивая build_route"
+        },
+        "explanation": {
+          "en": "`navigator.set_strategy(RoadRoute())` replaces `_strategy`, so the very same `build_route('Home', 'Park')` call now returns `RoadRoute.calculate`'s driving message instead.",
+          "ru": "`navigator.set_strategy(RoadRoute())` заменяет `_strategy`, поэтому тот же самый вызов `build_route('Home', 'Park')` теперь возвращает сообщение про автомобильный маршрут из `RoadRoute.calculate`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "New algorithms can be added as new strategy classes, without editing the context or any existing strategy.",

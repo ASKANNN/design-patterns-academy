@@ -67,6 +67,180 @@
     "csharp": "using System.Collections;\nusing System.Collections.Generic;\n\nclass Song\n{\n    public string Title { get; }\n\n    public Song(string title) => Title = title;\n}\n\nclass Playlist : IEnumerable<Song>\n{\n    private readonly List<Song> _songs = new();\n\n    public Playlist AddSong(string title)\n    {\n        _songs.Add(new Song(title));\n        return this;\n    }\n\n    public IEnumerator<Song> GetEnumerator()\n    {\n        foreach (var song in _songs)\n            yield return song;\n    }\n\n    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();\n}\n\nvar playlist = new Playlist()\n    .AddSong(\"Intro\")\n    .AddSong(\"Verse\")\n    .AddSong(\"Chorus\")\n    .AddSong(\"Outro\");\n\nforeach (var song in playlist)\n    Console.Write(song.Title + \" \");",
     "python": "from __future__ import annotations\nfrom collections.abc import Iterator, Iterable\n\n\nclass Song:\n    def __init__(self, title: str) -> None:\n        self.title = title\n\n\nclass PlaylistIterator(Iterator[Song]):\n    def __init__(self, songs: list[Song]) -> None:\n        self._songs = songs\n        self._current = 0\n\n    def __next__(self) -> Song:\n        if self._current >= len(self._songs):\n            raise StopIteration\n        song = self._songs[self._current]\n        self._current += 1\n        return song\n\n    def __iter__(self) -> Iterator[Song]:\n        return self\n\n\nclass Playlist(Iterable[Song]):\n    def __init__(self) -> None:\n        self.songs: list[Song] = []\n\n    def add_song(self, title: str) -> Playlist:\n        self.songs.append(Song(title))\n        return self\n\n    def __iter__(self) -> Iterator[Song]:\n        return PlaylistIterator(self.songs)\n\n\nplaylist = Playlist().add_song('Intro').add_song('Verse').add_song('Chorus').add_song('Outro')\n\nfor song in playlist:\n    print(song.title, end=' ')\n\nprint([s.title for s in playlist])"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          5
+        ],
+        "title": {
+          "en": "Song is the plain element stored in the collection",
+          "ru": "Song - обычный элемент, хранящийся в коллекции"
+        },
+        "explanation": {
+          "en": "It just wraps a `title` - the aggregate and its iterator are the parts that carry all the traversal logic, not the elements themselves.",
+          "ru": "Он просто оборачивает `title` - вся логика обхода лежит на агрегате и его итераторе, а не на самих элементах."
+        }
+      },
+      {
+        "lines": [
+          7,
+          15
+        ],
+        "title": {
+          "en": "Playlist is the aggregate - a plain array wrapped behind addSong",
+          "ru": "Playlist - агрегат, обычный массив за методом addSong"
+        },
+        "explanation": {
+          "en": "`this.songs` is a private-ish array, and `addSong` pushes a new `Song` and returns `this` for chaining - clients never touch `songs` directly.",
+          "ru": "`this.songs` - это фактически внутренний массив, а `addSong` добавляет новый `Song` и возвращает `this` для цепочки вызовов - клиенты никогда не обращаются к `songs` напрямую."
+        }
+      },
+      {
+        "lines": [
+          17,
+          29
+        ],
+        "title": {
+          "en": "[Symbol.iterator] returns a fresh iterator object with its own cursor",
+          "ru": "[Symbol.iterator] возвращает новый объект-итератор с собственным курсором"
+        },
+        "explanation": {
+          "en": "Each call creates a new `current = 0` closed over by a `next()` method - `next()` returns `{ value, done: false }` while there are songs left, then `{ value: undefined, done: true }` - this is the exact protocol `for...of` and spread expect.",
+          "ru": "Каждый вызов создаёт новую переменную `current = 0`, захваченную методом `next()` - `next()` возвращает `{ value, done: false }`, пока песни ещё есть, а затем `{ value: undefined, done: true }` - это в точности протокол, который ожидают `for...of` и spread."
+        }
+      },
+      {
+        "lines": [
+          32,
+          36
+        ],
+        "title": {
+          "en": "The client builds a playlist without knowing about iteration yet",
+          "ru": "Клиент строит плейлист, пока ничего не зная об итерации"
+        },
+        "explanation": {
+          "en": "Four chained `addSong` calls populate `playlist.songs` - at this point nothing has iterated over it.",
+          "ru": "Четыре цепочечных вызова `addSong` заполняют `playlist.songs` - на этом этапе по нему ещё никто не итерировался."
+        }
+      },
+      {
+        "lines": [
+          38,
+          40
+        ],
+        "title": {
+          "en": "for...of drives the iterator one next() call at a time",
+          "ru": "for...of управляет итератором, вызывая next() по одному разу за шаг"
+        },
+        "explanation": {
+          "en": "The loop calls `playlist[Symbol.iterator]()` once to get an iterator object, then repeatedly calls its `next()` until `done` is `true` - the loop body never touches `songs` or `current` directly.",
+          "ru": "Цикл один раз вызывает `playlist[Symbol.iterator]()`, чтобы получить объект-итератор, а затем многократно вызывает его `next()`, пока `done` не станет `true` - тело цикла никогда напрямую не обращается к `songs` или `current`."
+        }
+      },
+      {
+        "lines": [
+          42,
+          42
+        ],
+        "title": {
+          "en": "Spread syntax reuses the exact same iteration protocol",
+          "ru": "Спред-синтаксис использует тот же самый протокол итерации"
+        },
+        "explanation": {
+          "en": "`[...playlist]` calls `[Symbol.iterator]()` again - a brand-new iterator with its own `current`, independent from any earlier `for...of` loop - and collects the results into an array before `.map` runs.",
+          "ru": "`[...playlist]` снова вызывает `[Symbol.iterator]()` - создаётся совершенно новый итератор со своим `current`, независимый от любого предыдущего цикла `for...of` - и собирает результаты в массив ещё до вызова `.map`."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          5,
+          7
+        ],
+        "title": {
+          "en": "Song is the plain element stored in the collection",
+          "ru": "Song - обычный элемент, хранящийся в коллекции"
+        },
+        "explanation": {
+          "en": "It just wraps a `title` - the aggregate and its iterator carry all the traversal logic, not the elements themselves.",
+          "ru": "Он просто оборачивает `title` - вся логика обхода лежит на агрегате и его итераторе, а не на самих элементах."
+        }
+      },
+      {
+        "lines": [
+          10,
+          23
+        ],
+        "title": {
+          "en": "PlaylistIterator is a standalone iterator with its own cursor",
+          "ru": "PlaylistIterator - отдельный итератор с собственным курсором"
+        },
+        "explanation": {
+          "en": "It stores a reference to `_songs` plus its own `_current` index; `__next__` returns the next `Song` and advances `_current`, or raises `StopIteration` when exhausted; `__iter__` returns `self` so the object satisfies `Iterator`.",
+          "ru": "Он хранит ссылку на `_songs` и собственный индекс `_current`; `__next__` возвращает следующий `Song` и продвигает `_current`, либо бросает `StopIteration`, когда элементы закончились; `__iter__` возвращает `self`, чтобы объект удовлетворял протоколу `Iterator`."
+        }
+      },
+      {
+        "lines": [
+          26,
+          35
+        ],
+        "title": {
+          "en": "Playlist is the aggregate - it only knows how to create an iterator",
+          "ru": "Playlist - агрегат, который умеет лишь создавать итератор"
+        },
+        "explanation": {
+          "en": "`add_song` appends to `self.songs` and returns `self` for chaining; `__iter__` returns a brand-new `PlaylistIterator(self.songs)` on every call - the playlist itself has no traversal state.",
+          "ru": "`add_song` добавляет элемент в `self.songs` и возвращает `self` для цепочки вызовов; `__iter__` при каждом вызове возвращает новый `PlaylistIterator(self.songs)` - у самого плейлиста нет состояния обхода."
+        }
+      },
+      {
+        "lines": [
+          38,
+          38
+        ],
+        "title": {
+          "en": "The client builds a playlist without knowing about iteration yet",
+          "ru": "Клиент строит плейлист, пока ничего не зная об итерации"
+        },
+        "explanation": {
+          "en": "Four chained `add_song` calls populate `playlist.songs` - at this point nothing has iterated over it.",
+          "ru": "Четыре цепочечных вызова `add_song` заполняют `playlist.songs` - на этом этапе по нему ещё никто не итерировался."
+        }
+      },
+      {
+        "lines": [
+          40,
+          41
+        ],
+        "title": {
+          "en": "for calls __iter__ once, then __next__ repeatedly",
+          "ru": "for один раз вызывает __iter__, затем многократно __next__"
+        },
+        "explanation": {
+          "en": "`for song in playlist` calls `playlist.__iter__()` to get a fresh `PlaylistIterator`, then calls its `__next__()` until `StopIteration` is raised - the loop body never touches `_current` directly.",
+          "ru": "`for song in playlist` вызывает `playlist.__iter__()`, получая новый `PlaylistIterator`, а затем вызывает его `__next__()`, пока не будет брошено `StopIteration` - тело цикла никогда напрямую не обращается к `_current`."
+        }
+      },
+      {
+        "lines": [
+          43,
+          43
+        ],
+        "title": {
+          "en": "The list comprehension reuses the exact same iteration protocol",
+          "ru": "Списковое включение использует тот же самый протокол итерации"
+        },
+        "explanation": {
+          "en": "`[s.title for s in playlist]` triggers another `playlist.__iter__()` call - a brand-new `PlaylistIterator` independent from the `for` loop above, each with its own `_current`.",
+          "ru": "`[s.title for s in playlist]` снова вызывает `playlist.__iter__()` - создаётся совершенно новый `PlaylistIterator`, независимый от цикла `for` выше, с собственным `_current`."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "Collection classes shrink back down to just managing storage, since every traversal algorithm they used to carry moves out into its own iterator class.",

@@ -73,6 +73,180 @@
     "csharp": "interface IShapeVisitor<out T>\n{\n    T VisitCircle(Circle circle);\n    T VisitRectangle(Rectangle rect);\n}\n\ninterface IShape { T Accept<T>(IShapeVisitor<T> visitor); }\n\nclass Circle : IShape\n{\n    public double Radius { get; }\n    public Circle(double radius) => Radius = radius;\n    public T Accept<T>(IShapeVisitor<T> v) => v.VisitCircle(this);\n}\n\nclass Rectangle : IShape\n{\n    public double Width { get; }\n    public double Height { get; }\n    public Rectangle(double w, double h) { Width = w; Height = h; }\n    public T Accept<T>(IShapeVisitor<T> v) => v.VisitRectangle(this);\n}\n\nclass AreaVisitor : IShapeVisitor<double>\n{\n    public double VisitCircle(Circle c)       => Math.PI * c.Radius * c.Radius;\n    public double VisitRectangle(Rectangle r) => r.Width * r.Height;\n}\n\nclass XmlExportVisitor : IShapeVisitor<string>\n{\n    public string VisitCircle(Circle c)       => $\"<circle radius=\\\"{c.Radius}\\\"/>\";\n    public string VisitRectangle(Rectangle r) => $\"<rect width=\\\"{r.Width}\\\" height=\\\"{r.Height}\\\"/>\";\n}\n\nvar shapes = new IShape[] { new Circle(2), new Rectangle(3, 4) };\nvar area   = new AreaVisitor();\nvar xml    = new XmlExportVisitor();\n\nforeach (var shape in shapes)\n    Console.WriteLine($\"{shape.Accept(area):F2} -> {shape.Accept(xml)}\");",
     "python": "from __future__ import annotations\nfrom abc import ABC, abstractmethod\nimport math\n\n\nclass ShapeVisitor(ABC):\n    @abstractmethod\n    def visit_circle(self, circle: 'Circle'): ...\n\n    @abstractmethod\n    def visit_rectangle(self, rect: 'Rectangle'): ...\n\n\nclass Shape(ABC):\n    @abstractmethod\n    def accept(self, visitor: ShapeVisitor): ...\n\n\nclass Circle(Shape):\n    def __init__(self, radius: float) -> None:\n        self.radius = radius\n\n    def accept(self, visitor: ShapeVisitor):\n        return visitor.visit_circle(self)\n\n\nclass Rectangle(Shape):\n    def __init__(self, width: float, height: float) -> None:\n        self.width, self.height = width, height\n\n    def accept(self, visitor: ShapeVisitor):\n        return visitor.visit_rectangle(self)\n\n\nclass AreaVisitor(ShapeVisitor):\n    def visit_circle(self, circle: Circle) -> float:\n        return math.pi * circle.radius ** 2\n\n    def visit_rectangle(self, rect: Rectangle) -> float:\n        return rect.width * rect.height\n\n\nclass XmlExportVisitor(ShapeVisitor):\n    def visit_circle(self, circle: Circle) -> str:\n        return f'<circle radius=\"{circle.radius}\"/>'\n\n    def visit_rectangle(self, rect: Rectangle) -> str:\n        return f'<rect width=\"{rect.width}\" height=\"{rect.height}\"/>'\n\n\nshapes: list[Shape] = [Circle(2), Rectangle(3, 4)]\narea = AreaVisitor()\nxml = XmlExportVisitor()\n\nfor shape in shapes:\n    print(f'{shape.accept(area):.2f}', '->', shape.accept(xml))"
   },
+  "walkthrough": {
+    "javascript": [
+      {
+        "lines": [
+          1,
+          4
+        ],
+        "title": {
+          "en": "Circle's accept() double-dispatches to visitCircle",
+          "ru": "accept() у Circle выполняет двойную диспетчеризацию к visitCircle"
+        },
+        "explanation": {
+          "en": "`accept(visitor)` calls `visitor.visitCircle(this)` - the shape picks which visitor method fits its own type, so the visitor never has to type-check the shape.",
+          "ru": "`accept(visitor)` вызывает `visitor.visitCircle(this)` - сама фигура выбирает, какой метод визитора ей подходит, поэтому визитору не нужно проверять тип фигуры."
+        }
+      },
+      {
+        "lines": [
+          6,
+          9
+        ],
+        "title": {
+          "en": "Rectangle's accept() does the same, routing to visitRectangle",
+          "ru": "accept() у Rectangle делает то же самое, направляя вызов в visitRectangle"
+        },
+        "explanation": {
+          "en": "It follows the identical pattern as `Circle`, just calling `visitor.visitRectangle(this)` instead - each shape class only needs one line to plug into any visitor.",
+          "ru": "Он повторяет тот же паттерн, что и `Circle`, только вызывает `visitor.visitRectangle(this)` - каждому классу фигуры достаточно одной строки, чтобы подключиться к любому визитору."
+        }
+      },
+      {
+        "lines": [
+          11,
+          18
+        ],
+        "title": {
+          "en": "AreaVisitor implements one operation across both shape types",
+          "ru": "AreaVisitor реализует одну операцию сразу для обоих типов фигур"
+        },
+        "explanation": {
+          "en": "`visitCircle` computes `Math.PI * circle.radius ** 2` and `visitRectangle` computes `rect.width * rect.height` - both live in one class, so adding this operation didn't require touching `Circle` or `Rectangle`.",
+          "ru": "`visitCircle` вычисляет `Math.PI * circle.radius ** 2`, а `visitRectangle` - `rect.width * rect.height` - обе логики находятся в одном классе, поэтому добавление этой операции не потребовало изменений в `Circle` или `Rectangle`."
+        }
+      },
+      {
+        "lines": [
+          20,
+          27
+        ],
+        "title": {
+          "en": "XmlExportVisitor is a second, completely independent operation",
+          "ru": "XmlExportVisitor - вторая, полностью независимая операция"
+        },
+        "explanation": {
+          "en": "It implements the same `visitCircle`/`visitRectangle` pair but produces XML strings instead of numbers - adding it required zero changes to `Circle`, `Rectangle`, or `AreaVisitor`.",
+          "ru": "Он реализует ту же пару `visitCircle`/`visitRectangle`, но возвращает XML-строки вместо чисел - его добавление не потребовало никаких изменений в `Circle`, `Rectangle` или `AreaVisitor`."
+        }
+      },
+      {
+        "lines": [
+          29,
+          32
+        ],
+        "title": {
+          "en": "Two shapes and two visitors are set up independently",
+          "ru": "Две фигуры и два визитора настраиваются независимо друг от друга"
+        },
+        "explanation": {
+          "en": "`shapes` holds one `Circle` and one `Rectangle`; `area` and `xml` are separate visitor instances that will each be applied to both shapes.",
+          "ru": "`shapes` содержит один `Circle` и один `Rectangle`; `area` и `xml` - отдельные экземпляры визиторов, каждый из которых будет применён к обеим фигурам."
+        }
+      },
+      {
+        "lines": [
+          34,
+          36
+        ],
+        "title": {
+          "en": "Each shape.accept(visitor) call resolves to the right method automatically",
+          "ru": "Каждый вызов shape.accept(visitor) автоматически разрешается в нужный метод"
+        },
+        "explanation": {
+          "en": "`shape.accept(area)` and `shape.accept(xml)` both work for either shape in the loop - `accept` internally calls the visitor method matching that exact shape's class, without any `instanceof` checks in this code.",
+          "ru": "И `shape.accept(area)`, и `shape.accept(xml)` работают для любой фигуры в цикле - `accept` внутри вызывает метод визитора, соответствующий именно классу этой фигуры, без каких-либо проверок `instanceof` в этом коде."
+        }
+      }
+    ],
+    "python": [
+      {
+        "lines": [
+          6,
+          11
+        ],
+        "title": {
+          "en": "ShapeVisitor declares one method per shape type",
+          "ru": "ShapeVisitor объявляет отдельный метод для каждого типа фигуры"
+        },
+        "explanation": {
+          "en": "`visit_circle` and `visit_rectangle` are both `@abstractmethod` - every concrete visitor must handle every shape type in this hierarchy.",
+          "ru": "И `visit_circle`, и `visit_rectangle` объявлены как `@abstractmethod` - каждый конкретный визитор обязан обрабатывать каждый тип фигуры из этой иерархии."
+        }
+      },
+      {
+        "lines": [
+          14,
+          32
+        ],
+        "title": {
+          "en": "accept() double-dispatches each shape to its matching visit method",
+          "ru": "accept() выполняет двойную диспетчеризацию каждой фигуры к её методу visit"
+        },
+        "explanation": {
+          "en": "`Circle.accept` calls `visitor.visit_circle(self)` and `Rectangle.accept` calls `visitor.visit_rectangle(self)` - each shape knows which visitor method fits itself, so the visitor never has to check the shape's type.",
+          "ru": "`Circle.accept` вызывает `visitor.visit_circle(self)`, а `Rectangle.accept` - `visitor.visit_rectangle(self)` - каждая фигура знает, какой метод визитора ей соответствует, поэтому визитору не нужно проверять тип фигуры."
+        }
+      },
+      {
+        "lines": [
+          35,
+          40
+        ],
+        "title": {
+          "en": "AreaVisitor implements one operation across both shape types",
+          "ru": "AreaVisitor реализует одну операцию сразу для обоих типов фигур"
+        },
+        "explanation": {
+          "en": "`visit_circle` computes `math.pi * circle.radius ** 2` and `visit_rectangle` computes `rect.width * rect.height` - both live in one class, so adding this operation didn't require touching `Circle` or `Rectangle`.",
+          "ru": "`visit_circle` вычисляет `math.pi * circle.radius ** 2`, а `visit_rectangle` - `rect.width * rect.height` - обе логики находятся в одном классе, поэтому добавление этой операции не потребовало изменений в `Circle` или `Rectangle`."
+        }
+      },
+      {
+        "lines": [
+          43,
+          48
+        ],
+        "title": {
+          "en": "XmlExportVisitor is a second, completely independent operation",
+          "ru": "XmlExportVisitor - вторая, полностью независимая операция"
+        },
+        "explanation": {
+          "en": "It implements the same `visit_circle`/`visit_rectangle` pair but returns XML strings instead of numbers - adding it required zero changes to `Circle`, `Rectangle`, or `AreaVisitor`.",
+          "ru": "Он реализует ту же пару `visit_circle`/`visit_rectangle`, но возвращает XML-строки вместо чисел - его добавление не потребовало никаких изменений в `Circle`, `Rectangle` или `AreaVisitor`."
+        }
+      },
+      {
+        "lines": [
+          51,
+          53
+        ],
+        "title": {
+          "en": "Two shapes and two visitors are set up independently",
+          "ru": "Две фигуры и два визитора настраиваются независимо друг от друга"
+        },
+        "explanation": {
+          "en": "`shapes` holds one `Circle` and one `Rectangle`; `area` and `xml` are separate visitor instances that will each be applied to both shapes.",
+          "ru": "`shapes` содержит один `Circle` и один `Rectangle`; `area` и `xml` - отдельные экземпляры визиторов, каждый из которых будет применён к обеим фигурам."
+        }
+      },
+      {
+        "lines": [
+          55,
+          56
+        ],
+        "title": {
+          "en": "Each shape.accept(visitor) call resolves to the right method automatically",
+          "ru": "Каждый вызов shape.accept(visitor) автоматически разрешается в нужный метод"
+        },
+        "explanation": {
+          "en": "`shape.accept(area)` and `shape.accept(xml)` both work for either shape in the loop - `accept` internally calls the visitor method matching that exact shape's class, without any `isinstance` checks in this code.",
+          "ru": "И `shape.accept(area)`, и `shape.accept(xml)` работают для любой фигуры в цикле - `accept` внутри вызывает метод визитора, соответствующий именно классу этой фигуры, без каких-либо проверок `isinstance` в этом коде."
+        }
+      }
+    ]
+  },
   "pros": [
     {
       "en": "New behavior arrives as a new visitor class, so the element hierarchy it operates on is never touched or recompiled.",
