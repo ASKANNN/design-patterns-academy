@@ -42,10 +42,12 @@ in `src/scripts/ui.js` after the markup is in the DOM.
 ## UI Primitives (`ui/`)
 
 `Accordion`, `AccessibilityWidget`, `Alert`, `Badge`, `Breadcrumb`, `Button`,
-`Card`, `Checkbox`, `Chip`, `CodeBlock`, `CopyButton`, `Divider`, `EmptyState`,
-`ErrorPage`, `IconButton`, `Input`, `Modal`, `Pagination`, `ProgressBar`,
-`Radio`, `ScrollTopButton`, `SearchInput`, `Select`, `Skeleton`, `Spinner`,
-`Tabs`, `Tag`, `TextArea`, `TextField`, `Toggle`, `Tooltip`.
+`CodeBlock`, `EmptyState`, `ErrorPage`, `IconButton`, `Playground`, `Quiz`,
+`ScrollTopButton`, `SearchInput`, `Tabs`, `Tooltip`, `Walkthrough`.
+
+Note: a larger kit (`Card`, `Modal`, `Pagination`, form primitives, etc.) was
+built speculatively and removed as dead code on 2026-07-31 — none of it was
+ever wired into a page. Add a primitive here only when a page needs it.
 
 ## Visual (`visual/`)
 

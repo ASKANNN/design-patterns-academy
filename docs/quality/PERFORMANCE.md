@@ -44,7 +44,7 @@ shipping little code and loading data lazily.
 
 - Rendering is `data → string → innerHTML`; there is no virtual-DOM diffing cost.
 - Reserve space for async content to avoid layout shift (skeletons / fixed
-  dimensions) — see `Skeleton` / `Spinner`.
+  dimensions).
 - Keep DOM writes batched; avoid layout thrashing in `src/scripts/`.
 
 ---

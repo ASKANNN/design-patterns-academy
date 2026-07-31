@@ -1,3 +1,8 @@
+import { PATTERNS_CATEGORIES } from '../../config/pattern-categories.js';
+
+const _CATS = PATTERNS_CATEGORIES.filter(c => c.id !== 'all');
+const _cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export function Header() {
   return `
     <header class="header" role="banner">
@@ -34,24 +39,14 @@ export function Header() {
                 </svg>
               </button>
               <ul class="header__dropdown" role="list">
-                <li>
-                  <a href="#/patterns/creational" class="header__dropdown-link">
-                    <span class="header__dropdown-dot header__dropdown-dot--creational" aria-hidden="true"></span>
-                    <span data-i18n="patterns.categories.creational">Creational</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#/patterns/structural" class="header__dropdown-link">
-                    <span class="header__dropdown-dot header__dropdown-dot--structural" aria-hidden="true"></span>
-                    <span data-i18n="patterns.categories.structural">Structural</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#/patterns/behavioral" class="header__dropdown-link">
-                    <span class="header__dropdown-dot header__dropdown-dot--behavioral" aria-hidden="true"></span>
-                    <span data-i18n="patterns.categories.behavioral">Behavioral</span>
-                  </a>
-                </li>
+                ${_CATS.map(cat => `
+                  <li>
+                    <a href="#/patterns/${cat.id}" class="header__dropdown-link">
+                      <span class="header__dropdown-dot header__dropdown-dot--${cat.id}" aria-hidden="true"></span>
+                      <span data-i18n="patterns.categories.${cat.id}">${_cap(cat.id)}</span>
+                    </a>
+                  </li>
+                `).join('')}
               </ul>
             </li>
             <li>

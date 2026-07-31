@@ -125,7 +125,7 @@ Category hues are used **only** as a thin accent (title bar strip or left border
 
 ### Node style
 
-- Rectangular card with title region and an optional member list, mirroring the visual weight of the existing `Card` component.
+- Rectangular card with title region and an optional member list, mirroring the visual weight of the `.card` surface style (see DESIGN_SYSTEM.md § Card Variants).
 - Three semantic variants: **concrete** (solid border), **abstract/interface** (dashed border), **client/actor** (subtle background `--color-bg-subtle`).
 - Minimum touch/interaction target: 44×44px.
 

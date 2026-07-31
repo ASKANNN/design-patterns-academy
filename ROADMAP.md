@@ -36,15 +36,17 @@
 ## Phase 4 — UI Components ✅
 
 - [x] Button
-- [x] Card
-- [x] Badge / Tag
+- [x] Badge
 - [x] CodeBlock (syntax highlighted)
 - [x] Tabs
-- [x] Modal / Dialog
 - [x] Tooltip
 - [x] Search
 - [x] Theme toggle
 - [x] Language switcher
+
+Note (2026-07-31): Card, Modal, Pagination, and other kit primitives built
+speculatively in this phase were never wired into any page and were removed
+as dead code during a codebase audit. Build only what a page actually uses.
 
 ---
 

@@ -1,3 +1,8 @@
+import { PATTERNS_CATEGORIES } from '../../config/pattern-categories.js';
+
+const _CATS = PATTERNS_CATEGORIES.filter(c => c.id !== 'all');
+const _cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export function Footer() {
   const year = new Date().getFullYear();
 
@@ -27,9 +32,9 @@ export function Footer() {
           <div class="footer__col">
             <h3 class="footer__col-title" data-i18n="footer.col_patterns">Patterns</h3>
             <ul class="footer__col-list" role="list">
-              <li><a href="#/patterns/creational" class="footer__link" data-i18n="patterns.categories.creational">Creational</a></li>
-              <li><a href="#/patterns/structural" class="footer__link" data-i18n="patterns.categories.structural">Structural</a></li>
-              <li><a href="#/patterns/behavioral" class="footer__link" data-i18n="patterns.categories.behavioral">Behavioral</a></li>
+              ${_CATS.map(cat => `
+                <li><a href="#/patterns/${cat.id}" class="footer__link" data-i18n="patterns.categories.${cat.id}">${_cap(cat.id)}</a></li>
+              `).join('')}
               <li><a href="#/patterns" class="footer__link" data-i18n="footer.link_all">All 23 Patterns</a></li>
             </ul>
           </div>

@@ -177,14 +177,11 @@ Check whether an existing component already solves the problem.
 
 Prefer:
 
-* Card
 * Tabs
 * Accordion
 * Badge
 * Code Block
 * Alert
-* Modal
-* Pagination
 * Search
 
 Reuse first.

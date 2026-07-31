@@ -70,5 +70,15 @@ All notable changes to Design Patterns Academy are documented in this file.
   Implementation tab are now comment-free, matching the project's minimal-
   comments standard already applied to app source
 
+### Removed
+
+- 17 unused UI-kit primitives from Phase 4 that were never wired into any
+  page: `Card`, `Checkbox`, `Chip`, `CopyButton`, `Divider`, `Input`,
+  `Modal`, `Pagination`, `ProgressBar`, `Radio`, `Select`, `Skeleton`,
+  `Spinner`, `Tag`, `TextArea`, `TextField`, `Toggle`
+- Dead handlers in `src/scripts/ui.js` that only existed to support the
+  removed `Modal`/`Tag`/`CopyButton` components (modal open/close/focus
+  trap, tag-remove, the unused `data-copy` branch of the copy handler)
+
 See [MASTER_PLAN.md](../project-management/MASTER_PLAN.md) for the current
 per-pattern visual coverage status.

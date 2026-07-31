@@ -84,16 +84,6 @@ function onTipFocusOut(e) {
 }
 
 function handleClick(e) {
-  const openTrigger = e.target.closest('[data-modal-open]');
-  if (openTrigger) { openModal(openTrigger.dataset.modalOpen); return; }
-
-  const closeTrigger = e.target.closest('[data-modal-close]');
-  if (closeTrigger) {
-    const modal = e.target.closest('.modal') ?? document.querySelector('.modal.is-open');
-    if (modal) closeModal(modal.id);
-    return;
-  }
-
   const trigger = e.target.closest('.accordion__trigger');
   if (trigger) { toggleAccordion(trigger); return; }
 
@@ -105,9 +95,6 @@ function handleClick(e) {
 
   const copyBtn = e.target.closest('.copy-btn');
   if (copyBtn) { handleCopy(copyBtn); return; }
-
-  const tagRemove = e.target.closest('[data-tag-remove]');
-  if (tagRemove) { tagRemove.closest('.tag')?.remove(); return; }
 
   const filterChip = e.target.closest('.filter-chip[data-filter]');
   if (filterChip) { handleFilter(filterChip); return; }
@@ -159,11 +146,6 @@ function handleClick(e) {
 }
 
 function handleKeydown(e) {
-  if (e.key === 'Escape') {
-    const open = document.querySelector('.modal.is-open');
-    if (open) { closeModal(open.id); return; }
-  }
-
   if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
     const tab = e.target.closest('.tabs__tab');
     if (tab) { navigateTabs(tab, e.key); e.preventDefault(); }
@@ -173,43 +155,6 @@ function handleKeydown(e) {
     const t = e.target.closest('.accordion__trigger');
     if (t) { navigateAccordion(t, e.key); e.preventDefault(); }
   }
-}
-
-function openModal(id) {
-  const modal = document.getElementById(id);
-  if (!modal) return;
-  modal.classList.add('is-open');
-  modal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('modal-open');
-  trapFocus(modal);
-  const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-  firstFocusable?.focus();
-}
-
-function closeModal(id) {
-  const modal = id ? document.getElementById(id) : document.querySelector('.modal.is-open');
-  if (!modal) return;
-  modal.classList.remove('is-open');
-  modal.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('modal-open');
-  document.querySelector(`[data-modal-open="${modal.id}"]`)?.focus();
-}
-
-function trapFocus(element) {
-  const focusable = [...element.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')];
-  if (!focusable.length) return;
-  const first = focusable[0];
-  const last  = focusable[focusable.length - 1];
-
-  element.addEventListener('keydown', function trap(e) {
-    if (e.key !== 'Tab') return;
-    if (e.shiftKey) {
-      if (document.activeElement === first) { last.focus(); e.preventDefault(); }
-    } else {
-      if (document.activeElement === last) { first.focus(); e.preventDefault(); }
-    }
-    if (!element.classList.contains('is-open')) element.removeEventListener('keydown', trap);
-  });
 }
 
 function toggleAccordion(trigger) {
@@ -270,8 +215,7 @@ function dismissAlert(alert) {
 }
 
 async function handleCopy(btn) {
-  const target = btn.dataset.copy
-    ?? btn.closest('.code-block')?.querySelector('.code-block__code')?.textContent;
+  const target = btn.closest('.code-block')?.querySelector('.code-block__code')?.textContent;
 
   if (!target) return;
 

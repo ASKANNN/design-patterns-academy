@@ -1,3 +1,8 @@
+import { PATTERNS_CATEGORIES } from '../../config/pattern-categories.js';
+
+const _CATS = PATTERNS_CATEGORIES.filter(c => c.id !== 'all');
+const _cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export function MobileNav() {
   return `
     <div class="mobile-nav" id="mobile-nav" role="dialog" aria-modal="true" aria-label="Navigation menu" data-i18n-aria-label="a11y.nav_dialog" aria-hidden="true">
@@ -34,24 +39,14 @@ export function MobileNav() {
           <li class="mobile-nav__item mobile-nav__item--group">
             <span class="mobile-nav__group-label" data-i18n="nav.categories">Categories</span>
             <ul class="mobile-nav__sub" role="list">
-              <li>
-                <a href="#/patterns/creational" class="mobile-nav__link mobile-nav__link--sub">
-                  <span class="mobile-nav__dot mobile-nav__dot--creational" aria-hidden="true"></span>
-                  <span data-i18n="patterns.categories.creational">Creational</span>
-                </a>
-              </li>
-              <li>
-                <a href="#/patterns/structural" class="mobile-nav__link mobile-nav__link--sub">
-                  <span class="mobile-nav__dot mobile-nav__dot--structural" aria-hidden="true"></span>
-                  <span data-i18n="patterns.categories.structural">Structural</span>
-                </a>
-              </li>
-              <li>
-                <a href="#/patterns/behavioral" class="mobile-nav__link mobile-nav__link--sub">
-                  <span class="mobile-nav__dot mobile-nav__dot--behavioral" aria-hidden="true"></span>
-                  <span data-i18n="patterns.categories.behavioral">Behavioral</span>
-                </a>
-              </li>
+              ${_CATS.map(cat => `
+                <li>
+                  <a href="#/patterns/${cat.id}" class="mobile-nav__link mobile-nav__link--sub">
+                    <span class="mobile-nav__dot mobile-nav__dot--${cat.id}" aria-hidden="true"></span>
+                    <span data-i18n="patterns.categories.${cat.id}">${_cap(cat.id)}</span>
+                  </a>
+                </li>
+              `).join('')}
             </ul>
           </li>
           <li class="mobile-nav__item">
