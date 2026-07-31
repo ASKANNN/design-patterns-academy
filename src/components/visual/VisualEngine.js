@@ -14,6 +14,7 @@ export function createVisualEngine(root, options = {}) {
   const svgNS = 'http://www.w3.org/2000/svg';
   let overlay = null;
   let _pendingArrivals = [];
+  let _lastPacketDot = null;
 
   const node = (id) => svg.querySelector(`[data-node-id="${cssEscape(id)}"]`);
   const focalNodes = () =>
@@ -107,6 +108,7 @@ export function createVisualEngine(root, options = {}) {
     getOverlay().appendChild(dot);
     if (!spec.loop) {
       dot.addEventListener('animationend', () => dot.remove(), { once: true });
+      _lastPacketDot = dot;
     }
     return api;
   }
@@ -217,13 +219,34 @@ export function createVisualEngine(root, options = {}) {
       else immediate.push(a);
     });
 
+    _lastPacketDot = null;
     immediate.forEach((a) => _applyAction(a, true));
 
+    const applyDeferred = () => deferred.forEach((a) => _applyAction(a, true));
+
+    // Prefer the packet's real animationend over a wall-clock guess: on a
+    // loaded mobile GPU, dropped frames can make the traveling dot lag well
+    // behind where a setTimeout(75%) assumes it is, so the card would glow
+    // before the impulse visibly arrives. animationend is dispatched by the
+    // browser only when the dot's own animation truly finishes, so it can't
+    // desync from what's on screen. The timeout stays as a safety net for
+    // the rare case the animation gets interrupted and never fires.
+    const dot = _lastPacketDot;
     const delay = _arrivalDelay();
-    const tid = setTimeout(() => {
-      deferred.forEach((a) => _applyAction(a, true));
-    }, delay);
-    _pendingArrivals.push(tid);
+    if (dot) {
+      let fired = false;
+      const fire = () => {
+        if (fired) return;
+        fired = true;
+        applyDeferred();
+      };
+      dot.addEventListener('animationend', fire, { once: true });
+      const tid = setTimeout(fire, delay * 1.5);
+      _pendingArrivals.push(tid);
+    } else {
+      const tid = setTimeout(applyDeferred, delay);
+      _pendingArrivals.push(tid);
+    }
   }
 
   function _isArrivalTarget(action, ids) {
