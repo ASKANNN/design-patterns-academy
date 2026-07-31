@@ -7,11 +7,13 @@ import { patternsBreadcrumbItems } from '../config/pattern-categories.js';
 import { setPageMeta }             from './router.js';
 import { animateFilterIn }         from './animations.js';
 import { t }                       from '../utils/i18n.js';
+import { stripTypes }              from '../utils/strip-types.js';
 
 export function initUI() {
   document.addEventListener('click', handleClick);
   document.addEventListener('keydown', handleKeydown);
   document.addEventListener('input', handleInput);
+  window.addEventListener('message', handlePlaygroundMessage);
 
   document.addEventListener('mouseover', onTipOver);
   document.addEventListener('mouseout',  onTipOut);
@@ -127,6 +129,15 @@ function handleClick(e) {
 
   const walkthroughNav = e.target.closest('[data-walkthrough-prev], [data-walkthrough-next]');
   if (walkthroughNav) { handleWalkthroughNav(walkthroughNav); return; }
+
+  const playgroundRun = e.target.closest('[data-playground-run]');
+  if (playgroundRun) { handlePlaygroundRun(playgroundRun); return; }
+
+  const playgroundReset = e.target.closest('[data-playground-reset]');
+  if (playgroundReset) { handlePlaygroundReset(playgroundReset); return; }
+
+  const playgroundClear = e.target.closest('[data-playground-clear]');
+  if (playgroundClear) { handlePlaygroundClear(playgroundClear); return; }
 
   const searchBtn = e.target.closest('[data-action="search"]');
   if (searchBtn) { _triggerSearch(); return; }
@@ -461,6 +472,79 @@ function handleWalkthroughNav(btn) {
   const firstActiveLine = wrap.querySelector('.is-active-line');
   if (firstActiveLine) firstActiveLine.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   steps[next].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function handlePlaygroundRun(btn) {
+  const root      = btn.closest('[data-playground]');
+  const textarea  = root?.querySelector('[data-playground-textarea]');
+  const consoleEl = root?.querySelector('[data-playground-console]');
+  const iframe    = root?.querySelector('[data-playground-sandbox]');
+  if (!root || !textarea || !consoleEl || !iframe) return;
+
+  const lang = root.dataset.playgroundLang;
+  const code = lang === 'typescript' ? stripTypes(textarea.value) : textarea.value;
+
+  consoleEl.innerHTML = '';
+  iframe.srcdoc = _playgroundSandboxDoc(code);
+}
+
+function handlePlaygroundReset(btn) {
+  const root     = btn.closest('[data-playground]');
+  const textarea = root?.querySelector('[data-playground-textarea]');
+  if (!textarea) return;
+  textarea.value = JSON.parse(textarea.dataset.playgroundOriginal);
+}
+
+function handlePlaygroundClear(btn) {
+  const root      = btn.closest('[data-playground]');
+  const consoleEl = root?.querySelector('[data-playground-console]');
+  if (!consoleEl) return;
+  consoleEl.innerHTML = `<p class="playground__console-hint">${t('patterns.playground.run_hint')}</p>`;
+}
+
+function handlePlaygroundMessage(e) {
+  if (!e.data || e.data.__playground !== true) return;
+
+  const iframe = [...document.querySelectorAll('[data-playground-sandbox]')]
+    .find(f => f.contentWindow === e.source);
+  const consoleEl = iframe?.closest('[data-playground]')?.querySelector('[data-playground-console]');
+  if (!consoleEl) return;
+
+  const hint = consoleEl.querySelector('[data-playground-hint]');
+  if (hint) hint.remove();
+
+  const line = document.createElement('p');
+  line.className = `playground__console-line${e.data.type !== 'log' && e.data.type !== 'info' ? ` playground__console-line--${e.data.type}` : ''}`;
+  line.textContent = e.data.text;
+  consoleEl.appendChild(line);
+  line.scrollIntoView({ block: 'nearest' });
+}
+
+function _playgroundSandboxDoc(code) {
+  const escaped = code.replace(/<\/script>/g, '<\\/script>');
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><script>
+(function () {
+  function send(type, args) {
+    try {
+      parent.postMessage({ __playground: true, type, text: args.map(stringify).join(' ') }, '*');
+    } catch (_) {}
+  }
+  function stringify(v) {
+    if (typeof v === 'string') return v;
+    if (v instanceof Error) return v.message;
+    try { return JSON.stringify(v); } catch (_) { return String(v); }
+  }
+  ['log', 'info', 'warn', 'error'].forEach(function (m) {
+    console[m] = function () { send(m, Array.prototype.slice.call(arguments)); };
+  });
+  window.onerror = function (msg) { send('error', [String(msg)]); return true; };
+  try {
+    ${escaped}
+  } catch (err) {
+    send('error', [err && err.message ? err.message : String(err)]);
+  }
+})();
+</script></body></html>`;
 }
 
 let _searchTimer = null;

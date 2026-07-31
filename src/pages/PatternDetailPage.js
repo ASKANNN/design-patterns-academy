@@ -7,6 +7,7 @@ import { Breadcrumb }                                    from '../components/ui/
 import { Alert }                                         from '../components/ui/Alert.js';
 import { Quiz }                                          from '../components/ui/Quiz.js';
 import { Walkthrough }                                   from '../components/ui/Walkthrough.js';
+import { Playground }                                    from '../components/ui/Playground.js';
 import { PatternCard }                                   from '../components/patterns/PatternCard.js';
 import { Diagram }                                       from '../components/visual/Diagram.js';
 import { PatternIcon }                                   from '../components/visual/PatternIcon.js';
@@ -79,6 +80,7 @@ export async function PatternDetailPage({ category, slug } = {}) {
             { label: t('patterns.sections.intent'),        panel: _intentPanel(pattern, lang) },
             { label: t('patterns.sections.structure'),     panel: _structurePanel(pattern, lang) },
             { label: t('patterns.sections.implementation'), panel: _implementationPanel(pattern, lang) },
+            { label: t('patterns.sections.playground'),    panel: _playgroundPanel(pattern, lang) },
             { label: t('patterns.sections.pros_cons'),     panel: _prosConsPanel(pattern, lang) },
             { label: t('patterns.sections.quiz'),          panel: _quizPanel(pattern, lang) },
           ],
@@ -201,6 +203,37 @@ function _implementationPanel(p, lang) {
       ` : CodeBlock({ code: impl[l], language: l })}
     </div>`;
   }).join('');
+
+  return `
+    <div class="detail-section">
+      <div class="lang-select" role="group" aria-label="${t('patterns.select_language')}">
+        ${buttons}
+      </div>
+      ${panels}
+    </div>
+  `;
+}
+
+function _playgroundPanel(p, lang) {
+  const impl = p.implementation ?? {};
+  const runnableLangs = ['javascript', 'typescript'].filter(l => impl[l]);
+
+  if (!runnableLangs.length) {
+    return `<p style="color:var(--color-text-tertiary)">${t('patterns.playground_coming_soon')}</p>`;
+  }
+
+  const langLabels = { javascript: 'JavaScript', typescript: 'TypeScript' };
+
+  const buttons = runnableLangs.map((l, i) =>
+    `<button class="lang-btn${i === 0 ? ' is-active' : ''}" type="button" data-lang-btn="${l}">${langLabels[l]}</button>`
+  ).join('');
+
+  const panels = runnableLangs.map((l, i) => `
+    <div class="lang-panel${i === 0 ? ' is-visible' : ''}" data-lang-panel="${l}">
+      ${l === 'typescript' ? `<p class="playground__note">${t('patterns.playground.typescript_note')}</p>` : ''}
+      ${Playground({ id: `playground-${p.slug}-${l}`, code: impl[l], language: l })}
+    </div>
+  `).join('');
 
   return `
     <div class="detail-section">

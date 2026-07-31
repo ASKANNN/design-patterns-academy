@@ -242,7 +242,24 @@ No new features are implemented during this sprint — only bug fixing and stabi
       unchanged — no step-through mode for them at launch. A heavier
       WASM runtime for other languages was considered and rejected as
       disproportionate to this project's zero-runtime-deps principle;
-      revisit only if explicitly requested later.
+      revisit only if explicitly requested later. **Pilot shipped on
+      Singleton (2026-07-31):** new `src/components/ui/Playground.js`
+      (editor + console panes, Run/Reset/Clear) rendered in a new
+      "Playground" tab on `PatternDetailPage`, reusing `implementation.
+      javascript`/`typescript` as starter code — no new JSON field.
+      Execution runs in an `iframe` with `sandbox="allow-scripts"` (no
+      `allow-same-origin`, so the sandboxed code cannot reach the app's
+      DOM, cookies, or storage); `console.log/info/warn/error` and thrown
+      errors are relayed to the parent via `postMessage` and rendered as
+      console lines. TypeScript is run through a small regex-based
+      `stripTypes()` (`src/utils/strip-types.js`) that removes access
+      modifiers and type annotations before execution — works for the
+      simple class-based samples in this project, not a general TS
+      parser. Verified with a headless Playwright script (run, edit +
+      re-run, reset restores the original byte-for-byte, thrown errors
+      render in red, TypeScript sample runs after stripping, zero console
+      errors) and owner-reviewed in the browser. Rollout to the remaining
+      22 patterns (creational → structural → behavioral) not started yet.
 - [ ] Practical exercises
 
 ---

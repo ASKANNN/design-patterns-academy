@@ -62,7 +62,8 @@
       "real_world": "Real-World Examples",
       "related": "Related Patterns",
       "also_known_as": "Also Known As",
-      "quiz": "Quiz"
+      "quiz": "Quiz",
+      "playground": "Playground"
     },
 
     "tabs_aria": "Pattern sections",
@@ -95,6 +96,16 @@
       "restart": "Start over",
       "available": "Includes a step-by-step code walkthrough"
     },
+    "playground": {
+      "editor": "Editor",
+      "console": "Console",
+      "run": "Run",
+      "reset": "Reset",
+      "clear": "Clear",
+      "run_hint": "Click \"Run\" to execute this code in a sandboxed frame and see console output here.",
+      "typescript_note": "TypeScript runs as plain JavaScript here - type annotations are stripped, not type-checked."
+    },
+    "playground_coming_soon": "Playground coming soon.",
     "coming_soon_title": "Coming Soon",
     "coming_soon_message": "We are working on the full content for this pattern. Check back soon.",
     "no_patterns_filter": "No patterns found",

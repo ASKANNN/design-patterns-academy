@@ -274,10 +274,10 @@ only and may lag between updates.
 
 ## Phase 13 — Interactive Learning
 
-**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for all 23 patterns (Creational, Structural, Behavioral); playgrounds not started
+**Status:** Quizzes shipped for all 23 patterns; code walkthroughs shipped for all 23 patterns (Creational, Structural, Behavioral); playgrounds piloted on Singleton (1/23), rollout to the rest not started
 
 - [x] Interactive code walkthroughs — all 23 patterns done, see below
-- Pattern playgrounds
+- Pattern playgrounds — Singleton pilot shipped 2026-07-31, see below
 - [x] Quizzes — all 23 patterns done (5 questions each, verified via
       Playwright end to end for representative patterns from each
       category; dark-theme visual review passed). The `Quiz` engine
@@ -316,6 +316,34 @@ only and may lag between updates.
 > patterns), same grounding rule and same Playwright verification, owner
 > confirmed working in the browser. Code walkthroughs are now complete for
 > every GoF pattern.
+
+> **Pattern playgrounds pilot (Singleton, 2026-07-31):** new
+> `src/components/ui/Playground.js` (editor pane + console pane,
+> Run/Reset/Clear) shown in a new "Playground" tab on
+> `PatternDetailPage`, with a JS/TS language toggle reusing the existing
+> `lang-select` styling. No new JSON field — starter code is simply
+> `implementation.javascript`/`implementation.typescript`. Execution
+> happens in an `iframe` with `sandbox="allow-scripts"` and no
+> `allow-same-origin`, so sandboxed code gets an opaque origin and cannot
+> reach the app's DOM, cookies, localStorage, or navigate the top-level
+> page; a fresh `srcdoc` is assigned per run, so no state leaks between
+> runs. `console.log/info/warn/error` and thrown errors are captured
+> inside the sandbox and relayed to the parent via `postMessage`
+> (correlated by `e.source === iframe.contentWindow`, no id plumbing
+> needed), then rendered as console lines (errors in red). TypeScript
+> code is passed through `stripTypes()` (`src/utils/strip-types.js`), a
+> small regex-based stripper (removes `public`/`private`/`protected`/
+> `readonly` modifiers and `: Type` annotations) before execution — this
+> is deliberately not a real parser, matches the "no real TS
+> type-checking" scope decision, and is only verified to work for the
+> simple class-based samples used in this project. Verified via a
+> headless Playwright script: Run executes and prints console output,
+> editing the textarea and re-running reflects the new code, Reset
+> restores the original code byte-for-byte, thrown errors render with the
+> error style, the TypeScript sample runs correctly after stripping, and
+> there are zero browser console errors throughout. Owner reviewed in the
+> browser and approved. Rollout to the remaining 22 patterns (creational →
+> structural → behavioral) has not started.
 
 > **Build order and scope (agreed with owner, 2026-07-28):** the checklist
 > above is the target state, not the build order. Actual sequencing is
