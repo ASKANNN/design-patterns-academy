@@ -163,17 +163,30 @@ function _structurePanel(p, lang) {
         <div>
           <h3 class="detail-section__title">${t('patterns.sections.participants')}</h3>
           <div class="participants-list" role="list">
-            ${struct.participants.map(part => `
+            ${struct.participants.map(part => {
+              const { role, diagramNote } = _splitDiagramNote(localise(part.role, lang));
+              return `
               <div class="participant" role="listitem">
                 <span class="participant__name">${part.name}</span>
-                <p class="participant__role">${localise(part.role, lang)}</p>
+                <div>
+                  <p class="participant__role">${role}</p>
+                  ${diagramNote ? `<p class="participant__diagram-note">${diagramNote}</p>` : ''}
+                </div>
               </div>
-            `).join('')}
+            `;
+            }).join('')}
           </div>
         </div>
       ` : ''}
     </div>
   `;
+}
+
+function _splitDiagramNote(text = '') {
+  const match = text.match(/^(.*?)(На диаграмме:|In the diagram:)\s*(.+)$/s);
+  if (!match) return { role: text, diagramNote: '' };
+  const [, before, label, rest] = match;
+  return { role: before.trim(), diagramNote: `<span class="participant__diagram-note-label">${label}</span> ${rest.trim()}` };
 }
 
 function _implementationPanel(p, lang) {

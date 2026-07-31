@@ -130,6 +130,18 @@
   line-height: var(--line-height-relaxed);
 }
 
+.participant__diagram-note {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  line-height: var(--line-height-relaxed);
+}
+
+.participant__diagram-note-label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
 .lang-select {
   display: flex;
   gap: var(--space-1);
