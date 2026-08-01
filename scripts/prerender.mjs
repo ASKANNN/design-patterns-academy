@@ -42,8 +42,16 @@ function startPreviewServer() {
 
 async function main() {
   const routes = await getRoutes();
+  console.log(`[prerender] ${routes.length} routes to render`);
+
   const server = await startPreviewServer();
-  const browser = await chromium.launch();
+  console.log('[prerender] preview server ready');
+
+  const browser = await chromium.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  console.log('[prerender] browser launched');
+
   const page = await browser.newPage();
   page.setDefaultTimeout(15000);
   page.setDefaultNavigationTimeout(15000);
