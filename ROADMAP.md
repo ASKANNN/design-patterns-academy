@@ -348,7 +348,28 @@ No new features are implemented during this sprint — only bug fixing and stabi
       height/padding — `SearchPage.js` and `PatternDetailPage.js` used
       bare `btn btn--primary`, which collapsed the button to hug its
       text with no padding. Fixed in all four call sites.
-- [ ] Progress tracking
+- [x] Progress tracking — localStorage-backed (`src/utils/progress.js`,
+      key `dpa-progress`, same shape as `favorites.js`). **Scope decision
+      (2026-08-01, owner-picked):** completion is a manual, explicit
+      action (a "Mark as completed" toggle on `PatternDetailPage`, in the
+      stats row) rather than inferred from page visits or quiz/playground
+      activity — same reasoning as the Favorites star: predictable and
+      simple over a heuristic that could feel wrong to the learner.
+      Toggling fires `dpa:progress-changed` and updates the button's
+      label/`aria-pressed` in place. Completed patterns get a green
+      checkmark badge (`pattern-card__completed-badge`, `data-progress-
+      indicator`) on `PatternCard`, visible wherever cards are reused
+      (catalog, search, favorites, roadmap). `/roadmap` gained a
+      `X of 23 patterns completed` counter with a bar, reusing the
+      existing unused `.progress`/`.progress-wrap` CSS component from
+      `feedback.css` instead of inventing new markup. No new page and no
+      prerender/sitemap changes — the same reasoning as Favorites applies
+      (nothing canonical to index; the roadmap route itself was already
+      prerendered). Bilingual EN/RU strings added under a new `progress`
+      namespace in `ui.json`. Verified with a headless Playwright script
+      across light/dark and EN/RU: toggle on the detail page, badge
+      appears on catalog and roadmap cards, roadmap counter/bar update
+      and reset correctly, zero console errors.
 - [x] Learning roadmap — new `/roadmap` page (`src/pages/RoadmapPage.js`).
       **Scope decision (2026-08-01, owner-picked over the alternatives):**
       one fixed recommended path for all 23 patterns, no personalization

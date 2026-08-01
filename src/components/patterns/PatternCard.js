@@ -1,12 +1,14 @@
 import { localise, t } from '../../utils/i18n.js';
 import { PatternIcon } from '../visual/PatternIcon.js';
 import { isFavorite }  from '../../utils/favorites.js';
+import { isCompleted } from '../../utils/progress.js';
 
 export function PatternCard(pattern, { showSummary = true, hidden = false, query = '' } = {}) {
   const { slug, name, category, complexity, summary, status } = pattern;
   const isAvailable = status === 'available';
   const href        = `/patterns/${category}/${slug}${query ? `?${query}` : ''}`;
   const favorited   = isFavorite(slug);
+  const completed   = isCompleted(slug);
 
   const pips = (n) => Array.from({ length: 3 }, (_, i) =>
     `<span class="pip${i < n ? ' is-filled' : ''}" aria-hidden="true"></span>`
@@ -30,6 +32,13 @@ export function PatternCard(pattern, { showSummary = true, hidden = false, query
       <div class="pattern-card__top">
         <span class="badge badge--${category}" aria-label="${t('patterns.category_label')}: ${categoryLabel}">${categoryLabel}</span>
         ${!isAvailable ? `<span class="badge badge--default badge--sm">${soonLabel}</span>` : ''}
+        ${completed ? `
+          <span class="pattern-card__completed-badge" data-progress-indicator="${slug}" title="${t('progress.completed')}" aria-label="${t('progress.completed')}">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="3 8.5 6.5 12 13 4"/>
+            </svg>
+          </span>
+        ` : ''}
         <button
           type="button"
           class="pattern-card__favorite-btn${favorited ? ' is-active' : ''}"

@@ -188,7 +188,8 @@
   "roadmap": {
     "title": "Learning Roadmap",
     "subtitle": "A recommended order for all {{total}} patterns, grouped by category and sorted from simplest to most advanced.",
-    "step_label": "Step {{step}} of {{total}}"
+    "step_label": "Step {{step}} of {{total}}",
+    "progress_label": "{{done}} of {{total}} patterns completed"
   },
 
   "favorites": {
@@ -197,6 +198,11 @@
     "toggle_label": "Toggle favorite",
     "empty_title": "No favorites yet",
     "empty_desc": "Tap the star on any pattern card to save it here for quick reference."
+  },
+
+  "progress": {
+    "mark_completed": "Mark as completed",
+    "completed": "Completed"
   },
 
   "about": {

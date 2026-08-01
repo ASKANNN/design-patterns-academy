@@ -1,5 +1,6 @@
 import { loadPatternIndex }        from '../utils/data-loader.js';
 import { buildRoadmap }            from '../utils/roadmap.js';
+import { getCompleted }            from '../utils/progress.js';
 import { PatternCard }             from '../components/patterns/PatternCard.js';
 import { Breadcrumb }              from '../components/ui/Breadcrumb.js';
 import { t }                       from '../utils/i18n.js';
@@ -11,6 +12,9 @@ export async function RoadmapPage() {
   const index    = await loadPatternIndex();
   const roadmap  = buildRoadmap(index.patterns);
   const total    = roadmap.length;
+  const completed = getCompleted();
+  const done       = roadmap.filter(p => completed.includes(p.slug)).length;
+  const percent    = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const breadcrumbItems = [
     { label: t('breadcrumbs.home'), href: '/' },
@@ -47,6 +51,16 @@ export async function RoadmapPage() {
       <header class="roadmap-page__header">
         <h1 class="roadmap-page__title">${t('roadmap.title')}</h1>
         <p class="roadmap-page__subtitle">${t('roadmap.subtitle', { total })}</p>
+
+        <div class="progress-wrap roadmap-page__progress">
+          <div class="progress-wrap__header">
+            <span class="progress-wrap__label">${t('roadmap.progress_label', { done, total })}</span>
+            <span class="progress-wrap__value">${percent}%</span>
+          </div>
+          <div class="progress progress--success" role="progressbar" aria-valuenow="${done}" aria-valuemin="0" aria-valuemax="${total}" aria-label="${t('roadmap.progress_label', { done, total })}">
+            <div class="progress__bar" style="width:${percent}%"></div>
+          </div>
+        </div>
       </header>
 
       <div class="roadmap-page__body">

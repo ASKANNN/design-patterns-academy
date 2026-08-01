@@ -1,5 +1,6 @@
 import { loadPattern, loadPatternIndex, getPatternMeta } from '../utils/data-loader.js';
 import { buildRoadmap }                                  from '../utils/roadmap.js';
+import { isCompleted }                                   from '../utils/progress.js';
 import { getQueryParam }                                 from '../scripts/router.js';
 import { localise, getLang, t }                          from '../utils/i18n.js';
 import { CodeBlock }                                     from '../components/ui/CodeBlock.js';
@@ -77,6 +78,7 @@ export async function PatternDetailPage({ category, slug } = {}) {
           <div class="pattern-detail__stats">
             ${_statPips(t('patterns.complexity.label'), pattern.complexity)}
             ${_statPips(t('patterns.popularity.label'), pattern.popularity)}
+            ${_progressToggle(slug)}
           </div>
         </header>
 
@@ -457,6 +459,23 @@ function _statPips(label, n) {
       <span class="pattern-stat__label">${label}</span>
       <div class="pattern-stat__pips" aria-label="${t('patterns.stat_aria', { label, n })}">${pips}</div>
     </div>
+  `;
+}
+
+function _progressToggle(slug) {
+  const completed = isCompleted(slug);
+  return `
+    <button
+      type="button"
+      class="progress-toggle-btn${completed ? ' is-active' : ''}"
+      data-progress-toggle="${slug}"
+      aria-pressed="${completed}"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <polyline points="3 8.5 6.5 12 13 4"/>
+      </svg>
+      <span class="progress-toggle-btn__label">${completed ? t('progress.completed') : t('progress.mark_completed')}</span>
+    </button>
   `;
 }
 

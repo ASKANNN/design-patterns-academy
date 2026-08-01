@@ -10,6 +10,7 @@ import { t }                       from '../utils/i18n.js';
 import { stripTypes }              from '../utils/strip-types.js';
 import { searchPatterns }          from '../utils/search.js';
 import { toggleFavorite }          from '../utils/favorites.js';
+import { toggleCompleted }         from '../utils/progress.js';
 
 export function initUI() {
   document.addEventListener('click', handleClick);
@@ -133,6 +134,9 @@ function handleClick(e) {
 
   const favoriteBtn = e.target.closest('[data-favorite-toggle]');
   if (favoriteBtn) { e.preventDefault(); handleFavoriteToggle(favoriteBtn); return; }
+
+  const progressBtn = e.target.closest('[data-progress-toggle]');
+  if (progressBtn) { e.preventDefault(); handleProgressToggle(progressBtn); return; }
 
   const themeBtn = e.target.closest('[data-action="theme"]');
   if (themeBtn) {
@@ -271,6 +275,17 @@ function handleFavoriteToggle(btn) {
       actions:     `<a href="/patterns" class="btn btn--primary btn--md">${t('search.browse_all')}</a>`,
     });
   }
+}
+
+function handleProgressToggle(btn) {
+  const slug      = btn.dataset.progressToggle;
+  const completed = toggleCompleted(slug);
+
+  btn.classList.toggle('is-active', completed);
+  btn.setAttribute('aria-pressed', String(completed));
+  btn.querySelector('.progress-toggle-btn__label').textContent = completed
+    ? t('progress.completed')
+    : t('progress.mark_completed');
 }
 
 function handleFilter(chip) {
