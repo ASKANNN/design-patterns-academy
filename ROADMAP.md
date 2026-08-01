@@ -313,8 +313,41 @@ No new features are implemented during this sprint — only bug fixing and stabi
       Console and resubmit `sitemap.xml` under the new domain). **Deferred
       to the end of Phase 14 (2026-08-01, owner decision)** — no domain
       purchased yet; the other Phase 14 items don't depend on it.
-- [ ] Advanced search
-- [ ] Favorites
+- [x] Advanced search — search previously matched only `name`/`category`/
+      `summary`/`tags` from `index.json`, so alias queries like "Wrapper"
+      (Adapter, Decorator) or "Kit" (Abstract Factory) returned nothing.
+      Added `also_known_as` to every entry in `index.json` (mirrored from
+      each pattern's own JSON) and included it in the match fields. Also
+      deduped the filter logic itself: `SearchPage.js` and `ui.js`'s
+      live-typing handler each had their own copy of the same filter
+      function; both now call a single `src/utils/search.js`
+      (`searchPatterns(patterns, query)`), following the pure-function,
+      no-DOM shape of `src/utils/roadmap.js`. **Scope decision
+      (2026-08-01, owner-picked over adding category/complexity filter
+      chips):** text-matching improvements only, no new filter UI — kept
+      for a possible later iteration if requested. Verified with
+      Playwright: alias queries resolve on both the `/search?q=` and
+      live-typing paths, zero console errors.
+- [x] Favorites — localStorage-backed (`src/utils/favorites.js`,
+      key `dpa-favorites`), toggled via a star button added to every
+      `PatternCard` (works everywhere the card is reused: catalog,
+      search, roadmap, favorites itself). New `/favorites` page
+      (`src/pages/FavoritesPage.js`) lists saved patterns; unfavoriting
+      a card on that page removes it in place and falls back to an
+      empty state once the list is empty, without a full re-render.
+      Added the "Favorites" nav entry (desktop + mobile), breadcrumbs,
+      router page-meta, and bilingual EN/RU strings. **Deliberately
+      left out of `scripts/prerender.mjs` and `public/sitemap.xml`**
+      (unlike `/roadmap` and `/search`) — the page has no content that
+      is the same for two visitors, so there is nothing canonical for a
+      crawler to index. Verified with Playwright: add/remove favorite,
+      persistence, live list update, empty state, and confirmed the
+      star button does not trigger the card's own navigation.
+      **Incidental fix found while building the empty state:** `.btn`
+      requires a size modifier (`btn--sm`/`btn--md`/`btn--lg`) for
+      height/padding — `SearchPage.js` and `PatternDetailPage.js` used
+      bare `btn btn--primary`, which collapsed the button to hug its
+      text with no padding. Fixed in all four call sites.
 - [ ] Progress tracking
 - [x] Learning roadmap — new `/roadmap` page (`src/pages/RoadmapPage.js`).
       **Scope decision (2026-08-01, owner-picked over the alternatives):**
