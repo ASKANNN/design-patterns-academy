@@ -167,6 +167,9 @@ export function setPageMeta(path, params) {
   } else if (path.startsWith('/patterns/') && params.category) {
     title = `${_titleCase(params.category)} Patterns - ${base}`;
     desc  = `All ${_titleCase(params.category)} design patterns from the Gang of Four book.`;
+  } else if (path === '/roadmap') {
+    title = `Learning Roadmap - ${base}`;
+    desc  = 'A recommended order to learn all 23 Gang of Four design patterns, from simplest to most advanced.';
   } else if (path === '/about') {
     title = `About - ${base}`;
     desc  = 'Learn about Design Patterns Academy - a source-available educational platform for Software Engineering.';

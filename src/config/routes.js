@@ -23,6 +23,10 @@ export const ROUTES = [
       import('../pages/PatternDetailPage.js').then(m => m.PatternDetailPage(params)),
   },
   {
+    pattern: '/roadmap',
+    load: () => import('../pages/RoadmapPage.js').then(m => m.RoadmapPage()),
+  },
+  {
     pattern: '/about',
     load: () => import('../pages/AboutPage.js').then(m => m.AboutPage()),
   },

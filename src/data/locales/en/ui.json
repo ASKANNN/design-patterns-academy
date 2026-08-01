@@ -3,6 +3,7 @@
     "home": "Home",
     "patterns": "Patterns",
     "categories": "Categories",
+    "roadmap": "Roadmap",
     "about": "About",
     "skip_to_content": "Skip to content",
     "menu": "Menu"
@@ -144,6 +145,7 @@
     "home": "Home",
     "catalog": "Catalog",
     "patterns": "Patterns",
+    "roadmap": "Roadmap",
     "about": "About",
     "search": "Search"
   },
@@ -179,6 +181,12 @@
     "badge_active": "Active",
     "badge_coming_soon": "Coming Soon",
     "aria_coming_soon": " - coming soon"
+  },
+
+  "roadmap": {
+    "title": "Learning Roadmap",
+    "subtitle": "A recommended order for all {{total}} patterns, grouped by category and sorted from simplest to most advanced.",
+    "step_label": "Step {{step}} of {{total}}"
   },
 
   "about": {

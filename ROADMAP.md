@@ -310,11 +310,29 @@ No new features are implemented during this sprint — only bug fixing and stabi
 - [ ] Custom domain (buy + connect in Vercel, update `SITE_URL` in
       `src/config/site.js` and every place that references the domain,
       301-redirect the old `vercel.app` address, re-verify in Google Search
-      Console and resubmit `sitemap.xml` under the new domain)
+      Console and resubmit `sitemap.xml` under the new domain). **Deferred
+      to the end of Phase 14 (2026-08-01, owner decision)** — no domain
+      purchased yet; the other Phase 14 items don't depend on it.
 - [ ] Advanced search
 - [ ] Favorites
 - [ ] Progress tracking
-- [ ] Learning roadmap
+- [x] Learning roadmap — new `/roadmap` page (`src/pages/RoadmapPage.js`).
+      **Scope decision (2026-08-01, owner-picked over the alternatives):**
+      one fixed recommended path for all 23 patterns, no personalization
+      (that's deferred to Progress tracking, which may build a personal
+      variant on top later). Order is fully data-driven off existing
+      `index.json` fields (`src/utils/roadmap.js`) — grouped by category
+      in GoF book order (creational → structural → behavioral), then
+      sorted ascending by `complexity` and descending by `popularity`
+      within each group; no new hand-picked ordering field was added.
+      Steps are numbered continuously 1-23 across all three sections.
+      Reuses the existing `PatternCard` component wrapped in a numbered
+      timeline (`page-roadmap.css`) rather than inventing new card markup.
+      Added to desktop + mobile nav, breadcrumbs, router page-meta,
+      `scripts/prerender.mjs`, and `public/sitemap.xml`; bilingual
+      EN/RU strings added to `ui.json`. Verified with Playwright across
+      desktop/mobile/dark-mode/RU — zero console errors, all 23 pattern
+      links resolve, step numbering confirmed continuous.
 - [ ] User experience improvements
 
 > **Deferred idea — per-pattern illustrations.** Only revisit once all 23

@@ -14,7 +14,7 @@ const BASE_URL  = `http://localhost:${PORT}`;
 async function getRoutes() {
   const index = JSON.parse(await readFile(join(ROOT, 'src/data/patterns/index.json'), 'utf-8'));
   const categories = [...new Set(index.patterns.map(p => p.category))];
-  const routes = ['/', '/catalog', '/patterns', '/about', ...categories.map(c => `/patterns/${c}`)];
+  const routes = ['/', '/catalog', '/patterns', '/roadmap', '/about', ...categories.map(c => `/patterns/${c}`)];
 
   for (const p of index.patterns) {
     if (p.status === 'available') routes.push(`/patterns/${p.category}/${p.slug}`);

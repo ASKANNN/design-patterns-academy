@@ -50,6 +50,9 @@ export function Header() {
               </ul>
             </li>
             <li>
+              <a href="/roadmap" class="header__nav-link" data-nav-link="/roadmap" data-i18n="nav.roadmap">Roadmap</a>
+            </li>
+            <li>
               <a href="/about" class="header__nav-link" data-nav-link="/about" data-i18n="nav.about">About</a>
             </li>
           </ul>

@@ -30,6 +30,7 @@ import '../styles/components/pattern-icon.css';
 import '../styles/components/page-home.css';
 import '../styles/components/page-catalog.css';
 import '../styles/components/page-patterns.css';
+import '../styles/components/page-roadmap.css';
 import '../styles/components/page-pattern-detail.css';
 import '../styles/components/page-about.css';
 import '../styles/components/page-search.css';
