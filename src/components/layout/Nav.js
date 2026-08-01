@@ -53,6 +53,9 @@ export function MobileNav() {
             <a href="/roadmap" class="mobile-nav__link" data-nav-link="/roadmap" data-i18n="nav.roadmap">Roadmap</a>
           </li>
           <li class="mobile-nav__item">
+            <a href="/favorites" class="mobile-nav__link" data-nav-link="/favorites" data-i18n="nav.favorites">Favorites</a>
+          </li>
+          <li class="mobile-nav__item">
             <a href="/about" class="mobile-nav__link" data-nav-link="/about" data-i18n="nav.about">About</a>
           </li>
         </ul>

@@ -8,6 +8,8 @@ import { setPageMeta, navigate }   from './router.js';
 import { animateFilterIn }         from './animations.js';
 import { t }                       from '../utils/i18n.js';
 import { stripTypes }              from '../utils/strip-types.js';
+import { searchPatterns }          from '../utils/search.js';
+import { toggleFavorite }          from '../utils/favorites.js';
 
 export function initUI() {
   document.addEventListener('click', handleClick);
@@ -129,6 +131,9 @@ function handleClick(e) {
   const searchBtn = e.target.closest('[data-action="search"]');
   if (searchBtn) { _triggerSearch(); return; }
 
+  const favoriteBtn = e.target.closest('[data-favorite-toggle]');
+  if (favoriteBtn) { e.preventDefault(); handleFavoriteToggle(favoriteBtn); return; }
+
   const themeBtn = e.target.closest('[data-action="theme"]');
   if (themeBtn) {
     document.dispatchEvent(new CustomEvent('dpa:theme-toggle'));
@@ -239,6 +244,32 @@ async function handleCopy(btn) {
       `;
     }, 2000);
   } catch {
+  }
+}
+
+function handleFavoriteToggle(btn) {
+  const slug      = btn.dataset.favoriteToggle;
+  const favorited = toggleFavorite(slug);
+
+  document.querySelectorAll(`[data-favorite-toggle="${slug}"]`).forEach(el => {
+    el.classList.toggle('is-active', favorited);
+    el.setAttribute('aria-pressed', String(favorited));
+  });
+
+  if (favorited) return;
+
+  const resultsEl = document.querySelector('[data-favorites-results]');
+  if (!resultsEl) return;
+
+  const card = resultsEl.querySelector(`[data-favorite-toggle="${slug}"]`)?.closest('[data-filter-item]');
+  card?.remove();
+
+  if (!resultsEl.querySelector('[data-filter-item]')) {
+    resultsEl.innerHTML = EmptyState({
+      title:       t('favorites.empty_title'),
+      description: t('favorites.empty_desc'),
+      actions:     `<a href="/patterns" class="btn btn--primary btn--md">${t('search.browse_all')}</a>`,
+    });
   }
 }
 
@@ -530,12 +561,7 @@ function handleInput(e) {
     history.replaceState(null, '', lower ? `/search?q=${encodeURIComponent(raw.trim())}` : '/search');
 
     const { patterns } = await loadPatternIndex();
-    const results = lower
-      ? patterns.filter(p => {
-          const fields = [p.name, p.category, p.summary?.en ?? '', p.summary?.ru ?? '', ...(p.tags ?? [])];
-          return fields.some(f => f.toLowerCase().includes(lower));
-        })
-      : [];
+    const results = searchPatterns(patterns, raw);
 
     if (!lower) {
       metaEl.textContent = t('search.enter_keyword');
@@ -555,7 +581,7 @@ function handleInput(e) {
       resultsEl.innerHTML = EmptyState({
         title:       t('patterns.no_patterns_filter'),
         description: t('search.no_match_desc'),
-        actions:     `<a href="/patterns" class="btn btn--primary">${t('search.browse_all')}</a>`,
+        actions:     `<a href="/patterns" class="btn btn--primary btn--md">${t('search.browse_all')}</a>`,
       });
     } else {
       resultsEl.innerHTML = '';

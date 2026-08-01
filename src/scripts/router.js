@@ -170,6 +170,9 @@ export function setPageMeta(path, params) {
   } else if (path === '/roadmap') {
     title = `Learning Roadmap - ${base}`;
     desc  = 'A recommended order to learn all 23 Gang of Four design patterns, from simplest to most advanced.';
+  } else if (path === '/favorites') {
+    title = `My Favorites - ${base}`;
+    desc  = 'Your saved Gang of Four design patterns for quick reference.';
   } else if (path === '/about') {
     title = `About - ${base}`;
     desc  = 'Learn about Design Patterns Academy - a source-available educational platform for Software Engineering.';

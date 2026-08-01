@@ -4,6 +4,7 @@
     "patterns": "Patterns",
     "categories": "Categories",
     "roadmap": "Roadmap",
+    "favorites": "Favorites",
     "about": "About",
     "skip_to_content": "Skip to content",
     "menu": "Menu"
@@ -146,6 +147,7 @@
     "catalog": "Catalog",
     "patterns": "Patterns",
     "roadmap": "Roadmap",
+    "favorites": "Favorites",
     "about": "About",
     "search": "Search"
   },
@@ -187,6 +189,14 @@
     "title": "Learning Roadmap",
     "subtitle": "A recommended order for all {{total}} patterns, grouped by category and sorted from simplest to most advanced.",
     "step_label": "Step {{step}} of {{total}}"
+  },
+
+  "favorites": {
+    "title": "My Favorites",
+    "subtitle": "Patterns you've saved for quick reference.",
+    "toggle_label": "Toggle favorite",
+    "empty_title": "No favorites yet",
+    "empty_desc": "Tap the star on any pattern card to save it here for quick reference."
   },
 
   "about": {

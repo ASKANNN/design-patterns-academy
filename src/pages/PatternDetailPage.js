@@ -421,8 +421,8 @@ function _comingSoonPage(meta) {
         <h1 style="font-size:var(--text-4xl);font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:var(--space-4)">${meta.name}</h1>
         ${Alert({ variant: 'info', title: t('patterns.coming_soon_title'), message: t('patterns.coming_soon_message') })}
         <div style="margin-top:var(--space-6);display:flex;gap:var(--space-3);justify-content:center">
-          <a href="/patterns/${meta.category}" class="btn btn--primary">${t('patterns.back_to_category', { category: categoryLabel })}</a>
-          <a href="/patterns" class="btn btn--secondary">${t('patterns.categories.all')}</a>
+          <a href="/patterns/${meta.category}" class="btn btn--primary btn--md">${t('patterns.back_to_category', { category: categoryLabel })}</a>
+          <a href="/patterns" class="btn btn--secondary btn--md">${t('patterns.categories.all')}</a>
         </div>
       </div>
     </div>

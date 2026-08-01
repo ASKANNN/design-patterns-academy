@@ -27,6 +27,10 @@ export const ROUTES = [
     load: () => import('../pages/RoadmapPage.js').then(m => m.RoadmapPage()),
   },
   {
+    pattern: '/favorites',
+    load: () => import('../pages/FavoritesPage.js').then(m => m.FavoritesPage()),
+  },
+  {
     pattern: '/about',
     load: () => import('../pages/AboutPage.js').then(m => m.AboutPage()),
   },

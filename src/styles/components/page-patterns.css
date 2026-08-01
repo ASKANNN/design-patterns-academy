@@ -221,6 +221,33 @@
   gap: var(--space-2);
 }
 
+.pattern-card__favorite-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: var(--space-1);
+  color: var(--color-text-tertiary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-in-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.pattern-card__favorite-btn:hover {
+  color: var(--color-warning);
+  transform: scale(1.1);
+}
+
+.pattern-card__favorite-btn.is-active {
+  color: var(--color-warning);
+}
+
+.pattern-card__favorite-btn.is-active svg {
+  fill: currentColor;
+}
+
 .pattern-card__name {
   display: flex;
   align-items: center;
