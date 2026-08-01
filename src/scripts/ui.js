@@ -4,7 +4,7 @@ import { PatternCard }             from '../components/patterns/PatternCard.js';
 import { EmptyState }              from '../components/ui/EmptyState.js';
 import { BreadcrumbItems }         from '../components/ui/Breadcrumb.js';
 import { patternsBreadcrumbItems } from '../config/pattern-categories.js';
-import { setPageMeta }             from './router.js';
+import { setPageMeta, navigate }   from './router.js';
 import { animateFilterIn }         from './animations.js';
 import { t }                       from '../utils/i18n.js';
 import { stripTypes }              from '../utils/strip-types.js';
@@ -20,7 +20,7 @@ export function initUI() {
   document.addEventListener('focusin',   onTipFocusIn);
   document.addEventListener('focusout',  onTipFocusOut);
 
-  window.addEventListener('hashchange',        closeAllTips);
+  window.addEventListener('app:navigated',      closeAllTips);
   document.addEventListener('dpa:theme-toggle', closeAllTips);
   document.addEventListener('dpa:lang-toggle',  closeAllTips);
 }
@@ -274,7 +274,7 @@ function handleFilter(chip) {
   if (breadcrumbList) breadcrumbList.innerHTML = BreadcrumbItems(patternsBreadcrumbItems(filter));
 
   const path = filter === 'all' ? '/patterns' : `/patterns/${filter}`;
-  history.replaceState(null, '', `#${path}`);
+  history.replaceState(null, '', path);
   setPageMeta(path, filter === 'all' ? {} : { category: filter });
 }
 
@@ -527,7 +527,7 @@ function handleInput(e) {
     const resultsEl = document.querySelector('[data-search-results]');
     if (!metaEl || !resultsEl) return;
 
-    history.replaceState(null, '', lower ? `#/search?q=${encodeURIComponent(raw.trim())}` : '#/search');
+    history.replaceState(null, '', lower ? `/search?q=${encodeURIComponent(raw.trim())}` : '/search');
 
     const { patterns } = await loadPatternIndex();
     const results = lower
@@ -555,7 +555,7 @@ function handleInput(e) {
       resultsEl.innerHTML = EmptyState({
         title:       t('patterns.no_patterns_filter'),
         description: t('search.no_match_desc'),
-        actions:     `<a href="#/patterns" class="btn btn--primary">${t('search.browse_all')}</a>`,
+        actions:     `<a href="/patterns" class="btn btn--primary">${t('search.browse_all')}</a>`,
       });
     } else {
       resultsEl.innerHTML = '';
@@ -568,7 +568,6 @@ function _escHtml(str) {
 }
 
 function _triggerSearch() {
-  const hash = '#/search';
-  window.location.hash = hash;
+  navigate('/search');
   setTimeout(() => document.getElementById('search-page-input')?.focus(), 100);
 }

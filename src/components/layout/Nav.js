@@ -12,7 +12,7 @@ export function MobileNav() {
       <nav class="mobile-nav__panel" aria-label="Mobile navigation" data-i18n-aria-label="a11y.mobile_nav">
 
         <div class="mobile-nav__header">
-          <a href="#/" class="mobile-nav__logo" aria-label="Design Patterns Academy - Home" data-i18n-aria-label="a11y.logo_home">
+          <a href="/" class="mobile-nav__logo" aria-label="Design Patterns Academy - Home" data-i18n-aria-label="a11y.logo_home">
             <svg width="22" height="22" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
               <polygon points="14 2 26 8 26 20 14 26 2 20 2 8"/>
               <line x1="14" y1="2" x2="14" y2="26"/>
@@ -31,17 +31,17 @@ export function MobileNav() {
 
         <ul class="mobile-nav__list" role="list">
           <li class="mobile-nav__item">
-            <a href="#/" class="mobile-nav__link" data-nav-link="/" data-i18n="nav.home">Home</a>
+            <a href="/" class="mobile-nav__link" data-nav-link="/" data-i18n="nav.home">Home</a>
           </li>
           <li class="mobile-nav__item">
-            <a href="#/patterns" class="mobile-nav__link" data-nav-link="/patterns" data-i18n="nav.patterns">Patterns</a>
+            <a href="/patterns" class="mobile-nav__link" data-nav-link="/patterns" data-i18n="nav.patterns">Patterns</a>
           </li>
           <li class="mobile-nav__item mobile-nav__item--group">
             <span class="mobile-nav__group-label" data-i18n="nav.categories">Categories</span>
             <ul class="mobile-nav__sub" role="list">
               ${_CATS.map(cat => `
                 <li>
-                  <a href="#/patterns/${cat.id}" class="mobile-nav__link mobile-nav__link--sub">
+                  <a href="/patterns/${cat.id}" class="mobile-nav__link mobile-nav__link--sub">
                     <span class="mobile-nav__dot mobile-nav__dot--${cat.id}" aria-hidden="true"></span>
                     <span data-i18n="patterns.categories.${cat.id}">${_cap(cat.id)}</span>
                   </a>
@@ -50,7 +50,7 @@ export function MobileNav() {
             </ul>
           </li>
           <li class="mobile-nav__item">
-            <a href="#/about" class="mobile-nav__link" data-nav-link="/about" data-i18n="nav.about">About</a>
+            <a href="/about" class="mobile-nav__link" data-nav-link="/about" data-i18n="nav.about">About</a>
           </li>
         </ul>
 

@@ -5,6 +5,7 @@ import { SearchInput }          from '../components/ui/SearchInput.js';
 import { EmptyState }           from '../components/ui/EmptyState.js';
 import { Breadcrumb }           from '../components/ui/Breadcrumb.js';
 import { t }                    from '../utils/i18n.js';
+import { jsonLdScriptTag, breadcrumbListJsonLd } from '../utils/json-ld.js';
 
 export async function SearchPage() {
   const query   = getQueryParam('q').trim();
@@ -12,7 +13,7 @@ export async function SearchPage() {
   const results = query ? _search(index.patterns, query) : [];
 
   const breadcrumbs = [
-    { label: t('breadcrumbs.home'), href: '#/' },
+    { label: t('breadcrumbs.home'), href: '/' },
     { label: query ? `${t('breadcrumbs.search')}: "${query}"` : t('breadcrumbs.search') },
   ];
 
@@ -25,6 +26,7 @@ export async function SearchPage() {
   return `
     <div class="search-page container">
 
+      ${jsonLdScriptTag(breadcrumbListJsonLd(breadcrumbs))}
       ${Breadcrumb({ items: breadcrumbs })}
 
       <div class="search-page__header">
@@ -47,7 +49,7 @@ export async function SearchPage() {
         ` : query ? EmptyState({
           title:       t('patterns.no_patterns_filter'),
           description: t('search.no_match_desc'),
-          actions:     `<a href="#/patterns" class="btn btn--primary">${t('search.browse_all')}</a>`,
+          actions:     `<a href="/patterns" class="btn btn--primary">${t('search.browse_all')}</a>`,
         }) : ''}
       </div>
 

@@ -4,7 +4,7 @@ import { PatternIcon } from '../visual/PatternIcon.js';
 export function PatternCard(pattern, { showSummary = true, hidden = false } = {}) {
   const { slug, name, category, complexity, summary, status } = pattern;
   const isAvailable = status === 'available';
-  const href        = `#/patterns/${category}/${slug}`;
+  const href        = `/patterns/${category}/${slug}`;
 
   const pips = (n) => Array.from({ length: 3 }, (_, i) =>
     `<span class="pip${i < n ? ' is-filled' : ''}" aria-hidden="true"></span>`

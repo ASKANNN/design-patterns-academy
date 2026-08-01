@@ -9,7 +9,7 @@ export function Header() {
       <div class="header__inner container">
 
         <!-- Logo -->
-        <a href="#/" class="header__logo" aria-label="Design Patterns Academy - Home" data-i18n-aria-label="a11y.logo_home">
+        <a href="/" class="header__logo" aria-label="Design Patterns Academy - Home" data-i18n-aria-label="a11y.logo_home">
           <svg class="header__logo-mark" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
             <polygon points="14 2 26 8 26 20 14 26 2 20 2 8"/>
             <line x1="14" y1="2" x2="14" y2="26"/>
@@ -26,10 +26,10 @@ export function Header() {
         <nav class="header__nav" aria-label="Main navigation" data-i18n-aria-label="a11y.primary_nav">
           <ul class="header__nav-list" role="list">
             <li>
-              <a href="#/" class="header__nav-link" data-nav-link="/" data-i18n="nav.home">Home</a>
+              <a href="/" class="header__nav-link" data-nav-link="/" data-i18n="nav.home">Home</a>
             </li>
             <li>
-              <a href="#/patterns" class="header__nav-link" data-nav-link="/patterns" data-i18n="nav.patterns">Patterns</a>
+              <a href="/patterns" class="header__nav-link" data-nav-link="/patterns" data-i18n="nav.patterns">Patterns</a>
             </li>
             <li class="header__nav-item--dropdown">
               <button class="header__nav-link header__nav-link--trigger" type="button" aria-haspopup="true" aria-expanded="false">
@@ -41,7 +41,7 @@ export function Header() {
               <ul class="header__dropdown" role="list">
                 ${_CATS.map(cat => `
                   <li>
-                    <a href="#/patterns/${cat.id}" class="header__dropdown-link">
+                    <a href="/patterns/${cat.id}" class="header__dropdown-link">
                       <span class="header__dropdown-dot header__dropdown-dot--${cat.id}" aria-hidden="true"></span>
                       <span data-i18n="patterns.categories.${cat.id}">${_cap(cat.id)}</span>
                     </a>
@@ -50,7 +50,7 @@ export function Header() {
               </ul>
             </li>
             <li>
-              <a href="#/about" class="header__nav-link" data-nav-link="/about" data-i18n="nav.about">About</a>
+              <a href="/about" class="header__nav-link" data-nav-link="/about" data-i18n="nav.about">About</a>
             </li>
           </ul>
         </nav>

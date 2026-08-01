@@ -6,6 +6,7 @@ import { Accordion }               from '../components/ui/Accordion.js';
 import { t }                       from '../utils/i18n.js';
 import { PATTERNS_CATEGORIES,
          patternsBreadcrumbItems } from '../config/pattern-categories.js';
+import { jsonLdScriptTag, breadcrumbListJsonLd } from '../utils/json-ld.js';
 
 export async function PatternsCatalogPage({ category = '' } = {}) {
   const index    = await loadPatternIndex();
@@ -49,12 +50,17 @@ export async function PatternsCatalogPage({ category = '' } = {}) {
     </div>
   `).join('');
 
+  const pageTitle = active === 'all'
+    ? t('patterns.title')
+    : `${t(`patterns.categories.${active}`)} ${t('patterns.title')}`;
+
   return `
     <div class="container">
+      ${jsonLdScriptTag(breadcrumbListJsonLd(breadcrumbItems))}
       ${Breadcrumb({ items: breadcrumbItems, attrs: 'data-patterns-breadcrumb' })}
 
       <header class="patterns-page__header">
-        <h1 class="patterns-page__title">${t('patterns.title')}</h1>
+        <h1 class="patterns-page__title">${pageTitle}</h1>
         <p class="patterns-page__subtitle">${t('patterns.page_subtitle')}</p>
       </header>
 

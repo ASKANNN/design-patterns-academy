@@ -3,6 +3,7 @@ import { applyTranslations, t }                   from '../utils/i18n.js';
 import { pageLeave, pageEnter, refreshAnimations } from './animations.js';
 import { ErrorPage }                               from '../components/ui/ErrorPage.js';
 import { Button }                                  from '../components/ui/Button.js';
+import { SITE_URL }                                from '../config/site.js';
 
 const _routes = [];
 let   _outlet = null;
@@ -12,19 +13,24 @@ export function defineRoute(pattern, handler) {
 }
 
 export function getCurrentPath() {
-  const hash = window.location.hash.slice(1) || '/';
-  return hash.split('?')[0] || '/';
+  return window.location.pathname || '/';
 }
 
 export function getQueryParam(key) {
-  const query = (window.location.hash.slice(1).split('?')[1]) ?? '';
-  return new URLSearchParams(query).get(key) ?? '';
+  return new URLSearchParams(window.location.search).get(key) ?? '';
 }
+
+export function navigate(path, { replace = false } = {}) {
+  replace ? history.replaceState(null, '', path) : history.pushState(null, '', path);
+  return _resolve();
+}
+
+let _resolve = async () => {};
 
 export function initRouter(outletEl) {
   _outlet = outletEl;
 
-  const resolve = async () => {
+  _resolve = async () => {
     const path              = getCurrentPath();
     const { handler, params } = _match(path);
 
@@ -50,10 +56,28 @@ export function initRouter(outletEl) {
     _markActiveLinks(path);
     setPageMeta(path, params);
     refreshAnimations(_outlet);
+    window.dispatchEvent(new CustomEvent('app:navigated'));
   };
 
-  window.addEventListener('hashchange', resolve);
-  resolve();
+  window.addEventListener('popstate', _resolve);
+  document.addEventListener('click', _handleLinkClick);
+  _resolve();
+}
+
+function _handleLinkClick(e) {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+  const link = e.target.closest('a[href]');
+  if (!link || link.target || link.hasAttribute('download')) return;
+
+  const url = new URL(link.href, window.location.href);
+  if (url.origin !== window.location.origin) return;
+
+  e.preventDefault();
+  if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+
+  history.pushState(null, '', url.pathname + url.search);
+  _resolve();
 }
 
 export async function reloadRoute() {
@@ -152,7 +176,10 @@ export function setPageMeta(path, params) {
   }
 
   document.title = title;
+  const url = `${SITE_URL}${path === '/' ? '' : path}`;
 
+  _upsertLink('canonical', url);
+  _upsertMeta('property', 'og:url',            url);
   _upsertMeta('name',     'description',       desc);
   _upsertMeta('property', 'og:title',          title);
   _upsertMeta('property', 'og:description',    desc);
@@ -164,6 +191,12 @@ function _upsertMeta(attr, key, content) {
   let el = document.querySelector(`meta[${attr}="${key}"]`);
   if (!el) { el = document.createElement('meta'); el.setAttribute(attr, key); document.head.appendChild(el); }
   el.setAttribute('content', content);
+}
+
+function _upsertLink(rel, href) {
+  let el = document.querySelector(`link[rel="${rel}"]`);
+  if (!el) { el = document.createElement('link'); el.setAttribute('rel', rel); document.head.appendChild(el); }
+  el.setAttribute('href', href);
 }
 
 function _titleCase(str) {

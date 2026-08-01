@@ -12,7 +12,7 @@ export function Footer() {
 
         <!-- Brand -->
         <div class="footer__brand">
-          <a href="#/" class="footer__logo" aria-label="Design Patterns Academy - Home" data-i18n-aria-label="a11y.logo_home">
+          <a href="/" class="footer__logo" aria-label="Design Patterns Academy - Home" data-i18n-aria-label="a11y.logo_home">
             <svg width="24" height="24" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
               <polygon points="14 2 26 8 26 20 14 26 2 20 2 8"/>
               <line x1="14" y1="2" x2="14" y2="26"/>
@@ -33,16 +33,16 @@ export function Footer() {
             <h3 class="footer__col-title" data-i18n="footer.col_patterns">Patterns</h3>
             <ul class="footer__col-list" role="list">
               ${_CATS.map(cat => `
-                <li><a href="#/patterns/${cat.id}" class="footer__link" data-i18n="patterns.categories.${cat.id}">${_cap(cat.id)}</a></li>
+                <li><a href="/patterns/${cat.id}" class="footer__link" data-i18n="patterns.categories.${cat.id}">${_cap(cat.id)}</a></li>
               `).join('')}
-              <li><a href="#/patterns" class="footer__link" data-i18n="footer.link_all">All 23 Patterns</a></li>
+              <li><a href="/patterns" class="footer__link" data-i18n="footer.link_all">All 23 Patterns</a></li>
             </ul>
           </div>
 
           <div class="footer__col">
             <h3 class="footer__col-title" data-i18n="footer.col_resources">Resources</h3>
             <ul class="footer__col-list" role="list">
-              <li><a href="#/about" class="footer__link" data-i18n="footer.link_about">About</a></li>
+              <li><a href="/about" class="footer__link" data-i18n="footer.link_about">About</a></li>
               <li><a href="https://github.com/ASKANNN/design-patterns-academy/blob/main/docs/community/CONTRIBUTING.md" class="footer__link" target="_blank" rel="noopener noreferrer" data-i18n="footer.link_contributing">Contributing</a></li>
               <li><a href="https://github.com/ASKANNN/design-patterns-academy/blob/main/docs/git-and-releases/CHANGELOG.md" class="footer__link" target="_blank" rel="noopener noreferrer" data-i18n="footer.link_changelog">Changelog</a></li>
             </ul>

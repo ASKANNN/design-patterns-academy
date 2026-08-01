@@ -13,6 +13,7 @@ import { Diagram }                                       from '../components/vis
 import { PatternIcon }                                   from '../components/visual/PatternIcon.js';
 import { ErrorPage }                                     from '../components/ui/ErrorPage.js';
 import { Button }                                        from '../components/ui/Button.js';
+import { jsonLdScriptTag, breadcrumbListJsonLd, techArticleJsonLd } from '../utils/json-ld.js';
 
 export async function PatternDetailPage({ category, slug } = {}) {
   if (!category || !slug) return _notFoundPage();
@@ -29,9 +30,9 @@ export async function PatternDetailPage({ category, slug } = {}) {
   const lang = getLang();
 
   const breadcrumbs = [
-    { label: t('breadcrumbs.home'),     href: '#/'                  },
-    { label: t('breadcrumbs.patterns'), href: '#/patterns'           },
-    { label: t(`patterns.categories.${category}`), href: `#/patterns/${category}` },
+    { label: t('breadcrumbs.home'),     href: '/'                  },
+    { label: t('breadcrumbs.patterns'), href: '/patterns'           },
+    { label: t(`patterns.categories.${category}`), href: `/patterns/${category}` },
     { label: pattern.name, icon: PatternIcon({ pattern: slug, category, size: 'sm' }) },
   ];
 
@@ -49,6 +50,8 @@ export async function PatternDetailPage({ category, slug } = {}) {
     <div class="pattern-detail">
       <div class="container">
 
+        ${jsonLdScriptTag(breadcrumbListJsonLd(breadcrumbs))}
+        ${jsonLdScriptTag(techArticleJsonLd(pattern, category, slug))}
         ${Breadcrumb({ items: breadcrumbs })}
 
         <!-- Header -->
@@ -383,7 +386,7 @@ function _visualsSection(p, lang) {
 function _relatedCard(p) {
   const icon = PatternIcon({ pattern: p.slug, category: p.category, size: 'sm' });
   return `
-    <a href="#/patterns/${p.category}/${p.slug}" class="related-card">
+    <a href="/patterns/${p.category}/${p.slug}" class="related-card">
       ${icon || `<span class="pip is-filled" aria-hidden="true" style="background:var(--palette-category-${p.category})"></span>`}
       ${p.name}
     </a>
@@ -398,7 +401,7 @@ function _adjacentLink(p, dir) {
     : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>';
 
   return `
-    <a href="#/patterns/${p.category}/${p.slug}" class="adjacent-nav-link adjacent-nav-link--${dir}">
+    <a href="/patterns/${p.category}/${p.slug}" class="adjacent-nav-link adjacent-nav-link--${dir}">
       ${dir === 'prev' ? arrow : ''}
       <span class="adjacent-nav-link__body">
         <span class="adjacent-nav-link__label">${label}</span>
@@ -418,8 +421,8 @@ function _comingSoonPage(meta) {
         <h1 style="font-size:var(--text-4xl);font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:var(--space-4)">${meta.name}</h1>
         ${Alert({ variant: 'info', title: t('patterns.coming_soon_title'), message: t('patterns.coming_soon_message') })}
         <div style="margin-top:var(--space-6);display:flex;gap:var(--space-3);justify-content:center">
-          <a href="#/patterns/${meta.category}" class="btn btn--primary">${t('patterns.back_to_category', { category: categoryLabel })}</a>
-          <a href="#/patterns" class="btn btn--secondary">${t('patterns.categories.all')}</a>
+          <a href="/patterns/${meta.category}" class="btn btn--primary">${t('patterns.back_to_category', { category: categoryLabel })}</a>
+          <a href="/patterns" class="btn btn--secondary">${t('patterns.categories.all')}</a>
         </div>
       </div>
     </div>
@@ -433,8 +436,8 @@ function _notFoundPage() {
     title:       t('errors.pattern_not_found'),
     description: t('errors.pattern_not_found_desc'),
     actions: `
-      ${Button({ label: t('errors.browse_all_patterns'), variant: 'primary',   href: '#/patterns' })}
-      ${Button({ label: t('errors.go_home'),              variant: 'secondary', href: '#/' })}
+      ${Button({ label: t('errors.browse_all_patterns'), variant: 'primary',   href: '/patterns' })}
+      ${Button({ label: t('errors.go_home'),              variant: 'secondary', href: '/' })}
     `,
   });
 }

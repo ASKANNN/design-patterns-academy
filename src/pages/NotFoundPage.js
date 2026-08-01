@@ -9,8 +9,8 @@ export async function NotFoundPage() {
     title:       t('errors.not_found'),
     description: t('errors.not_found_desc'),
     actions: `
-      ${Button({ label: t('errors.go_home'),        variant: 'primary',   href: '#/' })}
-      ${Button({ label: t('errors.browse_patterns'), variant: 'secondary', href: '#/patterns' })}
+      ${Button({ label: t('errors.go_home'),        variant: 'primary',   href: '/' })}
+      ${Button({ label: t('errors.browse_patterns'), variant: 'secondary', href: '/patterns' })}
     `,
   });
 }

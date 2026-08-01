@@ -2,16 +2,20 @@ import { MODULES }    from '../config/modules.js';
 import { Badge }      from '../components/ui/Badge.js';
 import { Breadcrumb } from '../components/ui/Breadcrumb.js';
 import { t, localise } from '../utils/i18n.js';
+import { jsonLdScriptTag, breadcrumbListJsonLd } from '../utils/json-ld.js';
 
 export async function CatalogPage() {
   const moduleCards = MODULES.map(mod => moduleCard(mod)).join('');
 
+  const breadcrumbItems = [
+    { label: t('breadcrumbs.home'), href: '/' },
+    { label: t('breadcrumbs.catalog') },
+  ];
+
   return `
     <div class="container">
-      ${Breadcrumb({ items: [
-        { label: t('breadcrumbs.home'), href: '#/' },
-        { label: t('breadcrumbs.catalog') },
-      ]})}
+      ${jsonLdScriptTag(breadcrumbListJsonLd(breadcrumbItems))}
+      ${Breadcrumb({ items: breadcrumbItems })}
 
       <header class="catalog-page__header">
         <h1 class="catalog-page__title">${t('patterns.title')}</h1>
@@ -27,7 +31,7 @@ export async function CatalogPage() {
 
 function moduleCard(mod) {
   const isActive  = mod.status === 'active';
-  const href      = isActive ? `#/patterns` : 'javascript:void(0)';
+  const href      = isActive ? `/patterns` : 'javascript:void(0)';
   const tag       = isActive ? 'a' : 'div';
   const title     = localise(mod.title);
   const comingSoon = t('catalog.aria_coming_soon');

@@ -27,7 +27,7 @@ export async function HomePage() {
               ${t('home.hero_subtitle')}
             </p>
             <div class="hero__actions">
-              ${Button({ label: t('home.hero_cta_primary'), variant: 'primary', size: 'lg', href: '#/patterns' })}
+              ${Button({ label: t('home.hero_cta_primary'), variant: 'primary', size: 'lg', href: '/patterns' })}
               <a href="https://github.com/ASKANNN/design-patterns-academy"
                  class="btn btn--secondary btn--lg"
                  target="_blank" rel="noopener noreferrer"
@@ -107,7 +107,7 @@ export async function HomePage() {
               <h2 class="section__title" id="featured-title">${t('home.section_featured')}</h2>
               <p class="section__subtitle">${t('home.section_featured_sub')}</p>
             </div>
-            ${Button({ label: t('home.view_all_patterns'), variant: 'ghost', size: 'sm', href: '#/patterns' })}
+            ${Button({ label: t('home.view_all_patterns'), variant: 'ghost', size: 'sm', href: '/patterns' })}
           </div>
           <div class="patterns-grid">
             ${featured.map(p => PatternCard(p)).join('')}
@@ -126,7 +126,7 @@ export async function HomePage() {
             <p class="about-cta__desc">${t('home.oss_desc')}</p>
             <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;justify-content:center">
               ${Button({ label: t('home.btn_contribute'), variant: 'primary', href: 'https://github.com/ASKANNN/design-patterns-academy', attrs: 'target="_blank" rel="noopener noreferrer"' })}
-              ${Button({ label: t('home.btn_about'), variant: 'secondary', href: '#/about' })}
+              ${Button({ label: t('home.btn_about'), variant: 'secondary', href: '/about' })}
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@ export async function HomePage() {
 function categoryCard({ id, name, desc, count }) {
   const countLabel = t('home.category_count', { count });
   return `
-    <a href="#/patterns/${id}" class="category-card category-card--${id}" role="listitem"
+    <a href="/patterns/${id}" class="category-card category-card--${id}" role="listitem"
        aria-label="${name} - ${countLabel}">
       <div class="category-card__icon" aria-hidden="true">${_categoryIcon(id)}</div>
       <div class="category-card__name">${name}</div>

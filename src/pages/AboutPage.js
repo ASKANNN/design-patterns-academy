@@ -2,14 +2,18 @@ import { Button }    from '../components/ui/Button.js';
 import { Breadcrumb } from '../components/ui/Breadcrumb.js';
 import { Tooltip }    from '../components/ui/Tooltip.js';
 import { t }          from '../utils/i18n.js';
+import { jsonLdScriptTag, breadcrumbListJsonLd } from '../utils/json-ld.js';
 
 export async function AboutPage() {
+  const breadcrumbItems = [
+    { label: t('breadcrumbs.home'), href: '/' },
+    { label: t('breadcrumbs.about') },
+  ];
+
   return `
     <div class="container">
-      ${Breadcrumb({ items: [
-        { label: t('breadcrumbs.home'), href: '#/' },
-        { label: t('breadcrumbs.about') },
-      ]})}
+      ${jsonLdScriptTag(breadcrumbListJsonLd(breadcrumbItems))}
+      ${Breadcrumb({ items: breadcrumbItems })}
 
       <header class="about-page__hero">
         <h1 class="about-page__title">${t('home.section_about')}</h1>
