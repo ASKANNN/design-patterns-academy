@@ -106,7 +106,6 @@ function _switchRow(key, i18nKey) {
   `;
 }
 
-// Навешивает поведение: открытие/закрытие, фокус-ловушка, Esc, применение опций.
 export function initAccessibilityWidget() {
   const trigger = document.getElementById('a11y-trigger');
   const panel   = document.getElementById('a11y-panel');
