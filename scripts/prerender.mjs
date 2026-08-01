@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import http from 'node:http';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = join(__dirname, '..');
@@ -21,23 +22,50 @@ async function getRoutes() {
   return routes;
 }
 
-function startPreviewServer() {
+function waitForServer(timeoutMs) {
+  const deadline = Date.now() + timeoutMs;
   return new Promise((resolve, reject) => {
-    const proc = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], {
-      cwd: ROOT,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    let resolved = false;
-    proc.stdout.on('data', (data) => {
-      if (!resolved && data.toString().includes('Local:')) {
-        resolved = true;
-        resolve(proc);
-      }
-    });
-    proc.stderr.on('data', (data) => process.stderr.write(data));
-    proc.on('error', reject);
-    proc.on('exit', (code) => { if (!resolved) reject(new Error(`vite preview exited with code ${code}`)); });
+    const tryOnce = () => {
+      const req = http.get(BASE_URL, (res) => {
+        res.resume();
+        resolve();
+      });
+      req.on('error', () => {
+        if (Date.now() > deadline) {
+          reject(new Error(`timed out waiting for preview server on ${BASE_URL}`));
+        } else {
+          setTimeout(tryOnce, 300);
+        }
+      });
+    };
+    tryOnce();
   });
+}
+
+async function startPreviewServer() {
+  const proc = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], {
+    cwd: ROOT,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  proc.stdout.on('data', (data) => process.stdout.write(data));
+  proc.stderr.on('data', (data) => process.stderr.write(data));
+
+  let exited = false;
+  let exitError = null;
+  proc.on('exit', (code) => {
+    exited = true;
+    exitError = new Error(`vite preview exited with code ${code}`);
+  });
+
+  try {
+    await waitForServer(30000);
+  } catch (err) {
+    if (exited) throw exitError;
+    proc.kill();
+    throw err;
+  }
+  if (exited) throw exitError;
+  return proc;
 }
 
 async function main() {
