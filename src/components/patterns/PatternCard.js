@@ -2,10 +2,10 @@ import { localise, t } from '../../utils/i18n.js';
 import { PatternIcon } from '../visual/PatternIcon.js';
 import { isFavorite }  from '../../utils/favorites.js';
 
-export function PatternCard(pattern, { showSummary = true, hidden = false } = {}) {
+export function PatternCard(pattern, { showSummary = true, hidden = false, query = '' } = {}) {
   const { slug, name, category, complexity, summary, status } = pattern;
   const isAvailable = status === 'available';
-  const href        = `/patterns/${category}/${slug}`;
+  const href        = `/patterns/${category}/${slug}${query ? `?${query}` : ''}`;
   const favorited   = isFavorite(slug);
 
   const pips = (n) => Array.from({ length: 3 }, (_, i) =>

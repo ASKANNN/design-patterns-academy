@@ -31,7 +31,7 @@ export async function RoadmapPage() {
           ${items.map(p => `
             <li class="roadmap-step" aria-label="${t('roadmap.step_label', { step: p.step, total })}">
               <span class="roadmap-step__marker" aria-hidden="true">${p.step}</span>
-              <div class="roadmap-step__card">${PatternCard(p, { showSummary: false })}</div>
+              <div class="roadmap-step__card">${PatternCard(p, { showSummary: false, query: 'path=roadmap' })}</div>
             </li>
           `).join('')}
         </ol>

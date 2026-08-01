@@ -1,4 +1,6 @@
 import { loadPattern, loadPatternIndex, getPatternMeta } from '../utils/data-loader.js';
+import { buildRoadmap }                                  from '../utils/roadmap.js';
+import { getQueryParam }                                 from '../scripts/router.js';
 import { localise, getLang, t }                          from '../utils/i18n.js';
 import { CodeBlock }                                     from '../components/ui/CodeBlock.js';
 import { Badge }                                         from '../components/ui/Badge.js';
@@ -40,10 +42,13 @@ export async function PatternDetailPage({ category, slug } = {}) {
     .map(s => index.patterns.find(p => p.slug === s))
     .filter(Boolean);
 
-  const currentIndex = index.patterns.findIndex(p => p.slug === slug);
-  const prevPattern = currentIndex > 0 ? index.patterns[currentIndex - 1] : null;
-  const nextPattern = currentIndex >= 0 && currentIndex < index.patterns.length - 1
-    ? index.patterns[currentIndex + 1]
+  const fromRoadmap = getQueryParam('path') === 'roadmap';
+  const orderedPatterns = fromRoadmap ? buildRoadmap(index.patterns) : index.patterns;
+
+  const currentIndex = orderedPatterns.findIndex(p => p.slug === slug);
+  const prevPattern = currentIndex > 0 ? orderedPatterns[currentIndex - 1] : null;
+  const nextPattern = currentIndex >= 0 && currentIndex < orderedPatterns.length - 1
+    ? orderedPatterns[currentIndex + 1]
     : null;
 
   return `
@@ -102,8 +107,8 @@ export async function PatternDetailPage({ category, slug } = {}) {
         <!-- Prev / Next -->
         ${(prevPattern || nextPattern) ? `
           <nav class="pattern-adjacent-nav" aria-label="${t('patterns.adjacent_nav_aria')}">
-            ${prevPattern ? _adjacentLink(prevPattern, 'prev') : '<span></span>'}
-            ${nextPattern ? _adjacentLink(nextPattern, 'next') : '<span></span>'}
+            ${prevPattern ? _adjacentLink(prevPattern, 'prev', fromRoadmap) : '<span></span>'}
+            ${nextPattern ? _adjacentLink(nextPattern, 'next', fromRoadmap) : '<span></span>'}
           </nav>
         ` : ''}
 
@@ -393,15 +398,16 @@ function _relatedCard(p) {
   `;
 }
 
-function _adjacentLink(p, dir) {
+function _adjacentLink(p, dir, fromRoadmap) {
   const icon = PatternIcon({ pattern: p.slug, category: p.category, size: 'sm' });
   const label = t(dir === 'prev' ? 'patterns.prev_pattern' : 'patterns.next_pattern');
   const arrow = dir === 'prev'
     ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="10 3 5 8 10 13"/></svg>'
     : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>';
+  const href = `/patterns/${p.category}/${p.slug}${fromRoadmap ? '?path=roadmap' : ''}`;
 
   return `
-    <a href="/patterns/${p.category}/${p.slug}" class="adjacent-nav-link adjacent-nav-link--${dir}">
+    <a href="${href}" class="adjacent-nav-link adjacent-nav-link--${dir}">
       ${dir === 'prev' ? arrow : ''}
       <span class="adjacent-nav-link__body">
         <span class="adjacent-nav-link__label">${label}</span>
