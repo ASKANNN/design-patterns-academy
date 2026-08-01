@@ -45,23 +45,43 @@ async function main() {
   const server = await startPreviewServer();
   const browser = await chromium.launch();
   const page = await browser.newPage();
+  page.setDefaultTimeout(15000);
+  page.setDefaultNavigationTimeout(15000);
 
+  let failures = 0;
   try {
     for (const route of routes) {
-      await page.goto(BASE_URL + route, { waitUntil: 'networkidle' });
-      const html   = await page.content();
-      const outDir = route === '/' ? DIST : join(DIST, route);
-      await mkdir(outDir, { recursive: true });
-      await writeFile(join(outDir, 'index.html'), html, 'utf-8');
-      console.log(`prerendered ${route}`);
+      try {
+        await page.goto(BASE_URL + route, { waitUntil: 'load' });
+        const html   = await page.content();
+        const outDir = route === '/' ? DIST : join(DIST, route);
+        await mkdir(outDir, { recursive: true });
+        await writeFile(join(outDir, 'index.html'), html, 'utf-8');
+        console.log(`prerendered ${route}`);
+      } catch (err) {
+        failures++;
+        console.error(`[prerender] failed to render ${route}: ${err.message}`);
+      }
     }
   } finally {
     await browser.close();
     server.kill();
   }
+
+  if (failures > 0) {
+    throw new Error(`${failures}/${routes.length} routes failed to prerender`);
+  }
 }
 
-main().catch((err) => {
-  console.error('[prerender]', err);
+const watchdog = setTimeout(() => {
+  console.error('[prerender] watchdog: exceeded 3 minutes, aborting');
   process.exit(1);
-});
+}, 3 * 60 * 1000);
+watchdog.unref();
+
+main()
+  .then(() => clearTimeout(watchdog))
+  .catch((err) => {
+    console.error('[prerender]', err);
+    process.exit(1);
+  });
