@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -7,19 +7,19 @@
   <meta name="theme-color" content="#6366F1"/>
   <style>
     html {
-      color-scheme: light
-    }
-
-    html, body {
-      background-color: #F8F8FC
-    }
-
-    [data-theme="dark"] {
       color-scheme: dark
     }
 
-    [data-theme="dark"], [data-theme="dark"] body {
+    html, body {
       background-color: #0A0C10
+    }
+
+    [data-theme="light"] {
+      color-scheme: light
+    }
+
+    [data-theme="light"], [data-theme="light"] body {
+      background-color: #F8F8FC
     }
 
     #app {
@@ -36,7 +36,7 @@
   </style>
   <script>(function () {
     var t = localStorage.getItem('dpa-theme');
-    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark')
+    if (t === 'light') document.documentElement.setAttribute('data-theme', 'light')
   })()</script>
 
   <link rel="canonical" href="https://askan-de-pa-ac.vercel.app/"/>

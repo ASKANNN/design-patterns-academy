@@ -189,19 +189,19 @@
   top: calc(100% + var(--space-2));
   bottom: auto;
   left: 50%;
-  transform: translateX(-50%) translateY(-6px) scale(0.98);
+  transform: translateX(calc(-50% + var(--tt-shift-x, 0px))) translateY(-6px) scale(0.98);
 }
 
 .tooltip-wrap[data-tooltip-info][data-tooltip-pos="top"]::after {
   bottom: calc(100% + var(--space-2));
   top: auto;
   left: 50%;
-  transform: translateX(-50%) translateY(6px) scale(0.98);
+  transform: translateX(calc(-50% + var(--tt-shift-x, 0px))) translateY(6px) scale(0.98);
 }
 
 .tooltip-wrap[data-tooltip-info].is-open[data-tooltip-pos="bottom"]::after,
 .tooltip-wrap[data-tooltip-info].is-open[data-tooltip-pos="top"]::after {
   opacity: 1;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateX(calc(-50% + var(--tt-shift-x, 0px))) translateY(0) scale(1);
 }
 

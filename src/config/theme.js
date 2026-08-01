@@ -1,6 +1,6 @@
 
 export const THEMES            = ['light', 'dark'];
-export const DEFAULT_THEME     = 'light';
+export const DEFAULT_THEME     = 'dark';
 export const THEME_STORAGE_KEY = 'dpa-theme';
 export const THEME_ATTR        = 'data-theme';
 

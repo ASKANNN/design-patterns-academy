@@ -33,6 +33,8 @@ const TOOLTIP_CARD_HEIGHT = 132;
 let _tip       = null;
 let _tipReason = null;
 
+const TOOLTIP_EDGE_MARGIN = 12;
+
 function positionTip(wrap) {
   const anchor     = wrap.closest('.principle-item') ?? wrap;
   const rect       = anchor.getBoundingClientRect();
@@ -40,6 +42,19 @@ function positionTip(wrap) {
   const spaceAbove = rect.top;
   const flipUp     = spaceBelow < TOOLTIP_CARD_HEIGHT && spaceAbove > spaceBelow;
   wrap.setAttribute('data-tooltip-pos', flipUp ? 'top' : 'bottom');
+
+  const popoverWidth = parseFloat(getComputedStyle(wrap, '::after').width) || 0;
+  if (!popoverWidth) { wrap.style.removeProperty('--tt-shift-x'); return; }
+
+  const center = rect.left + rect.width / 2;
+  const halfW  = popoverWidth / 2;
+  let shift = 0;
+  if (center - halfW < TOOLTIP_EDGE_MARGIN) {
+    shift = TOOLTIP_EDGE_MARGIN - (center - halfW);
+  } else if (center + halfW > window.innerWidth - TOOLTIP_EDGE_MARGIN) {
+    shift = (window.innerWidth - TOOLTIP_EDGE_MARGIN) - (center + halfW);
+  }
+  wrap.style.setProperty('--tt-shift-x', `${shift}px`);
 }
 
 function openTip(wrap, reason) {
