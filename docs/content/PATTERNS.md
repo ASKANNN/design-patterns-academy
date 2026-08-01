@@ -22,7 +22,7 @@ src/data/patterns/
   └─ behavioral/<slug>.json
 ```
 
-- `<slug>` is kebab-case and matches the route: `#/patterns/<category>/<slug>`.
+- `<slug>` is kebab-case and matches the route: `/patterns/<category>/<slug>`.
 - The three categories are fixed (`src/config/pattern-categories.js`):
   `creational`, `structural`, `behavioral`.
 
@@ -131,7 +131,10 @@ first/last pattern).
 5. Register the pattern in `src/data/patterns/index.json` (the central registry
    that lists slug, name, category, complexity, popularity, status, tags, and
    a short summary for every pattern).
-6. Run `npm run dev` and open `#/patterns/<category>/<slug>` to verify rendering.
+6. Run `npm run dev` and open `/patterns/<category>/<slug>` to verify rendering.
+   Prerendering (`scripts/prerender.mjs`) derives its route list from
+   `index.json` automatically, so a pattern with `status: "available"` is
+   picked up for SEO with no extra step — see `docs/quality/SEO.md`.
 
 ---
 

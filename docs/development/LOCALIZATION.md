@@ -54,7 +54,7 @@ Mark elements with data attributes; `applyTranslations()` fills them after the
 locale loads and after every language switch.
 
 ```html
-<a href="#/patterns" data-i18n="nav.patterns">Patterns</a>
+<a href="/patterns" data-i18n="nav.patterns">Patterns</a>
 <input data-i18n-placeholder="search.placeholder" />
 <button data-i18n-aria-label="a11y.close"></button>
 ```

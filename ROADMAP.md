@@ -90,40 +90,42 @@ as dead code during a codebase audit. Build only what a page actually uses.
 
 ---
 
-## Phase 9 — Deployment (in progress)
+## Phase 9 — Deployment ✅
 
 - [x] GitHub Actions CI/CD pipeline
-- [x] GitHub Pages / Vercel deployment configuration
+- [x] Vercel deployment configuration (prebuilt output deployed via CLI,
+      build itself runs on GitHub Actions — Vercel's own build container
+      lacks the shared libraries Playwright's Chromium needs)
 - [x] sitemap.xml
 - [x] robots.txt
 - [x] PWA manifest
 - [x] Open Graph meta tags
-- [ ] Verified live production deployment
+- [x] Verified live production deployment
+      (`https://askan-de-pa-ac.vercel.app`)
 
-### ⚠️ HIGH PRIORITY — Search Engine Indexability (2026-07-28)
+### Search Engine Indexability (2026-08-01) — done
 
-Current setup (hash routing `#/catalog`, one static `<title>`/`description`/OG
-block in `index.html`, fully client-rendered `<div id="app">`) means Google
-cannot index individual pages — everything collapses into a single URL with
-identical metadata. `sitemap.xml` already lists hash URLs
-(`.../#/patterns/adapter`) that Google will not treat as distinct pages.
-This blocks any real SEO ranking regardless of content quality.
+Hash routing (`#/catalog`, one static `<title>`/`description`/OG block,
+fully client-rendered `<div id="app">`) collapsed every page into one URL
+with identical metadata, and `sitemap.xml` listed hash URLs Google would
+not treat as distinct pages — this blocked any real SEO ranking regardless
+of content quality.
 
-- [ ] Migrate from hash routing to History API routing (`/patterns/adapter`, no `#`)
-- [ ] Per-route dynamic `<title>`, `meta description`, `og:*`/Twitter tags
-- [ ] Prerender or SSR so crawlers see real HTML content, not an empty shell
-- [ ] JSON-LD structured data per pattern (`TechArticle` / `BreadcrumbList`)
-- [ ] Unique `<h1>` per page (not just the global site title)
-- [ ] Update `lastmod` dates in `sitemap.xml` to real values
-- [ ] Register site + submit sitemap in Google Search Console
+- [x] Migrate from hash routing to History API routing (`/patterns/adapter`, no `#`)
+- [x] Per-route dynamic `<title>`, `meta description`, canonical, `og:*`/Twitter tags
+- [x] Prerender via Playwright (`scripts/prerender.mjs`) so crawlers see real
+      HTML content, not an empty shell — built on GitHub Actions (Ubuntu),
+      deployed prebuilt to Vercel
+- [x] JSON-LD structured data per pattern (`TechArticle` / `BreadcrumbList`)
+- [x] Unique `<h1>` per page (not just the global site title)
+- [x] Updated `lastmod` dates in `sitemap.xml` to real values
+- [x] Registered site + submitted sitemap in Google Search Console
+      (ownership verified via `public/google27f15fcbbc0bee4a.html`)
 
-**When:** do this once the Phase 12 diagram/interactive-scene sweep across
-the 23 patterns is finished, and before Phase 13 (Interactive Learning)
-starts. Reason: routing migration touches the whole app shell, so it's
-safer to land after the current pattern-by-pattern diagram work settles
-rather than mid-sweep; and it should land *before* new interactive features
-in Phase 13 so those are built on real routes from the start instead of
-needing a second migration later.
+**Known gap:** indexing is a waiting game (days to a few weeks) and the
+domain has no backlink authority yet — see Phase 14 for the custom-domain
+follow-up, which will need a redirect from the `vercel.app` address and
+re-verification in Search Console once it lands.
 
 ---
 
@@ -305,6 +307,10 @@ No new features are implemented during this sprint — only bug fixing and stabi
 
 ## Phase 14 — Platform Improvements
 
+- [ ] Custom domain (buy + connect in Vercel, update `SITE_URL` in
+      `src/config/site.js` and every place that references the domain,
+      301-redirect the old `vercel.app` address, re-verify in Google Search
+      Console and resubmit `sitemap.xml` under the new domain)
 - [ ] Advanced search
 - [ ] Favorites
 - [ ] Progress tracking

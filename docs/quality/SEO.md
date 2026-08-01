@@ -8,8 +8,10 @@ Version: 1.0
 
 This document defines the SEO approach for Design Patterns Academy.
 
-The app is a hash-based SPA, so per-route metadata is managed in JavaScript on
-top of the static defaults in `index.html`.
+The app uses History API routing (real paths like `/patterns/adapter`, no
+`#`). Every route is prerendered at build time (`scripts/prerender.mjs`) so
+crawlers receive real HTML with the correct per-route metadata already
+baked in, on top of the static defaults in `index.html`.
 
 ---
 
@@ -35,12 +37,18 @@ On every navigation, `setPageMeta()` in `src/scripts/router.js` updates:
 
 - `document.title`
 - `meta[name="description"]`
+- `link[rel="canonical"]` / `og:url`
 - `og:title` / `og:description`
 - `twitter:title` / `twitter:description`
 
 Titles follow the pattern `"<Page> — Design Patterns Academy"`, and descriptions
 are tailored per route (home, catalog, patterns, category, pattern detail, about,
-search).
+search). The canonical domain lives in `src/config/site.js` (`SITE_URL`) —
+don't hardcode the domain elsewhere.
+
+Pages that render a breadcrumb trail also emit `BreadcrumbList` JSON-LD, and
+`PatternDetailPage` additionally emits `TechArticle` JSON-LD, via
+`src/utils/json-ld.js`.
 
 **When you add a route or rename a pattern, update `setPageMeta()` so the new
 page has an accurate title and description.**
@@ -56,12 +64,20 @@ page has an accurate title and description.**
 
 ---
 
-# Hash Routing Note
+# Prerendering
 
-Routes use `#/…` so the app deploys to any static host without server rewrites.
-Because crawlers may not index hash fragments as separate URLs, keep the base
-`index.html` metadata strong and descriptive, and ensure the canonical URL is
-correct for the deployed domain.
+`npm run build` runs `vite build && node scripts/prerender.mjs`. The
+prerender script spins up a local preview server, visits every route in a
+headless browser, waits for the `app:navigated` event the router dispatches
+once rendering + `setPageMeta()` have finished, and writes the resulting
+HTML to `dist/<route>/index.html`. This must run on an officially
+Playwright-supported OS (Ubuntu) — see `.github/workflows/deploy.yml`, which
+builds on GitHub Actions and deploys the prebuilt output to Vercel, since
+Vercel's own build container lacks the shared libraries Playwright's
+Chromium needs.
+
+When adding a new route, add it to the route list in
+`scripts/prerender.mjs` (`getRoutes()`) so it gets prerendered too.
 
 ---
 

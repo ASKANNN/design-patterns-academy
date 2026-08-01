@@ -31,7 +31,7 @@ If applicable, add screenshots to help explain the problem.
 
 ## Environment
 
-- Page / route: (e.g. `#/patterns/behavioral/observer`)
+- Page / route: (e.g. `/patterns/behavioral/observer`)
 - Language: (EN / RU)
 - Theme: (light / dark)
 - Browser & version:

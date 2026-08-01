@@ -37,3 +37,5 @@ yarn-error.log*
 /engine/
 /docs/project-management/ENGINEERING_GUIDE.md
 /docs/project-management/OWNER_GUIDE.md
+.vercel
+.env*

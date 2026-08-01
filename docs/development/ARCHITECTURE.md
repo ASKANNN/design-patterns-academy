@@ -20,7 +20,7 @@ JSON and is rendered in the browser.
 index.html
   └─ src/scripts/main.js        ← entry point (bootstraps the app)
        ├─ config/i18n.js         ← locale loading & translation engine
-       ├─ scripts/router.js      ← hash-based SPA router
+       ├─ scripts/router.js      ← History API SPA router
        ├─ layouts/AppLayout.js   ← header + outlet + footer shell
        └─ pages/*.js             ← one render function per route
 ```
@@ -62,13 +62,18 @@ This keeps the mental model simple: `data → string → innerHTML`.
 
 # Routing
 
-Routing is hash-based (`#/patterns/:category/:slug`) so it works on any static
-host without server rewrites. The route table (path patterns → page loaders)
-is declared in `src/config/routes.js` and registered with the router in
-`src/scripts/main.js`. See `src/scripts/router.js`:
+Routing uses the History API (real paths like `/patterns/:category/:slug`,
+no `#`). A delegated click handler intercepts same-origin link clicks and
+calls `history.pushState`; `popstate` handles back/forward. `vercel.json`
+rewrites unmatched paths to `/index.html` as the SPA fallback. Every route
+is prerendered at build time (`scripts/prerender.mjs`, see
+`docs/quality/SEO.md`) so crawlers and deep links get real HTML. The route
+table (path patterns → page loaders) is declared in `src/config/routes.js`
+and registered with the router in `src/scripts/main.js`. See
+`src/scripts/router.js`:
 
 - `defineRoute(pattern, handler)` — register a route.
-- `initRouter(outlet)` — resolve the current hash and listen for `hashchange`.
+- `initRouter(outlet)` — resolve the current path and listen for `popstate`.
 - `navigate(path)`, `getCurrentPath()`, `getQueryParam(key)` — navigation helpers.
 - `reloadRoute()` — re-render the current route in place (used after a language
   change).
