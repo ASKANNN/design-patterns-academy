@@ -10,5 +10,6 @@ export function AppLayout() {
       <div id="router-outlet"></div>
     </main>
     ${Footer()}
+    <div id="live-region" class="sr-only" role="status" aria-live="polite"></div>
   `;
 }

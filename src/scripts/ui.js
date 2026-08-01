@@ -239,6 +239,11 @@ function navigateTabs(tab, key) {
   if (next) switchTab(next);
 }
 
+function announce(message) {
+  const region = document.getElementById('live-region');
+  if (region) region.textContent = message;
+}
+
 function dismissAlert(alert) {
   if (!alert) return;
   alert.classList.add('is-dismissed');
@@ -270,6 +275,16 @@ async function handleCopy(btn) {
       `;
     }, 2000);
   } catch {
+    const label = btn.querySelector('.copy-btn__label');
+
+    btn.classList.add('is-copy-error');
+    if (label) label.textContent = t('actions.copy_failed');
+    announce(t('actions.copy_failed'));
+
+    setTimeout(() => {
+      btn.classList.remove('is-copy-error');
+      if (label) label.textContent = t('actions.copy');
+    }, 2000);
   }
 }
 
@@ -281,6 +296,8 @@ function handleFavoriteToggle(btn) {
     el.classList.toggle('is-active', favorited);
     el.setAttribute('aria-pressed', String(favorited));
   });
+
+  announce(favorited ? t('favorites.added_announcement') : t('favorites.removed_announcement'));
 
   if (favorited) return;
 
@@ -308,6 +325,8 @@ function handleProgressToggle(btn) {
   btn.querySelector('.progress-toggle-btn__label').textContent = completed
     ? t('progress.completed')
     : t('progress.mark_completed');
+
+  announce(completed ? t('progress.completed_announcement') : t('progress.incomplete_announcement'));
 }
 
 function handleFilter(chip) {
@@ -623,7 +642,7 @@ function handleInput(e) {
     } else {
       resultsEl.innerHTML = '';
     }
-  }, 150);
+  }, 250);
 }
 
 function _escHtml(str) {

@@ -9,6 +9,7 @@ const DEFAULTS = {
   monochrome:     false,
   readableFont:   false,
   underlineLinks: false,
+  soundEffects:   true,
 };
 
 let _state = { ...DEFAULTS };

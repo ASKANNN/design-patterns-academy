@@ -2,23 +2,36 @@ import { getA11yState, setA11y, resetA11y } from '../../config/accessibility.js'
 
 export function AccessibilityWidget() {
   return `
-    <button
-      type="button"
-      class="a11y-widget__trigger"
-      id="a11y-trigger"
-      aria-haspopup="dialog"
-      aria-expanded="false"
-      aria-controls="a11y-panel"
-      data-i18n-aria-label="a11y.open"
-    >
-      <svg class="a11y-widget__icon" width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="4" r="1.8" fill="currentColor"/>
-        <path d="M4 8.5c2.5 1 5.2 1.5 8 1.5s5.5-.5 8-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M12 10v11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M8 21l2.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M16 21l-2.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-    </button>
+    <div class="a11y-dock" id="a11y-dock">
+      <button
+        type="button"
+        class="a11y-widget__trigger"
+        id="a11y-trigger"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="a11y-panel"
+        data-i18n-aria-label="a11y.open"
+      >
+        <svg class="a11y-widget__icon" width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="4" r="1.8" fill="currentColor"/>
+          <path d="M4 8.5c2.5 1 5.2 1.5 8 1.5s5.5-.5 8-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M12 10v11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M8 21l2.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M16 21l-2.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="a11y-dock__tab"
+        id="a11y-dock-tab"
+        aria-expanded="true"
+        data-i18n-aria-label="a11y.toggle_dock"
+      >
+        <svg class="a11y-dock__tab-icon" width="10" height="16" viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="8 2 2 8 8 14"/>
+        </svg>
+      </button>
+    </div>
 
     <div
       class="a11y-widget__panel"
@@ -63,6 +76,7 @@ export function AccessibilityWidget() {
         ${_switchRow('monochrome',     'a11y.monochrome')}
         ${_switchRow('readableFont',   'a11y.readable_font')}
         ${_switchRow('underlineLinks', 'a11y.underline_links')}
+        ${_switchRow('soundEffects',   'a11y.sound_effects')}
 
         <button type="button" class="a11y-widget__reset" id="a11y-reset" data-i18n="a11y.reset">
           Reset all
@@ -106,6 +120,58 @@ function _switchRow(key, i18nKey) {
   `;
 }
 
+function initDock(trigger, isBusy) {
+  const dock = document.getElementById('a11y-dock');
+  const tab  = document.getElementById('a11y-dock-tab');
+  if (!dock || !tab) return;
+
+  const REVEAL_DELAY_ON_LOAD = 1400;
+  const AUTO_REDOCK_IDLE     = 2200;
+
+  let idleTimer      = null;
+  let usingKeyboard   = false;
+
+  function dockIt() {
+    if (isBusy()) return;
+    dock.classList.add('is-docked');
+    tab.setAttribute('aria-expanded', 'false');
+  }
+
+  function undockIt() {
+    dock.classList.remove('is-docked');
+    tab.setAttribute('aria-expanded', 'true');
+  }
+
+  function scheduleAutoRedock() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(dockIt, AUTO_REDOCK_IDLE);
+  }
+
+  function cancelAutoRedock() {
+    clearTimeout(idleTimer);
+  }
+
+  idleTimer = setTimeout(dockIt, REVEAL_DELAY_ON_LOAD);
+
+  tab.addEventListener('click', () => {
+    cancelAutoRedock();
+    if (dock.classList.contains('is-docked')) {
+      undockIt();
+      scheduleAutoRedock();
+    } else {
+      dockIt();
+    }
+  });
+
+  window.addEventListener('scroll', () => { cancelAutoRedock(); dockIt(); }, { passive: true });
+
+  document.addEventListener('keydown', (e) => { if (e.key === 'Tab') usingKeyboard = true; }, true);
+  document.addEventListener('pointerdown', () => { usingKeyboard = false; }, true);
+  trigger.addEventListener('focus', () => { if (usingKeyboard) { cancelAutoRedock(); undockIt(); } });
+
+  return { undockIt, scheduleAutoRedock, cancelAutoRedock };
+}
+
 export function initAccessibilityWidget() {
   const trigger = document.getElementById('a11y-trigger');
   const panel   = document.getElementById('a11y-panel');
@@ -113,6 +179,7 @@ export function initAccessibilityWidget() {
   const resetBtn = document.getElementById('a11y-reset');
 
   let lastFocused = null;
+  const dockCtl = initDock(trigger, () => isOpen());
 
   function syncControls() {
     const state = getA11yState();
@@ -131,6 +198,8 @@ export function initAccessibilityWidget() {
 
   function openPanel() {
     lastFocused = document.activeElement;
+    dockCtl.cancelAutoRedock();
+    dockCtl.undockIt();
     panel.setAttribute('aria-hidden', 'false');
     panel.classList.add('is-open');
     trigger.setAttribute('aria-expanded', 'true');
@@ -145,6 +214,7 @@ export function initAccessibilityWidget() {
     trigger.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', onKeydown);
     (lastFocused ?? trigger).focus();
+    dockCtl.scheduleAutoRedock();
   }
 
   function isOpen() {

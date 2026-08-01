@@ -41,6 +41,7 @@
   "actions": {
     "copy": "Copy",
     "copied": "Copied!",
+    "copy_failed": "Couldn't copy",
     "close": "Close",
     "dismiss": "Dismiss",
     "open_menu": "Open navigation menu",
@@ -122,6 +123,7 @@
 
     "open": "Accessibility options",
     "close": "Close accessibility panel",
+    "toggle_dock": "Show/hide accessibility button",
     "title": "Accessibility",
     "reset": "Reset all",
     "font_size": {
@@ -139,6 +141,7 @@
     "monochrome": "Monochrome mode",
     "readable_font": "Readable font",
     "underline_links": "Underline links",
+    "sound_effects": "Click sounds",
     "scroll_top": "Back to top"
   },
 
@@ -189,7 +192,9 @@
     "title": "Learning Roadmap",
     "subtitle": "A recommended order for all {{total}} patterns, grouped by category and sorted from simplest to most advanced.",
     "step_label": "Step {{step}} of {{total}}",
-    "progress_label": "{{done}} of {{total}} patterns completed"
+    "progress_label": "{{done}} of {{total}} patterns completed",
+    "complete_title": "You've completed all {{total}} patterns",
+    "complete_desc": "Nice work — you've worked through every pattern on the roadmap. Revisit any of them below anytime."
   },
 
   "favorites": {
@@ -197,11 +202,15 @@
     "subtitle": "Patterns you've saved for quick reference.",
     "toggle_label": "Toggle favorite",
     "empty_title": "No favorites yet",
-    "empty_desc": "Tap the star on any pattern card to save it here for quick reference."
+    "empty_desc": "Tap the star on any pattern card to save it here for quick reference.",
+    "added_announcement": "Added to favorites",
+    "removed_announcement": "Removed from favorites"
   },
 
   "progress": {
     "mark_completed": "Mark as completed",
+    "completed_announcement": "Marked as completed",
+    "incomplete_announcement": "Marked as not completed",
     "completed": "Completed"
   },
 

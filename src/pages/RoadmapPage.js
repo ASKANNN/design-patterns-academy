@@ -3,8 +3,15 @@ import { buildRoadmap }            from '../utils/roadmap.js';
 import { getCompleted }            from '../utils/progress.js';
 import { PatternCard }             from '../components/patterns/PatternCard.js';
 import { Breadcrumb }              from '../components/ui/Breadcrumb.js';
+import { EmptyState }              from '../components/ui/EmptyState.js';
 import { t }                       from '../utils/i18n.js';
 import { jsonLdScriptTag, breadcrumbListJsonLd } from '../utils/json-ld.js';
+
+const CHECK_ICON = `
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+    <path d="M20 6 9 17l-5-5"/>
+  </svg>
+`;
 
 const CATEGORY_ORDER = ['creational', 'structural', 'behavioral'];
 
@@ -62,6 +69,13 @@ export async function RoadmapPage() {
           </div>
         </div>
       </header>
+
+      ${total > 0 && done === total ? EmptyState({
+        icon:        CHECK_ICON,
+        title:       t('roadmap.complete_title', { total }),
+        description: t('roadmap.complete_desc'),
+        attrs:       'role="status"',
+      }) : ''}
 
       <div class="roadmap-page__body">
         ${sections}

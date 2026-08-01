@@ -4,6 +4,9 @@ import { pageLeave, pageEnter, refreshAnimations } from './animations.js';
 import { ErrorPage }                               from '../components/ui/ErrorPage.js';
 import { Button }                                  from '../components/ui/Button.js';
 import { SITE_URL }                                from '../config/site.js';
+import { playClickTick }                           from '../utils/sound.js';
+
+const _PATTERN_DETAIL_RE = /^\/patterns\/[^/]+\/[^/]+\/?$/;
 
 const _routes = [];
 let   _outlet = null;
@@ -56,6 +59,7 @@ export function initRouter(outletEl) {
     _markActiveLinks(path);
     setPageMeta(path, params);
     refreshAnimations(_outlet);
+    document.getElementById('main-content')?.focus();
     window.dispatchEvent(new CustomEvent('app:navigated'));
   };
 
@@ -75,6 +79,8 @@ function _handleLinkClick(e) {
 
   e.preventDefault();
   if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+
+  if (_PATTERN_DETAIL_RE.test(url.pathname)) playClickTick();
 
   history.pushState(null, '', url.pathname + url.search);
   _resolve();

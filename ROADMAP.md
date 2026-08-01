@@ -387,7 +387,70 @@ No new features are implemented during this sprint — only bug fixing and stabi
       EN/RU strings added to `ui.json`. Verified with Playwright across
       desktop/mobile/dark-mode/RU — zero console errors, all 23 pattern
       links resolve, step numbering confirmed continuous.
-- [ ] User experience improvements
+- [x] User experience improvements — **scope decision (2026-08-01, owner
+      said "do what's needed, do it right"):** ran a research-only UX
+      survey of the shipped app (accessibility, empty/loading states,
+      mobile responsiveness, navigation polish, small friction points).
+      Existing a11y for quiz/tabs/accordion/tooltips was already solid
+      (`aria-expanded`/`aria-selected`/`aria-pressed`, `focus-visible`,
+      `prefers-reduced-motion`); fixed the 5 concrete gaps found:
+      (1) focus wasn't moved to `#main-content` on route change even
+      though the markup already had `tabindex="-1"` waiting for it
+      (`router.js`); (2) Roadmap page had no completion state for
+      finishing all 23 patterns, unlike Favorites/Search
+      (`RoadmapPage.js`, new `roadmap.complete_title`/`complete_desc`
+      keys); (3) favoriting/marking-complete only flipped `aria-pressed`
+      with no screen-reader confirmation — added a shared `#live-region`
+      (`AppLayout.js`) and an `announce()` helper (`ui.js`) used by both
+      toggles, matching the pattern Quiz already used; (4) copy-to-code
+      button silently swallowed clipboard failures — now shows an error
+      state + announces it; (5) bumped the search-as-you-type debounce
+      from 150ms to 250ms. Deferred as lower-confidence/visual-only:
+      Playground/Walkthrough's single 860px breakpoint and a Playground
+      "running…" affordance — revisit only if an owner review flags them
+      on a real tablet viewport. Verified with a Playwright script:
+      focus lands on `#main-content` after navigation, live-region text
+      updates on favorite/progress toggle, roadmap completion banner
+      renders at 23/23 — zero console errors.
+      **Follow-up (2026-08-01):** added an optional click sound when
+      navigating to a pattern detail page (short synthesized tone via
+      Web Audio API, `src/utils/sound.js` — no external audio asset).
+      Discovered mid-conversation that a floating accessibility-settings
+      widget already existed (`AccessibilityWidget.js`, corner button
+      with font-size/contrast/monochrome/readable-font/underline-links
+      toggles, `dpa-a11y` in localStorage) — the new `soundEffects`
+      toggle (default **on**) was added as another switch row inside
+      that existing panel instead of a new standalone control, for
+      consistency. The single global link-click interceptor in
+      `router.js` triggers the sound for any click on a
+      `/patterns/:category/:slug` link, so it works from every pattern
+      card site-wide with no per-component wiring. Verified with a
+      Playwright script that stubs `AudioContext`: sound fires on by
+      default, the panel switch reflects and toggles state, disabling it
+      silences clicks, the choice persists across reload, and clicking
+      non-pattern links never triggers it — zero console errors.
+
+**Follow-up (2026-08-01) — dockable accessibility button.** Scoped to the
+accessibility widget trigger only ("back to top" was left untouched). On
+page load the circular trigger is fully visible, then after ~1.4s slides
+almost entirely off-screen to the right, leaving only a small angular
+purple arrow tab (`.a11y-dock__tab`) poking out at the bottom-right edge.
+Hovering the dock (desktop) or tapping the tab peeks the full circle back
+into view via a pure-CSS `:hover`/`:focus-within` rule — the docked state
+itself never changes on hover, only the trigger's visual position, so the
+tab never vanishes out from under the cursor mid-click. The tab stays
+visible and clickable in both states and toggles docking manually in
+either direction (its chevron flips 180° to hint direction); scrolling
+docks immediately; opening the accessibility panel force-undocks and
+suspends auto-redock until the panel closes; real keyboard `Tab` focus
+(tracked via explicit `keydown`/`pointerdown` modality, not the unreliable
+`:focus-visible`) also undocks it. Implementation lives entirely in
+`AccessibilityWidget.js` + `accessibility-widget.css` — no shared/generic
+module, since only one consumer needed this behavior. Verified with a
+Playwright script covering desktop (load-reveal, idle-dock, hover-peek
+without undocking, manual tab-toggle both directions, panel-open
+suspends redock, real keyboard-focus undock) and mobile (tap-to-reveal,
+tap-to-activate) — zero console errors.
 
 > **Deferred idea — per-pattern illustrations.** Only revisit once all 23
 > patterns reach bespoke Diagram Engine status (`MASTER_PLAN.md`). Requires
