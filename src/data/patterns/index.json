@@ -17,7 +17,8 @@
       "summary": {
         "en": "Produces whole families of related objects through one interface, so the objects always match.",
         "ru": "Создаёт целые семейства связанных объектов через единый интерфейс, гарантируя их совместимость."
-      }
+      },
+      "also_known_as": ["Kit"]
     },
     {
       "slug": "builder",
@@ -30,7 +31,8 @@
       "summary": {
         "en": "Assembles a complex object step by step, so the same steps can yield different configurations.",
         "ru": "Пошагово собирает сложный объект, позволяя получать разные конфигурации из одних и тех же шагов."
-      }
+      },
+      "also_known_as": []
     },
     {
       "slug": "factory-method",
@@ -43,7 +45,8 @@
       "summary": {
         "en": "Delegates object creation to a method subclasses can override, hiding the exact type being built.",
         "ru": "Делегирует создание объекта методу, который могут переопределять подклассы, скрывая конкретный создаваемый тип."
-      }
+      },
+      "also_known_as": ["Virtual Constructor"]
     },
     {
       "slug": "prototype",
@@ -56,7 +59,8 @@
       "summary": {
         "en": "Creates new objects by cloning an existing instance instead of building one from scratch.",
         "ru": "Создаёт новые объекты путём клонирования существующего экземпляра, а не построения с нуля."
-      }
+      },
+      "also_known_as": ["Clone"]
     },
     {
       "slug": "singleton",
@@ -69,7 +73,8 @@
       "summary": {
         "en": "Guarantees a class has exactly one instance and gives the whole program one way to reach it.",
         "ru": "Гарантирует существование только одного экземпляра класса и даёт программе единый способ его получить."
-      }
+      },
+      "also_known_as": []
     },
 
     {
@@ -83,7 +88,8 @@
       "summary": {
         "en": "Wraps an object with a mismatched interface so it can work with code that expects a different one.",
         "ru": "Оборачивает объект с несовместимым интерфейсом, чтобы он мог работать с кодом, ожидающим другой интерфейс."
-      }
+      },
+      "also_known_as": ["Wrapper"]
     },
     {
       "slug": "bridge",
@@ -96,7 +102,8 @@
       "summary": {
         "en": "Splits a class into two independent hierarchies - abstraction and implementation - connected through composition.",
         "ru": "Разделяет класс на две независимые иерархии - абстракцию и реализацию, - связанные через композицию."
-      }
+      },
+      "also_known_as": ["Handle/Body"]
     },
     {
       "slug": "composite",
@@ -109,7 +116,8 @@
       "summary": {
         "en": "Lets individual objects and groups of them be handled through the same interface, regardless of nesting depth.",
         "ru": "Позволяет обрабатывать отдельные объекты и их группы через единый интерфейс независимо от глубины вложенности."
-      }
+      },
+      "also_known_as": ["Object Tree"]
     },
     {
       "slug": "decorator",
@@ -122,7 +130,8 @@
       "summary": {
         "en": "Adds new behavior to a single object by wrapping it in layers that share its interface.",
         "ru": "Добавляет объекту новое поведение, оборачивая его в слои с тем же интерфейсом."
-      }
+      },
+      "also_known_as": ["Wrapper"]
     },
     {
       "slug": "facade",
@@ -135,7 +144,8 @@
       "summary": {
         "en": "Hides a tangle of interacting classes behind one simple entry point.",
         "ru": "Скрывает клубок взаимодействующих классов за одной простой точкой входа."
-      }
+      },
+      "also_known_as": []
     },
     {
       "slug": "flyweight",
@@ -148,7 +158,8 @@
       "summary": {
         "en": "Shares the common data of many similar objects to cut memory usage.",
         "ru": "Разделяет общие данные множества похожих объектов, снижая расход памяти."
-      }
+      },
+      "also_known_as": ["Cache"]
     },
     {
       "slug": "proxy",
@@ -161,7 +172,8 @@
       "summary": {
         "en": "Stands in for another object behind the same interface, intercepting calls to add checks, caching, or lazy loading.",
         "ru": "Подменяет собой другой объект за тем же интерфейсом, перехватывая вызовы для проверок, кэширования или ленивой загрузки."
-      }
+      },
+      "also_known_as": ["Surrogate"]
     },
 
     {
@@ -175,7 +187,8 @@
       "summary": {
         "en": "Passes a request along a line of handlers until one of them takes care of it.",
         "ru": "Передаёт запрос по цепочке обработчиков, пока один из них не возьмётся его выполнить."
-      }
+      },
+      "also_known_as": ["CoR", "Chain of Command"]
     },
     {
       "slug": "command",
@@ -188,7 +201,8 @@
       "summary": {
         "en": "Wraps a request as a standalone object, so it can be queued, logged, or undone independently of its trigger.",
         "ru": "Оборачивает запрос в отдельный объект, который можно поставить в очередь, залогировать или отменить независимо от источника вызова."
-      }
+      },
+      "also_known_as": ["Action", "Transaction"]
     },
     {
       "slug": "interpreter",
@@ -201,7 +215,8 @@
       "summary": {
         "en": "Represents each grammar rule of a small language as a class, so a sentence becomes a tree that can evaluate itself.",
         "ru": "Представляет каждое правило грамматики небольшого языка отдельным классом, превращая выражение в дерево, способное само себя вычислить."
-      }
+      },
+      "also_known_as": []
     },
     {
       "slug": "iterator",
@@ -214,7 +229,8 @@
       "summary": {
         "en": "Provides one consistent way to walk through a collection without exposing how it's stored.",
         "ru": "Даёт единый способ обхода коллекции, не раскрывая, как она устроена внутри."
-      }
+      },
+      "also_known_as": ["Cursor"]
     },
     {
       "slug": "mediator",
@@ -227,7 +243,8 @@
       "summary": {
         "en": "Moves the tangled communication between a group of objects into one go-between object.",
         "ru": "Переносит запутанное взаимодействие между группой объектов в отдельный класс-посредник."
-      }
+      },
+      "also_known_as": ["Intermediary", "Controller"]
     },
     {
       "slug": "memento",
@@ -240,7 +257,8 @@
       "summary": {
         "en": "Captures an object's state in a snapshot that can restore it later without exposing its internals.",
         "ru": "Сохраняет состояние объекта в снимке, который позже восстанавливает его, не раскрывая внутреннего устройства."
-      }
+      },
+      "also_known_as": ["Snapshot", "Token"]
     },
     {
       "slug": "observer",
@@ -253,7 +271,8 @@
       "summary": {
         "en": "Lets any number of objects subscribe to and get notified about another object's changes.",
         "ru": "Позволяет любому числу объектов подписываться на изменения другого объекта и получать о них уведомления."
-      }
+      },
+      "also_known_as": ["Event-Subscriber", "Listener", "Pub-Sub"]
     },
     {
       "slug": "state",
@@ -266,7 +285,8 @@
       "summary": {
         "en": "Lets an object change its entire behavior at runtime by switching between interchangeable state objects.",
         "ru": "Позволяет объекту полностью менять поведение во время выполнения, переключаясь между взаимозаменяемыми объектами-состояниями."
-      }
+      },
+      "also_known_as": ["Objects for States", "FSM"]
     },
     {
       "slug": "strategy",
@@ -279,7 +299,8 @@
       "summary": {
         "en": "Packages interchangeable algorithms into their own classes so they can be swapped at runtime.",
         "ru": "Оформляет взаимозаменяемые алгоритмы в отдельные классы, позволяя переключаться между ними во время выполнения."
-      }
+      },
+      "also_known_as": ["Policy"]
     },
     {
       "slug": "template-method",
@@ -292,7 +313,8 @@
       "summary": {
         "en": "Fixes the overall steps of an algorithm in a base class while letting subclasses fill in the details.",
         "ru": "Закрепляет общую последовательность шагов алгоритма в базовом классе, оставляя детали на усмотрение подклассов."
-      }
+      },
+      "also_known_as": ["Hook Method"]
     },
     {
       "slug": "visitor",
@@ -305,7 +327,8 @@
       "summary": {
         "en": "Moves an operation out of the classes it works on and into its own class, so adding operations doesn't require changing those classes.",
         "ru": "Выносит операцию из классов, над которыми она выполняется, в отдельный класс, чтобы новые операции не требовали изменения этих классов."
-      }
+      },
+      "also_known_as": []
     }
   ]
 }
