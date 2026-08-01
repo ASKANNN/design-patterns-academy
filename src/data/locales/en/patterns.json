@@ -7,12 +7,15 @@
 
     "intro_trigger": "What are design patterns?",
     "intro_p1": "A design pattern is a general, battle-tested solution to a problem that recurs often in software design. It isn't ready-made code - it's a reusable template you adapt to your own situation.",
+    "intro_p1b": "The idea comes from architecture: in 1977, architect Christopher Alexander described recurring solutions for building towns and buildings as a \"pattern language\" - each entry being a problem, the context it shows up in, and a proven solution. In 1994 the \"Gang of Four\" applied the same approach to object-oriented programming.",
     "intro_authors": "All 23 patterns come from the book \"Design Patterns: Elements of Reusable Object-Oriented Software\" (1994) - its authors, Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides, became known as the \"Gang of Four\" (GoF), and the book is still the standard reference for object-oriented design vocabulary.",
+    "intro_authors_b": "Every pattern in the book follows the same template: name, problem it solves, motivation, applicability, class structure, participants, consequences (trade-offs), and a sample implementation. This site follows the same structure for each of the 23 patterns.",
     "intro_p2_lead": "The patterns fall into three groups:",
-    "intro_p2_creational": "<a href=\"/patterns/creational\" class=\"intro-category-link intro-category-link--creational\">Creational</a> patterns handle object creation.",
-    "intro_p2_structural": "<a href=\"/patterns/structural\" class=\"intro-category-link intro-category-link--structural\">Structural</a> patterns compose classes and objects into larger structures.",
-    "intro_p2_behavioral": "<a href=\"/patterns/behavioral\" class=\"intro-category-link intro-category-link--behavioral\">Behavioral</a> patterns manage responsibilities and communication between objects.",
+    "intro_p2_creational": "<a href=\"/patterns/creational\" class=\"intro-category-link intro-category-link--creational\">Creational</a> patterns hide the logic behind object creation, letting a program decide at runtime which class to instantiate instead of hard-coding it.",
+    "intro_p2_structural": "<a href=\"/patterns/structural\" class=\"intro-category-link intro-category-link--structural\">Structural</a> patterns show how to assemble classes and objects into larger structures while keeping them loosely coupled and easy to change later.",
+    "intro_p2_behavioral": "<a href=\"/patterns/behavioral\" class=\"intro-category-link intro-category-link--behavioral\">Behavioral</a> patterns describe how objects split up responsibilities and communicate, reducing tight coupling and making interactions more predictable.",
     "intro_p3": "Knowing these patterns helps developers speak a shared vocabulary, read unfamiliar code faster, and reach for proven solutions instead of reinventing the wheel.",
+    "intro_p4": "A pattern is not a goal in itself and not a sign of \"correct\" code. Applying one where the problem doesn't call for it just adds unnecessary abstraction. Reach for a pattern when it actually solves a problem you have, not because it's \"the proper way\" to do things.",
 
     "categories": {
       "creational": "Creational",
