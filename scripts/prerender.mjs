@@ -83,11 +83,16 @@ async function main() {
   const page = await browser.newPage();
   page.setDefaultTimeout(15000);
   page.setDefaultNavigationTimeout(15000);
+  await page.addInitScript(() => {
+    window.__navigated = false;
+    window.addEventListener('app:navigated', () => { window.__navigated = true; });
+  });
 
   let failures = 0;
   for (const route of routes) {
     try {
       await page.goto(BASE_URL + route, { waitUntil: 'load' });
+      await page.waitForFunction(() => window.__navigated === true);
       const html   = await page.content();
       const outDir = route === '/' ? DIST : join(DIST, route);
       await mkdir(outDir, { recursive: true });
