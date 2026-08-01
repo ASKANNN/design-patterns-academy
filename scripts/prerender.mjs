@@ -76,7 +76,7 @@ async function main() {
   console.log('[prerender] preview server ready');
 
   const browser = await chromium.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
   console.log('[prerender] browser launched');
 
@@ -85,28 +85,25 @@ async function main() {
   page.setDefaultNavigationTimeout(15000);
 
   let failures = 0;
-  try {
-    for (const route of routes) {
-      try {
-        await page.goto(BASE_URL + route, { waitUntil: 'load' });
-        const html   = await page.content();
-        const outDir = route === '/' ? DIST : join(DIST, route);
-        await mkdir(outDir, { recursive: true });
-        await writeFile(join(outDir, 'index.html'), html, 'utf-8');
-        console.log(`prerendered ${route}`);
-      } catch (err) {
-        failures++;
-        console.error(`[prerender] failed to render ${route}: ${err.message}`);
-      }
+  for (const route of routes) {
+    try {
+      await page.goto(BASE_URL + route, { waitUntil: 'load' });
+      const html   = await page.content();
+      const outDir = route === '/' ? DIST : join(DIST, route);
+      await mkdir(outDir, { recursive: true });
+      await writeFile(join(outDir, 'index.html'), html, 'utf-8');
+      console.log(`prerendered ${route}`);
+    } catch (err) {
+      failures++;
+      console.error(`[prerender] failed to render ${route}: ${err.message}`);
     }
-  } finally {
-    await browser.close();
-    server.kill();
   }
 
-  if (failures > 0) {
-    throw new Error(`${failures}/${routes.length} routes failed to prerender`);
-  }
+  console.log(`[prerender] done, ${failures} failure(s)`);
+  server.kill();
+  // Headless Chromium can hang on close() inside CI containers; the process
+  // tree gets torn down by the runner anyway, so exit instead of waiting.
+  process.exit(failures > 0 ? 1 : 0);
 }
 
 const watchdog = setTimeout(() => {
@@ -115,9 +112,7 @@ const watchdog = setTimeout(() => {
 }, 3 * 60 * 1000);
 watchdog.unref();
 
-main()
-  .then(() => clearTimeout(watchdog))
-  .catch((err) => {
-    console.error('[prerender]', err);
-    process.exit(1);
-  });
+main().catch((err) => {
+  console.error('[prerender]', err);
+  process.exit(1);
+});
