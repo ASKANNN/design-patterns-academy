@@ -1,49 +1,65 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Premium educational platform for learning Gang of Four Design Patterns." />
-    <meta name="theme-color" content="#6366F1" />
-    <style>
-      html{color-scheme:light}
-      html,body{background-color:#F8F8FC}
-      [data-theme="dark"]{color-scheme:dark}
-      [data-theme="dark"],[data-theme="dark"] body{background-color:#0A0C10}
-      #app{opacity:0;transition:opacity .22s ease}
-      .skip-link{position:fixed;top:0;left:0;transform:translateY(-200%)}
-    </style>
-    <script>(function(){var t=localStorage.getItem('dpa-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')})()</script>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Premium educational platform for learning Gang of Four Design Patterns."/>
+  <meta name="theme-color" content="#6366F1"/>
+  <style>
+    html {
+      color-scheme: light
+    }
 
-    <!-- Canonical -->
-    <link rel="canonical" href="https://askan-de-pa-ac.vercel.app/" />
+    html, body {
+      background-color: #F8F8FC
+    }
 
-    <!-- Open Graph -->
-    <meta property="og:type"        content="website" />
-    <meta property="og:site_name"   content="Design Patterns Academy" />
-    <meta property="og:url"         content="https://askan-de-pa-ac.vercel.app/" />
-    <meta property="og:title"       content="Design Patterns Academy" />
-    <meta property="og:description" content="Premium educational platform for learning Gang of Four Design Patterns." />
+    [data-theme="dark"] {
+      color-scheme: dark
+    }
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary" />
-    <meta name="twitter:title"       content="Design Patterns Academy" />
-    <meta name="twitter:description" content="Premium educational platform for learning Gang of Four Design Patterns." />
+    [data-theme="dark"], [data-theme="dark"] body {
+      background-color: #0A0C10
+    }
 
-    <title>Design Patterns Academy</title>
+    #app {
+      opacity: 0;
+      transition: opacity .22s ease
+    }
 
-    <!-- Icons & PWA -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    .skip-link {
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: translateY(-200%)
+    }
+  </style>
+  <script>(function () {
+    var t = localStorage.getItem('dpa-theme');
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark')
+  })()</script>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
-  </head>
-  <body>
-    <a href="#main-content" class="skip-link">Skip to content</a>
-    <div id="app"></div>
-    <script type="module" src="/src/scripts/main.js"></script>
-  </body>
+  <link rel="canonical" href="https://askan-de-pa-ac.vercel.app/"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Design Patterns Academy"/>
+  <meta property="og:url" content="https://askan-de-pa-ac.vercel.app/"/>
+  <meta property="og:title" content="Design Patterns Academy"/>
+  <meta property="og:description" content="Premium educational platform for learning Gang of Four Design Patterns."/>
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:title" content="Design Patterns Academy"/>
+  <meta name="twitter:description" content="Premium educational platform for learning Gang of Four Design Patterns."/>
+
+  <title>Design Patterns Academy</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div id="app"></div>
+<script type="module" src="/src/scripts/main.js"></script>
+</body>
 </html>

@@ -76,10 +76,6 @@
   transition: max-height var(--duration-moderate) var(--ease-in-out);
 }
 
-.accordion__item.is-open .accordion__panel {
-  max-height: 2000px;
-}
-
 .accordion__content {
   padding: 0 var(--space-5) var(--space-5);
   font-size: var(--text-sm);

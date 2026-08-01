@@ -172,13 +172,35 @@ function toggleAccordion(trigger) {
   if (!item || !panel) return;
 
   const isOpen  = item.classList.contains('is-open');
-  item.classList.toggle('is-open', !isOpen);
   trigger.setAttribute('aria-expanded', String(!isOpen));
 
+  panel.removeEventListener('transitionend', panel._onAccordionTransitionEnd || (() => {}));
+
   if (isOpen) {
-    panel.setAttribute('hidden', '');
+    panel.style.maxHeight = `${panel.scrollHeight}px`;
+    requestAnimationFrame(() => {
+      item.classList.remove('is-open');
+      panel.style.maxHeight = '0px';
+    });
+    panel._onAccordionTransitionEnd = (e) => {
+      if (e.propertyName === 'max-height' && !item.classList.contains('is-open')) {
+        panel.setAttribute('hidden', '');
+      }
+    };
+    panel.addEventListener('transitionend', panel._onAccordionTransitionEnd, { once: true });
   } else {
     panel.removeAttribute('hidden');
+    panel.style.maxHeight = '0px';
+    requestAnimationFrame(() => {
+      item.classList.add('is-open');
+      panel.style.maxHeight = `${panel.scrollHeight}px`;
+    });
+    panel._onAccordionTransitionEnd = (e) => {
+      if (e.propertyName === 'max-height' && item.classList.contains('is-open')) {
+        panel.style.maxHeight = 'none';
+      }
+    };
+    panel.addEventListener('transitionend', panel._onAccordionTransitionEnd, { once: true });
   }
 }
 
