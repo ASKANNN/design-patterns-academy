@@ -93,6 +93,17 @@ async function main() {
     try {
       await page.goto(BASE_URL + route, { waitUntil: 'load' });
       await page.waitForFunction(() => window.__navigated === true);
+      // main.js injects global chrome (a11y widget, scroll-to-top button) at
+      // runtime via insertAdjacentHTML. If baked into the static snapshot,
+      // the real page load re-inserts a second copy on top with no listeners
+      // attached (getElementById binds to the first/dead one), so the widget
+      // becomes visually present but permanently unresponsive. Strip it here
+      // so the client-side insertion stays the single source of truth.
+      await page.evaluate(() => {
+        document.getElementById('a11y-dock')?.remove();
+        document.getElementById('a11y-panel')?.remove();
+        document.getElementById('scroll-top-btn')?.remove();
+      });
       const html   = await page.content();
       const outDir = route === '/' ? DIST : join(DIST, route);
       await mkdir(outDir, { recursive: true });
