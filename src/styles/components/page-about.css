@@ -7,7 +7,7 @@
 }
 
 .about-page__title {
-  font-size: var(--text-5xl);
+  font-size: var(--text-3xl);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
   color: var(--color-text-primary);
@@ -90,9 +90,13 @@
 
 .principles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--space-3);
   margin-top: var(--space-4);
+}
+
+.principles-grid--philosophy {
+  margin-top: var(--space-5);
 }
 
 .principle-item {
@@ -170,7 +174,7 @@
   max-width: 55ch;
 }
 
-@media (max-width: 639px) {
-  .about-page__title { font-size: var(--text-3xl); }
-  .principles-grid { grid-template-columns: 1fr; }
+@media (min-width: 640px) {
+  .about-page__title { font-size: var(--text-5xl); }
+  .principles-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }

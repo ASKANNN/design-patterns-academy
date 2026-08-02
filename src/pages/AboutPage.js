@@ -32,7 +32,7 @@ export async function AboutPage() {
       <section class="about-section" aria-labelledby="about-philosophy">
         <h2 class="about-section__title" id="about-philosophy">${t('about.section_philosophy')}</h2>
         <p>${t('about.philosophy_p1')}</p>
-        <div class="principles-grid" role="list" style="margin-top:var(--space-5)">
+        <div class="principles-grid principles-grid--philosophy" role="list">
           ${[
             { name: 'SOLID', key: 'about.tooltip_solid' },
             { name: 'DRY', key: 'about.tooltip_dry' },

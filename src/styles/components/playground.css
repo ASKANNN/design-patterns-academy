@@ -7,13 +7,13 @@
 
 .playground {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--space-4);
 }
 
-@media (max-width: 860px) {
+@media (min-width: 861px) {
   .playground {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
 

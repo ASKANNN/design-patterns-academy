@@ -27,14 +27,24 @@
 [data-viz-state='idle']    { opacity: 1; }
 [data-viz-state='active']  { opacity: 1; }
 
+/*
+ * WebKit (Safari/iOS) renders filter: drop-shadow() with a visibly softer,
+ * lower-opacity falloff than Chromium for the same values, so the neon rim
+ * around nodes reads as a faint smudge instead of a glow on phones/tablets.
+ * The stronger values below are the base/touch-sized default; non-touch
+ * desktop viewports get the toned-down values via the min-width override.
+ */
 [data-viz-highlight='true'] {
-  filter: drop-shadow(0 0 6px var(--viz-accent));
+  filter:
+    drop-shadow(0 0 16px color-mix(in srgb, var(--viz-accent) 70%, transparent))
+    drop-shadow(0 0 6px var(--viz-accent));
 }
 
 [data-viz-glow='true'] {
   filter:
-    drop-shadow(0 0 10px color-mix(in srgb, var(--viz-accent) 55%, transparent))
-    drop-shadow(0 0 2px color-mix(in srgb, var(--viz-accent) 80%, transparent));
+    drop-shadow(0 0 26px color-mix(in srgb, var(--viz-accent) 60%, transparent))
+    drop-shadow(0 0 12px color-mix(in srgb, var(--viz-accent) 80%, transparent))
+    drop-shadow(0 0 4px var(--viz-accent));
 }
 
 [data-viz-focus='true'],
@@ -45,53 +55,46 @@
 
 [data-theme="dark"] [data-viz-highlight='true'] {
   filter:
-    drop-shadow(0 0 8px var(--viz-accent))
-    drop-shadow(0 0 2px var(--viz-accent));
+    drop-shadow(0 0 18px var(--viz-accent))
+    drop-shadow(0 0 7px var(--viz-accent));
 }
 [data-theme="dark"] [data-viz-glow='true'] {
   filter:
-    drop-shadow(0 0 14px color-mix(in srgb, var(--viz-accent) 85%, transparent))
-    drop-shadow(0 0  4px var(--viz-accent));
+    drop-shadow(0 0 32px var(--viz-accent))
+    drop-shadow(0 0 15px var(--viz-accent))
+    drop-shadow(0 0 5px var(--viz-accent));
 }
 [data-theme="dark"] .diagram__flow[data-viz-active='true'],
 [data-theme="dark"] .diagram__edge[data-viz-active='true'] {
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--viz-accent) 80%, transparent));
+  filter:
+    drop-shadow(0 0 14px var(--viz-accent))
+    drop-shadow(0 0 4px var(--viz-accent));
 }
 
-/*
- * WebKit (Safari/iOS) renders filter: drop-shadow() with a visibly softer,
- * lower-opacity falloff than Chromium for the same values, so the neon rim
- * around nodes reads as a faint smudge instead of a glow on phones/tablets.
- * Compensate by pushing blur radius and opacity up at touch-sized viewports.
- */
-@media (max-width: 1024px) {
+@media (min-width: 1025px) {
   [data-viz-highlight='true'] {
-    filter:
-      drop-shadow(0 0 16px color-mix(in srgb, var(--viz-accent) 70%, transparent))
-      drop-shadow(0 0 6px var(--viz-accent));
+    filter: drop-shadow(0 0 6px var(--viz-accent));
   }
+
   [data-viz-glow='true'] {
     filter:
-      drop-shadow(0 0 26px color-mix(in srgb, var(--viz-accent) 60%, transparent))
-      drop-shadow(0 0 12px color-mix(in srgb, var(--viz-accent) 80%, transparent))
-      drop-shadow(0 0 4px var(--viz-accent));
+      drop-shadow(0 0 10px color-mix(in srgb, var(--viz-accent) 55%, transparent))
+      drop-shadow(0 0 2px color-mix(in srgb, var(--viz-accent) 80%, transparent));
   }
+
   [data-theme="dark"] [data-viz-highlight='true'] {
     filter:
-      drop-shadow(0 0 18px var(--viz-accent))
-      drop-shadow(0 0 7px var(--viz-accent));
+      drop-shadow(0 0 8px var(--viz-accent))
+      drop-shadow(0 0 2px var(--viz-accent));
   }
   [data-theme="dark"] [data-viz-glow='true'] {
     filter:
-      drop-shadow(0 0 32px var(--viz-accent))
-      drop-shadow(0 0 15px var(--viz-accent))
-      drop-shadow(0 0 5px var(--viz-accent));
+      drop-shadow(0 0 14px color-mix(in srgb, var(--viz-accent) 85%, transparent))
+      drop-shadow(0 0  4px var(--viz-accent));
   }
   [data-theme="dark"] .diagram__flow[data-viz-active='true'],
   [data-theme="dark"] .diagram__edge[data-viz-active='true'] {
-    filter:
-      drop-shadow(0 0 14px var(--viz-accent))
-      drop-shadow(0 0 4px var(--viz-accent));
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--viz-accent) 80%, transparent));
   }
 }
 
