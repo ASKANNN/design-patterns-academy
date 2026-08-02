@@ -10,72 +10,97 @@ function getContext() {
   return _ctx;
 }
 
-function _playTone(ctx, { start, end, duration, delay = 0, peak = 0.12, type = 'sine' }) {
-  const now        = ctx.currentTime + delay;
-  const oscillator = ctx.createOscillator();
+function _withContext(fn) {
+  if (!getA11yState().soundEffects) return;
+
+  const ctx = getContext();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume();
+
+  fn(ctx, ctx.currentTime);
+}
+
+function _tone(ctx, now, { freq, endFreq, duration, delay = 0, peak = 0.08, type = 'sine', filterStart, filterEnd, q = 0.6 }) {
+  const start       = now + delay;
+  const oscillator  = ctx.createOscillator();
   const gain        = ctx.createGain();
+  let   node        = oscillator;
 
   oscillator.type = type;
-  oscillator.frequency.setValueAtTime(start, now);
-  oscillator.frequency.exponentialRampToValueAtTime(end, now + duration);
+  oscillator.frequency.setValueAtTime(freq, start);
+  oscillator.frequency.exponentialRampToValueAtTime(endFreq ?? freq, start + duration);
 
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(peak, now + 0.002);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  if (filterStart) {
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.Q.value = q;
+    filter.frequency.setValueAtTime(filterStart, start);
+    filter.frequency.exponentialRampToValueAtTime(filterEnd ?? filterStart, start + duration);
+    node.connect(filter);
+    node = filter;
+  }
 
-  oscillator.connect(gain).connect(ctx.destination);
-  oscillator.start(now);
-  oscillator.stop(now + duration);
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(peak, start + 0.006);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+  node.connect(gain).connect(ctx.destination);
+  oscillator.start(start);
+  oscillator.stop(start + duration);
 }
 
-function _play(tones) {
-  if (!getA11yState().soundEffects) return;
+function _noiseBurst(ctx, now, { duration = 0.012, delay = 0, peak = 0.05, freq = 900, q = 3 }) {
+  const start   = now + delay;
+  const buffer  = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * duration), ctx.sampleRate);
+  const data    = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
 
-  const ctx = getContext();
-  if (!ctx) return;
-  if (ctx.state === 'suspended') ctx.resume();
+  const noise  = ctx.createBufferSource();
+  noise.buffer = buffer;
 
-  tones.forEach(tone => _playTone(ctx, tone));
+  const bandpass = ctx.createBiquadFilter();
+  bandpass.type            = 'bandpass';
+  bandpass.frequency.value = freq;
+  bandpass.Q.value         = q;
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(peak, start + 0.002);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+  noise.connect(bandpass).connect(gain).connect(ctx.destination);
+  noise.start(start);
+  noise.stop(start + duration);
 }
 
+// Navigation Click — ultra-short, dry, low-latency tap for general nav links/buttons.
 export function playClickTick() {
-  if (!getA11yState().soundEffects) return;
-
-  const ctx = getContext();
-  if (!ctx) return;
-  if (ctx.state === 'suspended') ctx.resume();
-
-  const now        = ctx.currentTime;
-  const duration   = 0.05;
-  const oscillator = ctx.createOscillator();
-  const filter     = ctx.createBiquadFilter();
-  const gain       = ctx.createGain();
-
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(560, now);
-  oscillator.frequency.exponentialRampToValueAtTime(300, now + duration);
-
-  filter.type            = 'lowpass';
-  filter.frequency.setValueAtTime(1400, now);
-  filter.frequency.exponentialRampToValueAtTime(350, now + duration);
-  filter.Q.value          = 0.5;
-
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.06, now + 0.008);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-  oscillator.connect(filter).connect(gain).connect(ctx.destination);
-  oscillator.start(now);
-  oscillator.stop(now + duration);
+  _withContext((ctx, now) => {
+    _tone(ctx, now, { freq: 900, endFreq: 600, duration: 0.035, peak: 0.05, filterStart: 3000, filterEnd: 1200, q: 0.5 });
+  });
 }
 
+// Element Selection / Open Tutorial — deeper, snappier "locks into place" click for opening a pattern/chapter.
+export function playSelectClick() {
+  _withContext((ctx, now) => {
+    _noiseBurst(ctx, now, { duration: 0.01, peak: 0.045, freq: 850, q: 3.5 });
+    _tone(ctx, now, { freq: 260, endFreq: 140, duration: 0.09, peak: 0.09, filterStart: 1800, filterEnd: 400, q: 0.7 });
+  });
+}
+
+// Success / Quiz Passed — rewarding, uplifting, modern three-note chime.
 export function playSuccessChime() {
-  _play([
-    { start: 880,  end: 880,  duration: 0.09, delay: 0,    peak: 0.11 },
-    { start: 1320, end: 1320, duration: 0.14, delay: 0.09, peak: 0.13 },
-  ]);
+  _withContext((ctx, now) => {
+    _tone(ctx, now, { freq: 523.25, duration: 0.11, delay: 0,    peak: 0.09,  filterStart: 4000, filterEnd: 2500 });
+    _tone(ctx, now, { freq: 659.25, duration: 0.13, delay: 0.08, peak: 0.1,   filterStart: 4000, filterEnd: 2500 });
+    _tone(ctx, now, { freq: 784,    duration: 0.2,  delay: 0.16, peak: 0.11,  filterStart: 4000, filterEnd: 2000 });
+  });
 }
 
+// Error / Incorrect Answer / Reset — muted, non-aggressive double-thud, corrective rather than punishing.
 export function playErrorTone() {
-  _play([{ start: 220, end: 150, duration: 0.16, peak: 0.12, type: 'triangle' }]);
+  _withContext((ctx, now) => {
+    _tone(ctx, now, { freq: 190, endFreq: 160, duration: 0.11, delay: 0,    peak: 0.08, filterStart: 900, filterEnd: 300 });
+    _tone(ctx, now, { freq: 170, endFreq: 140, duration: 0.14, delay: 0.13, peak: 0.07, filterStart: 900, filterEnd: 250 });
+  });
 }
