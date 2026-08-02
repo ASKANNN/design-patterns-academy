@@ -6,8 +6,6 @@ import { Button }                                  from '../components/ui/Button
 import { SITE_URL }                                from '../config/site.js';
 import { playClickTick }                           from '../utils/sound.js';
 
-const _PATTERN_DETAIL_RE = /^\/patterns\/[^/]+\/[^/]+\/?$/;
-
 const _routes = [];
 let   _outlet = null;
 
@@ -80,7 +78,7 @@ function _handleLinkClick(e) {
   e.preventDefault();
   if (url.pathname === window.location.pathname && url.search === window.location.search) return;
 
-  if (_PATTERN_DETAIL_RE.test(url.pathname)) playClickTick();
+  playClickTick();
 
   history.pushState(null, '', url.pathname + url.search);
   _resolve();

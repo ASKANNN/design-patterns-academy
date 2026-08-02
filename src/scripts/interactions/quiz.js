@@ -1,4 +1,5 @@
 import { t } from '../../utils/i18n.js';
+import { playSuccessChime, playErrorTone } from '../../utils/sound.js';
 
 export function handleQuizOption(btn) {
   const question = btn.closest('[data-quiz-question]');
@@ -6,6 +7,7 @@ export function handleQuizOption(btn) {
   question.classList.add('is-answered');
 
   const isCorrect = btn.dataset.quizCorrect === 'true';
+  isCorrect ? playSuccessChime() : playErrorTone();
   question.querySelectorAll('[data-quiz-option]').forEach(opt => {
     opt.disabled = true;
     if (opt.dataset.quizCorrect === 'true') opt.classList.add('is-correct');
