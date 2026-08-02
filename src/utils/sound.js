@@ -76,7 +76,7 @@ function _noiseBurst(ctx, now, { duration = 0.012, delay = 0, peak = 0.05, freq 
 // Navigation Click — ultra-short, dry, low-latency tap for general nav links/buttons.
 export function playClickTick() {
   _withContext((ctx, now) => {
-    _tone(ctx, now, { freq: 900, endFreq: 600, duration: 0.035, peak: 0.05, filterStart: 3000, filterEnd: 1200, q: 0.5 });
+    _tone(ctx, now, { freq: 900, endFreq: 600, duration: 0.035, peak: 0.032, filterStart: 1800, filterEnd: 800, q: 0.5 });
   });
 }
 
@@ -91,9 +91,9 @@ export function playSelectClick() {
 // Success / Quiz Passed — rewarding, uplifting, modern three-note chime.
 export function playSuccessChime() {
   _withContext((ctx, now) => {
-    _tone(ctx, now, { freq: 523.25, duration: 0.11, delay: 0,    peak: 0.09,  filterStart: 4000, filterEnd: 2500 });
-    _tone(ctx, now, { freq: 659.25, duration: 0.13, delay: 0.08, peak: 0.1,   filterStart: 4000, filterEnd: 2500 });
-    _tone(ctx, now, { freq: 784,    duration: 0.2,  delay: 0.16, peak: 0.11,  filterStart: 4000, filterEnd: 2000 });
+    _tone(ctx, now, { freq: 523.25, duration: 0.11, delay: 0,    peak: 0.055, filterStart: 2200, filterEnd: 1400 });
+    _tone(ctx, now, { freq: 659.25, duration: 0.13, delay: 0.08, peak: 0.06,  filterStart: 2200, filterEnd: 1400 });
+    _tone(ctx, now, { freq: 784,    duration: 0.2,  delay: 0.16, peak: 0.065, filterStart: 2200, filterEnd: 1100 });
   });
 }
 

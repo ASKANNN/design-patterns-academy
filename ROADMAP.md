@@ -429,6 +429,32 @@ No new features are implemented during this sprint — only bug fixing and stabi
       default, the panel switch reflects and toggles state, disabling it
       silences clicks, the choice persists across reload, and clicking
       non-pattern links never triggers it — zero console errors.
+      **Follow-up (2026-08-02):** expanded the sound system beyond pattern
+      links — general internal navigation (navbar, "Browse all patterns",
+      etc.) now plays a soft filtered click (`playClickTick`), opening a
+      pattern card plays a deeper "locks into place" click
+      (`playSelectClick`, noise-burst + low tone), and the quiz now plays a
+      three-note success chime on a correct answer vs. a muted double-thud
+      on an incorrect one (`playSuccessChime` / `playErrorTone`,
+      `scripts/interactions/quiz.js`). All tones were iterated for a
+      softer, more muted character per owner listening feedback (lower
+      gain peaks, lower lowpass cutoffs) — same `soundEffects` toggle
+      gates all of them. Also fixed an unrelated bug found while reviewing
+      the walkthrough code panel: the global inline `code {}` rule
+      (border + padding + border-radius, meant for `` `inline code` ``)
+      was leaking onto `.code-block__code`, shrinking the highlighted
+      walkthrough line background by 7px on each side and showing as a
+      stray vertical line/box on mobile — reset those properties on
+      `.code-block__code` specifically (`code-block.css`).
+      Added a small pulsing "new feature" badge dot
+      (`.a11y-widget__badge`) on the accessibility trigger button to
+      surface the `soundEffects` toggle's discoverability, since it's
+      easy to miss inside the existing panel; it disappears the first
+      time the panel is opened and never reappears (`dpa-a11y-hint-seen`
+      in localStorage, separate from the `dpa-a11y` settings key).
+      Chosen over a one-time toast/tooltip bubble because a badge stays
+      visible until the panel is actually seen rather than vanishing
+      after a few seconds whether or not the user noticed it.
 
 **Follow-up (2026-08-01) — dockable accessibility button.** Scoped to the
 accessibility widget trigger only ("back to top" was left untouched). On
