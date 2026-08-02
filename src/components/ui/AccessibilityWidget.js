@@ -125,6 +125,15 @@ function initDock(trigger, isBusy) {
   const tab  = document.getElementById('a11y-dock-tab');
   if (!dock || !tab) return;
 
+  // The peek-out dock relies on :hover to bring the trigger back into view,
+  // which touch input never provides — so on touch-primary devices the
+  // trigger would auto-hide behind a sliver at the screen edge and stay
+  // unreachable. Skip auto-docking entirely there; keep the button always shown.
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    tab.hidden = true;
+    return { undockIt() {}, scheduleAutoRedock() {}, cancelAutoRedock() {} };
+  }
+
   const REVEAL_DELAY_ON_LOAD = 1400;
   const AUTO_REDOCK_IDLE     = 2200;
 

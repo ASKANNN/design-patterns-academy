@@ -49,6 +49,10 @@
   height: var(--icon-lg);
 }
 
+.a11y-dock__tab[hidden] {
+  display: none;
+}
+
 .a11y-dock__tab {
   position: fixed;
   right: 0;
