@@ -186,12 +186,12 @@ Features: responsive, localized, dynamic routing.
 
 ## Phase 9 — Deployment & Production Readiness
 
-**Status:** In Progress
+**Status:** Completed
 
 Completed:
 
 - GitHub Actions CI/CD workflow (`.github/workflows/deploy.yml`)
-- GitHub Pages / Vercel deployment configuration
+- Vercel deployment configuration (build runs on GitHub Actions, deployed via Vercel CLI)
 - robots.txt
 - sitemap.xml
 - PWA manifest
@@ -469,9 +469,12 @@ Version: **v1.1.0**
 
 Status: In active development
 
-Current focus: Phase 9 — verified live production deployment (Phase 13 closed
-2026-07-31; practical exercises deferred pending scope discussion). Phase 14
-— Platform Improvements is next after deployment is verified live.
+Current focus: Phase 14 — Platform Improvements is nearly complete (advanced
+search, favorites, progress tracking, learning roadmap, and UX improvements
+shipped; only "Custom domain" remains, deliberately deferred — no budget yet).
+Phase 15 has not started. Phase 9 (live production deployment) and Phase 13
+(interactive learning) are both closed; practical exercises remain deferred
+pending scope discussion.
 
 ---
 

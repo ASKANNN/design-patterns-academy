@@ -25,7 +25,7 @@ Inspired by the design language of Apple, Linear, and Stripe.
 - Structured pattern pages: intent, problem, solution, structure, code, pros & cons
 - Interactive diagrams and animated visualizations for all 23 patterns (bespoke visuals shipped pattern by pattern — see [MASTER_PLAN.md](docs/project-management/MASTER_PLAN.md) for details)
 - English and Russian localization
-- Light and Dark themes with smooth transitions
+- Light and Dark themes with smooth transitions (Dark is the default)
 - Accessibility-focused (targets WCAG 2.1 AA)
 - No runtime dependencies — pure HTML, CSS, and JS (Vite is used only for the build)
 - Performance-focused, static-first architecture
@@ -40,7 +40,7 @@ Inspired by the design language of Apple, Linear, and Stripe.
 | Styles  | CSS3, CSS Variables, CSS Modules |
 | Logic   | Vanilla JS, ES Modules           |
 | Bundler | Vite 8                           |
-| Hosting | GitHub Pages / Vercel            |
+| Hosting | Vercel                            |
 
 ---
 

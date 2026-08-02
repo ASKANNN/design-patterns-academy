@@ -10,7 +10,7 @@ the project locally, how we work, and where to find the detailed conventions.
 
 Requirements:
 
-- Node.js `>= 18`
+- Node.js `24.x`
 - npm
 
 Setup:
