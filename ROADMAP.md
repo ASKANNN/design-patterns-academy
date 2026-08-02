@@ -446,15 +446,6 @@ No new features are implemented during this sprint — only bug fixing and stabi
       walkthrough line background by 7px on each side and showing as a
       stray vertical line/box on mobile — reset those properties on
       `.code-block__code` specifically (`code-block.css`).
-      Added a small pulsing "new feature" badge dot
-      (`.a11y-widget__badge`) on the accessibility trigger button to
-      surface the `soundEffects` toggle's discoverability, since it's
-      easy to miss inside the existing panel; it disappears the first
-      time the panel is opened and never reappears (`dpa-a11y-hint-seen`
-      in localStorage, separate from the `dpa-a11y` settings key).
-      Chosen over a one-time toast/tooltip bubble because a badge stays
-      visible until the panel is actually seen rather than vanishing
-      after a few seconds whether or not the user noticed it.
 
 **Follow-up (2026-08-01) — dockable accessibility button.** Scoped to the
 accessibility widget trigger only ("back to top" was left untouched). On

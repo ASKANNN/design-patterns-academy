@@ -53,33 +53,6 @@
   height: var(--icon-lg);
 }
 
-.a11y-widget__badge {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-error);
-  border: 2px solid var(--color-bg-base);
-  animation: a11y-badge-pulse 2s ease-in-out infinite;
-}
-
-.a11y-widget__badge[hidden] {
-  display: none;
-}
-
-@keyframes a11y-badge-pulse {
-  0%, 100% { transform: scale(1);   opacity: 1; }
-  50%      { transform: scale(1.25); opacity: 0.7; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .a11y-widget__badge {
-    animation: none;
-  }
-}
-
 .a11y-dock__tab {
   position: fixed;
   right: 0;

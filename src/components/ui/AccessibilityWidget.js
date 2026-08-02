@@ -1,7 +1,5 @@
 import { getA11yState, setA11y, resetA11y } from '../../config/accessibility.js';
 
-const HINT_SEEN_KEY = 'dpa-a11y-hint-seen';
-
 export function AccessibilityWidget() {
   return `
     <div class="a11y-dock" id="a11y-dock">
@@ -21,7 +19,6 @@ export function AccessibilityWidget() {
           <path d="M8 21l2.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           <path d="M16 21l-2.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
-        <span class="a11y-widget__badge" id="a11y-hint-badge" aria-hidden="true"></span>
       </button>
       <button
         type="button"
@@ -183,8 +180,6 @@ export function initAccessibilityWidget() {
 
   let lastFocused = null;
   const dockCtl = initDock(trigger, () => isOpen());
-  const hintBadge = document.getElementById('a11y-hint-badge');
-  if (hintBadge && localStorage.getItem(HINT_SEEN_KEY)) hintBadge.hidden = true;
 
   function syncControls() {
     const state = getA11yState();
@@ -205,8 +200,6 @@ export function initAccessibilityWidget() {
     lastFocused = document.activeElement;
     dockCtl.cancelAutoRedock();
     dockCtl.undockIt();
-    if (hintBadge) hintBadge.hidden = true;
-    localStorage.setItem(HINT_SEEN_KEY, '1');
     panel.setAttribute('aria-hidden', 'false');
     panel.classList.add('is-open');
     trigger.setAttribute('aria-expanded', 'true');
