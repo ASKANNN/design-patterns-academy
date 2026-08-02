@@ -21,11 +21,6 @@
   transition: transform 450ms var(--ease-in-out), var(--transition-shadow);
 }
 
-.a11y-widget__trigger:hover {
-  background-color: var(--color-accent-hover);
-  transform: translateY(-2px);
-}
-
 .a11y-widget__trigger[aria-expanded="true"] {
   background-color: var(--color-accent-pressed);
 }
@@ -35,22 +30,27 @@
   pointer-events: none;
 }
 
-/* peeking is a pure hover/focus effect - it never touches the docked
-   state, so the tab stays put and clickable instead of disappearing
-   out from under the cursor the instant the pointer reaches it */
-.a11y-dock.is-docked:hover .a11y-widget__trigger,
-.a11y-dock.is-docked:focus-within .a11y-widget__trigger {
-  transform: translateX(0);
-  pointer-events: auto;
+/* :hover rules on tappable elements are scoped to real pointer devices only.
+   WebKit on iOS treats the first tap on an element with its own :hover rule
+   as "activate hover", not a click - the click only fires on a second tap.
+   Undocking still works on touch via the tab's click handler; hover here is
+   just the desktop-only peek preview. */
+@media (hover: hover) and (pointer: fine) {
+  .a11y-widget__trigger:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-2px);
+  }
+
+  .a11y-dock.is-docked:hover .a11y-widget__trigger,
+  .a11y-dock.is-docked:focus-within .a11y-widget__trigger {
+    transform: translateX(0);
+    pointer-events: auto;
+  }
 }
 
 .a11y-widget__icon {
   width: var(--icon-lg);
   height: var(--icon-lg);
-}
-
-.a11y-dock__tab[hidden] {
-  display: none;
 }
 
 .a11y-dock__tab {
@@ -71,8 +71,10 @@
   transition: background-color var(--duration-fast) var(--ease-in-out);
 }
 
-.a11y-dock__tab:hover {
-  background-color: var(--color-accent-hover);
+@media (hover: hover) and (pointer: fine) {
+  .a11y-dock__tab:hover {
+    background-color: var(--color-accent-hover);
+  }
 }
 
 .a11y-dock__tab:focus-visible {
@@ -140,9 +142,11 @@
   color: var(--color-text-secondary);
 }
 
-.a11y-widget__close:hover {
-  background-color: var(--color-bg-subtle);
-  color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .a11y-widget__close:hover {
+    background-color: var(--color-bg-subtle);
+    color: var(--color-text-primary);
+  }
 }
 
 .a11y-widget__body {
@@ -183,8 +187,10 @@
   transition: var(--transition-colors);
 }
 
-.a11y-widget__segment-btn:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .a11y-widget__segment-btn:hover {
+    color: var(--color-text-primary);
+  }
 }
 
 .a11y-widget__segment-btn.is-active {
@@ -260,9 +266,11 @@
   transition: var(--transition-colors);
 }
 
-.a11y-widget__reset:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .a11y-widget__reset:hover {
+    border-color: var(--color-border-strong);
+    color: var(--color-text-primary);
+  }
 }
 
 html:has(body.a11y-font-large)  { font-size: 18px; }
