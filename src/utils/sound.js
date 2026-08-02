@@ -39,7 +39,34 @@ function _play(tones) {
 }
 
 export function playClickTick() {
-  _play([{ start: 1100, end: 700, duration: 0.018 }]);
+  if (!getA11yState().soundEffects) return;
+
+  const ctx = getContext();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume();
+
+  const now        = ctx.currentTime;
+  const duration   = 0.05;
+  const oscillator = ctx.createOscillator();
+  const filter     = ctx.createBiquadFilter();
+  const gain       = ctx.createGain();
+
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(560, now);
+  oscillator.frequency.exponentialRampToValueAtTime(300, now + duration);
+
+  filter.type            = 'lowpass';
+  filter.frequency.setValueAtTime(1400, now);
+  filter.frequency.exponentialRampToValueAtTime(350, now + duration);
+  filter.Q.value          = 0.5;
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.06, now + 0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+  oscillator.connect(filter).connect(gain).connect(ctx.destination);
+  oscillator.start(now);
+  oscillator.stop(now + duration);
 }
 
 export function playSuccessChime() {
