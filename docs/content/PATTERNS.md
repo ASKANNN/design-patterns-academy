@@ -113,10 +113,11 @@ client-side on render, so source data always puts the right answer at index
 already present in that pattern's own JSON — no outside trivia.
 
 The results screen (`src/components/ui/Quiz.js` +
-`src/scripts/interactions/quiz.js`) shows a pass state (score ratio >= 0.7,
-with a distinct "perfect score" variant at 100%) with a celebratory
-title/message, or a fail state with a professional, encouraging retry
-message — see the `patterns.quiz.result_*` locale keys.
+`src/scripts/interactions/quiz.js`) has three tiers based on score ratio:
+pass (>= 0.7, with a distinct "perfect score" variant at 100%) with a
+celebratory title/message, warn (>= 0.4 and < 0.7) with an encouraging
+"getting there" message, or fail (< 0.4) with a professional, encouraging
+retry message — see the `patterns.quiz.result_*` locale keys.
 
 ---
 

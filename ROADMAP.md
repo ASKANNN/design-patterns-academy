@@ -218,11 +218,13 @@ No new features are implemented during this sprint — only bug fixing and stabi
       render, so the correct answer never sits in a fixed slot and the
       first question isn't reliably answerable from the hero paragraph
       alone (fixed 2026-07-28 after an owner review caught both issues).
-      Results screen shows a celebratory pass message (>=70% correct,
-      with a distinct "perfect score" variant) or a professional
-      encouraging retry message on fail (added 2026-08-02 after an owner
-      review flagged bland pass/fail feedback and overly obvious/vague
-      hints in the shipped question bank).
+      Results screen shows three tiers by score ratio: a celebratory pass
+      message (>=70% correct, with a distinct "perfect score" variant), an
+      encouraging "getting there" warn message (40-69%), or a professional
+      encouraging retry message on fail (<40%) — added 2026-08-02 after an
+      owner review flagged bland pass/fail feedback and overly obvious/vague
+      hints in the shipped question bank, with the warn tier added the same
+      day to soften the binary pass/fail jump.
 - [x] Interactive code walkthroughs — step-by-step line highlighting +
       explanation layered over the existing `CodeBlock` component; step
       data lives in a new `walkthrough` field on the pattern JSON, keyed

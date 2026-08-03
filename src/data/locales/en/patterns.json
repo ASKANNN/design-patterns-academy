@@ -97,6 +97,8 @@
       "result_perfect_message": "Every answer was correct - you've got a firm grip on this pattern.",
       "result_pass_title": "Well done!",
       "result_pass_message": "Solid result - you understand how this pattern works. Skim the explanations above for anything you missed.",
+      "result_warn_title": "Getting there",
+      "result_warn_message": "You're partway there, but a few key ideas didn't land yet. Reread the explanations above and give it another go.",
       "result_fail_title": "Not quite there yet",
       "result_fail_message": "A few gaps to close. Read through the explanations above and give the quiz another try - you'll get it."
     },

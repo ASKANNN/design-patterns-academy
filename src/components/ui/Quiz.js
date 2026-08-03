@@ -7,6 +7,7 @@ const uid = (prefix = 'quiz') => `${prefix}-${++_uid}`;
 const HINT_ICON = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2Z"/></svg>`;
 
 const RESULT_ICON_PASS = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/><circle cx="12" cy="8" r="7"/></svg>`;
+const RESULT_ICON_WARN = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`;
 const RESULT_ICON_FAIL = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>`;
 
 function shuffled(array) {
@@ -74,6 +75,7 @@ export function Quiz({ id = uid(), questions = [], reportUrl = '' } = {}) {
       <div class="quiz__results" data-quiz-results hidden>
         <div class="quiz__result-icon" data-quiz-result-icon aria-hidden="true">
           <span class="quiz__result-icon-pass" data-quiz-result-icon-pass hidden>${RESULT_ICON_PASS}</span>
+          <span class="quiz__result-icon-warn" data-quiz-result-icon-warn hidden>${RESULT_ICON_WARN}</span>
           <span class="quiz__result-icon-fail" data-quiz-result-icon-fail hidden>${RESULT_ICON_FAIL}</span>
         </div>
         <p class="quiz__result-title" data-quiz-result-title></p>

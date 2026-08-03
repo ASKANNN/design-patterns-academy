@@ -424,7 +424,10 @@ only and may lag between updates.
 > title+message on pass (score ratio >= 0.7, distinct copy for a perfect
 > score), professional encouraging retry copy on fail — see
 > `patterns.quiz.result_*` locale keys, `Quiz.js`, and
-> `interactions/quiz.js`.
+> `interactions/quiz.js`. **Same-day follow-up:** owner asked for a third,
+> intermediate tier so the jump from red to green wasn't so binary — added
+> a warn/"getting there" state for score ratio 0.4-0.69 (amber border/icon,
+> `patterns.quiz.result_warn_*` keys), leaving fail at <0.4.
 
 ---
 

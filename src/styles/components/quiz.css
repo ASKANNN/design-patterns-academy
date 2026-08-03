@@ -190,6 +190,11 @@
   background-color: rgba(34, 197, 94, 0.08);
 }
 
+.quiz__results.is-warn {
+  border-color: var(--color-warning);
+  background-color: rgba(234, 179, 8, 0.08);
+}
+
 .quiz__results.is-fail {
   border-color: var(--color-error);
   background-color: rgba(239, 68, 68, 0.06);
@@ -201,6 +206,10 @@
 
 .quiz__results.is-pass .quiz__result-icon {
   color: var(--color-success);
+}
+
+.quiz__results.is-warn .quiz__result-icon {
+  color: var(--color-warning);
 }
 
 .quiz__results.is-fail .quiz__result-icon {

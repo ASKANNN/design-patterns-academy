@@ -2,6 +2,7 @@ import { t } from '../../utils/i18n.js';
 import { playSuccessChime, playErrorTone } from '../../utils/sound.js';
 
 const PASS_RATIO = 0.7;
+const WARN_RATIO = 0.4;
 
 export function handleQuizOption(btn) {
   const question = btn.closest('[data-quiz-question]');
@@ -51,12 +52,15 @@ export function handleQuizNext(btn) {
     const total    = questions.length;
     if (scoreEl) scoreEl.textContent = t('patterns.quiz.score', { correct: score, total });
     if (results) {
+      const ratio   = score / total;
       const perfect = score === total;
-      const passed  = score / total >= PASS_RATIO;
-      const key     = perfect ? 'perfect' : passed ? 'pass' : 'fail';
+      const passed  = ratio >= PASS_RATIO;
+      const warn    = !passed && ratio >= WARN_RATIO;
+      const key     = perfect ? 'perfect' : passed ? 'pass' : warn ? 'warn' : 'fail';
 
       results.classList.toggle('is-pass', passed);
-      results.classList.toggle('is-fail', !passed);
+      results.classList.toggle('is-warn', warn);
+      results.classList.toggle('is-fail', !passed && !warn);
 
       const titleEl   = results.querySelector('[data-quiz-result-title]');
       const messageEl = results.querySelector('[data-quiz-result-message]');
@@ -64,9 +68,11 @@ export function handleQuizNext(btn) {
       if (messageEl) messageEl.textContent = t(`patterns.quiz.result_${key}_message`);
 
       const iconPass = results.querySelector('[data-quiz-result-icon-pass]');
+      const iconWarn = results.querySelector('[data-quiz-result-icon-warn]');
       const iconFail = results.querySelector('[data-quiz-result-icon-fail]');
       if (iconPass) iconPass.hidden = !passed;
-      if (iconFail) iconFail.hidden = passed;
+      if (iconWarn) iconWarn.hidden = !warn;
+      if (iconFail) iconFail.hidden = passed || warn;
 
       passed ? playSuccessChime() : playErrorTone();
       results.hidden = false;
@@ -99,7 +105,7 @@ export function handleQuizRetry(btn) {
   const results = quiz.querySelector('[data-quiz-results]');
   if (results) {
     results.hidden = true;
-    results.classList.remove('is-pass', 'is-fail');
+    results.classList.remove('is-pass', 'is-warn', 'is-fail');
   }
 }
 
