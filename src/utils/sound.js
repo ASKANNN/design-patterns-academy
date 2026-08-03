@@ -73,14 +73,12 @@ function _noiseBurst(ctx, now, { duration = 0.012, delay = 0, peak = 0.05, freq 
   noise.stop(start + duration);
 }
 
-// Navigation Click — ultra-short, dry, low-latency tap for general nav links/buttons.
 export function playClickTick() {
   _withContext((ctx, now) => {
     _tone(ctx, now, { freq: 900, endFreq: 600, duration: 0.035, peak: 0.032, filterStart: 1800, filterEnd: 800, q: 0.5 });
   });
 }
 
-// Element Selection / Open Tutorial — deeper, snappier "locks into place" click for opening a pattern/chapter.
 export function playSelectClick() {
   _withContext((ctx, now) => {
     _noiseBurst(ctx, now, { duration: 0.01, peak: 0.045, freq: 850, q: 3.5 });
@@ -88,7 +86,6 @@ export function playSelectClick() {
   });
 }
 
-// Success / Quiz Passed — rewarding, uplifting, modern three-note chime.
 export function playSuccessChime() {
   _withContext((ctx, now) => {
     _tone(ctx, now, { freq: 523.25, duration: 0.11, delay: 0,    peak: 0.055, filterStart: 2200, filterEnd: 1400 });
@@ -97,7 +94,6 @@ export function playSuccessChime() {
   });
 }
 
-// Error / Incorrect Answer / Reset — muted, non-aggressive double-thud, corrective rather than punishing.
 export function playErrorTone() {
   _withContext((ctx, now) => {
     _tone(ctx, now, { freq: 190, endFreq: 160, duration: 0.11, delay: 0,    peak: 0.08, filterStart: 900, filterEnd: 300 });

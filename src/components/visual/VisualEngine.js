@@ -146,18 +146,22 @@ export function createVisualEngine(root, options = {}) {
   }
 
   let timeline = null;
+  const timelineCall = (method) => (...args) => {
+    if (timeline) timeline[method](...args);
+    return api;
+  };
 
   const api = {
     root, svg,
     reducedMotion,
     setState, dim, highlight, glow, focus, reset, run,
-    play:        () => (timeline && timeline.play(),        api),
-    pause:       () => (timeline && timeline.pause(),       api),
-    toggle:      () => (timeline && timeline.toggle(),      api),
-    restart:     () => (timeline && timeline.restart(),     api),
-    stepForward: () => (timeline && timeline.stepForward(), api),
-    stepBack:    () => (timeline && timeline.stepBack(),    api),
-    seek:     (i) => (timeline && timeline.seek(i),         api),
+    play: timelineCall('play'),
+    pause: timelineCall('pause'),
+    toggle: timelineCall('toggle'),
+    restart: timelineCall('restart'),
+    stepForward: timelineCall('stepForward'),
+    stepBack: timelineCall('stepBack'),
+    seek: timelineCall('seek'),
     get timeline() { return timeline; },
     destroy() {
       if (keyboard) svg.removeEventListener('keydown', onKeydown);
@@ -224,13 +228,6 @@ export function createVisualEngine(root, options = {}) {
 
     const applyDeferred = () => deferred.forEach((a) => _applyAction(a, true));
 
-    // Prefer the packet's real animationend over a wall-clock guess: on a
-    // loaded mobile GPU, dropped frames can make the traveling dot lag well
-    // behind where a setTimeout(75%) assumes it is, so the card would glow
-    // before the impulse visibly arrives. animationend is dispatched by the
-    // browser only when the dot's own animation truly finishes, so it can't
-    // desync from what's on screen. The timeout stays as a safety net for
-    // the rare case the animation gets interrupted and never fires.
     const dot = _lastPacketDot;
     const delay = _arrivalDelay();
     if (dot) {

@@ -30,11 +30,6 @@
   pointer-events: none;
 }
 
-/* :hover rules on tappable elements are scoped to real pointer devices only.
-   WebKit on iOS treats the first tap on an element with its own :hover rule
-   as "activate hover", not a click - the click only fires on a second tap.
-   Undocking still works on touch via the tab's click handler; hover here is
-   just the desktop-only peek preview. */
 @media (hover: hover) and (pointer: fine) {
   .a11y-widget__trigger:hover {
     background-color: var(--color-accent-hover);

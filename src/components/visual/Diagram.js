@@ -2557,7 +2557,6 @@ function _assemblyDiagram(model) {
     x: builderG.x + BUILDER_W + GAP2, y: builderCy - frameH / 2, w: frameW, h: frameH,
   };
 
-  // parts[0] settles at the bottom of the frame, growing upward as each step fires
   let slotGeoms = parts.map((_, i) => ({
     x: frameG.x + FRAME_PAD,
     y: frameG.y + frameH - FRAME_PAD - (i + 1) * SLOT_H - i * SLOT_GAP,

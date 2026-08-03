@@ -20,7 +20,7 @@ export class Timeline {
     this._stepDuration = Number(stepDuration) || DEFAULT_STEP_DURATION;
 
     this._index = 0;
-    this._status = /** @type {TimelineStatus} */ ('idle');
+    this._status = 'idle';
     this._timer = null;
 
     if (this._reduced) {
