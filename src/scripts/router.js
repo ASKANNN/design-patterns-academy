@@ -37,13 +37,14 @@ export async function initRouter(outletEl) {
     const path              = getCurrentPath();
     const { handler, params } = _match(path);
 
+    const pagePromise = Promise.resolve().then(() => handler(params));
+
     await pageLeave(_outlet);
     window.scrollTo({ top: 0, behavior: 'instant' });
     _showLoading();
 
     try {
-      const html = await handler(params);
-      _outlet.innerHTML = html;
+      _outlet.innerHTML = await pagePromise;
     } catch (err) {
       console.error('[router]', err);
       _outlet.innerHTML = ErrorPage({

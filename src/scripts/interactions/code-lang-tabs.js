@@ -1,3 +1,5 @@
+import { hydrateLazyCodeBlock } from '../../components/ui/CodeBlock.js';
+
 export function handleLangSelect(btn) {
   const lang      = btn.dataset.langBtn;
   const container = btn.closest('.detail-section');
@@ -8,6 +10,10 @@ export function handleLangSelect(btn) {
   });
 
   container.querySelectorAll('[data-lang-panel]').forEach(panel => {
-    panel.classList.toggle('is-visible', panel.dataset.langPanel === lang);
+    const isTarget = panel.dataset.langPanel === lang;
+    if (isTarget) {
+      panel.querySelectorAll('[data-lazy-code]').forEach(hydrateLazyCodeBlock);
+    }
+    panel.classList.toggle('is-visible', isTarget);
   });
 }

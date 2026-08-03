@@ -8,8 +8,11 @@ export function CodeBlock({
   numbered    = false,
   activeLines = null,
   attrs       = '',
+  lazy        = false,
 } = {}) {
   const label = filename || language.toUpperCase();
+  const lazyAttrs = lazy ? ` data-lazy-code data-lazy-lines="${activeLines ? activeLines.join(',') : ''}"` : '';
+  const body = lazy ? _esc(code) : highlight(code, language, activeLines);
 
   return `
     <div class="code-block${numbered ? ' code-block--numbered' : ''}" ${attrs}>
@@ -33,10 +36,20 @@ export function CodeBlock({
         </button>
       </div>
       <div class="code-block__body">
-        <pre class="code-block__pre"><code class="code-block__code language-${language}">${highlight(code, language, activeLines)}</code></pre>
+        <pre class="code-block__pre"><code class="code-block__code language-${language}"${lazyAttrs}>${body}</code></pre>
       </div>
     </div>
   `;
+}
+
+export function hydrateLazyCodeBlock(codeEl) {
+  if (!codeEl.hasAttribute('data-lazy-code')) return;
+  const language    = [...codeEl.classList].find(c => c.startsWith('language-'))?.slice(9) || 'javascript';
+  const linesAttr   = codeEl.dataset.lazyLines;
+  const activeLines = linesAttr ? linesAttr.split(',').map(Number) : null;
+  codeEl.innerHTML = highlight(codeEl.textContent, language, activeLines);
+  codeEl.removeAttribute('data-lazy-code');
+  codeEl.removeAttribute('data-lazy-lines');
 }
 
 const _KW = {

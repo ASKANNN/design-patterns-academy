@@ -220,10 +220,10 @@ function _implementationPanel(p, lang) {
     <div class="lang-panel${i === 0 ? ' is-visible' : ''}" data-lang-panel="${l}">
       ${steps.length ? `
         <div class="walkthrough-wrap" data-walkthrough-wrap>
-          ${CodeBlock({ code: impl[l], language: l, activeLines: steps[0].lines, attrs: 'data-walkthrough-code' })}
+          ${CodeBlock({ code: impl[l], language: l, activeLines: steps[0].lines, attrs: 'data-walkthrough-code', lazy: i !== 0 })}
           ${Walkthrough({ id: `walkthrough-${p.slug}-${l}`, steps, lang })}
         </div>
-      ` : CodeBlock({ code: impl[l], language: l })}
+      ` : CodeBlock({ code: impl[l], language: l, lazy: i !== 0 })}
     </div>`;
   }).join('');
 
