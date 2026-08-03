@@ -30,7 +30,7 @@ export function navigate(path, { replace = false } = {}) {
 
 let _resolve = async () => {};
 
-export function initRouter(outletEl) {
+export async function initRouter(outletEl) {
   _outlet = outletEl;
 
   _resolve = async () => {
@@ -65,7 +65,7 @@ export function initRouter(outletEl) {
 
   window.addEventListener('popstate', _resolve);
   document.addEventListener('click', _handleLinkClick);
-  _resolve();
+  await _resolve();
 }
 
 function _handleLinkClick(e) {

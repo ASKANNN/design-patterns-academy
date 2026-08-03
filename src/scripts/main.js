@@ -66,10 +66,10 @@ initAnimations();
 
 ROUTES.forEach(({ pattern, load }) => defineRoute(pattern, load));
 
-initI18n().then(() => {
+initI18n().then(async () => {
   applyTranslations();
   updateLangButtons();
-  initRouter(document.getElementById('router-outlet'));
+  await initRouter(document.getElementById('router-outlet'));
   revealApp();
 });
 
@@ -128,6 +128,9 @@ function closeNav() {
 burger?.addEventListener('click', openNav);
 closeBtn?.addEventListener('click', closeNav);
 backdrop?.addEventListener('click', closeNav);
+mobileNav?.addEventListener('click', (e) => {
+  if (e.target.closest('a[href]')) closeNav();
+});
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && mobileNav?.classList.contains('is-open')) closeNav();
