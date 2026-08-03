@@ -27,23 +27,16 @@
 [data-viz-state='idle']    { opacity: 1; }
 [data-viz-state='active']  { opacity: 1; }
 
-/*
- * WebKit (Safari/iOS) renders filter: drop-shadow() with a visibly softer,
- * lower-opacity falloff than Chromium for the same values, so the neon rim
- * around nodes reads as a faint smudge instead of a glow on phones/tablets.
- * The stronger values below are the base/touch-sized default; non-touch
- * desktop viewports get the toned-down values via the min-width override.
- */
 [data-viz-highlight='true'] {
   filter:
-    drop-shadow(0 0 16px color-mix(in srgb, var(--viz-accent) 70%, transparent))
+    drop-shadow(0 0 16px color-mix(in srgb, var(--viz-accent) 85%, transparent))
     drop-shadow(0 0 6px var(--viz-accent));
 }
 
 [data-viz-glow='true'] {
   filter:
-    drop-shadow(0 0 26px color-mix(in srgb, var(--viz-accent) 60%, transparent))
-    drop-shadow(0 0 12px color-mix(in srgb, var(--viz-accent) 80%, transparent))
+    drop-shadow(0 0 26px color-mix(in srgb, var(--viz-accent) 80%, transparent))
+    drop-shadow(0 0 12px color-mix(in srgb, var(--viz-accent) 95%, transparent))
     drop-shadow(0 0 4px var(--viz-accent));
 }
 
@@ -69,6 +62,39 @@
   filter:
     drop-shadow(0 0 14px var(--viz-accent))
     drop-shadow(0 0 4px var(--viz-accent));
+}
+
+@media (max-width: 640px) {
+  [data-viz-highlight='true'] {
+    filter:
+      drop-shadow(0 0 42px color-mix(in srgb, var(--viz-accent) 90%, transparent))
+      drop-shadow(0 0 16px var(--viz-accent));
+  }
+
+  [data-viz-glow='true'] {
+    filter:
+      drop-shadow(0 0 70px color-mix(in srgb, var(--viz-accent) 90%, transparent))
+      drop-shadow(0 0 34px var(--viz-accent))
+      drop-shadow(0 0 12px var(--viz-accent));
+  }
+
+  [data-theme="dark"] [data-viz-highlight='true'] {
+    filter:
+      drop-shadow(0 0 48px var(--viz-accent))
+      drop-shadow(0 0 18px var(--viz-accent));
+  }
+  [data-theme="dark"] [data-viz-glow='true'] {
+    filter:
+      drop-shadow(0 0 90px var(--viz-accent))
+      drop-shadow(0 0 42px var(--viz-accent))
+      drop-shadow(0 0 14px var(--viz-accent));
+  }
+  [data-theme="dark"] .diagram__flow[data-viz-active='true'],
+  [data-theme="dark"] .diagram__edge[data-viz-active='true'] {
+    filter:
+      drop-shadow(0 0 34px var(--viz-accent))
+      drop-shadow(0 0 10px var(--viz-accent));
+  }
 }
 
 @media (min-width: 1025px) {
