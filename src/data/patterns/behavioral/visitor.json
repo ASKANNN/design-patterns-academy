@@ -313,7 +313,7 @@
     {
       "question": {
         "en": "What does Visitor move out of the classes it acts on?",
-        "ru": "Что Посетитель выносит из классов, над которыми он выполняется?"
+        "ru": "Что Посетитель выносит из классов, с которыми он работает?"
       },
       "hint": {
         "en": "Think about what a new export format or calculation needs to live in, if it shouldn't live inside the shape classes themselves.",
@@ -339,8 +339,41 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Visitor moves an operation out of the classes it acts on and into its own class, so new operations can be added to a fixed set of element types without touching those types at all.",
-        "ru": "Посетитель выносит операцию из классов, над которыми она выполняется, в отдельный класс - благодаря этому новые операции можно добавлять к фиксированному набору типов элементов, вообще не изменяя сами эти типы."
+        "en": "Take XML export: instead of adding an exportToXml() method to Circle, Rectangle, and Point, Visitor puts that logic into its own XmlExportVisitor class. The shape classes stay untouched, and the same trick works for the JSON export and area calculation that come next.",
+        "ru": "Возьмём экспорт в XML: вместо того чтобы добавлять метод exportToXml() в Circle, Rectangle и Point, Посетитель выносит эту логику в отдельный класс XmlExportVisitor. Классы фигур остаются нетронутыми, и тот же приём сработает для экспорта в JSON и вычисления площади, которые понадобятся дальше."
+      }
+    },
+    {
+      "question": {
+        "en": "In the geometric-scene example, what triggers the need for a pattern like Visitor?",
+        "ru": "В примере с геометрической сценой что именно вызывает потребность в таком паттерне, как Посетитель?"
+      },
+      "hint": {
+        "en": "XML export is just the first of several planned operations on the same shapes.",
+        "ru": "Экспорт в XML - лишь первая из нескольких запланированных операций над одними и теми же фигурами."
+      },
+      "options": [
+        {
+          "en": "XML export is only the first of several planned operations",
+          "ru": "Экспорт в XML - лишь первая из нескольких запланированных операций"
+        },
+        {
+          "en": "The shapes need to be rendered on screen for the first time",
+          "ru": "Фигуры впервые нужно отрисовать на экране"
+        },
+        {
+          "en": "The scene has too many shapes to fit in memory",
+          "ru": "В сцене слишком много фигур, чтобы поместиться в памяти"
+        },
+        {
+          "en": "Circles and rectangles need to share a common constructor",
+          "ru": "Кругам и прямоугольникам нужен общий конструктор"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "XML export is only the beginning - next comes JSON export, area calculation, and bounding-box computation, and each one bolted on directly would force edits to every shape class.",
+        "ru": "Экспорт в XML - только начало: дальше будут экспорт в JSON, вычисление площади и расчёт ограничивающего прямоугольника, и каждая операция, добавленная напрямую, вынуждала бы редактировать каждый класс фигуры."
       }
     },
     {
@@ -374,6 +407,39 @@
       "explanation": {
         "en": "Each new operation forces you to edit every shape class, mixing unrelated concerns into classes that should only model geometry.",
         "ru": "Каждая новая операция вынуждает править каждый класс фигуры, примешивая посторонние обязанности к классам, которые должны лишь моделировать геометрию."
+      }
+    },
+    {
+      "question": {
+        "en": "How does a ConcreteElement's accept(visitor) method route the call?",
+        "ru": "Как метод accept(visitor) у Конкретного элемента направляет вызов?"
+      },
+      "hint": {
+        "en": "Look at what Circle and Rectangle each call inside their own accept implementation.",
+        "ru": "Посмотрите, что именно вызывают Circle и Rectangle внутри своей реализации accept."
+      },
+      "options": [
+        {
+          "en": "It calls the visitor method matching its own class",
+          "ru": "Он вызывает метод посетителя, соответствующий его собственному классу"
+        },
+        {
+          "en": "It asks the client which visitor method to call",
+          "ru": "Он спрашивает клиента, какой метод посетителя вызвать"
+        },
+        {
+          "en": "It checks the visitor's type with an if/else chain",
+          "ru": "Он проверяет тип посетителя через цепочку if/else"
+        },
+        {
+          "en": "It stores the visitor for later, without calling anything yet",
+          "ru": "Он сохраняет посетителя на потом, ничего пока не вызывая"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Each element class implements a single accept(visitor) method that calls back the visitor method matching its own type - Circle calls visitCircle, Rectangle calls visitRectangle.",
+        "ru": "Каждый класс элемента реализует единственный метод accept(visitor), который вызывает метод посетителя, соответствующий его собственному типу, - Circle вызывает visitCircle, Rectangle - visitRectangle."
       }
     },
     {
@@ -444,6 +510,72 @@
     },
     {
       "question": {
+        "en": "According to the pros listed for Visitor, what happens to logic that would otherwise be scattered across many element classes?",
+        "ru": "Согласно перечисленным преимуществам Посетителя, что происходит с логикой, которая иначе была бы разбросана по многим классам элементов?"
+      },
+      "hint": {
+        "en": "Think about where operation-specific code physically ends up once it's pulled out of the elements.",
+        "ru": "Подумайте, где физически оказывается код, специфичный для операции, после того как его вынесли из элементов."
+      },
+      "options": [
+        {
+          "en": "It ends up grouped together in one visitor",
+          "ru": "Она собирается в одном посетителе"
+        },
+        {
+          "en": "It gets deleted since it's no longer needed",
+          "ru": "Она удаляется как более ненужная"
+        },
+        {
+          "en": "It moves into a shared base class for all elements",
+          "ru": "Она переносится в общий базовый класс для всех элементов"
+        },
+        {
+          "en": "It stays scattered, just renamed to accept()",
+          "ru": "Она остаётся разбросанной, просто переименованной в accept()"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Related logic that would otherwise be scattered across many element classes ends up grouped together in one visitor, which is easier to read and change as a unit.",
+        "ru": "Связанная логика, которая иначе была бы разбросана по множеству классов элементов, собирается в одном посетителе - так её проще читать и менять как единое целое."
+      }
+    },
+    {
+      "question": {
+        "en": "Why can a visitor accumulate state, like a running total, across a whole traversal?",
+        "ru": "Почему посетитель может накапливать состояние, например текущую сумму, на протяжении всего обхода?"
+      },
+      "hint": {
+        "en": "Think about how many elements a single visitor instance ends up seeing during one traversal.",
+        "ru": "Подумайте, сколько элементов видит один и тот же экземпляр посетителя за один обход."
+      },
+      "options": [
+        {
+          "en": "It is handed every element it touches during the traversal",
+          "ru": "Ему передаётся каждый элемент, с которым он работает во время обхода"
+        },
+        {
+          "en": "Each element keeps a running total and hands it over at the end",
+          "ru": "Каждый элемент сам ведёт итог и передаёт его в конце"
+        },
+        {
+          "en": "The client resets the visitor's state before each element",
+          "ru": "Клиент сбрасывает состояние посетителя перед каждым элементом"
+        },
+        {
+          "en": "State accumulation is handled by the accept() method instead",
+          "ru": "Накопление состояния происходит внутри метода accept()"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Because a visitor is handed every element it touches, it can build up state - totals, counts, a rendered document - across an entire traversal.",
+        "ru": "Поскольку посетителю передаётся каждый элемент, с которым он работает, он может накапливать состояние - суммы, счётчики, собираемый документ - на протяжении всего обхода."
+      }
+    },
+    {
+      "question": {
         "en": "What is a stated drawback of Visitor regarding adding a new element type?",
         "ru": "Какой недостаток Посетителя указан в отношении добавления нового типа элемента?"
       },
@@ -473,6 +605,39 @@
       "explanation": {
         "en": "Adding a new element type means adding a matching method to every existing visitor, so the element hierarchy and the visitor set are tightly coupled to each other.",
         "ru": "Добавление нового типа элемента требует добавления соответствующего метода в каждый существующий посетитель - иерархия элементов и набор посетителей оказываются тесно связаны друг с другом."
+      }
+    },
+    {
+      "question": {
+        "en": "Why does a visitor sometimes force an element to widen its public interface?",
+        "ru": "Почему посетитель иногда вынуждает элемент расширять свой публичный интерфейс?"
+      },
+      "hint": {
+        "en": "A visitor can only work with data the element chooses to expose - what if that isn't enough?",
+        "ru": "Посетитель может работать только с теми данными, которые элемент решил раскрыть, - а что если этого недостаточно?"
+      },
+      "options": [
+        {
+          "en": "A visitor only sees what an element exposes publicly",
+          "ru": "Посетитель видит только то, что элемент раскрывает публично"
+        },
+        {
+          "en": "Visitors are required to subclass every element they visit",
+          "ru": "Посетители обязаны наследоваться от каждого элемента, который посещают"
+        },
+        {
+          "en": "Elements must implement every visitor's methods themselves",
+          "ru": "Элементы обязаны сами реализовывать методы каждого посетителя"
+        },
+        {
+          "en": "The accept() method requires elements to be immutable",
+          "ru": "Метод accept() требует, чтобы элементы были неизменяемыми"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A visitor only sees what an element exposes publicly, so elements sometimes end up widening their interface just to give visitors enough to work with.",
+        "ru": "Посетитель видит только то, что элемент раскрывает публично, поэтому иногда элементам приходится расширять свой интерфейс, только чтобы дать посетителю достаточно данных для работы."
       }
     }
   ],

@@ -329,6 +329,39 @@
     },
     {
       "question": {
+        "en": "In the traffic-light example, what does each color need besides its own behavior?",
+        "ru": "В примере со светофором что нужно каждому цвету, помимо собственного поведения?"
+      },
+      "hint": {
+        "en": "Red means stop and wait, but what else does the controller need to figure out once that's done?",
+        "ru": "Красный означает «стой и жди», но что ещё контроллеру нужно решить, когда это выполнено?"
+      },
+      "options": [
+        {
+          "en": "Its own duration and its own idea of the next color",
+          "ru": "Собственную длительность и представление о следующем цвете"
+        },
+        {
+          "en": "A unique pin number on the physical traffic light hardware",
+          "ru": "Уникальный номер контакта на аппаратуре светофора"
+        },
+        {
+          "en": "Permission from the other two colors before activating",
+          "ru": "Разрешение от двух других цветов перед активацией"
+        },
+        {
+          "en": "A separate TrafficLight class dedicated to only that color",
+          "ru": "Отдельный класс TrafficLight, выделенный только для этого цвета"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Each color also has its own duration and its own idea of what the next color should be, which is exactly the kind of per-state logic State is meant to isolate.",
+        "ru": "У каждого цвета также своя длительность и своё представление о том, каким должен быть следующий цвет, - именно такую специфичную для состояния логику и призвано изолировать Состояние."
+      }
+    },
+    {
+      "question": {
         "en": "What goes wrong with a single `tick()` method using if/else on the traffic light's color?",
         "ru": "Что идёт не так с единым методом `tick()`, использующим if/else по цвету светофора?"
       },
@@ -395,6 +428,39 @@
     },
     {
       "question": {
+        "en": "What must every ConcreteState implement to fit into the Context's calls?",
+        "ru": "Что обязано реализовать каждое Конкретное состояние, чтобы вписаться в вызовы Контекста?"
+      },
+      "hint": {
+        "en": "The context calls through one shared shape - what gives every state object that same shape?",
+        "ru": "Контекст вызывает через единую общую форму - что даёт каждому объекту-состоянию эту же форму?"
+      },
+      "options": [
+        {
+          "en": "The shared State interface, with behavior for its own state",
+          "ru": "Общий интерфейс State, с поведением, подобающим своему состоянию"
+        },
+        {
+          "en": "A direct reference to every other ConcreteState instance",
+          "ru": "Прямую ссылку на каждый другой экземпляр Конкретного состояния"
+        },
+        {
+          "en": "A copy of the Context's full internal field list",
+          "ru": "Копию полного списка внутренних полей Контекста"
+        },
+        {
+          "en": "Its own independent tick() method, separate from the context's",
+          "ru": "Собственный независимый метод tick(), отдельный от контекстного"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Each ConcreteState implements the shared State interface with behavior appropriate to one specific state, which is what lets the context call through it uniformly.",
+        "ru": "Каждое конкретное состояние реализует общий интерфейс State с поведением, подобающим именно этому состоянию, - именно это позволяет контексту единообразно вызывать его."
+      }
+    },
+    {
+      "question": {
         "en": "Where does the decision about the next state live in the solution?",
         "ru": "Где в решении находится решение о следующем состоянии?"
       },
@@ -428,6 +494,72 @@
     },
     {
       "question": {
+        "en": "According to the pros listed for State, what does understanding the \"Paused\" state require?",
+        "ru": "Согласно перечисленным преимуществам Состояния, что требуется, чтобы понять состояние «Пауза»?"
+      },
+      "hint": {
+        "en": "Compare reading one small file to tracing a case through a sprawling method.",
+        "ru": "Сравните чтение одного небольшого файла с отслеживанием ветки внутри разросшегося метода."
+      },
+      "options": [
+        {
+          "en": "Reading one small file instead of tracing a case in a giant method",
+          "ru": "Прочитать один небольшой файл вместо отслеживания case в гигантском методе"
+        },
+        {
+          "en": "Reading through the entire codebase from top to bottom",
+          "ru": "Прочитать всю кодовую базу от начала до конца"
+        },
+        {
+          "en": "Debugging the context class with a step-through debugger",
+          "ru": "Отладить класс контекста с помощью пошагового отладчика"
+        },
+        {
+          "en": "Consulting a separate transition table stored in a database",
+          "ru": "Обратиться к отдельной таблице переходов, хранящейся в базе данных"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Each state's rules live in their own class, so understanding what happens in \"Paused\" means reading one small file instead of tracing a case through a giant method.",
+        "ru": "Правила каждого состояния живут в собственном классе, поэтому понять, что происходит в состоянии «Пауза», означает прочитать один небольшой файл, а не отслеживать case в гигантском методе."
+      }
+    },
+    {
+      "question": {
+        "en": "According to its recommended use cases, when should you reach for State?",
+        "ru": "Согласно рекомендуемым случаям применения, когда стоит использовать Состояние?"
+      },
+      "hint": {
+        "en": "Think about a class dominated by conditionals that all check one and the same thing.",
+        "ru": "Подумайте о классе, в котором преобладают условия, проверяющие одно и то же."
+      },
+      "options": [
+        {
+          "en": "When behavior depends heavily on a growing set of states",
+          "ru": "Когда поведение сильно зависит от растущего набора состояний"
+        },
+        {
+          "en": "Only when an object has just a single possible state",
+          "ru": "Только когда у объекта есть лишь одно возможное состояние"
+        },
+        {
+          "en": "Only when the object never needs to change behavior at all",
+          "ru": "Только когда объекту вообще никогда не нужно менять поведение"
+        },
+        {
+          "en": "Only for objects that have no context class of their own",
+          "ru": "Только для объектов, у которых вообще нет собственного класса контекста"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Reach for State when an object's behavior depends heavily on which of several states it's in, and that set of states keeps growing.",
+        "ru": "Применяйте Состояние, когда поведение объекта сильно зависит от того, в каком из нескольких состояний он находится, и это множество состояний продолжает расти."
+      }
+    },
+    {
+      "question": {
         "en": "When is applying State said to be more machinery than the problem calls for?",
         "ru": "Когда, согласно паттерну, применение Состояния - это больше механики, чем требует задача?"
       },
@@ -457,6 +589,39 @@
       "explanation": {
         "en": "For an object with two states and one transition, a full set of state classes is more machinery than the problem calls for.",
         "ru": "Для объекта с двумя состояниями и одним переходом полноценный набор классов состояний - это больше механики, чем требует задача."
+      }
+    },
+    {
+      "question": {
+        "en": "Why can following the full transition graph be harder to trace with State than with a single table?",
+        "ru": "Почему проследить весь граф переходов при использовании Состояния может быть сложнее, чем по одной таблице?"
+      },
+      "hint": {
+        "en": "Each state object decides its own next state - where does that scatter the information a reader needs?",
+        "ru": "Каждый объект состояния сам решает своё следующее состояние - куда это рассеивает информацию, нужную читателю?"
+      },
+      "options": [
+        {
+          "en": "It means reading through several state classes rather than one table",
+          "ru": "Приходится читать несколько классов состояний, а не одну таблицу"
+        },
+        {
+          "en": "State machines with State applied have no transitions at all",
+          "ru": "Машины состояний с применённым Состоянием вообще не имеют переходов"
+        },
+        {
+          "en": "The context class lists every transition in one big switch statement",
+          "ru": "Класс контекста перечисляет все переходы в одном большом switch"
+        },
+        {
+          "en": "Transitions become impossible to change once written",
+          "ru": "Переходы становится невозможно изменить после написания"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Because a state object often decides what the next state should be, following the full transition graph means reading through several state classes rather than one table.",
+        "ru": "Поскольку объект состояния часто сам решает, каким будет следующее состояние, чтобы проследить весь граф переходов, приходится читать несколько классов состояний, а не одну таблицу."
       }
     }
   ],

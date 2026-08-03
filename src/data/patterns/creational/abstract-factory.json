@@ -346,8 +346,107 @@
   "quiz": [
     {
       "question": {
-        "en": "What does Abstract Factory guarantee about the objects a single factory instance produces?",
-        "ru": "Что гарантирует Абстрактная фабрика в отношении объектов, создаваемых одним экземпляром фабрики?"
+        "en": "In the cross-platform UI library, what does the Abstract Factory do with button, checkbox, and text-field creation?",
+        "ru": "В библиотеке кроссплатформенного UI - что Абстрактная фабрика делает с созданием кнопок, чекбоксов и текстовых полей?"
+      },
+      "hint": {
+        "en": "Focus on the word \"family\" - what does grouping several creation methods behind one interface buy you?",
+        "ru": "Обратите внимание на слово «семейство» - что даёт объединение нескольких методов создания за одним интерфейсом?"
+      },
+      "options": [
+        {
+          "en": "Groups creation of several related objects so they always match",
+          "ru": "Объединяет создание нескольких связанных объектов, чтобы они всегда были согласованы"
+        },
+        {
+          "en": "Restricts a class to exactly one instance",
+          "ru": "Ограничивает класс ровно одним экземпляром"
+        },
+        {
+          "en": "Assembles a complex object through a sequence of steps",
+          "ru": "Собирает сложный объект через последовательность шагов"
+        },
+        {
+          "en": "Copies an existing object instead of constructing a new one",
+          "ru": "Копирует существующий объект вместо создания нового"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "It groups their creation behind one factory interface, so a screen built with a WindowsFactory only ever gets Windows-style widgets - never a stray macOS checkbox breaking the illusion.",
+        "ru": "Она объединяет их создание за одним интерфейсом фабрики, поэтому экран, собранный через WindowsFactory, получает только виджеты в стиле Windows - и никогда случайный чекбокс в стиле macOS, ломающий иллюзию."
+      }
+    },
+    {
+      "question": {
+        "en": "In the UI library problem, why does mixing a Windows-style button with a macOS-style checkbox matter?",
+        "ru": "В примере с UI-библиотекой, почему важно не смешивать кнопку в стиле Windows с флажком в стиле macOS?"
+      },
+      "hint": {
+        "en": "Think about what a screen is supposed to look like to the person using it.",
+        "ru": "Подумайте, как экран должен выглядеть для того, кто им пользуется."
+      },
+      "options": [
+        {
+          "en": "It breaks the illusion of a native-looking screen",
+          "ru": "Это разрушает иллюзию нативно выглядящего экрана"
+        },
+        {
+          "en": "It causes a runtime type error in the rendering engine",
+          "ru": "Это вызывает ошибку типов во время выполнения движка отрисовки"
+        },
+        {
+          "en": "It makes the checkbox permanently unclickable",
+          "ru": "Флажок становится навсегда недоступным для нажатия"
+        },
+        {
+          "en": "It doubles the memory used by the screen",
+          "ru": "Это удваивает объём памяти, используемой экраном"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A screen only looks right if every widget on it comes from the same platform's set - mixing widgets from different platforms breaks the illusion of a native UI immediately.",
+        "ru": "Экран выглядит правильно только тогда, когда все виджеты на нём взяты из набора одной платформы - смешение виджетов разных платформ сразу разрушает иллюзию нативного интерфейса."
+      }
+    },
+    {
+      "question": {
+        "en": "In the UI library example, what goes wrong if screen-assembly code instantiates WindowsButton and MacCheckbox directly?",
+        "ru": "В примере с UI-библиотекой, что идёт не так, если код сборки экрана напрямую создаёт WindowsButton и MacCheckbox?"
+      },
+      "hint": {
+        "en": "Notice that the two class names come from different platforms - what stops that mix-up from happening?",
+        "ru": "Обратите внимание, что эти два класса относятся к разным платформам - что мешает такому смешению произойти?"
+      },
+      "options": [
+        {
+          "en": "Nothing stops a call from grabbing a widget from the wrong platform",
+          "ru": "Ничто не мешает по ошибке взять виджет из набора чужой платформы"
+        },
+        {
+          "en": "The code runs slower due to extra abstraction layers",
+          "ru": "Код работает медленнее из-за лишних слоёв абстракции"
+        },
+        {
+          "en": "The widgets can no longer be rendered on screen at all",
+          "ru": "Виджеты вообще перестают отрисовываться на экране"
+        },
+        {
+          "en": "The Button and Checkbox interfaces become unnecessary",
+          "ru": "Интерфейсы Button и Checkbox становятся ненужными"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Direct instantiation litters the code with platform if/else branches, and the compiler has no concept that certain classes belong together, so a careless call can grab a mismatched widget.",
+        "ru": "Прямое создание заполняет код условиями по платформам, а компилятор не знает, что определённые классы должны использоваться вместе, - поэтому по ошибке можно взять несовместимый виджет."
+      }
+    },
+    {
+      "question": {
+        "en": "What does Abstract Factory guarantee about the objects a single concrete factory produces?",
+        "ru": "Что гарантирует Абстрактная фабрика в отношении объектов, создаваемых одной конкретной фабрикой?"
       },
       "hint": {
         "en": "Each concrete factory knows how to build widgets for only one platform - what does that limit rule out?",
@@ -355,12 +454,12 @@
       },
       "options": [
         {
-          "en": "That they are all created lazily on first use",
-          "ru": "Что все они создаются лениво при первом обращении"
+          "en": "That they all belong to the same matching variant",
+          "ru": "Что все они принадлежат одному согласованному варианту"
         },
         {
-          "en": "That they all belong to the same variant",
-          "ru": "Что все они принадлежат одному варианту"
+          "en": "That they are all created lazily on first use",
+          "ru": "Что все они создаются лениво при первом обращении"
         },
         {
           "en": "That they share a single instance across the whole program",
@@ -371,7 +470,7 @@
           "ru": "Что они неизменяемы после создания"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
         "en": "Each concrete factory (WindowsFactory, MacFactory) only knows how to build its own platform's widgets, so it physically cannot hand out a mismatched pair.",
         "ru": "Каждая конкретная фабрика (WindowsFactory, MacFactory) умеет создавать виджеты только своей платформы, поэтому физически не может выдать несовместимую пару."
@@ -379,35 +478,35 @@
     },
     {
       "question": {
-        "en": "In the UI library example, what problem arises if screen-assembly code instantiates WindowsButton and MacCheckbox directly?",
-        "ru": "В примере с UI-библиотекой, какая проблема возникает, если код сборки экрана напрямую создаёт WindowsButton и MacCheckbox?"
+        "en": "What role does the AbstractFactory interface play in the pattern's structure?",
+        "ru": "Какую роль играет интерфейс AbstractFactory в структуре паттерна?"
       },
       "hint": {
-        "en": "Notice that the two class names come from different platforms - what does that combination look like on screen?",
-        "ru": "Обратите внимание, что эти два класса относятся к разным платформам - как такое сочетание будет выглядеть на экране?"
+        "en": "Count how many creation methods it declares relative to the number of product types in the family.",
+        "ru": "Посмотрите, сколько методов создания оно объявляет по отношению к числу типов продуктов в семействе."
       },
       "options": [
         {
-          "en": "The code runs slower due to extra abstraction layers",
-          "ru": "Код работает медленнее из-за лишних слоёв абстракции"
+          "en": "Lists one creation method per product type the family needs",
+          "ru": "Перечисляет по одному методу создания на каждый нужный семейству тип продукта"
         },
         {
-          "en": "Widgets from different platforms can get mixed together",
-          "ru": "Виджеты разных платформ можно случайно смешать"
+          "en": "Implements the rendering logic shared by every platform",
+          "ru": "Реализует логику отрисовки, общую для всех платформ"
         },
         {
-          "en": "The widgets can no longer be rendered on screen",
-          "ru": "Виджеты вообще перестают отрисовываться на экране"
+          "en": "Holds the one shared instance used by the whole program",
+          "ru": "Хранит единственный общий экземпляр, используемый всей программой"
         },
         {
-          "en": "The Button and Checkbox interfaces become unnecessary",
-          "ru": "Интерфейсы Button и Checkbox становятся ненужными"
+          "en": "Stores the current field values of an existing widget",
+          "ru": "Хранит текущие значения полей существующего виджета"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
-        "en": "Direct instantiation litters the code with platform if/else branches and gives the compiler no concept that certain classes belong together, so mismatched widgets can slip in.",
-        "ru": "Прямое создание заполняет код условиями по платформам, а компилятор не знает, что определённые классы должны использоваться вместе, - поэтому могут проскочить несовместимые виджеты."
+        "en": "The AbstractFactory interface lists one creation method per product type the family needs, e.g. createButton() and createCheckbox(), guaranteeing every concrete factory produces a matching pair.",
+        "ru": "Интерфейс AbstractFactory перечисляет по одному методу создания на каждый нужный семейству тип продукта, например createButton() и createCheckbox(), гарантируя, что любая конкретная фабрика создаёт согласованную пару."
       }
     },
     {
@@ -421,32 +520,32 @@
       },
       "options": [
         {
-          "en": "Only on interfaces, never a concrete class name",
-          "ru": "Только от интерфейсов, никогда от конкретного класса"
+          "en": "Only on the factory and product interfaces, never a concrete class",
+          "ru": "Только на интерфейсы фабрики и продуктов, никогда на конкретный класс"
         },
         {
           "en": "On every concrete widget class for every platform",
-          "ru": "От каждого конкретного класса виджета для каждой платформы"
+          "ru": "На каждый конкретный класс виджета для каждой платформы"
         },
         {
           "en": "On a global switch statement that picks the platform",
-          "ru": "От глобального switch, выбирающего платформу"
+          "ru": "На глобальный switch, выбирающий платформу"
         },
         {
           "en": "On the operating system's native rendering API directly",
-          "ru": "Напрямую от нативного API отрисовки операционной системы"
+          "ru": "Напрямую на нативный API отрисовки операционной системы"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "The client receives a factory instance and calls its creation methods without ever naming a concrete widget class; switching platforms just means injecting a different factory.",
-        "ru": "Клиент получает экземпляр фабрики и вызывает её методы создания, ни разу не называя конкретный класс виджета; переход на другую платформу - это просто внедрение другой фабрики."
+        "en": "Client code depends only on the factory and product interfaces, never on the concrete classes behind them; switching platforms just means injecting a different factory.",
+        "ru": "Клиентский код зависит только от интерфейсов фабрики и продуктов, но никогда - от конкретных классов за ними; переход на другую платформу - это просто внедрение другой фабрики."
       }
     },
     {
       "question": {
-        "en": "According to the pattern's drawbacks, what happens when you need to add a brand-new product type (not just a new variant)?",
-        "ru": "Согласно недостаткам паттерна, что происходит при необходимости добавить совершенно новый тип продукта (а не просто новый вариант)?"
+        "en": "According to the pattern's drawbacks, what happens when you need to add a brand-new product type rather than a new variant?",
+        "ru": "Согласно недостаткам паттерна, что происходит при необходимости добавить совершенно новый тип продукта, а не просто новый вариант?"
       },
       "hint": {
         "en": "A new product type needs a new creation method - which pieces of code have to declare or implement that method?",
@@ -454,12 +553,12 @@
       },
       "options": [
         {
-          "en": "Nothing changes - it's purely additive like adding a new variant",
-          "ru": "Ничего не меняется - это чисто аддитивная операция, как добавление нового варианта"
+          "en": "You must touch the factory interface and every concrete factory",
+          "ru": "Нужно менять интерфейс фабрики и каждую конкретную фабрику"
         },
         {
-          "en": "You must touch the factory interface and every concrete factory",
-          "ru": "Нужно менять интерфейс фабрики и все конкретные фабрики"
+          "en": "Nothing changes - it's purely additive like adding a new variant",
+          "ru": "Ничего не меняется - это чисто аддитивная операция, как добавление нового варианта"
         },
         {
           "en": "Only the base Button interface needs to change",
@@ -470,9 +569,9 @@
           "ru": "Клиентский код нужно переписывать с нуля"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
-        "en": "Adding a new variant (a new platform) is cheap - one new factory class - but a new product type forces edits to the factory interface and every existing concrete factory.",
+        "en": "Adding a new variant (a new platform) is cheap - one new factory class - but a new product type forces edits to the factory interface and every existing concrete factory that implements it.",
         "ru": "Добавить новый вариант (новую платформу) дёшево - одна новая фабрика, - а вот новый тип продукта требует правки интерфейса фабрики и каждой существующей конкретной фабрики."
       }
     },
@@ -507,6 +606,72 @@
       "explanation": {
         "en": "Small applications with only one product family gain little from the extra layer of interfaces and factory classes, since there's no variant-mismatch risk to guard against.",
         "ru": "Небольшие приложения с единственным семейством продуктов почти ничего не выигрывают от дополнительного слоя интерфейсов и классов фабрик, так как риска смешать варианты попросту нет."
+      }
+    },
+    {
+      "question": {
+        "en": "Which listed real-world example matches Abstract Factory's shape?",
+        "ru": "Какой из перечисленных реальных примеров соответствует форме Абстрактной фабрики?"
+      },
+      "hint": {
+        "en": "Look for an example where switching one setting swaps out a whole matching set of related objects at once.",
+        "ru": "Найдите пример, где переключение одной настройки разом заменяет целый согласованный набор связанных объектов."
+      },
+      "options": [
+        {
+          "en": "Swapping a Swing look-and-feel replaces matching buttons, scrollbars, and menus",
+          "ru": "Смена look-and-feel в Swing заменяет согласованные кнопки, полосы прокрутки и меню"
+        },
+        {
+          "en": "structuredClone() deep-copying an arbitrary object",
+          "ru": "structuredClone(), глубоко копирующий произвольный объект"
+        },
+        {
+          "en": "A single Redux store shared across an application",
+          "ru": "Единый Redux store, общий для всего приложения"
+        },
+        {
+          "en": "A StringBuilder assembling text through append() calls",
+          "ru": "StringBuilder, собирающий текст через вызовы append()"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Swapping the look-and-feel in Java AWT/Swing swaps out an entire factory that produces matching buttons, scrollbars, and menus - the same family-of-related-objects shape as Abstract Factory.",
+        "ru": "Смена look-and-feel в Java AWT/Swing заменяет целую фабрику, производящую согласованные кнопки, полосы прокрутки и меню, - та же форма семейства связанных объектов, что и у Абстрактной фабрики."
+      }
+    },
+    {
+      "question": {
+        "en": "According to the pattern's pros, what happens to object-creation logic for a whole product family?",
+        "ru": "Согласно преимуществам паттерна, что происходит с логикой создания объектов для целого семейства продуктов?"
+      },
+      "hint": {
+        "en": "Compare a codebase littered with platform conditionals against one where creation is funneled through factories.",
+        "ru": "Сравните кодовую базу, заполненную условиями по платформам, с той, где создание сосредоточено в фабриках."
+      },
+      "options": [
+        {
+          "en": "It lives in one place instead of being scattered as conditionals",
+          "ru": "Она сосредоточена в одном месте вместо того, чтобы быть разбросанной по условным конструкциям"
+        },
+        {
+          "en": "It gets duplicated once per widget instance",
+          "ru": "Она дублируется для каждого экземпляра виджета"
+        },
+        {
+          "en": "It moves entirely into the Button interface",
+          "ru": "Она полностью переходит в интерфейс Button"
+        },
+        {
+          "en": "It disappears once a Client class is introduced",
+          "ru": "Она исчезает после появления класса Клиента"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Object-creation logic for a whole family lives in one place instead of being scattered across the codebase as conditionals, since each concrete factory owns the creation of its entire matching set.",
+        "ru": "Логика создания объектов всего семейства сосредоточена в одном месте вместо того, чтобы быть разбросанной по кодовой базе в виде условных конструкций, поскольку каждая конкретная фабрика владеет созданием всего своего согласованного набора."
       }
     }
   ],

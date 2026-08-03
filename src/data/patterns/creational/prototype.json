@@ -337,6 +337,39 @@
     },
     {
       "question": {
+        "en": "In the drawing app problem, what kind of work is a shape put through after it's first placed?",
+        "ru": "В примере с приложением для рисования, каким операциям подвергается фигура после того, как её разместили?"
+      },
+      "hint": {
+        "en": "Picture a Circle sitting on the canvas - what does the user typically do to it next?",
+        "ru": "Представьте Circle на холсте - что пользователь обычно делает с ней дальше?"
+      },
+      "options": [
+        {
+          "en": "It gets dragged into position, recolored, and resized",
+          "ru": "Её перетаскивают, перекрашивают и меняют размер"
+        },
+        {
+          "en": "It is immediately serialized to a database",
+          "ru": "Её сразу сериализуют в базу данных"
+        },
+        {
+          "en": "It is converted into a Rectangle automatically",
+          "ru": "Она автоматически превращается в Rectangle"
+        },
+        {
+          "en": "It loses its color property permanently",
+          "ru": "Она навсегда теряет свойство color"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The drawing app builds shapes at runtime - a Circle placed and dragged into position, recolored, resized - and producing a copy of that current state is what motivates the pattern.",
+        "ru": "Приложение для рисования строит фигуры во время выполнения - Circle размещается, перетаскивается, перекрашивается, меняет размер, - и необходимость скопировать это текущее состояние и мотивирует паттерн."
+      }
+    },
+    {
+      "question": {
         "en": "Why does calling `new Circle(x, y, color, radius)` to copy a shape become brittle?",
         "ru": "Почему вызов `new Circle(x, y, color, radius)` для копирования фигуры оказывается хрупким?"
       },
@@ -366,6 +399,39 @@
       "explanation": {
         "en": "It gets brittle the moment a subclass like Rectangle adds its own fields the caller doesn't know about, and code holding only a Shape reference can't call a concrete constructor at all.",
         "ru": "Это становится хрупким, как только подкласс вроде Rectangle добавляет собственные поля, о которых вызывающий код не знает, а код, держащий лишь ссылку Shape, вообще не может вызвать конкретный конструктор."
+      }
+    },
+    {
+      "question": {
+        "en": "Why can't code holding only a Shape reference construct a copy with `new`?",
+        "ru": "Почему код, держащий лишь ссылку Shape, не может создать копию через `new`?"
+      },
+      "hint": {
+        "en": "Think about what that code actually knows about the object versus what a concrete constructor call requires.",
+        "ru": "Подумайте, что этот код реально знает об объекте, и что требует вызов конкретного конструктора."
+      },
+      "options": [
+        {
+          "en": "It doesn't know, and shouldn't need to know, the concrete subclass it holds",
+          "ru": "Он не знает и не должен знать, какой конкретный подкласс он держит"
+        },
+        {
+          "en": "Shape objects cannot be instantiated more than once",
+          "ru": "Объекты Shape нельзя создавать более одного раза"
+        },
+        {
+          "en": "The Shape interface forbids calling any constructor",
+          "ru": "Интерфейс Shape запрещает вызов любого конструктора"
+        },
+        {
+          "en": "JavaScript classes cannot be referenced through an interface",
+          "ru": "Классы JavaScript нельзя использовать через интерфейс"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Code that only holds the shape through a common Shape reference has no way to call new Circle(...) or new Rectangle(...) on it, since it doesn't know which concrete subclass it's holding.",
+        "ru": "Код, который держит фигуру только через общую ссылку Shape, не может вызвать на ней new Circle(...) или new Rectangle(...), поскольку не знает, какой конкретный подкласс держит в руках."
       }
     },
     {
@@ -403,6 +469,39 @@
     },
     {
       "question": {
+        "en": "In the ConcretePrototype's role, what does it decide when implementing clone()?",
+        "ru": "Что решает ConcretePrototype, реализуя clone()?"
+      },
+      "hint": {
+        "en": "Not everything inside an object should necessarily be duplicated the same way - what choice does the implementer face?",
+        "ru": "Не всё внутри объекта обязательно нужно копировать одинаково - перед каким выбором стоит реализующий класс?"
+      },
+      "options": [
+        {
+          "en": "What needs deep-copying versus what can stay a shared reference",
+          "ru": "Что требует глубокого копирования, а что может остаться общей ссылкой"
+        },
+        {
+          "en": "Whether the Client is allowed to call clone() at all",
+          "ru": "Разрешено ли Клиенту вообще вызывать clone()"
+        },
+        {
+          "en": "Which unrelated class the clone should be converted into",
+          "ru": "В какой не связанный класс следует превратить клон"
+        },
+        {
+          "en": "How many times the constructor should run during cloning",
+          "ru": "Сколько раз конструктор должен запускаться при клонировании"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Each concrete class implements clone() with direct access to its own private fields, deciding what to deep-copy so the clone doesn't secretly share mutable state with the original.",
+        "ru": "Каждый конкретный класс реализует clone() с прямым доступом к собственным приватным полям, решая, что нужно копировать глубоко, чтобы клон не разделял скрытно изменяемое состояние с оригиналом."
+      }
+    },
+    {
+      "question": {
         "en": "What is a stated benefit of Prototype regarding expensive setup work?",
         "ru": "Какое преимущество Прототипа указано в отношении затратной настройки?"
       },
@@ -436,6 +535,39 @@
     },
     {
       "question": {
+        "en": "According to Prototype's pros, how does a library of prototype instances compare to a subclass per variant?",
+        "ru": "Согласно преимуществам Прототипа, чем библиотека экземпляров-прототипов лучше подкласса на каждый вариант?"
+      },
+      "hint": {
+        "en": "Think of producing many pre-configured variants without writing a new class for each one.",
+        "ru": "Подумайте о производстве множества преднастроенных вариантов без написания нового класса под каждый."
+      },
+      "options": [
+        {
+          "en": "It replaces the need for a subclass per pre-configured variant",
+          "ru": "Она заменяет необходимость в подклассе на каждый преднастроенный вариант"
+        },
+        {
+          "en": "It requires even more subclasses than before",
+          "ru": "Она требует ещё больше подклассов, чем раньше"
+        },
+        {
+          "en": "It only works for classes with exactly one field",
+          "ru": "Она работает только для классов с одним полем"
+        },
+        {
+          "en": "It forces every variant to share the same color",
+          "ru": "Она заставляет все варианты иметь один и тот же цвет"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Producing many pre-configured variants no longer requires a subclass per variant - a library of prototype instances covers the same ground.",
+        "ru": "Производство множества преднастроенных вариантов больше не требует подкласса на каждый вариант - ту же задачу решает библиотека экземпляров-прототипов."
+      }
+    },
+    {
+      "question": {
         "en": "What is a stated risk of cloning objects with shared nested structures?",
         "ru": "Какой риск указан при клонировании объектов с общими вложенными структурами?"
       },
@@ -465,6 +597,39 @@
       "explanation": {
         "en": "Getting deep copies right for circular references or shared nested structures takes careful logic inside clone() - get it wrong and mutations leak between original and copy.",
         "ru": "Корректное глубокое копирование для циклических ссылок или общих вложенных структур требует аккуратной логики внутри clone() - при ошибке изменения просачиваются между оригиналом и копией."
+      }
+    },
+    {
+      "question": {
+        "en": "According to Prototype's drawbacks, what is easy to forget when a hierarchy gains a new subclass?",
+        "ru": "Согласно недостаткам Прототипа, о чём легко забыть при добавлении нового подкласса в иерархию?"
+      },
+      "hint": {
+        "en": "Cloning isn't automatic just because a class extends another - what does each class need to handle itself?",
+        "ru": "Клонирование не происходит автоматически просто потому, что класс наследует другой, - что каждый класс должен обеспечить сам?"
+      },
+      "options": [
+        {
+          "en": "Implementing or correctly inheriting its own cloning logic",
+          "ru": "Реализовать или корректно унаследовать собственную логику клонирования"
+        },
+        {
+          "en": "Renaming the base Shape class",
+          "ru": "Переименовать базовый класс Shape"
+        },
+        {
+          "en": "Removing the constructor entirely",
+          "ru": "Полностью убрать конструктор"
+        },
+        {
+          "en": "Deleting the Prototype interface",
+          "ru": "Удалить интерфейс Prototype"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Every class in a hierarchy needs to implement or correctly inherit its own cloning logic, which is easy to forget when a new subclass is added.",
+        "ru": "Каждый класс в иерархии должен реализовать или корректно унаследовать собственную логику клонирования, о чём легко забыть при добавлении нового подкласса."
       }
     }
   ],

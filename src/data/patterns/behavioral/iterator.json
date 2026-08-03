@@ -344,6 +344,39 @@
     },
     {
       "question": {
+        "en": "In the media-library example, why does a shuffle button, an export feature, and a search filter each end up with a different loop shape?",
+        "ru": "В примере с медиатекой - почему кнопка перемешивания, функция экспорта и фильтр поиска получают разный вид цикла?"
+      },
+      "hint": {
+        "en": "Playlists, favorites, and history are each stored differently - what does that force on the code that loops over them?",
+        "ru": "Плейлисты, избранное и история хранятся по-разному - что это вынуждает делать код, который по ним проходит?"
+      },
+      "options": [
+        {
+          "en": "Each UI feature loops differently depending on which underlying structure it touches",
+          "ru": "Каждая часть интерфейса обходит коллекцию по-своему, в зависимости от структуры, с которой работает"
+        },
+        {
+          "en": "The ring buffer used for history cannot be looped over at all",
+          "ru": "Кольцевой буфер для истории вообще нельзя обойти в цикле"
+        },
+        {
+          "en": "The hash set used for favorites has no elements to loop over",
+          "ru": "Хеш-множество для избранного не содержит элементов для обхода"
+        },
+        {
+          "en": "Every feature ends up using the exact same loop with no changes",
+          "ru": "Каждая функция в итоге использует совершенно одинаковый цикл"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Every part of the UI that needs to loop over one of these collections ends up with a different loop shape depending on which structure it's touching - a flat array, a hash set, or a ring buffer.",
+        "ru": "Каждая часть интерфейса, которой нужно пройтись по одной из этих коллекций, получает свой собственный вид цикла в зависимости от того, с какой структурой она работает."
+      }
+    },
+    {
+      "question": {
         "en": "What problem arises if traversal logic is written straight into each collection class?",
         "ru": "Какая проблема возникает, если логика обхода прописана прямо в каждом классе коллекции?"
       },
@@ -353,8 +386,8 @@
       },
       "options": [
         {
-          "en": "The class ends up handling both storage and traversal",
-          "ru": "Класс отвечает и за хранение данных, и за обход"
+          "en": "The class ends up handling both storage and every possible way to walk it",
+          "ru": "Класс отвечает и за хранение данных, и за все возможные способы их обхода"
         },
         {
           "en": "The collection can no longer store any elements",
@@ -371,8 +404,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "That class ends up handling both storage and traversal, so switching storage later breaks client code.",
-        "ru": "У этого класса появляется две обязанности - управлять данными и знать все возможные способы обхода, - а смена внутреннего хранилища позже ломает клиентский код, рассчитывавший на индексацию массива."
+        "en": "That class now has two jobs: managing its data and knowing every way someone might want to walk through it, and switching the underlying storage later breaks every piece of client code that assumed array indexing.",
+        "ru": "У этого класса появляется две обязанности: управлять данными и знать все возможные способы обхода, - а смена внутреннего хранилища позже ломает весь клиентский код, рассчитывавший на индексацию массива."
       }
     },
     {
@@ -386,8 +419,8 @@
       },
       "options": [
         {
-          "en": "Something like \"is there a next\" and \"give me the next\"",
-          "ru": "Что-то вроде «есть ли следующий» и «дай следующий»"
+          "en": "Something like \"is there a next element\" and \"give me the next element\"",
+          "ru": "Что-то вроде «есть ли следующий элемент» и «дай следующий элемент»"
         },
         {
           "en": "A method that returns the entire collection at once",
@@ -398,7 +431,7 @@
           "ru": "Метод для удаления текущего элемента"
         },
         {
-          "en": "A method that only works on arrays",
+          "en": "A method that only works when the collection is an array",
           "ru": "Метод, работающий только с массивами"
         }
       ],
@@ -406,6 +439,105 @@
       "explanation": {
         "en": "Every iterator exposes the same small interface: something like \"is there a next element\" and \"give me the next element\", so client code never has to care about the underlying structure.",
         "ru": "Каждый итератор предоставляет один и тот же небольшой интерфейс: примерно «есть ли следующий элемент» и «дай следующий элемент», поэтому клиентскому коду не важна структура под капотом."
+      }
+    },
+    {
+      "question": {
+        "en": "What is the relationship between IterableCollection and ConcreteCollection in the structure?",
+        "ru": "Как в структуре паттерна соотносятся IterableCollection и ConcreteCollection?"
+      },
+      "hint": {
+        "en": "One is a promise, the other fulfills it - look at what each is said to expose versus what it actually owns.",
+        "ru": "Одно - это обещание, другое - его исполнение. Сравните, что каждое из них обещает, а что реально хранит."
+      },
+      "options": [
+        {
+          "en": "IterableCollection promises a factory method; ConcreteCollection owns storage and returns a fresh iterator",
+          "ru": "IterableCollection обещает фабричный метод; ConcreteCollection владеет хранилищем и возвращает новый итератор"
+        },
+        {
+          "en": "ConcreteCollection defines the contract; IterableCollection stores the actual elements",
+          "ru": "ConcreteCollection задаёт контракт; IterableCollection хранит сами элементы"
+        },
+        {
+          "en": "They are two names for exactly the same class",
+          "ru": "Это два названия одного и того же класса"
+        },
+        {
+          "en": "IterableCollection tracks the cursor position for every iterator in use",
+          "ru": "IterableCollection отслеживает позицию курсора для каждого используемого итератора"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "An IterableCollection interface promises a way to produce a compatible iterator, and a ConcreteCollection implements that by handing back a fresh ConcreteIterator on request.",
+        "ru": "Интерфейс коллекции обещает способ создать совместимый итератор, а конкретная коллекция реализует это, возвращая по запросу новый экземпляр конкретного итератора."
+      }
+    },
+    {
+      "question": {
+        "en": "In the JavaScript Playlist implementation, why does [Symbol.iterator] create a new current = 0 on every call?",
+        "ru": "В реализации Playlist на JavaScript - почему [Symbol.iterator] при каждом вызове создаёт новую переменную current = 0?"
+      },
+      "hint": {
+        "en": "Think about what would happen to a second for...of loop if the cursor were stored once on the playlist itself.",
+        "ru": "Подумайте, что случилось бы со вторым циклом for...of, если бы курсор хранился один раз прямо в плейлисте."
+      },
+      "options": [
+        {
+          "en": "So each iteration gets its own independent cursor, letting multiple loops run without interfering",
+          "ru": "Чтобы у каждого обхода был свой независимый курсор и несколько циклов не мешали друг другу"
+        },
+        {
+          "en": "Because songs is cleared and rebuilt on every call to stay in sync",
+          "ru": "Потому что songs очищается и пересобирается при каждом вызове для синхронизации"
+        },
+        {
+          "en": "To make sure the playlist can never be iterated more than once total",
+          "ru": "Чтобы плейлист вообще нельзя было обойти больше одного раза"
+        },
+        {
+          "en": "It is required by the spread operator but not by for...of",
+          "ru": "Это требуется только оператору расширения, но не for...of"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Each call to [Symbol.iterator] creates a new current = 0 closed over by that iterator's own next() method, which is what lets a collection hand out several independent iterators, each tracking its own position.",
+        "ru": "Каждый вызов [Symbol.iterator] создаёт новую переменную current = 0, захваченную собственным методом next() этого итератора, - именно это позволяет коллекции выдавать несколько независимых итераторов, каждый со своей позицией."
+      }
+    },
+    {
+      "question": {
+        "en": "Which of these is listed as a genuine benefit of Iterator?",
+        "ru": "Что из перечисленного указано как настоящее преимущество Итератора?"
+      },
+      "hint": {
+        "en": "Once traversal logic moves out of the collection class, what is that class left doing?",
+        "ru": "Когда логика обхода уходит из класса коллекции, чем этому классу остаётся заниматься?"
+      },
+      "options": [
+        {
+          "en": "Collection classes shrink back to just managing storage",
+          "ru": "Классы коллекций сокращаются до простого управления хранилищем"
+        },
+        {
+          "en": "Every collection is guaranteed to support random access after adopting it",
+          "ru": "Каждая коллекция гарантированно получает произвольный доступ после внедрения паттерна"
+        },
+        {
+          "en": "It removes the need for a collection to store any elements at all",
+          "ru": "Он устраняет необходимость коллекции вообще хранить элементы"
+        },
+        {
+          "en": "It makes every traversal run in constant time regardless of size",
+          "ru": "Он делает любой обход выполняющимся за постоянное время независимо от размера"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Collection classes shrink back down to just managing storage, since every traversal algorithm they used to carry moves out into its own iterator class.",
+        "ru": "Классы коллекций сокращаются до простого управления хранилищем, поскольку каждый алгоритм обхода, который они раньше несли, переезжает в собственный класс итератора."
       }
     },
     {
@@ -419,15 +551,15 @@
       },
       "options": [
         {
-          "en": "Yes - several independent iterators can run at once",
-          "ru": "Да - несколько независимых итераторов могут работать одновременно"
+          "en": "Yes - several independent iterators can run at once, each with its own cursor",
+          "ru": "Да - несколько независимых итераторов могут работать одновременно, каждый со своим курсором"
         },
         {
           "en": "No - only one iterator can ever exist per collection",
           "ru": "Нет - на коллекцию может существовать только один итератор"
         },
         {
-          "en": "Only if the collection is a linked list",
+          "en": "Only if the collection is implemented as a linked list",
           "ru": "Только если коллекция реализована как связный список"
         },
         {
@@ -437,8 +569,41 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "A collection can hand out several independent iterators at once, each tracking its own position.",
-        "ru": "Коллекция может выдать сразу несколько независимых итераторов, каждый со своей позицией."
+        "en": "A collection can hand out several independent iterators at once, each tracking its own position, so several passes over the same collection can run at once without stepping on each other.",
+        "ru": "Коллекция может выдать сразу несколько независимых итераторов, каждый со своей позицией, поэтому по одной коллекции можно вести несколько параллельных обходов, не мешая друг другу."
+      }
+    },
+    {
+      "question": {
+        "en": "When does wrapping a collection in a full iterator abstraction add ceremony without real benefit?",
+        "ru": "Когда оборачивание коллекции в полноценную абстракцию итератора добавляет церемоний без реальной пользы?"
+      },
+      "hint": {
+        "en": "Think about a plain list that's always looped over exactly the same single way.",
+        "ru": "Подумайте об обычном списке, который всегда обходится ровно одним и тем же способом."
+      },
+      "options": [
+        {
+          "en": "For a plain array or list that's only ever looped over one way",
+          "ru": "Для обычного массива или списка, который всегда обходится одним и тем же способом"
+        },
+        {
+          "en": "Whenever a collection needs to support more than one traversal order",
+          "ru": "Всякий раз, когда коллекции нужно поддерживать больше одного порядка обхода"
+        },
+        {
+          "en": "Whenever the underlying storage might change in the future",
+          "ru": "Всякий раз, когда внутреннее хранилище может измениться в будущем"
+        },
+        {
+          "en": "Only when the collection is empty",
+          "ru": "Только когда коллекция пуста"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "For a plain array or list that's only ever looped over one way, wrapping it in a full iterator abstraction adds ceremony without real benefit.",
+        "ru": "Для обычного массива или списка, который всегда обходится одним и тем же способом, оборачивание в полноценную абстракцию итератора добавляет церемоний без реальной пользы."
       }
     },
     {

@@ -179,10 +179,48 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: var(--space-6) var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background-color: var(--color-bg-subtle);
+}
+
+.quiz__results.is-pass {
+  border-color: var(--color-success);
+  background-color: rgba(34, 197, 94, 0.08);
+}
+
+.quiz__results.is-fail {
+  border-color: var(--color-error);
+  background-color: rgba(239, 68, 68, 0.06);
+}
+
+.quiz__result-icon {
+  color: var(--color-text-tertiary);
+}
+
+.quiz__results.is-pass .quiz__result-icon {
+  color: var(--color-success);
+}
+
+.quiz__results.is-fail .quiz__result-icon {
+  color: var(--color-error);
+}
+
+.quiz__result-icon [hidden] {
+  display: none;
+}
+
+.quiz__result-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.quiz__result-message {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
 }
 
 .quiz__next {

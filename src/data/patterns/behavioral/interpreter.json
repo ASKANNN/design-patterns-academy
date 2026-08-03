@@ -345,8 +345,8 @@
     },
     {
       "question": {
-        "en": "What goes wrong with a single big if/else function for evaluating expressions like `x + 5 - 2`?",
-        "ru": "Что идёт не так с единой большой функцией if/else для вычисления выражений вроде `x + 5 - 2`?"
+        "en": "Why does a single big if/else function for evaluating expressions like x + 5 - 2 eventually fall apart?",
+        "ru": "Почему единая большая функция if/else для вычисления выражений вроде x + 5 - 2 в итоге разваливается?"
       },
       "hint": {
         "en": "Imagine adding a third level of nesting or a brand-new operator - what has to happen inside that one function?",
@@ -354,11 +354,11 @@
       },
       "options": [
         {
-          "en": "It breaks down as expressions nest deeper or a new operator is added",
-          "ru": "Она ломается по мере усложнения вложенности или появления нового оператора"
+          "en": "Parsing and evaluating are tangled together with no reusable pieces",
+          "ru": "Разбор и вычисление перемешаны в одном месте без переиспользуемых частей"
         },
         {
-          "en": "It cannot evaluate a plain number by itself",
+          "en": "It cannot evaluate a plain number on its own",
           "ru": "Она вообще не может вычислить простое число само по себе"
         },
         {
@@ -372,14 +372,14 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "A single big function works for a couple of examples but falls apart as expressions nest deeper or a new operator shows up, since parsing and evaluating are tangled together.",
-        "ru": "Единая большая функция срабатывает для пары примеров, но разваливается, как только выражение усложняется или появляется новый оператор, - ведь разбор и вычисление перемешаны в одном месте."
+        "en": "A single big function works for a couple of examples, then falls apart as expressions nest deeper or a new operator shows up, because parsing and evaluating are tangled together in one place with no reusable pieces.",
+        "ru": "Такая функция сработает для пары примеров, но развалится, как только выражение станет вложенным глубже или появится новый оператор, - ведь разбор и вычисление перемешаны в одном месте без переиспользуемых частей."
       }
     },
     {
       "question": {
-        "en": "What is the difference between terminal and nonterminal expression classes?",
-        "ru": "В чём разница между терминальными и нетерминальными классами выражений?"
+        "en": "What distinguishes a terminal expression class from a nonterminal one?",
+        "ru": "Чем терминальный класс выражения отличается от нетерминального?"
       },
       "hint": {
         "en": "Think of a leaf of the tree versus a branch - which one needs children to produce a result, and which doesn't?",
@@ -387,8 +387,8 @@
       },
       "options": [
         {
-          "en": "Terminal classes know their value; nonterminal classes combine them",
-          "ru": "Терминальные классы знают своё значение; нетерминальные их объединяют"
+          "en": "Terminal classes know their value directly; nonterminal classes combine sub-expressions",
+          "ru": "Терминальные классы знают своё значение напрямую; нетерминальные объединяют подвыражения"
         },
         {
           "en": "Terminal classes can only appear at the root of the tree",
@@ -399,14 +399,47 @@
           "ru": "Нетерминальные классы никогда не реализуют метод interpret"
         },
         {
-          "en": "There is no functional difference between them",
-          "ru": "Между ними нет функциональной разницы"
+          "en": "Terminal expressions are always slower to evaluate than nonterminal ones",
+          "ru": "Терминальные выражения всегда вычисляются медленнее нетерминальных"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Simple pieces (a number, a variable) become terminal expression classes that know their value directly; compound pieces (a sum, a difference) become nonterminal classes that hold sub-expressions and combine what those return.",
-        "ru": "Простые части (число, переменная) становятся терминальными классами, знающими своё значение напрямую; составные части (сумма, разность) становятся нетерминальными классами, которые хранят подвыражения и объединяют их результаты."
+        "en": "Simple pieces of the expression, like a number or a variable, become terminal classes that know their value directly, while compound pieces, like a sum or a difference, become nonterminal classes that hold sub-expressions and combine what those return.",
+        "ru": "Простые части выражения - число, переменная - становятся терминальными классами, которые знают своё значение напрямую. Составные части - сумма, разность - становятся нетерминальными классами, которые хранят подвыражения и объединяют то, что те возвращают."
+      }
+    },
+    {
+      "question": {
+        "en": "What does the Context participant represent in the x + 5 - 2 example?",
+        "ru": "Что представляет собой участник Контекст в примере с x + 5 - 2?"
+      },
+      "hint": {
+        "en": "It's the piece that lets the Variable leaf know what x actually equals.",
+        "ru": "Это та часть, благодаря которой лист Переменная узнаёт, чему на самом деле равен x."
+      },
+      "options": [
+        {
+          "en": "The variable bindings threaded through every interpret call",
+          "ru": "Значения переменных, которые передаются в каждый вызов interpret"
+        },
+        {
+          "en": "A separate tree built purely for error reporting",
+          "ru": "Отдельное дерево, построенное исключительно для отчётов об ошибках"
+        },
+        {
+          "en": "The class responsible for parsing raw text into expression objects",
+          "ru": "Класс, отвечающий за разбор исходного текста в объекты выражений"
+        },
+        {
+          "en": "A cache of previously computed subtraction results",
+          "ru": "Кэш ранее вычисленных результатов вычитания"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The Context is the variable bindings, like { x: 10 }, threaded through every interpret call; it has no box of its own on the diagram since it's data carried alongside the tree, surfacing only where the Variable leaf reads x.",
+        "ru": "Контекст - это значения переменных, например { x: 10 }, которые передаются в каждый вызов interpret; отдельного узла на схеме у него нет, поскольку это данные, которые несутся вместе с деревом, - они проявляются только там, где лист Переменная читает x."
       }
     },
     {
@@ -420,8 +453,8 @@
       },
       "options": [
         {
-          "en": "Adding one new nonterminal class - nothing else in the tree changes",
-          "ru": "Добавление одного нового класса нетерминального выражения - остальное не меняется"
+          "en": "One new nonterminal class, leaving the rest of the tree untouched",
+          "ru": "Один новый класс нетерминального выражения, остальное дерево не меняется"
         },
         {
           "en": "Rewriting every existing terminal and nonterminal class",
@@ -432,14 +465,80 @@
           "ru": "Удаление метода interpret из корневого класса"
         },
         {
-          "en": "Flattening the tree back into a single string",
-          "ru": "Разворачивание дерева обратно в единую строку"
+          "en": "Flattening the whole tree back into a single string",
+          "ru": "Разворачивание всего дерева обратно в единую строку"
         }
       ],
       "correct": 0,
       "explanation": {
         "en": "Adding a new operator, like multiplication, means adding one new nonterminal class - the rest of the tree, and the rest of the grammar, doesn't change.",
         "ru": "Чтобы добавить новый оператор, например умножение, достаточно добавить один новый класс нетерминального выражения - остальное дерево и остальная грамматика не меняются."
+      }
+    },
+    {
+      "question": {
+        "en": "In the JavaScript implementation, how does AddExpression's interpret method get its result?",
+        "ru": "В реализации на JavaScript - как метод interpret у AddExpression получает свой результат?"
+      },
+      "hint": {
+        "en": "Look at what AddExpression stores and what it calls on those stored pieces before combining anything.",
+        "ru": "Посмотрите, что хранит AddExpression и что вызывает на этих сохранённых частях перед тем, как что-то объединить."
+      },
+      "options": [
+        {
+          "en": "It recursively calls interpret on its left and right sub-expressions and adds the results",
+          "ru": "Рекурсивно вызывает interpret у своих левого и правого подвыражений и складывает результаты"
+        },
+        {
+          "en": "It looks up a precomputed sum stored in the Context object",
+          "ru": "Ищет заранее вычисленную сумму, хранящуюся в объекте Context"
+        },
+        {
+          "en": "It parses the original string again to find the operands",
+          "ru": "Заново разбирает исходную строку, чтобы найти операнды"
+        },
+        {
+          "en": "It delegates entirely to SubtractExpression to compute the value",
+          "ru": "Полностью делегирует вычисление значения классу SubtractExpression"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "AddExpression stores left and right expressions, and interpret(context) recursively calls this.left.interpret(context) + this.right.interpret(context) - it doesn't care whether left/right are numbers, variables, or other expressions.",
+        "ru": "AddExpression хранит подвыражения left и right, а interpret(context) рекурсивно вызывает this.left.interpret(context) + this.right.interpret(context) - ему не важно, являются ли left/right числами, переменными или другими выражениями."
+      }
+    },
+    {
+      "question": {
+        "en": "Which listed benefit of Interpreter concerns testing?",
+        "ru": "Какое указанное преимущество Интерпретатора связано с тестированием?"
+      },
+      "hint": {
+        "en": "Each grammar rule is its own small class - what does that let you do with just one rule at a time?",
+        "ru": "Каждое правило грамматики - отдельный небольшой класс. Что это позволяет делать всего с одним правилом за раз?"
+      },
+      "options": [
+        {
+          "en": "Each rule is small and self-contained, so it can be unit-tested in isolation",
+          "ru": "Каждое правило маленькое и самодостаточное, поэтому его можно тестировать в изоляции"
+        },
+        {
+          "en": "Tests can skip the interpret method entirely",
+          "ru": "Тесты могут полностью обойтись без вызова метода interpret"
+        },
+        {
+          "en": "Only the root class of the tree needs to be tested",
+          "ru": "Тестировать нужно только корневой класс дерева"
+        },
+        {
+          "en": "Testing requires rebuilding the entire grammar from scratch each time",
+          "ru": "Тестирование требует каждый раз заново строить всю грамматику"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Each rule is a small, self-contained class, which makes it easy to unit-test a single piece of grammar in isolation from the rest.",
+        "ru": "Каждое правило - маленький самодостаточный класс, что позволяет тестировать отдельный фрагмент грамматики в изоляции от остальных."
       }
     },
     {
@@ -453,8 +552,8 @@
       },
       "options": [
         {
-          "en": "One class per rule scales badly as rules multiply",
-          "ru": "Один класс на правило плохо масштабируется с ростом их числа"
+          "en": "One class per rule scales badly, becoming dozens of classes to navigate",
+          "ru": "Один класс на правило плохо масштабируется, превращаясь в десятки классов"
         },
         {
           "en": "It becomes impossible to add any new terminal expression",
@@ -465,14 +564,80 @@
           "ru": "Метод interpret перестаёт работать после трёх правил"
         },
         {
-          "en": "It requires switching to a completely different pattern for every new rule",
-          "ru": "Требуется переходить на совершенно другой паттерн для каждого нового правила"
+          "en": "Grammar rules must all be merged into a single class past a certain size",
+          "ru": "Все правила грамматики приходится объединять в один класс начиная с некоторого размера"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "One class per grammar rule scales badly, and beyond a handful of rules a hand-rolled interpreter is usually outclassed by a proper parser generator or parsing library.",
-        "ru": "Подход «один класс на правило» плохо масштабируется, а начиная с определённого числа правил самодельный интерпретатор обычно уступает полноценному генератору парсеров."
+        "en": "One class per grammar rule scales badly - a language with dozens of rules means dozens of small classes to navigate and keep straight.",
+        "ru": "Подход «один класс на правило» плохо масштабируется - язык с десятками правил означает десятки мелких классов, среди которых приходится ориентироваться."
+      }
+    },
+    {
+      "question": {
+        "en": "Beyond a handful of grammar rules, what is usually the better alternative to a hand-rolled Interpreter?",
+        "ru": "Начиная с определённого числа правил грамматики, что обычно оказывается лучшей альтернативой самодельному Интерпретатору?"
+      },
+      "hint": {
+        "en": "Think about what handles ambiguity and error recovery better than a set of hand-written expression classes.",
+        "ru": "Подумайте, что лучше самодельных классов выражений справляется с неоднозначностями и восстановлением после ошибок."
+      },
+      "options": [
+        {
+          "en": "A proper parser generator or parsing library",
+          "ru": "Полноценный генератор парсеров или библиотека разбора"
+        },
+        {
+          "en": "A larger single if/else function covering every rule",
+          "ru": "Более крупная единая функция if/else, покрывающая все правила"
+        },
+        {
+          "en": "Storing every possible sentence in a lookup table",
+          "ru": "Хранение всех возможных предложений в таблице соответствий"
+        },
+        {
+          "en": "Removing the Context object to simplify the tree",
+          "ru": "Удаление объекта Context для упрощения дерева"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Beyond a handful of rules, a hand-rolled interpreter is usually outclassed by a proper parser generator or parsing library, which handles ambiguity and error recovery far better.",
+        "ru": "Начиная с определённого числа правил, самодельный интерпретатор обычно уступает полноценному генератору парсеров или библиотеке разбора, которые куда лучше справляются с неоднозначностями и восстановлением после ошибок."
+      }
+    },
+    {
+      "question": {
+        "en": "Why can interpreting a tree directly be slower than compiling an expression once into a more efficient form?",
+        "ru": "Почему прямая интерпретация дерева может быть медленнее однократной компиляции выражения в более эффективную форму?"
+      },
+      "hint": {
+        "en": "Compare running the tree walk once per evaluation against transforming the tree a single time up front.",
+        "ru": "Сравните обход дерева при каждом вычислении с однократным преобразованием дерева заранее."
+      },
+      "options": [
+        {
+          "en": "The tree gets re-walked on every single evaluation instead of being processed once",
+          "ru": "Дерево заново обходится при каждом вычислении, вместо обработки один раз"
+        },
+        {
+          "en": "Terminal expressions cannot be evaluated more than once",
+          "ru": "Терминальные выражения нельзя вычислить больше одного раза"
+        },
+        {
+          "en": "Nonterminal classes are incompatible with recursion",
+          "ru": "Нетерминальные классы несовместимы с рекурсией"
+        },
+        {
+          "en": "The Context object must be rebuilt before every interpret call",
+          "ru": "Объект Context приходится пересоздавать перед каждым вызовом interpret"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Interpreting the tree directly on every evaluation is slower than compiling the expression once into a more efficient form, and deep trees risk hitting recursion limits.",
+        "ru": "Прямая интерпретация дерева при каждом вычислении медленнее однократной компиляции выражения в более эффективную форму, а глубокие деревья рискуют упереться в предел рекурсии."
       }
     }
   ],

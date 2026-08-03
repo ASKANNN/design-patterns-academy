@@ -363,6 +363,39 @@
     },
     {
       "question": {
+        "en": "In the House example, what makes a constructor covering every combination of parts unwieldy?",
+        "ru": "В примере с House, что делает конструктор, покрывающий все комбинации частей, неудобным?"
+      },
+      "hint": {
+        "en": "Most of the parts are optional and several depend on each other - what does listing them all as arguments look like?",
+        "ru": "Большинство частей опциональны, а некоторые зависят друг от друга - как будет выглядеть их перечисление в виде аргументов?"
+      },
+      "options": [
+        {
+          "en": "Most fields are optional, so many arguments would sit at defaults nobody remembers",
+          "ru": "Большинство полей опциональны, и многие аргументы остаются значениями по умолчанию, порядок которых никто не помнит"
+        },
+        {
+          "en": "JavaScript constructors cannot accept more than five arguments",
+          "ru": "Конструкторы JavaScript не могут принимать больше пяти аргументов"
+        },
+        {
+          "en": "A House object cannot have both a roof and a garage",
+          "ru": "Объект House не может иметь одновременно и крышу, и гараж"
+        },
+        {
+          "en": "The House class would need to extend Builder directly",
+          "ru": "Классу House пришлось бы напрямую наследоваться от Builder"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Most parts are optional and many depend on each other, so a constructor covering every combination explodes into new House(...) calls with half the arguments set to defaults nobody remembers the order of.",
+        "ru": "Большинство параметров опциональны, и многие зависят друг от друга, поэтому конструктор, покрывающий все комбинации, разрастается до вызовов new House(...), где половина аргументов - значения по умолчанию, порядок которых никто не помнит."
+      }
+    },
+    {
+      "question": {
         "en": "What problem does a House constructor covering every combination of walls, doors, windows, roof, and garage run into?",
         "ru": "С какой проблемой сталкивается конструктор House, покрывающий все комбинации стен, дверей, окон, крыши и гаража?"
       },
@@ -429,6 +462,39 @@
     },
     {
       "question": {
+        "en": "What can two different concrete builders implementing the same step interface produce?",
+        "ru": "Что могут производить два разных конкретных строителя, реализующих один и тот же интерфейс шагов?"
+      },
+      "hint": {
+        "en": "Compare a HouseBuilder to a HouseBlueprintBuilder consuming the same sequence of calls.",
+        "ru": "Сравните HouseBuilder с HouseBlueprintBuilder, принимающим ту же последовательность вызовов."
+      },
+      "options": [
+        {
+          "en": "Entirely different representations from the same step sequence",
+          "ru": "Совершенно разные представления из одной последовательности шагов"
+        },
+        {
+          "en": "Only identical House objects with different variable names",
+          "ru": "Только одинаковые объекты House с разными именами переменных"
+        },
+        {
+          "en": "A single shared House instance used by both builders",
+          "ru": "Единый общий экземпляр House, используемый обоими строителями"
+        },
+        {
+          "en": "Nothing - builders must all produce the same product type",
+          "ru": "Ничего - все строители обязаны производить один и тот же тип продукта"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A HouseBuilder and a HouseBlueprintBuilder could both consume the same steps but produce a livable house object versus a printable blueprint - entirely different representations from the same sequence of calls.",
+        "ru": "HouseBuilder и HouseBlueprintBuilder могут принимать одни и те же шаги, но производить готовый для проживания дом и печатный чертёж соответственно - совершенно разные представления из одной последовательности вызовов."
+      }
+    },
+    {
+      "question": {
         "en": "What role does the Director play in the Builder pattern?",
         "ru": "Какую роль играет Директор в паттерне Строитель?"
       },
@@ -462,6 +528,39 @@
     },
     {
       "question": {
+        "en": "According to the Product participant's role, must different builders share a product hierarchy?",
+        "ru": "Согласно роли участника Product, обязаны ли разные строители иметь общую иерархию продуктов?"
+      },
+      "hint": {
+        "en": "Look at what the structure description says about builders producing unrelated product types.",
+        "ru": "Посмотрите, что описание структуры говорит о строителях, производящих не связанные между собой типы продуктов."
+      },
+      "options": [
+        {
+          "en": "No - different builders may assemble unrelated product types",
+          "ru": "Нет - разные строители могут собирать никак не связанные типы продуктов"
+        },
+        {
+          "en": "Yes - every product must extend the same House base class",
+          "ru": "Да - каждый продукт обязан наследоваться от одного базового класса House"
+        },
+        {
+          "en": "Yes - the Director enforces one shared product hierarchy",
+          "ru": "Да - Директор навязывает единую общую иерархию продуктов"
+        },
+        {
+          "en": "No - but only if a Director is present",
+          "ru": "Нет - но только если присутствует Директор"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Different builders may assemble unrelated product types through the same step interface - nothing forces them to share a hierarchy.",
+        "ru": "Разные строители могут собирать никак не связанные типы продуктов через один и тот же интерфейс шагов - общая иерархия не обязательна."
+      }
+    },
+    {
+      "question": {
         "en": "What is a stated drawback of forgetting to call a required builder step?",
         "ru": "В чём заключается указанный недостаток, связанный с забытым обязательным шагом строителя?"
       },
@@ -491,6 +590,72 @@
       "explanation": {
         "en": "Unlike a constructor that forces all arguments up front, a skipped builder step just leaves that field at its default, producing an incomplete object unless the builder validates explicitly.",
         "ru": "В отличие от конструктора, требующего сразу все аргументы, пропущенный шаг строителя просто оставляет поле значением по умолчанию - получается неполный объект, если строитель не проверяет это явно."
+      }
+    },
+    {
+      "question": {
+        "en": "According to Builder's drawbacks, when is a builder class not worth introducing?",
+        "ru": "Согласно недостаткам Строителя, когда не стоит вводить класс строителя?"
+      },
+      "hint": {
+        "en": "Weigh the cost of a builder, a step interface, and a product against an object with very few fields.",
+        "ru": "Сравните затраты на строителя, интерфейс шагов и продукт с объектом, у которого совсем немного полей."
+      },
+      "options": [
+        {
+          "en": "For simple objects with only two or three fields",
+          "ru": "Для простых объектов с двумя-тремя полями"
+        },
+        {
+          "en": "Whenever the Director class is unavailable",
+          "ru": "Когда недоступен класс Директор"
+        },
+        {
+          "en": "Whenever a product has more than one build step",
+          "ru": "Когда у продукта больше одного шага сборки"
+        },
+        {
+          "en": "Only when the product is a House specifically",
+          "ru": "Только когда продукт - конкретно House"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Simple objects with two or three fields don't justify a builder class, a step interface, and a product - a plain constructor is clearer.",
+        "ru": "Для простых объектов с двумя-тремя полями класс строителя, интерфейс шагов и продукт избыточны - обычный конструктор нагляднее."
+      }
+    },
+    {
+      "question": {
+        "en": "Which listed real-world example matches Builder's shape?",
+        "ru": "Какой из перечисленных реальных примеров соответствует форме Строителя?"
+      },
+      "hint": {
+        "en": "Look for an example where a complex result accumulates through chained method calls before it's finally executed.",
+        "ru": "Найдите пример, где сложный результат накапливается через цепочку вызовов методов, прежде чем окончательно выполняется."
+      },
+      "options": [
+        {
+          "en": "Query builders chaining .select().where().limit() before executing SQL",
+          "ru": "Построители запросов, соединяющие .select().where().limit() перед выполнением SQL"
+        },
+        {
+          "en": "document.createElement(tag) returning different element classes",
+          "ru": "document.createElement(tag), возвращающий разные классы элементов"
+        },
+        {
+          "en": "A single Runtime object exposed once per process",
+          "ru": "Единственный объект Runtime, предоставляемый один раз на процесс"
+        },
+        {
+          "en": "structuredClone() deep-copying an arbitrary object",
+          "ru": "structuredClone(), глубоко копирующий произвольный объект"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Query builders in ORMs like Knex.js and TypeORM assemble a SQL query step by step through chained calls before it's compiled and executed - the same step-by-step assembly shape as Builder.",
+        "ru": "Построители запросов в ORM вроде Knex.js и TypeORM собирают SQL-запрос по шагам через цепочку вызовов перед его компиляцией и выполнением - та же форма пошаговой сборки, что и у Строителя."
       }
     }
   ],

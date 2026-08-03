@@ -417,35 +417,167 @@
     },
     {
       "question": {
-        "en": "What is a stated benefit of Decorator regarding attaching behavior?",
-        "ru": "Какое преимущество Декоратора указано в отношении подключения поведения?"
+        "en": "In the Notifier structure, what role does the Base Decorator (NotifierDecorator) play?",
+        "ru": "Какую роль в структуре Notifier играет базовый декоратор (NotifierDecorator)?"
       },
       "hint": {
-        "en": "Contrast this with subclassing, which locks behavior in before any object even exists - when can a decorator be applied instead?",
-        "ru": "Сравните с наследованием, которое фиксирует поведение ещё до появления объекта, - а когда можно применить декоратор?"
+        "en": "Look at what's common to SMSDecorator and SlackDecorator before either one adds its own step.",
+        "ru": "Посмотрите, что общего у SMSDecorator и SlackDecorator до того, как каждый добавит свой шаг."
       },
       "options": [
         {
-          "en": "Behavior can be attached to one object at runtime, no class changes",
-          "ru": "Поведение можно подключить к объекту во время выполнения"
+          "en": "A shared parent storing the wrapped Component and forwarding calls to it",
+          "ru": "Общий родитель, хранящий вложенный Компонент и передающий ему вызовы"
         },
         {
-          "en": "Behavior must be fixed at class-definition time for all instances",
-          "ru": "Поведение обязательно фиксируется на этапе определения класса для всех экземпляров"
+          "en": "The plain, undecorated object at the center of the stack",
+          "ru": "Обычный, ещё не декорированный объект в центре стека"
         },
         {
-          "en": "Behavior can only be removed, never added",
-          "ru": "Поведение можно только убирать, но никогда не добавлять"
+          "en": "The client code that assembles the stack of decorators",
+          "ru": "Клиентский код, собирающий стек декораторов"
         },
         {
-          "en": "Behavior changes affect every instance of the base class simultaneously",
-          "ru": "Изменения поведения затрагивают одновременно все экземпляры базового класса"
+          "en": "The interface that both Component and every decorator must satisfy",
+          "ru": "Интерфейс, которому должны соответствовать Компонент и каждый декоратор"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Behavior can be attached to or removed from one specific object at runtime, without touching the class definition or any other instance.",
-        "ru": "Поведение можно подключить к конкретному объекту или убрать от него во время выполнения, не трогая определение класса или другие экземпляры."
+        "en": "The Base Decorator is a shared parent for all decorators that stores the wrapped Component and forwards calls to it, so each concrete decorator only needs to add its own piece.",
+        "ru": "Базовый декоратор - это общий родитель для всех декораторов, хранящий вложенный Компонент и передающий ему вызовы, благодаря чему каждый конкретный декоратор добавляет только свою часть."
+      }
+    },
+    {
+      "question": {
+        "en": "Why must both EmailNotifier and every decorator implement the same `Notifier` interface?",
+        "ru": "Почему и EmailNotifier, и каждый декоратор обязаны реализовывать один и тот же интерфейс `Notifier`?"
+      },
+      "hint": {
+        "en": "Think about what lets a decorator be wrapped by another decorator.",
+        "ru": "Подумайте, что позволяет одному декоратору быть обёрнутым другим декоратором."
+      },
+      "options": [
+        {
+          "en": "So a decorator is itself a Notifier and decorators can be stacked",
+          "ru": "Чтобы декоратор сам являлся Notifier и декораторы можно было накладывать друг на друга"
+        },
+        {
+          "en": "So the compiler can optimize away unused decorators",
+          "ru": "Чтобы компилятор мог удалять неиспользуемые декораторы"
+        },
+        {
+          "en": "So only one decorator can ever wrap EmailNotifier at a time",
+          "ru": "Чтобы EmailNotifier мог быть обёрнут только одним декоратором одновременно"
+        },
+        {
+          "en": "So EmailNotifier can call methods defined only on SMSDecorator",
+          "ru": "Чтобы EmailNotifier мог вызывать методы, определённые только в SMSDecorator"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "NotifierDecorator also extends Notifier, so a decorator is itself a Notifier - that shared interface is exactly what lets decorators be stacked on top of each other.",
+        "ru": "NotifierDecorator тоже расширяет Notifier, то есть декоратор сам является Notifier - именно этот общий интерфейс и позволяет накладывать декораторы друг на друга."
+      }
+    },
+    {
+      "question": {
+        "en": "In the walkthrough, what does SMSDecorator's `send()` do, in order?",
+        "ru": "Что делает `send()` у SMSDecorator, согласно разбору кода, и в каком порядке?"
+      },
+      "hint": {
+        "en": "Look at the sequence of calls inside SMSDecorator's send() method - what comes before the console.log?",
+        "ru": "Посмотрите на последовательность вызовов внутри send() у SMSDecorator - что идёт перед console.log?"
+      },
+      "options": [
+        {
+          "en": "Calls super.send() first, then logs its own SMS line",
+          "ru": "Сначала вызывает super.send(), затем выводит свою строку про SMS"
+        },
+        {
+          "en": "Logs its own SMS line first, then calls super.send()",
+          "ru": "Сначала выводит строку про SMS, затем вызывает super.send()"
+        },
+        {
+          "en": "Replaces super.send() entirely with its own SMS logic",
+          "ru": "Полностью заменяет super.send() собственной логикой SMS"
+        },
+        {
+          "en": "Calls super.send() only if no phone number was provided",
+          "ru": "Вызывает super.send() только если номер телефона не указан"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "SMSDecorator's send() calls super.send(message) first, running whatever is wrapped, then adds its own console.log for the SMS - extending behavior without modifying the wrapped object.",
+        "ru": "send() у SMSDecorator сначала вызывает super.send(message), запуская то, что обёрнуто, а затем добавляет собственный console.log для SMS - поведение расширяется без изменения обёрнутого объекта."
+      }
+    },
+    {
+      "question": {
+        "en": "Given `notifier = new SMSDecorator(notifier, ...)` followed by `notifier = new SlackDecorator(notifier, ...)`, in what order does a single `notifier.send(...)` call trigger the three channels?",
+        "ru": "После `notifier = new SMSDecorator(notifier, ...)`, а затем `notifier = new SlackDecorator(notifier, ...)`, в каком порядке один вызов `notifier.send(...)` запускает три канала?"
+      },
+      "hint": {
+        "en": "Each decorator calls into its wrapped object before adding its own step - trace the call chain from the outermost layer inward.",
+        "ru": "Каждый декоратор сначала вызывает вложенный объект, а потом добавляет свой шаг - проследите цепочку вызовов от внешнего слоя внутрь."
+      },
+      "options": [
+        {
+          "en": "Email, then SMS, then Slack",
+          "ru": "Email, затем SMS, затем Slack"
+        },
+        {
+          "en": "Slack, then SMS, then Email",
+          "ru": "Slack, затем SMS, затем Email"
+        },
+        {
+          "en": "SMS and Slack simultaneously, then Email",
+          "ru": "SMS и Slack одновременно, затем Email"
+        },
+        {
+          "en": "Only Slack fires, since it's the outermost wrapper",
+          "ru": "Срабатывает только Slack, поскольку это самая внешняя обёртка"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "notifier ends up wrapped as SlackDecorator(SMSDecorator(EmailNotifier)), and since each decorator delegates inward before adding its own step, send() triggers email, SMS, and Slack in that nested order.",
+        "ru": "notifier в итоге оказывается обёрнут как SlackDecorator(SMSDecorator(EmailNotifier)), и поскольку каждый декоратор сначала делегирует вызов внутрь, а затем добавляет свой шаг, send() запускает email, SMS и Slack именно в этом вложенном порядке."
+      }
+    },
+    {
+      "question": {
+        "en": "According to the pattern's stated drawbacks, what happens when decorators aren't commutative?",
+        "ru": "Согласно указанным недостаткам паттерна, что происходит, если декораторы не коммутативны?"
+      },
+      "hint": {
+        "en": "Think about what changes if you apply SMSDecorator before SlackDecorator versus the reverse order.",
+        "ru": "Подумайте, что изменится, если применить SMSDecorator до SlackDecorator, а не наоборот."
+      },
+      "options": [
+        {
+          "en": "The order they're applied in changes the result, making the stack error-prone",
+          "ru": "Порядок их применения влияет на результат, что делает сборку стека источником ошибок"
+        },
+        {
+          "en": "The base object throws a runtime exception",
+          "ru": "Базовый объект выбрасывает исключение времени выполнения"
+        },
+        {
+          "en": "The decorators automatically reorder themselves to match a fixed sequence",
+          "ru": "Декораторы автоматически переупорядочиваются в фиксированной последовательности"
+        },
+        {
+          "en": "Only the innermost decorator's behavior ever runs",
+          "ru": "Выполняется только поведение самого внутреннего декоратора"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "When decorators aren't commutative, the order they're applied in changes the result, which makes assembling the stack error-prone.",
+        "ru": "Если декораторы не коммутативны, порядок их применения влияет на результат, что делает сборку стека источником ошибок."
       }
     },
     {
@@ -479,6 +611,39 @@
       "explanation": {
         "en": "Pulling one wrapper out of the middle of a stack usually means rebuilding it, since each layer only knows about its immediate neighbor.",
         "ru": "Извлечение обёртки из середины стека обычно требует пересборки всего стека, поскольку каждый слой знает только о своём непосредственном соседе."
+      }
+    },
+    {
+      "question": {
+        "en": "How do Java's `BufferedInputStream` and `GZIPInputStream` illustrate Decorator, per the real-world examples?",
+        "ru": "Как `BufferedInputStream` и `GZIPInputStream` в Java иллюстрируют Декоратор, согласно примерам из реальной практики?"
+      },
+      "hint": {
+        "en": "Both classes take a raw InputStream as a constructor argument - what do they do with it?",
+        "ru": "Оба класса принимают исходный InputStream аргументом конструктора - что они с ним делают?"
+      },
+      "options": [
+        {
+          "en": "They wrap a raw InputStream to add buffering or decompression",
+          "ru": "Они оборачивают исходный InputStream, добавляя буферизацию или разжатие"
+        },
+        {
+          "en": "They replace InputStream with an entirely new base class",
+          "ru": "Они заменяют InputStream совершенно новым базовым классом"
+        },
+        {
+          "en": "They subclass InputStream once per possible combination of features",
+          "ru": "Они создают подкласс InputStream на каждую возможную комбинацию возможностей"
+        },
+        {
+          "en": "They require modifying the underlying stream class directly",
+          "ru": "Они требуют прямого изменения самого класса потока"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "BufferedInputStream and GZIPInputStream wrap a raw InputStream to add buffering or decompression without changing the underlying stream class - the same wrap-without-modifying idea as the Notifier decorators.",
+        "ru": "BufferedInputStream и GZIPInputStream оборачивают исходный InputStream, добавляя буферизацию или разжатие без изменения самого класса потока - та же идея обёртки без изменения, что и у декораторов Notifier."
       }
     }
   ],

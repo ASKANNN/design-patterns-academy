@@ -309,8 +309,41 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Strategy packages a group of interchangeable algorithms into their own classes and lets the object using them switch between algorithms at runtime through a shared interface.",
-        "ru": "Стратегия оформляет набор взаимозаменяемых алгоритмов в виде отдельных классов и позволяет объекту, который их использует, переключаться между алгоритмами во время выполнения через общий интерфейс."
+        "en": "Take the navigation app: instead of one giant if/else inside Navigator for walking, driving, and later cycling, each route-building algorithm gets its own class behind a shared interface, and Navigator just calls whichever one is currently plugged in.",
+        "ru": "Возьмём навигационное приложение: вместо одного гигантского if/else внутри Navigator для пешего маршрута, автомобильного, а потом ещё и велосипедного, каждый алгоритм построения маршрута получает свой класс за общим интерфейсом, а Navigator просто вызывает тот, что сейчас подключён."
+      }
+    },
+    {
+      "question": {
+        "en": "In the navigation-app example, why does a walking route need to be calculated differently from a road route?",
+        "ru": "В примере с навигационным приложением почему пеший маршрут нужно рассчитывать иначе, чем автомобильный?"
+      },
+      "hint": {
+        "en": "Compare what a person on foot cares about versus what a driver is bound by.",
+        "ru": "Сравните, что важно для пешехода и чем связан водитель."
+      },
+      "options": [
+        {
+          "en": "One favors footpaths and shortcuts, the other follows streets and traffic rules",
+          "ru": "Один предпочитает тропинки и срезки, другой следует улицам и правилам движения"
+        },
+        {
+          "en": "Walking routes are always shorter in distance than road routes",
+          "ru": "Пешие маршруты всегда короче по расстоянию, чем автомобильные"
+        },
+        {
+          "en": "Road routes never need a starting or ending point",
+          "ru": "Автомобильным маршрутам никогда не нужны начальная и конечная точки"
+        },
+        {
+          "en": "Only walking routes can be computed by a Navigator class",
+          "ru": "Только пешие маршруты может рассчитывать класс Navigator"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A walking route favors footpaths and shortcuts, while a road route must follow streets and traffic rules, which is exactly the kind of variation Strategy is meant to isolate into separate classes.",
+        "ru": "Пеший маршрут предпочитает тропинки и срезки, а автомобильный обязан следовать улицам и правилам дорожного движения - именно такое различие Стратегия и призвана вынести в отдельные классы."
       }
     },
     {
@@ -410,6 +443,138 @@
       "explanation": {
         "en": "The context works with all strategies through a generic interface exposing a single method that triggers the algorithm, making it independent of concrete strategies.",
         "ru": "Контекст взаимодействует со всеми стратегиями через единый интерфейс, выставляющий один метод, запускающий алгоритм, - это делает контекст независимым от конкретных стратегий."
+      }
+    },
+    {
+      "question": {
+        "en": "What role does the client play once a strategy has been handed to the context?",
+        "ru": "Какую роль играет клиент после того, как стратегия передана контексту?"
+      },
+      "hint": {
+        "en": "The context exposes a setter for a reason - what can the client still do after the initial handoff?",
+        "ru": "Контекст неспроста предоставляет сеттер - что клиент всё ещё может сделать после первоначальной передачи?"
+      },
+      "options": [
+        {
+          "en": "It can replace the strategy at runtime through a setter",
+          "ru": "Может заменить стратегию во время выполнения через сеттер"
+        },
+        {
+          "en": "It has no further role once the strategy object is created",
+          "ru": "У него больше нет никакой роли после создания объекта стратегии"
+        },
+        {
+          "en": "It must recreate the entire context to change strategies",
+          "ru": "Он обязан пересоздать весь контекст, чтобы сменить стратегию"
+        },
+        {
+          "en": "It becomes responsible for implementing the algorithm itself",
+          "ru": "Он становится ответственным за реализацию самого алгоритма"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The context exposes a setter that lets clients replace the strategy at runtime, so the client can create a strategy object, pass it to the context, and swap it out later.",
+        "ru": "Контекст предоставляет сеттер, позволяющий клиентам заменять стратегию во время выполнения, - клиент может создать объект-стратегию, передать его контексту, а затем заменить позже."
+      }
+    },
+    {
+      "question": {
+        "en": "According to the pros listed for Strategy, what happens to a tangled chain of conditionals?",
+        "ru": "Согласно перечисленным преимуществам Стратегии, что происходит с запутанной цепочкой условных операторов?"
+      },
+      "hint": {
+        "en": "Think about what the context does with a strategy object instead of branching on a type.",
+        "ru": "Подумайте, что делает контекст с объектом стратегии вместо ветвления по типу."
+      },
+      "options": [
+        {
+          "en": "It gets replaced by composition - the context holds and delegates",
+          "ru": "Она заменяется композицией - контекст хранит объект и делегирует ему"
+        },
+        {
+          "en": "It gets duplicated once per concrete strategy class",
+          "ru": "Она дублируется по одному разу для каждого класса стратегии"
+        },
+        {
+          "en": "It moves unchanged into the Strategy interface itself",
+          "ru": "Она без изменений переносится в сам интерфейс стратегии"
+        },
+        {
+          "en": "It becomes the client's responsibility to maintain forever",
+          "ru": "Она навсегда становится обязанностью клиента"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A tangled chain of conditionals gets replaced by composition: the context simply holds and delegates to an object, rather than branching on type internally.",
+        "ru": "Запутанная цепочка условных операторов заменяется композицией: контекст просто хранит объект и делегирует ему работу, вместо ветвления по типу внутри себя."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a stated drawback of Strategy for a handful of algorithms that almost never change?",
+        "ru": "Какой недостаток Стратегии указан для небольшого числа алгоритмов, которые почти никогда не меняются?"
+      },
+      "hint": {
+        "en": "Weigh the ceremony of a full class hierarchy against how often that flexibility actually gets used.",
+        "ru": "Сравните формальности полноценной иерархии классов с тем, как часто эта гибкость реально используется."
+      },
+      "options": [
+        {
+          "en": "A strategy hierarchy adds more ceremony than a simple conditional would",
+          "ru": "Иерархия стратегий добавляет больше формальностей, чем простое условие"
+        },
+        {
+          "en": "It makes those algorithms impossible to test independently",
+          "ru": "Это делает такие алгоритмы невозможными для независимого тестирования"
+        },
+        {
+          "en": "It forces every algorithm to share a single implementation",
+          "ru": "Это заставляет все алгоритмы использовать одну общую реализацию"
+        },
+        {
+          "en": "It prevents the context from ever being reused elsewhere",
+          "ru": "Это не позволяет повторно использовать контекст где-либо ещё"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "For a handful of algorithms that almost never change, a strategy hierarchy adds more ceremony than a simple conditional would.",
+        "ru": "Если алгоритмов немного и они почти не меняются, иерархия стратегий добавляет больше формальностей, чем простое условие."
+      }
+    },
+    {
+      "question": {
+        "en": "Does Strategy make the decision logic about which algorithm to use disappear?",
+        "ru": "Устраняет ли Стратегия саму логику выбора, какой алгоритм использовать?"
+      },
+      "hint": {
+        "en": "The context never chooses - so where does the choosing still have to happen?",
+        "ru": "Контекст никогда не выбирает сам - так где всё же приходится делать этот выбор?"
+      },
+      "options": [
+        {
+          "en": "No - it just moves to the client, which must know the strategies",
+          "ru": "Нет - она просто переносится к клиенту, который должен знать стратегии"
+        },
+        {
+          "en": "Yes - Strategy eliminates the need for any decision entirely",
+          "ru": "Да - Стратегия полностью устраняет необходимость в каком-либо выборе"
+        },
+        {
+          "en": "Yes - the Strategy interface makes the decision automatically",
+          "ru": "Да - интерфейс стратегии делает выбор автоматически"
+        },
+        {
+          "en": "No - it moves into the ConcreteStrategy classes themselves",
+          "ru": "Нет - она переносится в сами классы конкретных стратегий"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The calling code has to know which strategies exist and what each one is for, so the decision logic doesn't disappear - it just moves to the client.",
+        "ru": "Вызывающий код должен знать, какие стратегии существуют и для чего каждая из них нужна, - логика выбора никуда не исчезает, а просто переносится к клиенту."
       }
     },
     {

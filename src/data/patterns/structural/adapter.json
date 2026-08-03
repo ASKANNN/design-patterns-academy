@@ -340,35 +340,134 @@
     },
     {
       "question": {
-        "en": "In the payment example, why can't you just rename the new provider's `submitTransaction` method to `charge`?",
-        "ru": "В примере с оплатой - почему нельзя просто переименовать метод `submitTransaction` нового провайдера в `charge`?"
+        "en": "In the checkout example, what's the actual problem with the new provider's SDK?",
+        "ru": "В примере с чекаутом - в чём именно проблема с SDK нового провайдера?"
       },
       "hint": {
-        "en": "Who owns that SDK's code, and who controls its releases?",
-        "ru": "Кому принадлежит код этого SDK и кто контролирует его релизы?"
+        "en": "Compare the two method signatures mentioned in the problem description.",
+        "ru": "Сравните две сигнатуры методов, упомянутые в описании проблемы."
       },
       "options": [
         {
-          "en": "It's someone else's package, so its source can't be changed",
-          "ru": "Это чужой пакет, его исходный код нельзя менять"
+          "en": "Its method takes a differently-shaped argument than the one your code calls everywhere",
+          "ru": "Его метод принимает аргумент другой формы, чем тот, что вызывается по всему коду"
         },
         {
-          "en": "JavaScript doesn't allow renaming methods",
-          "ru": "В JavaScript запрещено переименовывать методы"
+          "en": "It doesn't support charging cards at all",
+          "ru": "Он вообще не поддерживает списание с карт"
         },
         {
-          "en": "The checkout flow has no other call sites to update",
-          "ru": "В чекауте больше нет других мест вызова, которые нужно обновлять"
+          "en": "It's written in a different programming language",
+          "ru": "Он написан на другом языке программирования"
         },
         {
-          "en": "The new provider's SDK has no methods at all",
-          "ru": "У SDK нового провайдера вообще нет методов"
+          "en": "It requires a network call while the old one didn't",
+          "ru": "Он требует сетевого вызова, в отличие от старого"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "The SDK belongs to someone else and is updated independently, so you can't rename its method - you need a wrapper instead.",
-        "ru": "SDK принадлежит другой стороне и обновляется независимо, поэтому переименовать его метод нельзя - нужна обёртка."
+        "en": "Your code calls `charge(amountCents, cardToken)` everywhere, but the new SDK only exposes `submitTransaction({ total, currency, source })` - a mismatched method name and argument shape.",
+        "ru": "Ваш код повсюду вызывает `charge(amountCents, cardToken)`, но новый SDK предоставляет только `submitTransaction({ total, currency, source })` - несовпадающее имя метода и форма аргументов."
+      }
+    },
+    {
+      "question": {
+        "en": "In the Adapter structure, what interface does Client code depend on?",
+        "ru": "На какой интерфейс опирается клиентский код в структуре Адаптера?"
+      },
+      "hint": {
+        "en": "Check the structure description - which participant does the Client talk to directly?",
+        "ru": "Загляните в описание структуры - с каким участником Клиент взаимодействует напрямую?"
+      },
+      "options": [
+        {
+          "en": "Only the Target interface",
+          "ru": "Только на интерфейс Target"
+        },
+        {
+          "en": "Directly the Adaptee's own interface",
+          "ru": "Напрямую на собственный интерфейс Adaptee"
+        },
+        {
+          "en": "Both Target and Adaptee equally",
+          "ru": "Одновременно на Target и Adaptee"
+        },
+        {
+          "en": "Whichever interface is fastest at runtime",
+          "ru": "На тот интерфейс, что быстрее работает в рантайме"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Client code is written against the Target interface only, unaware that an Adapter is translating calls behind it.",
+        "ru": "Клиентский код написан только под интерфейс Target и не подозревает о преобразовании, происходящем за ним."
+      }
+    },
+    {
+      "question": {
+        "en": "In the walkthrough, what does PaymentAdapter's `charge()` method do with the SDK's response?",
+        "ru": "В разборе кода - что делает метод `charge()` класса PaymentAdapter с ответом от SDK?"
+      },
+      "hint": {
+        "en": "Look at what type `charge()` promises to return versus what `submitTransaction` actually returns.",
+        "ru": "Посмотрите, какой тип обещает вернуть `charge()`, а что на самом деле возвращает `submitTransaction`."
+      },
+      "options": [
+        {
+          "en": "Converts the SDK's result back into the boolean charge() promises to return",
+          "ru": "Превращает результат SDK обратно в булево значение, которое обещает вернуть charge()"
+        },
+        {
+          "en": "Passes the SDK's raw result object straight back to the caller",
+          "ru": "Передаёт вызывающему коду сырой объект результата от SDK без изменений"
+        },
+        {
+          "en": "Logs the result and returns nothing",
+          "ru": "Логирует результат и ничего не возвращает"
+        },
+        {
+          "en": "Stores the result in a database before returning",
+          "ru": "Сохраняет результат в базе данных перед возвратом"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The adapter builds the request object submitTransaction expects, then converts its result back into the boolean that charge() promises to return.",
+        "ru": "Адаптер собирает объект запроса, ожидаемый submitTransaction, а затем превращает его результат обратно в булево значение, которое обещает вернуть charge()."
+      }
+    },
+    {
+      "question": {
+        "en": "In the code example, what does the `checkout()` function's signature reveal about its dependency on NewProviderSDK?",
+        "ru": "Что сигнатура функции `checkout()` в примере кода говорит о её зависимости от NewProviderSDK?"
+      },
+      "hint": {
+        "en": "Check which type checkout()'s parameter is annotated with, and whether NewProviderSDK is mentioned in its body.",
+        "ru": "Проверьте, каким типом аннотирован параметр checkout() и упоминается ли NewProviderSDK в его теле."
+      },
+      "options": [
+        {
+          "en": "checkout() takes a PaymentProcessor and never mentions NewProviderSDK at all",
+          "ru": "checkout() принимает PaymentProcessor и вообще не упоминает NewProviderSDK"
+        },
+        {
+          "en": "checkout() calls NewProviderSDK's submitTransaction directly as a fallback",
+          "ru": "checkout() напрямую вызывает submitTransaction у NewProviderSDK как запасной вариант"
+        },
+        {
+          "en": "checkout() imports NewProviderSDK to validate the adapter's output",
+          "ru": "checkout() импортирует NewProviderSDK, чтобы проверить вывод адаптера"
+        },
+        {
+          "en": "checkout() instantiates NewProviderSDK internally on every call",
+          "ru": "checkout() создаёт экземпляр NewProviderSDK внутри при каждом вызове"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "checkout() only calls `processor.charge(amountCents, cardToken)` and nothing in it mentions NewProviderSDK, so it works with any PaymentProcessor implementation.",
+        "ru": "checkout() вызывает только `processor.charge(amountCents, cardToken)`, и нигде в нём не упоминается NewProviderSDK, поэтому он работает с любой реализацией PaymentProcessor."
       }
     },
     {
@@ -402,6 +501,39 @@
       "explanation": {
         "en": "All the translation logic lives in one isolated wrapper class rather than being smeared across the codebase.",
         "ru": "Вся логика перевода сосредоточена в одном изолированном классе-обёртке, а не размазана по кодовой базе."
+      }
+    },
+    {
+      "question": {
+        "en": "According to the pattern's participants, what role does the Adapter class play?",
+        "ru": "Какую роль, согласно участникам паттерна, играет класс Adapter?"
+      },
+      "hint": {
+        "en": "Think about what the Adapter implements versus what it holds internally.",
+        "ru": "Подумайте, что Adapter реализует, а что хранит внутри себя."
+      },
+      "options": [
+        {
+          "en": "It implements Target and holds an Adaptee instance to forward reformatted calls to",
+          "ru": "Реализует Target и хранит экземпляр Adaptee, которому передаёт переформатированные вызовы"
+        },
+        {
+          "en": "It implements Adaptee and holds a Target instance for reference",
+          "ru": "Реализует Adaptee и хранит экземпляр Target для справки"
+        },
+        {
+          "en": "It replaces both Target and Adaptee with a single merged class",
+          "ru": "Заменяет и Target, и Adaptee единым объединённым классом"
+        },
+        {
+          "en": "It only defines the Target interface without implementing it",
+          "ru": "Лишь определяет интерфейс Target, не реализуя его"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The Adapter implements Target so the Client can call it normally, while internally holding the wrapped Adaptee and reformatting each call before forwarding it.",
+        "ru": "Adapter реализует Target, чтобы клиент мог вызывать его как обычно, и внутренне хранит обёрнутый Adaptee, переформатируя каждый вызов перед его передачей."
       }
     },
     {
@@ -468,6 +600,39 @@
       "explanation": {
         "en": "Stacking several adapters obscures where a value actually gets transformed, complicating debugging.",
         "ru": "Наложение нескольких адаптеров друг на друга скрывает место, где значение фактически преобразуется, усложняя отладку."
+      }
+    },
+    {
+      "question": {
+        "en": "According to the real-world examples, what does Java's `Arrays.asList()` do?",
+        "ru": "Согласно примерам из реального мира - что делает `Arrays.asList()` в Java?"
+      },
+      "hint": {
+        "en": "Think about what it wraps and whether it copies the underlying data.",
+        "ru": "Подумайте, что именно оно оборачивает и копирует ли исходные данные."
+      },
+      "options": [
+        {
+          "en": "Wraps a plain array so it fits code expecting the List interface, without copying data",
+          "ru": "Оборачивает обычный массив, чтобы он подошёл коду, ожидающему интерфейс List, без копирования данных"
+        },
+        {
+          "en": "Converts a List into a plain array by copying every element",
+          "ru": "Преобразует List в обычный массив, копируя каждый элемент"
+        },
+        {
+          "en": "Sorts an array in place before returning it as a List",
+          "ru": "Сортирует массив на месте перед возвратом в виде List"
+        },
+        {
+          "en": "Creates a new empty List unrelated to the original array",
+          "ru": "Создаёт новый пустой List, не связанный с исходным массивом"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Arrays.asList() wraps a plain array so it can be handed to any code expecting the List interface, without copying the underlying data - a textbook Adapter use.",
+        "ru": "Arrays.asList() оборачивает обычный массив, позволяя передать его в код, ожидающий интерфейс List, без копирования исходных данных, - классический пример применения Адаптера."
       }
     }
   ],

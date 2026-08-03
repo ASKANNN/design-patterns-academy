@@ -278,12 +278,14 @@ only and may lag between updates.
 
 - [x] Interactive code walkthroughs — all 23 patterns done, see below
 - [x] Pattern playgrounds — all 23 patterns done, see below
-- [x] Quizzes — all 23 patterns done (5 questions each, verified via
-      Playwright end to end for representative patterns from each
-      category; dark-theme visual review passed). The `Quiz` engine
+- [x] Quizzes — all 23 patterns done (10 questions each as of 2026-08-02,
+      up from the original 5, see quiz content/UX revision note below;
+      verified via Playwright end to end for representative patterns from
+      each category; dark-theme visual review passed). The `Quiz` engine
       (`src/components/ui/Quiz.js`) shuffles question order and option
       order on every render, so the correct answer's position and the
-      first question shown are never predictable.
+      first question shown are never predictable. A pass/fail results
+      screen with tailored copy was added 2026-08-02.
 - Owner manually tested quizzes, walkthroughs, and playgrounds across all
   23 patterns and confirmed them working (2026-07-31).
 
@@ -411,6 +413,18 @@ only and may lag between updates.
 > `Quiz.js` (Fisher–Yates shuffle of question order and option order per
 > render) rather than by rewriting per-pattern JSON — applies to all 23
 > patterns automatically.
+>
+> **Quiz content/UX revision (owner review, 2026-08-02):** owner found the
+> shipped quizzes frustrating — questions phrased in a convoluted way,
+> answer options too similar/wordy to tell apart, and hints either dead
+> giveaways or too vague to help. Question count per pattern raised from
+> 5 to **10**, all 10 rewritten for clarity per pattern (same
+> sourced-from-own-JSON rule, still `correct: 0` by convention pre-shuffle).
+> Results screen also gained a proper pass/fail state: celebratory
+> title+message on pass (score ratio >= 0.7, distinct copy for a perfect
+> score), professional encouraging retry copy on fail — see
+> `patterns.quiz.result_*` locale keys, `Quiz.js`, and
+> `interactions/quiz.js`.
 
 ---
 

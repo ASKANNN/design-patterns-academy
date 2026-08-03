@@ -330,6 +330,39 @@
     },
     {
       "question": {
+        "en": "In the vector-graphics editor example, when does the app need to remember how a shape looked a moment ago?",
+        "ru": "В примере с векторным редактором когда приложению нужно запомнить, как фигура выглядела мгновение назад?"
+      },
+      "hint": {
+        "en": "Undo has to have something to roll back to - so when does that snapshot need to be taken?",
+        "ru": "Отмене нужно к чему-то откатываться - в какой момент должен делаться снимок?"
+      },
+      "options": [
+        {
+          "en": "Before every move, resize, or color change",
+          "ru": "Перед каждым перемещением, изменением размера или цвета"
+        },
+        {
+          "en": "Only once, when the application first starts",
+          "ru": "Только один раз, при запуске приложения"
+        },
+        {
+          "en": "Only when the user explicitly saves the file",
+          "ru": "Только когда пользователь явно сохраняет файл"
+        },
+        {
+          "en": "Only after the shape has been deleted",
+          "ru": "Только после того, как фигура была удалена"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Before every move, resize, or color change, the app should remember how the shape looked a moment ago, so that change can later be undone.",
+        "ru": "Перед каждым перемещением, изменением размера или цвета приложение должно запомнить, как фигура выглядела мгновение назад, чтобы это изменение можно было позже отменить."
+      }
+    },
+    {
+      "question": {
         "en": "What goes wrong if an undo manager reaches directly into a shape and copies out its fields?",
         "ru": "Что идёт не так, если менеджер отмены напрямую залезает в фигуру и копирует её поля?"
       },
@@ -396,6 +429,39 @@
     },
     {
       "question": {
+        "en": "Once outside code holds a memento, what can it do with it?",
+        "ru": "Что может делать внешний код со снимком, получив его на руки?"
+      },
+      "hint": {
+        "en": "The memento is opaque to everyone except the originator that made it - what's left for a holder to do besides looking inside?",
+        "ru": "Снимок непрозрачен для всех, кроме создавшего его создателя, - что остаётся делать держателю снимка, кроме как заглядывать внутрь?"
+      },
+      "options": [
+        {
+          "en": "Hold it, store it, or pass it back later to be restored",
+          "ru": "Хранить его, сохранять или позже передать обратно для восстановления"
+        },
+        {
+          "en": "Read and modify any field inside it directly",
+          "ru": "Напрямую читать и изменять любое поле внутри него"
+        },
+        {
+          "en": "Convert it into a new originator instance",
+          "ru": "Преобразовать его в новый экземпляр создателя"
+        },
+        {
+          "en": "Merge it with another memento into one combined snapshot",
+          "ru": "Слить его с другим снимком в один объединённый снимок"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Outside code can hold onto a memento, store it, or pass it back later to be restored, but it can't peek inside or modify what it holds - only the originator that created it can read its contents.",
+        "ru": "Внешний код может хранить снимок, передавать его дальше и позже вернуть для восстановления, но не может заглянуть внутрь или изменить содержимое - читать его может только создавший его создатель."
+      }
+    },
+    {
+      "question": {
         "en": "What does the caretaker need to know about the state stored in a memento?",
         "ru": "Что опекуну нужно знать о состоянии, хранящемся в снимке?"
       },
@@ -429,6 +495,39 @@
     },
     {
       "question": {
+        "en": "According to the pros listed for Memento, what happens to history bookkeeping like how many snapshots to keep?",
+        "ru": "Согласно перечисленным преимуществам Снимка, что происходит с учётом истории - например, сколько снимков хранить?"
+      },
+      "hint": {
+        "en": "Which of the three roles is described as owning the bookkeeping, keeping it out of the object with the actual state?",
+        "ru": "Какая из трёх ролей описана как отвечающая за учёт истории, оставляя эту логику вне объекта с реальным состоянием?"
+      },
+      "options": [
+        {
+          "en": "It is entirely the caretaker's job, kept out of the originator",
+          "ru": "Это полностью задача опекуна, вынесенная за пределы создателя"
+        },
+        {
+          "en": "It is split evenly between the originator and the memento",
+          "ru": "Она поровну делится между создателем и снимком"
+        },
+        {
+          "en": "It is the memento's own responsibility to prune itself",
+          "ru": "Это собственная обязанность снимка - удалять себя самому"
+        },
+        {
+          "en": "Memento has no concept of bookkeeping at all",
+          "ru": "У Снимка вообще нет понятия учёта истории"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "History bookkeeping (how many snapshots to keep, when to discard old ones) is entirely the caretaker's job, keeping that logic out of the originator.",
+        "ru": "Учёт истории (сколько снимков хранить, когда удалять старые) полностью ложится на опекуна, оставляя эту логику вне создателя."
+      }
+    },
+    {
+      "question": {
         "en": "What is a stated drawback of keeping a long history of full snapshots?",
         "ru": "Какой недостаток указан для хранения длинной истории полных снимков?"
       },
@@ -458,6 +557,72 @@
       "explanation": {
         "en": "Keeping a long history of full snapshots can burn through memory fast, especially if the originator's state is large.",
         "ru": "Хранение длинной истории полных снимков может быстро съедать память, особенно если состояние создателя велико."
+      }
+    },
+    {
+      "question": {
+        "en": "What can go wrong with memento encapsulation in a language without real private fields?",
+        "ru": "Что может пойти не так с инкапсуляцией снимка в языке без настоящих приватных полей?"
+      },
+      "hint": {
+        "en": "The intended rule is that only the originator reads a memento's contents - what enforces that rule, or fails to?",
+        "ru": "Задуманное правило - что содержимое снимка читает только создатель - что обеспечивает это правило, а что может его нарушить?"
+      },
+      "options": [
+        {
+          "en": "Nothing stops other code from reaching in and mutating it",
+          "ru": "Ничто не мешает постороннему коду залезть внутрь и изменить его"
+        },
+        {
+          "en": "The memento automatically encrypts its own fields",
+          "ru": "Снимок автоматически шифрует свои поля"
+        },
+        {
+          "en": "The originator loses the ability to create new mementos",
+          "ru": "Создатель теряет способность создавать новые снимки"
+        },
+        {
+          "en": "The caretaker is forced to read the memento's fields directly",
+          "ru": "Опекун вынужден напрямую считывать поля снимка"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "In languages without real private fields, nothing stops other code from reaching into a memento and mutating it despite the intended encapsulation.",
+        "ru": "В языках без настоящих приватных полей ничто не мешает постороннему коду залезть в снимок и изменить его, несмотря на задуманную инкапсуляцию."
+      }
+    },
+    {
+      "question": {
+        "en": "Why is it easy to serialize, log, or send a memento across a network for later replay?",
+        "ru": "Почему снимок легко сериализовать, логировать или отправлять по сети для последующего воспроизведения?"
+      },
+      "hint": {
+        "en": "Think about what kind of thing a memento fundamentally is, compared to a live object with behavior.",
+        "ru": "Подумайте, чем по сути является снимок в сравнении с живым объектом с поведением."
+      },
+      "options": [
+        {
+          "en": "It's just a value carrying a copy of state",
+          "ru": "Это просто значение с копией состояния"
+        },
+        {
+          "en": "It contains a live reference back to the originator's methods",
+          "ru": "Он содержит живую ссылку на методы создателя"
+        },
+        {
+          "en": "It automatically compresses itself before being stored",
+          "ru": "Он автоматически сжимает себя перед сохранением"
+        },
+        {
+          "en": "The caretaker rewrites it into a network-friendly format",
+          "ru": "Опекун переписывает его в формат, удобный для сети"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Because a memento is just a value carrying a copy of state, it's easy to serialize, log, or send across a network for later replay.",
+        "ru": "Поскольку снимок - это просто значение с копией состояния, его легко сериализовать, логировать или отправлять по сети для последующего воспроизведения."
       }
     }
   ],

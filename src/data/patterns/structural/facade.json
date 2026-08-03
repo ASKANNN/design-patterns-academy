@@ -266,41 +266,74 @@
   "quiz": [
     {
       "question": {
-        "en": "What does Facade do for client code?",
-        "ru": "Что Фасад делает для клиентского кода?"
+        "en": "In the home-theater example, what does the client call instead of five separate device methods?",
+        "ru": "В примере с домашним кинотеатром - что вызывает клиент вместо пяти отдельных методов устройств?"
       },
       "hint": {
-        "en": "Think about what the client sees instead of the subsystem's many classes.",
-        "ru": "Подумайте, что видит клиент вместо множества классов подсистемы."
+        "en": "Think about what replaces the need to orchestrate the subsystem directly.",
+        "ru": "Подумайте, что приходит на смену самостоятельной оркестровке подсистемы."
       },
       "options": [
         {
-          "en": "Hides interacting classes behind one clean entry point",
-          "ru": "Прячет взаимодействующие классы за единой точкой входа"
+          "en": "One high-level call instead of orchestrating the subsystem",
+          "ru": "Один высокоуровневый вызов вместо оркестровки подсистемы"
         },
         {
-          "en": "Duplicates the subsystem's classes for redundancy",
-          "ru": "Дублирует классы подсистемы для избыточности"
+          "en": "Direct access to every subsystem method, unfiltered",
+          "ru": "Прямой доступ ко всем методам подсистемы без ограничений"
         },
         {
-          "en": "Adds new behavior to each subsystem object individually",
-          "ru": "Добавляет новое поведение каждому объекту подсистемы по отдельности"
+          "en": "A copy of the subsystem for offline use",
+          "ru": "Копию подсистемы для автономной работы"
         },
         {
-          "en": "Guarantees only one instance of the subsystem exists",
-          "ru": "Гарантирует, что существует только один экземпляр подсистемы"
+          "en": "A guarantee that the subsystem has no bugs",
+          "ru": "Гарантию отсутствия ошибок в подсистеме"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Facade hides a tangle of interacting classes behind one clean entry point, so client code makes a single call instead of managing the subsystem itself.",
-        "ru": "Фасад прячет клубок взаимодействующих классов за единой точкой входа, поэтому клиентский код делает один вызов вместо самостоятельной оркестровки подсистемы."
+        "en": "The client just calls watchMovie() on the HomeTheaterFacade - dimming the lights, powering the projector and amplifier, and starting the DVD player all happen behind that one call, in the right order, every time.",
+        "ru": "Клиент просто вызывает watchMovie() у HomeTheaterFacade - приглушение света, включение проектора и усилителя, запуск DVD-плеера происходят за этим единственным вызовом, каждый раз в правильном порядке."
       }
     },
     {
       "question": {
-        "en": "In the home-theater example, what goes wrong if the multi-step setup logic lives directly in client code?",
-        "ru": "В примере с домашним кинотеатром - что идёт не так, если многошаговая логика настройки живёт прямо в клиентском коде?"
+        "en": "In the home-theater example, why does watching a movie require getting five objects' calls in the right order?",
+        "ru": "В примере с домашним кинотеатром - почему для просмотра фильма нужно вызывать методы пяти объектов в строго определённом порядке?"
+      },
+      "hint": {
+        "en": "Count the separate devices involved and think about what happens if one powers on before another.",
+        "ru": "Посчитайте, сколько отдельных устройств задействовано, и подумайте, что будет, если одно включится раньше другого."
+      },
+      "options": [
+        {
+          "en": "Each device has its own methods and must be sequenced correctly",
+          "ru": "У каждого устройства свои методы, и их нужно вызывать в правильной последовательности"
+        },
+        {
+          "en": "The devices share one physical power cable",
+          "ru": "Все устройства подключены к одному кабелю питания"
+        },
+        {
+          "en": "Only one device can be powered on at a time",
+          "ru": "Включить можно только одно устройство за раз"
+        },
+        {
+          "en": "The DVD player controls the other four devices internally",
+          "ru": "DVD-плеер сам управляет остальными четырьмя устройствами"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Watching a movie means dimming the lights, powering on the projector and setting widescreen mode, powering on the amplifier and setting volume, and powering on the DVD player before playing - five objects, each with its own methods, called in a specific order.",
+        "ru": "Просмотр фильма означает: приглушить свет, включить проектор и настроить широкоэкранный режим, включить усилитель и настроить громкость, включить DVD-плеер и запустить воспроизведение - пять объектов, у каждого свои методы, вызываемые в строго определённом порядке."
+      }
+    },
+    {
+      "question": {
+        "en": "What goes wrong if the multi-step setup logic lives directly in client code instead of behind a facade?",
+        "ru": "Что идёт не так, если многошаговая логика настройки живёт прямо в клиентском коде, а не за фасадом?"
       },
       "hint": {
         "en": "Picture every screen that wants to watch a movie writing out that same sequence itself.",
@@ -308,8 +341,8 @@
       },
       "options": [
         {
-          "en": "Every place duplicates the same setup sequence",
-          "ru": "Каждое место повторяет одну и ту же последовательность"
+          "en": "Every place duplicates the same multi-step sequence",
+          "ru": "Каждое место дублирует одну и ту же многошаговую последовательность"
         },
         {
           "en": "The projector permanently stops working",
@@ -326,35 +359,68 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Every place that wants to watch a movie duplicates the same multi-step sequence, and missing a step or getting the order wrong causes real malfunctions.",
-        "ru": "Каждое место, где нужно посмотреть фильм, дублирует одну и ту же многошаговую последовательность, а пропуск шага или неверный порядок приводят к реальным сбоям."
+        "en": "Every place that wants to watch a movie duplicates the same multi-step sequence, and stopping a movie needs its own mirrored teardown - miss a step or get the order wrong, and the amplifier or DVD player misbehaves.",
+        "ru": "Каждое место, где нужно посмотреть фильм, дублирует одну и ту же многошаговую последовательность, а остановка требует своей зеркальной последовательности - пропуск шага или неверный порядок приводят к сбоям усилителя или DVD-плеера."
       }
     },
     {
       "question": {
-        "en": "Does the Facade pattern remove direct access to the subsystem entirely?",
-        "ru": "Полностью ли паттерн Фасад устраняет прямой доступ к подсистеме?"
+        "en": "In the solution, what is the facade responsible for internally?",
+        "ru": "За что фасад отвечает изнутри, согласно описанию решения?"
       },
       "hint": {
-        "en": "Recall whether the facade is described as an added layer or as a wall.",
+        "en": "Think about the setup work that used to sit in client code before the facade existed.",
+        "ru": "Подумайте о работе по настройке, которая раньше лежала в клиентском коде до появления фасада."
+      },
+      "options": [
+        {
+          "en": "Creating subsystem objects, wiring them, and calling them in order",
+          "ru": "Создание объектов подсистемы, их связывание и вызов в нужном порядке"
+        },
+        {
+          "en": "Rewriting the subsystem's classes to add new features",
+          "ru": "Переписывание классов подсистемы для добавления новых возможностей"
+        },
+        {
+          "en": "Storing user data instead of the subsystem doing so",
+          "ru": "Хранение пользовательских данных вместо подсистемы"
+        },
+        {
+          "en": "Compiling the subsystem into a single binary file",
+          "ru": "Компиляция подсистемы в единый бинарный файл"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Internally, the facade owns the job of creating subsystem objects, wiring their dependencies, and calling them in the correct order, exposing only the operations clients actually need.",
+        "ru": "Внутри себя фасад берёт на себя создание объектов подсистемы, связывание их зависимостей и вызов методов в нужной последовательности, открывая наружу только те операции, что действительно нужны клиентам."
+      }
+    },
+    {
+      "question": {
+        "en": "Does introducing a facade remove direct access to the subsystem entirely?",
+        "ru": "Устраняет ли появление фасада прямой доступ к подсистеме полностью?"
+      },
+      "hint": {
+        "en": "Recall whether the solution describes the facade as an added layer or as a wall.",
         "ru": "Вспомните, описывается ли фасад как дополнительный слой или как непроницаемая стена."
       },
       "options": [
         {
-          "en": "No - direct access still exists; the facade just adds convenience",
-          "ru": "Нет - прямой доступ остаётся, фасад лишь добавляет удобство"
+          "en": "No - direct access still exists for cases needing fine-grained control",
+          "ru": "Нет - прямой доступ остаётся для случаев, где нужен тонкий контроль"
         },
         {
-          "en": "Yes - after adding a facade, the subsystem classes can no longer be called directly",
-          "ru": "Да - после добавления фасада классы подсистемы больше нельзя вызывать напрямую"
+          "en": "Yes - subsystem classes become permanently inaccessible",
+          "ru": "Да - классы подсистемы становятся навсегда недоступны"
         },
         {
           "en": "Yes, but only for the codec manager class",
           "ru": "Да, но только для класса менеджера кодеков"
         },
         {
-          "en": "It depends on whether TypeScript is used",
-          "ru": "Это зависит от того, используется ли TypeScript"
+          "en": "It depends on which programming language is used",
+          "ru": "Это зависит от используемого языка программирования"
         }
       ],
       "correct": 0,
@@ -365,41 +431,140 @@
     },
     {
       "question": {
-        "en": "What is a stated benefit of Facade regarding refactoring the subsystem?",
-        "ru": "Какое преимущество Фасада указано в отношении рефакторинга подсистемы?"
+        "en": "In the Facade structure, what do the Complex Subsystem classes know about the Facade?",
+        "ru": "Что классы Сложной подсистемы знают о Фасаде, согласно структуре паттерна?"
       },
       "hint": {
-        "en": "Ask yourself who else depends on the subsystem's internal API surface besides the facade.",
-        "ru": "Спросите себя, кто ещё, кроме фасада, зависит от внутреннего API подсистемы."
+        "en": "Check the participants section for how the subsystem classes relate to the facade sitting in front of them.",
+        "ru": "Загляните в раздел участников: как классы подсистемы относятся к фасаду, который стоит перед ними?"
       },
       "options": [
         {
-          "en": "The subsystem can be refactored with fewer ripple effects",
-          "ru": "Подсистему можно рефакторить с меньшими побочными эффектами"
+          "en": "Nothing - they have no notion a facade exists",
+          "ru": "Ничего - они не подозревают о существовании фасада"
         },
         {
-          "en": "The subsystem can never be changed once a facade is introduced",
-          "ru": "Подсистему больше никогда нельзя менять после введения фасада"
+          "en": "They each hold a reference back to the facade",
+          "ru": "Каждый из них хранит ссылку обратно на фасад"
         },
         {
-          "en": "Refactoring the subsystem automatically rewrites the facade",
-          "ru": "Рефакторинг подсистемы автоматически переписывает фасад"
+          "en": "They inherit their public methods from the facade",
+          "ru": "Они наследуют свои публичные методы от фасада"
         },
         {
-          "en": "It eliminates the need for the subsystem's internal classes entirely",
-          "ru": "Он полностью устраняет необходимость во внутренних классах подсистемы"
+          "en": "They register themselves with the facade at startup",
+          "ru": "Они регистрируются в фасаде при запуске"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "The subsystem can be refactored, upgraded, or replaced with fewer ripple effects, since only the facade needs to track its API surface.",
-        "ru": "Подсистему можно рефакторить, обновлять или заменять с меньшими побочными эффектами, поскольку только фасаду нужно отслеживать её API."
+        "en": "The Complex Subsystem classes do the actual work and have no notion that a facade exists, so they can be used with or without it.",
+        "ru": "Классы Сложной подсистемы выполняют реальную работу и ничего не знают о существовании фасада, поэтому могут использоваться как с ним, так и без него."
       }
     },
     {
       "question": {
-        "en": "What is a stated risk of a facade left unchecked?",
-        "ru": "Какой риск указан для фасада, оставленного без контроля?"
+        "en": "In the sample implementation, what does HomeTheaterFacade's constructor do?",
+        "ru": "Что делает конструктор HomeTheaterFacade в примере реализации?"
+      },
+      "hint": {
+        "en": "Look at what happens before watchMovie() is ever called.",
+        "ru": "Посмотрите, что происходит ещё до первого вызова watchMovie()."
+      },
+      "options": [
+        {
+          "en": "Creates and stores all four subsystem instances",
+          "ru": "Создаёт и сохраняет все четыре экземпляра подсистем"
+        },
+        {
+          "en": "Immediately starts playing a default movie",
+          "ru": "Сразу запускает воспроизведение фильма по умолчанию"
+        },
+        {
+          "en": "Asks the client to pass in pre-built subsystem objects",
+          "ru": "Просит клиента передать уже готовые объекты подсистем"
+        },
+        {
+          "en": "Deletes any existing Amplifier or Projector instances",
+          "ru": "Удаляет уже существующие экземпляры Amplifier и Projector"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The constructor creates and stores all four subsystem instances in private fields, so the client will never construct the Amplifier, Projector, DVDPlayer, or Lights directly.",
+        "ru": "Конструктор создаёт и сохраняет все четыре экземпляра подсистем в приватных полях, поэтому клиент никогда не создаёт Amplifier, Projector, DVDPlayer или Lights напрямую."
+      }
+    },
+    {
+      "question": {
+        "en": "Why does endMovie() need its own separate sequence rather than just calling watchMovie()'s steps in reverse order?",
+        "ru": "Почему для endMovie() нужна отдельная последовательность, а не просто вызов шагов watchMovie() в обратном порядке?"
+      },
+      "hint": {
+        "en": "Compare the shutdown order in the walkthrough to the startup order - they aren't mirror images.",
+        "ru": "Сравните порядок выключения из пошагового разбора с порядком включения - это не зеркальное отражение."
+      },
+      "options": [
+        {
+          "en": "The shutdown order genuinely differs from the startup order",
+          "ru": "Порядок выключения на самом деле отличается от порядка включения"
+        },
+        {
+          "en": "JavaScript cannot iterate arrays in reverse",
+          "ru": "В JavaScript нельзя перебирать массивы в обратном порядке"
+        },
+        {
+          "en": "The subsystem objects get destroyed after watchMovie() runs",
+          "ru": "Объекты подсистемы уничтожаются сразу после watchMovie()"
+        },
+        {
+          "en": "endMovie() is only a placeholder with no real logic",
+          "ru": "endMovie() - это лишь заглушка без реальной логики"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Shutdown order is different from startup order (DVD off, then amp, then projector, then lights on) - the facade hides that ordering knowledge from the client entirely by encapsulating it in its own method.",
+        "ru": "Порядок выключения отличается от порядка включения (сначала DVD, затем усилитель, затем проектор, затем свет включается) - фасад полностью скрывает это знание о порядке от клиента, инкапсулируя его в отдельном методе."
+      }
+    },
+    {
+      "question": {
+        "en": "According to the pros, what happens to application code once it talks to a facade instead of the subsystem directly?",
+        "ru": "Согласно преимуществам паттерна - что происходит с кодом приложения, когда он общается с фасадом вместо прямого обращения к подсистеме?"
+      },
+      "hint": {
+        "en": "Compare 'export the video' to manually wiring a codec manager, bitrate reader, and mixer.",
+        "ru": "Сравните «экспортировать видео» с ручной настройкой менеджера кодеков, читателя битрейта и микшера."
+      },
+      "options": [
+        {
+          "en": "It reads at the level of business intent instead of subsystem plumbing",
+          "ru": "Он читается на уровне бизнес-намерения, а не внутренней механики подсистемы"
+        },
+        {
+          "en": "It runs measurably faster than calling the subsystem directly",
+          "ru": "Он выполняется заметно быстрее, чем прямой вызов подсистемы"
+        },
+        {
+          "en": "It no longer needs any error handling",
+          "ru": "Ему больше не требуется обработка ошибок"
+        },
+        {
+          "en": "It becomes impossible to unit test",
+          "ru": "Его становится невозможно покрыть модульными тестами"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Application code reads at the level of business intent (\"export the video\") instead of being cluttered with subsystem plumbing, since the facade absorbs the wiring details.",
+        "ru": "Код приложения читается на уровне бизнес-намерения («экспортировать видео»), а не захламлён внутренней механикой подсистемы, поскольку фасад берёт на себя все детали связки."
+      }
+    },
+    {
+      "question": {
+        "en": "What tradeoff does the pattern warn about if a facade is left unchecked over time?",
+        "ru": "О каком компромиссе предупреждает паттерн, если оставить фасад без контроля со временем?"
       },
       "hint": {
         "en": "Think about what happens if a facade keeps absorbing entry points for every subsystem in the app.",

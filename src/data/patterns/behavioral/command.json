@@ -299,8 +299,8 @@
       },
       "options": [
         {
-          "en": "One object holding the receiver, action, and arguments",
-          "ru": "Один объект с получателем, действием и аргументами"
+          "en": "A request: the receiver, the action, and its arguments",
+          "ru": "Запрос: получателя, действие и его аргументы"
         },
         {
           "en": "The entire class hierarchy of the application",
@@ -317,8 +317,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Command wraps the receiver, the action, and its arguments into one object that can be passed around, stored, and invoked independently.",
-        "ru": "Команда упаковывает получателя, действие и аргументы в один объект, который можно передавать, хранить и выполнять независимо."
+        "en": "Command wraps a request - the receiver, the action, and its arguments - into a self-contained object that can be passed around, stored, and invoked independently of whatever triggered it.",
+        "ru": "Команда упаковывает запрос - получателя, действие и его аргументы - в самостоятельный объект, который можно передавать, хранить и выполнять независимо от того, что его инициировало."
       }
     },
     {
@@ -327,21 +327,21 @@
         "ru": "Что идёт не так, если кнопка панели, горячая клавиша и пункт меню каждый напрямую вызывают логику удаления фигуры?"
       },
       "hint": {
-        "en": "If you later wanted to undo that delete, where would you even look for what happened?",
+        "en": "If you later wanted to undo that delete, where would you even look for a record of what happened?",
         "ru": "Если бы потом понадобилось отменить это удаление, где вообще искать сведения о том, что произошло?"
       },
       "options": [
         {
-          "en": "Duplicated logic in three places, with no record for undo",
-          "ru": "Логика дублируется в трёх местах, и отменить нечего"
+          "en": "The logic is duplicated three times, with nothing recording what happened",
+          "ru": "Логика дублируется трижды, и нет записи о произошедшем"
         },
         {
-          "en": "The shape can no longer be deleted at all",
-          "ru": "Фигуру вообще становится невозможно удалить"
+          "en": "The shape can no longer be deleted through any of the three entry points",
+          "ru": "Фигуру вообще становится невозможно удалить ни одним из трёх способов"
         },
         {
-          "en": "The keyboard shortcut stops working entirely",
-          "ru": "Горячая клавиша полностью перестаёт работать"
+          "en": "The keyboard shortcut stops responding to input entirely",
+          "ru": "Горячая клавиша полностью перестаёт реагировать на нажатия"
         },
         {
           "en": "The right-click menu automatically gains undo support",
@@ -350,14 +350,14 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Duplicating the logic in three places leaves no record of what happened, so undo has nothing to hook into.",
-        "ru": "Дублирование логики в трёх местах не оставляет записи о произошедшем, поэтому отменить нечего."
+        "en": "If each UI element calls the deletion logic directly, that logic ends up duplicated in three places, and none of them has any record of what just happened, so undo has nowhere to hook in.",
+        "ru": "Если каждый элемент интерфейса напрямую вызывает логику удаления, эта логика дублируется в трёх местах, и ни в одном из них нет записи о том, что произошло, - отмене попросту не за что зацепиться."
       }
     },
     {
       "question": {
-        "en": "In the solution, what does the UI element that triggers the action do?",
-        "ru": "В решении - что делает элемент интерфейса, инициирующий действие?"
+        "en": "Once Command is applied, what does the UI element that triggers an action actually do?",
+        "ru": "После применения Команды - что на самом деле делает элемент интерфейса, инициирующий действие?"
       },
       "hint": {
         "en": "The whole point was to stop the button from knowing the receiver directly - what does it talk to instead?",
@@ -365,59 +365,191 @@
       },
       "options": [
         {
-          "en": "It holds a command object and calls execute() on it",
-          "ru": "Он хранит объект-команду и вызывает у него execute()"
+          "en": "Holds a command object and calls execute() on it",
+          "ru": "Хранит объект-команду и вызывает у него execute()"
         },
         {
-          "en": "It calls the receiver's methods directly, bypassing any command object",
-          "ru": "Он напрямую вызывает методы получателя, минуя объект-команду"
+          "en": "Calls the receiver's methods directly, bypassing any command object",
+          "ru": "Напрямую вызывает методы получателя, минуя объект-команду"
         },
         {
-          "en": "It stores the entire undo history inside itself",
-          "ru": "Он сам хранит всю историю отмены"
+          "en": "Stores the entire undo history inside itself",
+          "ru": "Сам хранит всю историю отмены"
         },
         {
-          "en": "It must know the concrete receiver class to function",
-          "ru": "Он обязан знать конкретный класс получателя, чтобы работать"
+          "en": "Must know the concrete receiver class to function at all",
+          "ru": "Обязан знать конкретный класс получателя, чтобы вообще работать"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "The UI element that triggers the action no longer calls the receiver directly; it just holds a command object and calls execute() on it.",
-        "ru": "Элемент интерфейса, инициирующий действие, больше не вызывает получателя напрямую - он лишь хранит объект-команду и вызывает у него execute()."
+        "en": "The UI element that triggers the action no longer calls the receiver directly; it just holds a command object and calls execute() on it, without caring what that command actually does.",
+        "ru": "Элемент интерфейса, инициирующий действие, больше не вызывает получателя напрямую - он лишь хранит объект-команду и вызывает у него execute(), не зная, что именно эта команда делает."
       }
     },
     {
       "question": {
-        "en": "What is a stated benefit of Command regarding undo/redo?",
-        "ru": "Какое преимущество Команды указано в отношении отмены/повтора?"
+        "en": "In the structure, what is the Invoker responsible for?",
+        "ru": "За что в структуре паттерна отвечает Инициатор?"
       },
       "hint": {
-        "en": "A plain function call vanishes once it returns - what's different about an object that represents the same action?",
-        "ru": "Обычный вызов функции исчезает, как только она завершится - чем в этом смысле отличается объект, представляющий то же действие?"
+        "en": "The invoker's whole job description fits in the word \"triggers\" - what is it explicitly said not to know?",
+        "ru": "Вся роль инициатора укладывается в слово «запускает» - чего он явно не должен знать?"
       },
       "options": [
         {
-          "en": "A command is a real object, so it can be stored in a history list",
-          "ru": "Команда - полноценный объект, поэтому её можно хранить в списке истории"
+          "en": "Triggering a command's execution without knowing what it does internally",
+          "ru": "Запускать выполнение команды, не зная, что она делает внутри"
         },
         {
-          "en": "Undo/redo is impossible with the Command pattern",
-          "ru": "Отмена и повтор невозможны с паттерном Команда"
+          "en": "Implementing the domain logic that actually performs the work",
+          "ru": "Реализовывать доменную логику, которая выполняет работу"
         },
         {
-          "en": "Undo requires rewriting the receiver class entirely",
-          "ru": "Отмена требует полностью переписать класс получателя"
+          "en": "Deciding which Receiver class the application will use",
+          "ru": "Решать, какой класс получателя будет использовать приложение"
         },
         {
-          "en": "Redo only works if commands are executed on a separate thread",
-          "ru": "Повтор работает только при выполнении команд в отдельном потоке"
+          "en": "Serializing every command to disk before it runs",
+          "ru": "Сериализовывать каждую команду на диск перед выполнением"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Because the command is a real object rather than a bare function call, it can be stored in a history list, giving undo/redo almost for free.",
-        "ru": "Поскольку команда - полноценный объект, а не голый вызов функции, её можно сохранить в списке истории, что почти бесплатно даёт отмену и повтор."
+        "en": "The Invoker holds a reference to a command and triggers its execution - right away, on a delay, or as part of a queue - without knowing what the command does internally.",
+        "ru": "Инициатор хранит ссылку на команду и запускает её выполнение - сразу, с задержкой или как часть очереди, - не зная, что команда делает внутри."
+      }
+    },
+    {
+      "question": {
+        "en": "What distinguishes the Receiver from the ConcreteCommand in this pattern?",
+        "ru": "Чем Получатель отличается от Конкретной команды в этом паттерне?"
+      },
+      "hint": {
+        "en": "One of the two participants has no idea a command even exists - which one owns the domain logic itself?",
+        "ru": "Один из двух участников вообще не подозревает о существовании команды - кто из них владеет самой доменной логикой?"
+      },
+      "options": [
+        {
+          "en": "The Receiver owns the domain logic and has no idea it's driven by a command",
+          "ru": "Получатель владеет доменной логикой и не подозревает, что им управляет команда"
+        },
+        {
+          "en": "The Receiver holds a reference to the Invoker and triggers it",
+          "ru": "Получатель хранит ссылку на Инициатора и запускает его"
+        },
+        {
+          "en": "The ConcreteCommand performs the actual work instead of delegating it",
+          "ru": "Конкретная команда сама выполняет работу вместо делегирования"
+        },
+        {
+          "en": "The Receiver is only ever a UI element like a button or menu item",
+          "ru": "Получатель - это всегда только элемент интерфейса вроде кнопки или пункта меню"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The Receiver owns the domain logic that gets the work done and has no idea it's being driven by a command, while the ConcreteCommand stores a reference to its Receiver and forwards the actual work to it.",
+        "ru": "Получатель владеет доменной логикой, которая выполняет работу, и не подозревает, что им управляет команда, тогда как конкретная команда хранит ссылку на получателя и передаёт ему реальную работу."
+      }
+    },
+    {
+      "question": {
+        "en": "In the TextEditor implementation, how does InsertCommand's undo() reverse an insertion?",
+        "ru": "В реализации TextEditor - как undo() у InsertCommand отменяет вставку?"
+      },
+      "hint": {
+        "en": "Look at what undo() calls on the editor - it isn't insert() again.",
+        "ru": "Посмотрите, какой метод редактора вызывает undo() - это не повторный insert()."
+      },
+      "options": [
+        {
+          "en": "It calls editor.delete() at the same position with the inserted text's length",
+          "ru": "Вызывает editor.delete() в той же позиции с длиной вставленного текста"
+        },
+        {
+          "en": "It restores the entire document from a full backup copy",
+          "ru": "Восстанавливает весь документ из полной резервной копии"
+        },
+        {
+          "en": "It asks CommandHistory to recompute the document from scratch",
+          "ru": "Просит CommandHistory заново вычислить документ с нуля"
+        },
+        {
+          "en": "It calls insert() again with an empty string at the same position",
+          "ru": "Снова вызывает insert() с пустой строкой в той же позиции"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "InsertCommand's undo() calls the inverse operation editor.delete(...) with the same position and the inserted text's length, exactly reversing what execute() did.",
+        "ru": "undo() у InsertCommand вызывает обратную операцию editor.delete(...) с той же позицией и длиной вставленного текста, в точности отменяя то, что сделал execute()."
+      }
+    },
+    {
+      "question": {
+        "en": "How does CommandHistory implement undo without knowing what kind of command it's running?",
+        "ru": "Как CommandHistory реализует отмену, не зная, какая именно это команда?"
+      },
+      "hint": {
+        "en": "CommandHistory only ever calls methods declared on the shared Command interface, never something specific to InsertCommand.",
+        "ru": "CommandHistory вызывает только методы общего интерфейса Command, а не что-то специфичное для InsertCommand."
+      },
+      "options": [
+        {
+          "en": "It pops the last executed command off its history and calls its undo()",
+          "ru": "Снимает последнюю выполненную команду со своей истории и вызывает её undo()"
+        },
+        {
+          "en": "It re-executes every command in the history except the last one",
+          "ru": "Заново выполняет все команды истории, кроме последней"
+        },
+        {
+          "en": "It asks the TextEditor to guess what the last change was",
+          "ru": "Просит TextEditor угадать, каким было последнее изменение"
+        },
+        {
+          "en": "It deletes the entire command history and starts over",
+          "ru": "Полностью удаляет историю команд и начинает заново"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "CommandHistory keeps a stack of executed commands; undo() pops the last command off that stack and calls its own undo() - the invoker never needs to know what kind of command it's running.",
+        "ru": "CommandHistory хранит стек выполненных команд; undo() снимает последнюю команду со стека и вызывает её собственный undo() - инициатору никогда не нужно знать, какая именно это команда."
+      }
+    },
+    {
+      "question": {
+        "en": "Which of these is listed as a genuine benefit of Command?",
+        "ru": "Что из перечисленного указано как настоящее преимущество Команды?"
+      },
+      "hint": {
+        "en": "A plain function call vanishes the moment it returns - what's different about an object representing the same action?",
+        "ru": "Обычный вызов функции исчезает сразу после завершения - чем в этом смысле отличается объект, представляющий то же действие?"
+      },
+      "options": [
+        {
+          "en": "Being a real object lets a command sit in a history list, giving undo/redo almost for free",
+          "ru": "Будучи полноценным объектом, команда может лежать в списке истории, что почти бесплатно даёт отмену и повтор"
+        },
+        {
+          "en": "It removes the need for a Receiver object entirely",
+          "ru": "Полностью устраняет необходимость в объекте-получателе"
+        },
+        {
+          "en": "It guarantees commands execute faster than direct method calls",
+          "ru": "Гарантирует, что команды выполняются быстрее прямых вызовов методов"
+        },
+        {
+          "en": "It merges the Invoker and Receiver into a single class",
+          "ru": "Объединяет Инициатора и Получателя в один класс"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Because a command is a real object rather than a bare function call, it can be stacked in a history list to give you undo/redo almost for free.",
+        "ru": "Поскольку команда - полноценный объект, а не голый вызов функции, её можно складывать в список истории, что почти бесплатно даёт отмену и повтор действий."
       }
     },
     {
@@ -431,19 +563,19 @@
       },
       "options": [
         {
-          "en": "Each command must save enough state to reverse itself",
-          "ru": "Каждая команда должна сохранять состояние для отката"
+          "en": "Each command must capture enough prior state to reverse itself",
+          "ru": "Каждая команда должна сохранять достаточно состояния, чтобы откатить себя"
         },
         {
-          "en": "Undo automatically works with zero extra code in every command",
+          "en": "Undo works automatically with zero extra code in every command",
           "ru": "Отмена автоматически работает без дополнительного кода в каждой команде"
         },
         {
-          "en": "Undo can only be implemented for exactly one command at a time",
-          "ru": "Отмену можно реализовать только для одной команды одновременно"
+          "en": "Only one command in the whole application can support undo",
+          "ru": "Отмену можно реализовать только для одной команды во всём приложении"
         },
         {
-          "en": "Supporting undo removes the need for an execute() method",
+          "en": "Supporting undo eliminates the need for an execute() method",
           "ru": "Поддержка отмены устраняет необходимость в методе execute()"
         }
       ],
@@ -451,6 +583,39 @@
       "explanation": {
         "en": "Supporting undo properly often requires each command to capture enough prior state to reverse itself, which is extra bookkeeping beyond just running the action once.",
         "ru": "Корректная поддержка отмены обычно требует, чтобы каждая команда сохраняла достаточно состояния для собственного отката, - это дополнительная работа сверх простого однократного выполнения действия."
+      }
+    },
+    {
+      "question": {
+        "en": "What tradeoff does Command introduce even for a trivial, one-off operation?",
+        "ru": "Какой компромисс Команда вносит даже для тривиальной, разовой операции?"
+      },
+      "hint": {
+        "en": "Compare calling a receiver's method directly versus going through a command object - what sits in between now?",
+        "ru": "Сравните прямой вызов метода получателя с вызовом через объект-команду - что теперь стоит между ними?"
+      },
+      "options": [
+        {
+          "en": "An extra layer of indirection between trigger and receiver, adding classes for simple operations",
+          "ru": "Дополнительный уровень косвенности между инициатором и получателем, что добавляет классы даже для простых операций"
+        },
+        {
+          "en": "The complete loss of the ability to trigger an action synchronously",
+          "ru": "Полная потеря возможности вызвать действие синхронно"
+        },
+        {
+          "en": "A requirement that every receiver be rewritten as a command",
+          "ru": "Требование переписать каждого получателя в виде команды"
+        },
+        {
+          "en": "The removal of the Invoker from the design entirely",
+          "ru": "Полное исключение Инициатора из дизайна"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "There's an extra indirection layer between whoever triggers an action and whoever performs it, which adds a class or two even for trivial operations.",
+        "ru": "Между инициатором действия и его исполнителем появляется дополнительный уровень косвенности, что добавляет один-два класса даже для тривиальных операций."
       }
     }
   ],

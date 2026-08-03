@@ -303,6 +303,39 @@
     },
     {
       "question": {
+        "en": "In the weather-station example, why can't the station just call the phone app, widget, and logger directly by name?",
+        "ru": "В примере с метеостанцией почему станция не может просто напрямую вызывать приложение, виджет и логгер по имени?"
+      },
+      "hint": {
+        "en": "Think about what happens to the station's own code every time a fourth consumer is added.",
+        "ru": "Подумайте, что происходит с кодом самой станции каждый раз при добавлении четвёртого потребителя."
+      },
+      "options": [
+        {
+          "en": "Adding a fourth consumer would mean editing the station's code",
+          "ru": "Добавление четвёртого потребителя означало бы правку кода самой станции"
+        },
+        {
+          "en": "Hardcoded calls are always faster than any alternative",
+          "ru": "Жёстко прописанные вызовы всегда быстрее любой альтернативы"
+        },
+        {
+          "en": "The station cannot technically call more than three consumers",
+          "ru": "Станция технически не может вызывать больше трёх потребителей"
+        },
+        {
+          "en": "It would require the phone app to poll the station instead",
+          "ru": "Это потребовало бы, чтобы приложение само опрашивало станцию"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Hardcoding calls from the station to each specific consumer means the station has to know about the phone app, the widget, and the logger by name, and adding a fourth consumer means editing the station's code.",
+        "ru": "Жёстко прописанные вызовы от станции к каждому конкретному потребителю означают, что станции пришлось бы поимённо знать о приложении, виджете и логгере, а добавление четвёртого потребителя означало бы правку кода самой станции."
+      }
+    },
+    {
+      "question": {
         "en": "What is wrong with polling as a fix for the weather-station problem?",
         "ru": "В чём недостаток опроса как решения проблемы метеостанции?"
       },
@@ -369,6 +402,39 @@
     },
     {
       "question": {
+        "en": "How does a publisher notify its subscribers when its state changes?",
+        "ru": "Как издатель уведомляет своих подписчиков при изменении состояния?"
+      },
+      "hint": {
+        "en": "The publisher doesn't care what each subscriber does with the news - so how uniform is the way it reaches out to them?",
+        "ru": "Издателю не важно, что каждый подписчик делает с новостью, - насколько единообразно он к ним обращается?"
+      },
+      "options": [
+        {
+          "en": "It calls the same notification method on every entry",
+          "ru": "Он вызывает один и тот же метод уведомления у каждой записи"
+        },
+        {
+          "en": "It calls a different, custom method for each subscriber type",
+          "ru": "Он вызывает разный, специфичный метод для каждого типа подписчика"
+        },
+        {
+          "en": "It sends a single notification only to the first subscriber in the list",
+          "ru": "Он отправляет одно уведомление только первому подписчику в списке"
+        },
+        {
+          "en": "It asks each subscriber to poll it for the new state",
+          "ru": "Он просит каждого подписчика самому опросить его на предмет нового состояния"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "When the publisher's state changes, it walks the subscriber list and calls the same notification method on every entry, without caring what each subscriber actually does with the news.",
+        "ru": "Когда состояние издателя меняется, он проходит по списку подписчиков и вызывает один и тот же метод уведомления у каждой записи, не заботясь о том, что именно подписчик делает с новостью."
+      }
+    },
+    {
+      "question": {
         "en": "What is a stated benefit of Observer for adding new subscriber types?",
         "ru": "Какое преимущество Наблюдателя указано для добавления новых типов подписчиков?"
       },
@@ -402,6 +468,39 @@
     },
     {
       "question": {
+        "en": "According to the pros listed for Observer, what keeps the publisher and its subscribers loosely coupled?",
+        "ru": "Согласно перечисленным преимуществам Наблюдателя, что сохраняет слабую связанность издателя и подписчиков?"
+      },
+      "hint": {
+        "en": "Compare what the publisher depends on to what it deliberately avoids depending on.",
+        "ru": "Сравните, от чего зависит издатель и от чего он намеренно не зависит."
+      },
+      "options": [
+        {
+          "en": "The publisher depends only on a thin notification interface",
+          "ru": "Издатель зависит лишь от тонкого интерфейса уведомления"
+        },
+        {
+          "en": "Subscribers are required to inherit directly from the publisher",
+          "ru": "Подписчики обязаны наследоваться напрямую от издателя"
+        },
+        {
+          "en": "The publisher stores a hardcoded list of subscriber class names",
+          "ru": "Издатель хранит жёстко заданный список имён классов подписчиков"
+        },
+        {
+          "en": "Every subscriber must know the publisher's internal fields",
+          "ru": "Каждый подписчик обязан знать внутренние поля издателя"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The publisher depends only on a thin notification interface, never on any subscriber's concrete class, keeping the two sides loosely coupled.",
+        "ru": "Издатель зависит лишь от тонкого интерфейса уведомления, но никогда - от конкретного класса подписчика, что сохраняет слабую связанность сторон."
+      }
+    },
+    {
+      "question": {
         "en": "What is a stated risk of a subscriber that forgets to unsubscribe?",
         "ru": "Какой риск указан для подписчика, забывшего отписаться?"
       },
@@ -431,6 +530,72 @@
       "explanation": {
         "en": "A subscriber that forgets to unsubscribe keeps a live reference in the publisher's list, quietly leaking memory long after it should have been collected.",
         "ru": "Подписчик, забывший отписаться, продолжает висеть в списке издателя, незаметно вызывая утечку памяти задолго после того, как должен был быть собран сборщиком мусора."
+      }
+    },
+    {
+      "question": {
+        "en": "When should you reach for Observer according to its recommended use cases?",
+        "ru": "Когда, согласно рекомендуемым случаям применения, стоит использовать Наблюдателя?"
+      },
+      "hint": {
+        "en": "Think about whether the set of interested parties is fixed and known ahead of time, or not.",
+        "ru": "Подумайте, зафиксирован ли заранее набор заинтересованных сторон или нет."
+      },
+      "options": [
+        {
+          "en": "When a change needs to ripple out to objects not fully known in advance",
+          "ru": "Когда изменение должно затрагивать объекты, заранее не полностью известные"
+        },
+        {
+          "en": "Only when there is exactly one subscriber for the entire program",
+          "ru": "Только когда во всей программе ровно один подписчик"
+        },
+        {
+          "en": "Only when subscribers never need to leave once they join",
+          "ru": "Только когда подписчики никогда не должны уходить после подписки"
+        },
+        {
+          "en": "Only for state that changes exactly once during the program's life",
+          "ru": "Только для состояния, которое меняется ровно один раз за всё время работы программы"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Reach for Observer when one object's state change needs to ripple out to a set of other objects that isn't fixed or fully known in advance.",
+        "ru": "Применяйте Наблюдатель, когда изменение состояния одного объекта должно затрагивать набор других объектов, который заранее не фиксирован или не полностью известен."
+      }
+    },
+    {
+      "question": {
+        "en": "Why does Observer offer no guarantee about notification order?",
+        "ru": "Почему Наблюдатель не даёт никакой гарантии относительно порядка уведомлений?"
+      },
+      "hint": {
+        "en": "This is listed directly among the cons - think about when it becomes an actual problem, not just a theoretical one.",
+        "ru": "Это указано прямо среди недостатков - подумайте, когда это становится реальной проблемой, а не просто теоретической."
+      },
+      "options": [
+        {
+          "en": "It becomes a problem if one subscriber depends on another running first",
+          "ru": "Это становится проблемой, если один подписчик зависит от того, что другой уже отработал"
+        },
+        {
+          "en": "It is never a problem because subscribers never depend on each other",
+          "ru": "Это никогда не проблема, поскольку подписчики никогда не зависят друг от друга"
+        },
+        {
+          "en": "Notification order is always alphabetical by subscriber class name",
+          "ru": "Порядок уведомлений всегда определяется по алфавиту имён классов подписчиков"
+        },
+        {
+          "en": "It only affects the very first subscriber that registers",
+          "ru": "Это затрагивает только самого первого зарегистрированного подписчика"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Nothing guarantees the order subscribers are notified in, which becomes a problem if one subscriber's reaction depends on another running first.",
+        "ru": "Ничто не гарантирует порядок оповещения подписчиков, что становится проблемой, если реакция одного подписчика зависит от того, что другой уже отработал."
       }
     }
   ],

@@ -283,8 +283,8 @@
   "quiz": [
     {
       "question": {
-        "en": "What does Proxy do behind an identical interface?",
-        "ru": "Что делает Заместитель за идентичным интерфейсом?"
+        "en": "In the reporting-service example, what sits between the screen and the slow analytics API without either side noticing?",
+        "ru": "В примере с сервисом отчётов - что находится между экраном и медленным API аналитики, оставаясь незаметным для обеих сторон?"
       },
       "hint": {
         "en": "Think about who the caller believes it's talking to, versus who actually intercepts the call.",
@@ -292,26 +292,59 @@
       },
       "options": [
         {
-          "en": "Stands in for another object, intercepting every call",
-          "ru": "Подменяет собой другой объект, перехватывая каждый вызов"
+          "en": "An object stands in for another behind an identical interface",
+          "ru": "Один объект подменяет собой другой за счёт идентичного интерфейса"
         },
         {
-          "en": "Merges two unrelated interfaces into one",
-          "ru": "Объединяет два несвязанных интерфейса в один"
+          "en": "Two unrelated interfaces are merged into a single one",
+          "ru": "Два несвязанных интерфейса объединяются в один"
         },
         {
-          "en": "Splits an object's behavior into two independent hierarchies",
-          "ru": "Разделяет поведение объекта на две независимые иерархии"
+          "en": "An object's behavior is split into two independent hierarchies",
+          "ru": "Поведение объекта разделяется на две независимые иерархии"
         },
         {
-          "en": "Guarantees the object it wraps is never destroyed",
-          "ru": "Гарантирует, что оборачиваемый объект никогда не будет уничтожен"
+          "en": "A family of related objects is created without specifying their class",
+          "ru": "Создаётся семейство связанных объектов без указания их конкретного класса"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Proxy stands in for another object behind an identical interface, letting it intercept every call to add checks, caching, lazy creation, or logging without the real object or its callers knowing.",
-        "ru": "Заместитель подменяет собой другой объект за счёт идентичного интерфейса, позволяя перехватывать каждый вызов и добавлять проверки, кэширование, отложенное создание или логирование - незаметно ни для реального объекта, ни для вызывающего кода."
+        "en": "A caching proxy, implementing the exact same interface as the real service. Screens keep calling the same methods as before, but the proxy intercepts the calls and serves recent results from cache instead of hitting the network every time.",
+        "ru": "Кэширующий заместитель, реализующий тот же самый интерфейс, что и настоящий сервис. Экраны как и раньше вызывают те же методы, но заместитель перехватывает вызовы и отдаёт недавние результаты из кэша вместо обращения к сети при каждом запросе."
+      }
+    },
+    {
+      "question": {
+        "en": "In the reporting service example, why does re-fetching data on every screen make the UI feel sluggish?",
+        "ru": "В примере с сервисом отчётов - почему повторный запрос данных на каждом экране делает интерфейс менее отзывчивым?"
+      },
+      "hint": {
+        "en": "Look at what kind of call the analytics API requires.",
+        "ru": "Обратите внимание, каким по своей природе является вызов к API аналитики."
+      },
+      "options": [
+        {
+          "en": "Every screen re-triggers a slow, network-bound call to a remote API",
+          "ru": "Каждый экран заново запускает медленный сетевой вызов к удалённому API"
+        },
+        {
+          "en": "The service class fails to compile without a cache",
+          "ru": "Класс сервиса не компилируется без кэша"
+        },
+        {
+          "en": "The analytics API only accepts one request per day",
+          "ru": "API аналитики принимает только один запрос в день"
+        },
+        {
+          "en": "The UI framework blocks all network calls by default",
+          "ru": "UI-фреймворк по умолчанию блокирует все сетевые вызовы"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Every screen that displays a report re-triggers the slow, network-bound call to the remote analytics API, even when the underlying data hasn't changed in the last five minutes, burning bandwidth and making the UI feel sluggish.",
+        "ru": "Каждый экран, отображающий отчёт, заново запускает медленный сетевой вызов к удалённому API аналитики, даже если данные не менялись последние пять минут - это впустую расходует трафик и делает интерфейс менее отзывчивым."
       }
     },
     {
@@ -325,7 +358,7 @@
       },
       "options": [
         {
-          "en": "The class is generated or shared, so editing it is risky",
+          "en": "The class is generated or shared, so editing it risks losing changes",
           "ru": "Класс сгенерирован или используется совместно, редактировать его рискованно"
         },
         {
@@ -333,8 +366,8 @@
           "ru": "У класса сервиса нет методов, которые можно перехватить"
         },
         {
-          "en": "Caching is impossible to implement in any language",
-          "ru": "Кэширование в принципе невозможно реализовать ни на одном языке"
+          "en": "Caching logic cannot legally live outside a database layer",
+          "ru": "Логика кэширования не может по определению находиться вне слоя базы данных"
         },
         {
           "en": "The remote analytics API forbids any client-side caching",
@@ -382,68 +415,200 @@
     },
     {
       "question": {
-        "en": "What is a stated benefit of a virtual proxy specifically?",
-        "ru": "Какое преимущество указано именно для виртуального заместителя?"
+        "en": "In the structure, what is the ServiceInterface's role?",
+        "ru": "Какова роль ServiceInterface в структуре паттерна?"
       },
       "hint": {
-        "en": "Think about timing - when does the expensive object actually need to exist?",
-        "ru": "Подумайте про момент времени - когда дорогой объект действительно должен появиться?"
+        "en": "Look at what makes the Service and the Proxy interchangeable in the first place.",
+        "ru": "Подумайте, что вообще делает Сервис и Заместителя взаимозаменяемыми."
       },
       "options": [
         {
-          "en": "It can defer creating an expensive object until needed",
-          "ru": "Он может отложить создание дорогого объекта до момента, когда он понадобится"
+          "en": "Defines the contract both the real object and its stand-in must honor",
+          "ru": "Определяет контракт, которому должны следовать и реальный объект, и его заменитель"
         },
         {
-          "en": "It permanently removes the need to ever construct the real object",
-          "ru": "Он навсегда устраняет необходимость когда-либо создавать реальный объект"
+          "en": "Holds the cached results produced by the proxy",
+          "ru": "Хранит кэшированные результаты, полученные заместителем"
         },
         {
-          "en": "It automatically parallelizes every call to the wrapped service",
-          "ru": "Он автоматически распараллеливает каждый вызов к обёрнутому сервису"
+          "en": "Performs the actual business logic on behalf of the client",
+          "ru": "Выполняет саму бизнес-логику от имени клиента"
         },
         {
-          "en": "It converts the wrapped service into a singleton",
-          "ru": "Он превращает обёрнутый сервис в одиночку"
+          "en": "Decides at runtime which concrete proxy class to instantiate",
+          "ru": "Определяет во время выполнения, какой конкретный класс заместителя создать"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "A virtual proxy can defer creating an expensive object until the moment it's genuinely needed, saving startup time and resources for the common case where it's never touched.",
-        "ru": "Виртуальный заместитель может отложить создание дорогого объекта до момента, когда он действительно понадобится, экономя время запуска и ресурсы в типичном случае, когда объект вообще не используется."
+        "en": "ServiceInterface defines the contract that both the real object and its stand-in must honor, making the two interchangeable from the caller's point of view.",
+        "ru": "ServiceInterface определяет контракт, которому должны следовать и реальный объект, и его заменитель, делая их взаимозаменяемыми с точки зрения вызывающего кода."
       }
     },
     {
       "question": {
-        "en": "What is a stated risk of caching inside a proxy?",
-        "ru": "Какой риск указан для кэширования внутри заместителя?"
+        "en": "According to the participant roles, what does the Proxy actually do with calls it receives?",
+        "ru": "Согласно ролям участников, что Заместитель делает с получаемыми вызовами?"
       },
       "hint": {
-        "en": "Think about what a cached value might no longer reflect after enough time passes.",
-        "ru": "Подумайте, чему кэшированное значение может перестать соответствовать спустя время."
+        "en": "Look at how the Proxy's description describes the relationship between its own logic and the wrapped Service.",
+        "ru": "Обратите внимание, как в описании роли Заместителя соотносятся его собственная логика и обёрнутый Сервис."
       },
       "options": [
         {
-          "en": "A stale cache can silently return outdated results",
-          "ru": "Устаревший кэш может незаметно вернуть неактуальные данные"
+          "en": "Inserts its own logic around delegating to a Service it owns or creates",
+          "ru": "Вставляет собственную логику вокруг делегирования Сервису, которым владеет или который создаёт"
         },
         {
-          "en": "Caching inside a proxy is impossible without changing the service's interface",
-          "ru": "Кэширование внутри заместителя невозможно без изменения интерфейса сервиса"
+          "en": "Replaces the Service's business logic entirely with its own",
+          "ru": "Полностью заменяет бизнес-логику Сервиса своей собственной"
         },
         {
-          "en": "It forces every call to bypass the proxy entirely",
-          "ru": "Оно заставляет каждый вызов полностью обходить заместителя"
+          "en": "Forwards every call unmodified without adding any behavior",
+          "ru": "Пересылает каждый вызов без изменений, не добавляя никакого поведения"
         },
         {
-          "en": "It guarantees the client always receives live, uncached data",
-          "ru": "Оно гарантирует, что клиент всегда получает актуальные, некэшированные данные"
+          "en": "Compiles a new ServiceInterface at runtime for each call",
+          "ru": "Компилирует новый ServiceInterface во время выполнения при каждом вызове"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "A stale or overly aggressive cache inside the proxy can silently return outdated results, a class of bug that's easy to introduce and awkward to trace back to the proxy layer.",
-        "ru": "Устаревший или слишком агрессивный кэш внутри заместителя может незаметно возвращать неактуальные результаты - такую ошибку легко внести и трудно проследить до слоя заместителя."
+        "en": "The Proxy implements the same interface and forwards calls to a Service instance it owns or creates, inserting its own logic - a cache lookup, a permission check, deferred construction - around the delegation.",
+        "ru": "Заместитель реализует тот же интерфейс и перенаправляет вызовы экземпляру Сервиса, которым владеет или который создаёт, вставляя вокруг делегирования собственную логику - обращение к кэшу, проверку прав, отложенное создание."
+      }
+    },
+    {
+      "question": {
+        "en": "In the CachingProxy implementation, what happens when fetchData() is called with a query already present in the cache?",
+        "ru": "В реализации CachingProxy - что происходит при вызове fetchData() с запросом, уже присутствующим в кэше?"
+      },
+      "hint": {
+        "en": "Look at whether the wrapped service's method gets called at all on a cache hit.",
+        "ru": "Обратите внимание, вызывается ли вообще метод обёрнутого сервиса при попадании в кэш."
+      },
+      "options": [
+        {
+          "en": "The cached result is returned immediately, without calling the real service",
+          "ru": "Кэшированный результат возвращается сразу, без вызова настоящего сервиса"
+        },
+        {
+          "en": "The real service is still called to verify the cached value is correct",
+          "ru": "Настоящий сервис всё равно вызывается, чтобы проверить корректность кэшированного значения"
+        },
+        {
+          "en": "The cache entry is deleted and a fresh query is executed instead",
+          "ru": "Запись в кэше удаляется, и вместо неё выполняется новый запрос"
+        },
+        {
+          "en": "An error is thrown because the same query cannot be requested twice",
+          "ru": "Выбрасывается ошибка, потому что один и тот же запрос нельзя запросить дважды"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "If the cache has the query, fetchData() returns the cached result immediately without calling the wrapped service's fetchData() at all - only a cache miss triggers the real call and stores the fresh result.",
+        "ru": "Если запрос уже есть в кэше, fetchData() сразу возвращает закэшированный результат, вообще не вызывая fetchData() обёрнутого сервиса - реальный вызов происходит только при промахе кэша, после чего результат сохраняется."
+      }
+    },
+    {
+      "question": {
+        "en": "In the walkthrough, what does the constructor of CachingProxy store?",
+        "ru": "Согласно разбору кода, что сохраняет конструктор CachingProxy?"
+      },
+      "hint": {
+        "en": "Two things get stored - one is the object being wrapped, the other holds results.",
+        "ru": "Сохраняются две вещи - одна это оборачиваемый объект, другая хранит результаты."
+      },
+      "options": [
+        {
+          "en": "A reference to the wrapped service and an empty cache",
+          "ru": "Ссылку на обёрнутый сервис и пустой кэш"
+        },
+        {
+          "en": "Only a reference to the ServiceInterface, with no cache at all",
+          "ru": "Только ссылку на ServiceInterface, без какого-либо кэша"
+        },
+        {
+          "en": "A list of every client that has ever called the proxy",
+          "ru": "Список всех клиентов, когда-либо обращавшихся к заместителю"
+        },
+        {
+          "en": "A timestamp marking when the real service was last restarted",
+          "ru": "Временную метку последнего перезапуска настоящего сервиса"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The constructor stores both the wrapped service and a private cache map, which is what lets fetchData() later check the cache before deciding whether to delegate.",
+        "ru": "Конструктор сохраняет и обёрнутый сервис, и приватную карту кэша - именно это позволяет fetchData() впоследствии проверять кэш перед решением о делегировании."
+      }
+    },
+    {
+      "question": {
+        "en": "What tradeoff does introducing a proxy add to every call, according to the listed cons?",
+        "ru": "Какой компромисс, согласно перечисленным минусам, вносит заместитель в каждый вызов?"
+      },
+      "hint": {
+        "en": "Think about what an extra layer between client and service costs, even when it does nothing else.",
+        "ru": "Подумайте, чего стоит дополнительный слой между клиентом и сервисом, даже если он больше ничего не делает."
+      },
+      "options": [
+        {
+          "en": "A small but nonzero latency cost from the extra hop",
+          "ru": "Небольшая, но ненулевая задержка из-за дополнительного промежуточного слоя"
+        },
+        {
+          "en": "A guaranteed doubling of memory usage for every request",
+          "ru": "Гарантированное удвоение потребления памяти на каждый запрос"
+        },
+        {
+          "en": "Complete loss of access to the real service's original behavior",
+          "ru": "Полная потеря доступа к исходному поведению реального сервиса"
+        },
+        {
+          "en": "A requirement to rewrite the ServiceInterface for every new proxy",
+          "ru": "Необходимость переписывать ServiceInterface для каждого нового заместителя"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Every call now passes through an extra hop, which adds a small but nonzero latency cost, and can matter in tight loops calling the service repeatedly.",
+        "ru": "Каждый вызов теперь проходит через дополнительный промежуточный слой, что добавляет небольшую, но ненулевую задержку и может быть заметно в плотных циклах с частыми вызовами сервиса."
+      }
+    },
+    {
+      "question": {
+        "en": "How does a protection proxy differ in purpose from a caching proxy, based on the pros listed?",
+        "ru": "Чем защищающий заместитель отличается по своему назначению от кэширующего, судя по перечисленным плюсам?"
+      },
+      "hint": {
+        "en": "One pro is about who is allowed to call, the other is about what happens once a call goes through.",
+        "ru": "Один плюс связан с тем, кому разрешено вызывать, другой - с тем, что происходит после того, как вызов прошёл."
+      },
+      "options": [
+        {
+          "en": "It enforces authorization rules at the call boundary, instead of caching results",
+          "ru": "Он применяет правила авторизации на границе вызова, а не кэширует результаты"
+        },
+        {
+          "en": "It replaces the need for a ServiceInterface entirely",
+          "ru": "Он полностью устраняет необходимость в ServiceInterface"
+        },
+        {
+          "en": "It is the only proxy type that can wrap a remote service",
+          "ru": "Это единственный тип заместителя, способный оборачивать удалённый сервис"
+        },
+        {
+          "en": "It automatically converts every call into a cached one",
+          "ru": "Он автоматически превращает каждый вызов в кэшированный"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A protection proxy can enforce authorization rules at the exact call boundary, independent of whatever checks exist inside the service itself - a distinct concern from the caching proxy's job of storing and reusing results.",
+        "ru": "Защищающий заместитель может применять правила авторизации ровно на границе вызова, независимо от проверок внутри самого сервиса - это отдельная задача, отличная от работы кэширующего заместителя по сохранению и повторному использованию результатов."
       }
     }
   ],

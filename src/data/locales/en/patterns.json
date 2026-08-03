@@ -92,7 +92,13 @@
       "score": "You scored {{correct}} out of {{total}}.",
       "hint_show": "Show hint",
       "hint_hide": "Hide hint",
-      "report_issue": "Something wrong with this quiz? Report it"
+      "report_issue": "Something wrong with this quiz? Report it",
+      "result_perfect_title": "Perfect score!",
+      "result_perfect_message": "Every answer was correct - you've got a firm grip on this pattern.",
+      "result_pass_title": "Well done!",
+      "result_pass_message": "Solid result - you understand how this pattern works. Skim the explanations above for anything you missed.",
+      "result_fail_title": "Not quite there yet",
+      "result_fail_message": "A few gaps to close. Read through the explanations above and give the quiz another try - you'll get it."
     },
 
     "walkthrough": {

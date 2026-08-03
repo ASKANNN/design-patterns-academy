@@ -1,6 +1,8 @@
 import { t } from '../../utils/i18n.js';
 import { playSuccessChime, playErrorTone } from '../../utils/sound.js';
 
+const PASS_RATIO = 0.7;
+
 export function handleQuizOption(btn) {
   const question = btn.closest('[data-quiz-question]');
   if (!question || question.classList.contains('is-answered')) return;
@@ -46,8 +48,29 @@ export function handleQuizNext(btn) {
     const results  = quiz.querySelector('[data-quiz-results]');
     const scoreEl  = quiz.querySelector('[data-quiz-score-text]');
     const score    = Number(quiz.dataset.quizScore || 0);
-    if (scoreEl) scoreEl.textContent = t('patterns.quiz.score', { correct: score, total: questions.length });
-    if (results) results.hidden = false;
+    const total    = questions.length;
+    if (scoreEl) scoreEl.textContent = t('patterns.quiz.score', { correct: score, total });
+    if (results) {
+      const perfect = score === total;
+      const passed  = score / total >= PASS_RATIO;
+      const key     = perfect ? 'perfect' : passed ? 'pass' : 'fail';
+
+      results.classList.toggle('is-pass', passed);
+      results.classList.toggle('is-fail', !passed);
+
+      const titleEl   = results.querySelector('[data-quiz-result-title]');
+      const messageEl = results.querySelector('[data-quiz-result-message]');
+      if (titleEl) titleEl.textContent = t(`patterns.quiz.result_${key}_title`);
+      if (messageEl) messageEl.textContent = t(`patterns.quiz.result_${key}_message`);
+
+      const iconPass = results.querySelector('[data-quiz-result-icon-pass]');
+      const iconFail = results.querySelector('[data-quiz-result-icon-fail]');
+      if (iconPass) iconPass.hidden = !passed;
+      if (iconFail) iconFail.hidden = passed;
+
+      passed ? playSuccessChime() : playErrorTone();
+      results.hidden = false;
+    }
   }
 }
 
@@ -74,7 +97,10 @@ export function handleQuizRetry(btn) {
   });
 
   const results = quiz.querySelector('[data-quiz-results]');
-  if (results) results.hidden = true;
+  if (results) {
+    results.hidden = true;
+    results.classList.remove('is-pass', 'is-fail');
+  }
 }
 
 export function handleQuizHint(btn) {

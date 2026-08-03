@@ -208,16 +208,21 @@ No new features are implemented during this sprint — only bug fixing and stabi
 > remaining 22 — same process used for the Phase 12 Diagram Engine.
 
 - [x] Quizzes — reusable `Quiz` UI component (`src/components/ui/Quiz.js`)
-      + a `quiz` array field on the pattern JSON (`question`/`options`/
+      + a `quiz` array field on the pattern JSON (`question`/`hint`/`options`/
       `correct`/`explanation`, all bilingual). **Content scope decision
-      (2026-07-28):** 5 questions per pattern, drawn only from facts
-      already stated elsewhere in that pattern's own JSON
+      (2026-07-28, revised 2026-08-02):** 10 questions per pattern, drawn
+      only from facts already stated elsewhere in that pattern's own JSON
       (intent/cons/implementation) — no new claims introduced by a quiz.
       Shipped for **all 23 patterns**. The engine also
       Fisher–Yates-shuffles question order and option order on every
       render, so the correct answer never sits in a fixed slot and the
       first question isn't reliably answerable from the hero paragraph
       alone (fixed 2026-07-28 after an owner review caught both issues).
+      Results screen shows a celebratory pass message (>=70% correct,
+      with a distinct "perfect score" variant) or a professional
+      encouraging retry message on fail (added 2026-08-02 after an owner
+      review flagged bland pass/fail feedback and overly obvious/vague
+      hints in the shipped question bank).
 - [x] Interactive code walkthroughs — step-by-step line highlighting +
       explanation layered over the existing `CodeBlock` component; step
       data lives in a new `walkthrough` field on the pattern JSON, keyed

@@ -376,6 +376,39 @@
     },
     {
       "question": {
+        "en": "Why can't the remote/device hierarchy vary independently before Bridge is applied?",
+        "ru": "Почему до применения Моста иерархия пультов/устройств не может изменяться независимо?"
+      },
+      "hint": {
+        "en": "Look at what the problem says the hierarchy is really modeling versus what a single inheritance chain can express.",
+        "ru": "Посмотрите, что на самом деле должна выражать иерархия по условию задачи и что способна выразить одна цепочка наследования."
+      },
+      "options": [
+        {
+          "en": "Inheritance forces two separate concerns into one chain",
+          "ru": "Наследование вынуждает объединить две разные ответственности в одну цепочку"
+        },
+        {
+          "en": "JavaScript classes cannot hold references to other objects",
+          "ru": "Классы JavaScript не могут хранить ссылки на другие объекты"
+        },
+        {
+          "en": "RemoteControl was declared as a final class",
+          "ru": "RemoteControl был объявлен как финальный класс"
+        },
+        {
+          "en": "Devices and remotes must always share the same volume range",
+          "ru": "Устройства и пульты обязаны всегда иметь одинаковый диапазон громкости"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The hierarchy is really modeling two separate concerns - control logic and the device it operates - but inheritance forces them into a single chain, so they can't vary independently.",
+        "ru": "Иерархия на самом деле описывает две разные ответственности - логику управления и устройство, которым управляют, - но наследование вынуждает объединить их в одну цепочку, из-за чего они не могут изменяться независимо."
+      }
+    },
+    {
+      "question": {
         "en": "In the Bridge solution, how does RemoteControl relate to a Device?",
         "ru": "В решении Моста - как RemoteControl связан с Device?"
       },
@@ -409,6 +442,105 @@
     },
     {
       "question": {
+        "en": "In Bridge terminology, what role does the Device interface play?",
+        "ru": "Какую роль в терминологии Моста играет интерфейс Device?"
+      },
+      "hint": {
+        "en": "Check the participants list for the role that defines low-level operations independent of the Abstraction's own API.",
+        "ru": "Загляните в список участников - какая роль определяет низкоуровневые операции, независимые от собственного API Абстракции."
+      },
+      "options": [
+        {
+          "en": "Implementation, a contract independent of the Abstraction's API",
+          "ru": "Реализация - контракт, независимый от API Абстракции"
+        },
+        {
+          "en": "Refined Abstraction, adding specialized operations",
+          "ru": "Уточнённая абстракция, добавляющая специализированные операции"
+        },
+        {
+          "en": "Concrete Implementation, one specific backend",
+          "ru": "Конкретная реализация - один конкретный бэкенд"
+        },
+        {
+          "en": "Client, the code that calls the high-level operations",
+          "ru": "Клиент - код, вызывающий высокоуровневые операции"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Implementation defines the low-level operations available to any Abstraction - a contract deliberately independent from the Abstraction's own API - and in this pattern it's shown as the Device interface.",
+        "ru": "Реализация определяет набор низкоуровневых операций, доступных любой Абстракции, - контракт, намеренно независимый от собственного API Абстракции, - и в этом примере она показана как интерфейс Device."
+      }
+    },
+    {
+      "question": {
+        "en": "What distinguishes AdvancedRemote from RemoteControl in the participant roles?",
+        "ru": "Чем AdvancedRemote отличается от RemoteControl в ролях участников?"
+      },
+      "hint": {
+        "en": "One is the base Abstraction; the other adds something on top without touching the Implementation side.",
+        "ru": "Один - базовая Абстракция; другой добавляет что-то поверх, не затрагивая сторону Реализации."
+      },
+      "options": [
+        {
+          "en": "AdvancedRemote is the Refined Abstraction, adding operations like mute",
+          "ru": "AdvancedRemote - это Уточнённая абстракция, добавляющая операции вроде mute"
+        },
+        {
+          "en": "AdvancedRemote is a Concrete Implementation of Device",
+          "ru": "AdvancedRemote - это Конкретная реализация Device"
+        },
+        {
+          "en": "AdvancedRemote replaces the Device interface entirely",
+          "ru": "AdvancedRemote полностью заменяет интерфейс Device"
+        },
+        {
+          "en": "AdvancedRemote and RemoteControl are unrelated classes",
+          "ru": "AdvancedRemote и RemoteControl никак не связаны между собой"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Refined Abstraction adds specialized operations on top of the base Abstraction without needing any changes on the Implementation side - in the diagram it's shown as AdvancedRemote.",
+        "ru": "Уточнённая абстракция добавляет специализированные операции поверх базовой Абстракции, не требуя изменений на стороне Реализации - на диаграмме она показана как AdvancedRemote."
+      }
+    },
+    {
+      "question": {
+        "en": "In the walkthrough, why does AdvancedRemote's mute() count as abstraction-side growth rather than device-side growth?",
+        "ru": "Почему в разборе кода mute() у AdvancedRemote считается ростом на стороне абстракции, а не на стороне устройства?"
+      },
+      "hint": {
+        "en": "Look at what mute() calls and which class it's defined on.",
+        "ru": "Посмотрите, что вызывает mute() и в каком классе он определён."
+      },
+      "options": [
+        {
+          "en": "It's new remote-side behavior built from calling the held device's setVolume",
+          "ru": "Это новое поведение на стороне пульта, построенное на вызове setVolume у хранимого устройства"
+        },
+        {
+          "en": "It modifies the Device interface to add a mute method",
+          "ru": "Он изменяет интерфейс Device, добавляя метод mute"
+        },
+        {
+          "en": "It creates a new subclass of TV specifically for muting",
+          "ru": "Он создаёт новый подкласс TV специально для отключения звука"
+        },
+        {
+          "en": "It duplicates the volume logic already present in TV and Radio",
+          "ru": "Он дублирует логику громкости, уже присутствующую в TV и Radio"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "mute() is new remote-side behavior built from this.device.setVolume(0) - the abstraction hierarchy grows independently of the implementor hierarchy, without touching Device or its subclasses.",
+        "ru": "mute() - новое поведение на стороне пульта, построенное на this.device.setVolume(0) - иерархия абстракции растёт независимо от иерархии реализации, не затрагивая Device или его подклассы."
+      }
+    },
+    {
+      "question": {
         "en": "What benefit does Bridge give regarding runtime behavior?",
         "ru": "Какое преимущество даёт Мост в отношении поведения во время выполнения?"
       },
@@ -438,6 +570,39 @@
       "explanation": {
         "en": "The implementation object can be swapped at runtime - useful for switching a real backend for a test double, or changing behavior based on configuration.",
         "ru": "Объект реализации можно заменить во время выполнения - полезно для подстановки тестового дублёра вместо реального бэкенда или для смены поведения по конфигурации."
+      }
+    },
+    {
+      "question": {
+        "en": "According to the listed cons, what's the readability tradeoff Bridge introduces?",
+        "ru": "Какой компромисс с читаемостью, согласно перечисленным недостаткам, вносит Мост?"
+      },
+      "hint": {
+        "en": "Think about what it takes to trace a single call once the Abstraction no longer contains the actual logic itself.",
+        "ru": "Подумайте, что нужно сделать, чтобы проследить один вызов, когда Абстракция сама больше не содержит фактическую логику."
+      },
+      "options": [
+        {
+          "en": "Tracing a call means jumping from the Abstraction to whatever Implementation it holds",
+          "ru": "Отслеживание вызова означает переход от Абстракции к тому объекту Реализации, который она хранит"
+        },
+        {
+          "en": "It makes unit testing individual classes impossible",
+          "ru": "Он делает модульное тестирование отдельных классов невозможным"
+        },
+        {
+          "en": "It forces all Implementation classes to share one constructor",
+          "ru": "Он вынуждает все классы Реализации использовать один общий конструктор"
+        },
+        {
+          "en": "It prevents the Abstraction from having more than one method",
+          "ru": "Он не позволяет Абстракции иметь больше одного метода"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Tracing a call now means jumping from the Abstraction to whatever Implementation object it currently holds, which costs some readability upfront.",
+        "ru": "Отслеживание вызова теперь означает переход от Абстракции к тому объекту Реализации, который она хранит, что немного снижает читаемость на первых порах."
       }
     },
     {

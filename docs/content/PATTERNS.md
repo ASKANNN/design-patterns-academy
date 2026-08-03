@@ -50,7 +50,7 @@ src/data/patterns/
 | `real_world_examples` | `{en,ru}[]`   | Markdown-flavored examples                                |
 | `related_patterns`    | string[]      | Slugs of related patterns                                 |
 | `visuals`             | object[]      | Diagram / timeline definitions (see below)                |
-| `quiz`                | object[]      | Exactly 5 questions, sourced only from this pattern's own content (see below) |
+| `quiz`                | object[]      | Exactly 10 questions, sourced only from this pattern's own content (see below) |
 
 ---
 
@@ -105,10 +105,18 @@ a new visualization.
 
 # Quiz
 
-`quiz` is an array of exactly 5 questions per pattern. Each question has a
-localized `question`, localized `options`, a `correct` option index, and a
-localized `explanation`. Questions must be sourced only from facts already
-present in that pattern's own JSON — no outside trivia.
+`quiz` is an array of exactly 10 questions per pattern. Each question has a
+localized `question`, a localized `hint`, localized `options` (4 per
+question), a `correct` option index (0-based; the array is shuffled
+client-side on render, so source data always puts the right answer at index
+0), and a localized `explanation`. Questions must be sourced only from facts
+already present in that pattern's own JSON — no outside trivia.
+
+The results screen (`src/components/ui/Quiz.js` +
+`src/scripts/interactions/quiz.js`) shows a pass state (score ratio >= 0.7,
+with a distinct "perfect score" variant at 100%) with a celebratory
+title/message, or a fail state with a professional, encouraging retry
+message — see the `patterns.quiz.result_*` locale keys.
 
 ---
 

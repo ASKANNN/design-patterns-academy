@@ -336,6 +336,39 @@
     },
     {
       "question": {
+        "en": "In the file manager problem, what task does the size-computing function need to handle?",
+        "ru": "Какую задачу должна решать функция подсчёта размера в задаче с файловым менеджером?"
+      },
+      "hint": {
+        "en": "The user can select either a single file or a directory - what can that directory itself contain?",
+        "ru": "Пользователь может выбрать как отдельный файл, так и директорию - а что может содержать сама эта директория?"
+      },
+      "options": [
+        {
+          "en": "A single file, or a directory nested several levels deep",
+          "ru": "Отдельный файл или директорию, вложенную на несколько уровней"
+        },
+        {
+          "en": "Only files stored on a remote network drive",
+          "ru": "Только файлы, хранящиеся на удалённом сетевом диске"
+        },
+        {
+          "en": "A fixed list of exactly ten predefined files",
+          "ru": "Фиксированный список ровно из десяти заранее заданных файлов"
+        },
+        {
+          "en": "Files that have already been compressed into an archive",
+          "ru": "Файлы, уже упакованные в архив"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The file manager needs to compute the total size of anything a user selects: a single file, or a directory that itself contains files and other directories nested several levels deep.",
+        "ru": "Файловому менеджеру нужно вычислять общий размер того, что выбрал пользователь: как отдельного файла, так и директории, которая сама может содержать файлы и другие директории, вложенные на несколько уровней."
+      }
+    },
+    {
+      "question": {
         "en": "What goes wrong with the naive `if (item.type === 'file')` / `if (item.type === 'directory')` approach to computing sizes?",
         "ru": "Что идёт не так с наивным подходом `if (item.type === 'file')` / `if (item.type === 'directory')` при вычислении размеров?"
       },
@@ -402,68 +435,200 @@
     },
     {
       "question": {
-        "en": "What is a stated drawback of forcing leaves and containers to share one interface?",
-        "ru": "Какой недостаток указан для принуждения листьев и контейнеров к общему интерфейсу?"
+        "en": "In the pattern's structure, what distinguishes a Leaf from a Composite?",
+        "ru": "Что в структуре паттерна отличает Лист от Контейнера?"
       },
       "hint": {
-        "en": "A file doesn't have children to manage, yet it shares the interface with a directory - what does that leave it with?",
-        "ru": "У файла нет потомков для управления, но интерфейс у него общий с директорией - что это ему навязывает?"
+        "en": "Look at how each one answers a Component call - does it forward the call anywhere?",
+        "ru": "Посмотрите, как каждый из них отвечает на вызов Компонента - передаёт ли он его дальше?"
       },
       "options": [
         {
-          "en": "It can leave leaves with methods that make no sense for them",
-          "ru": "У листьев появляются методы, для них бессмысленные"
+          "en": "A Leaf answers a call directly; a Composite forwards it to children",
+          "ru": "Лист отвечает на вызов напрямую; Контейнер передаёт его потомкам"
         },
         {
-          "en": "It makes it impossible to compute a file's own size",
-          "ru": "Он делает невозможным вычисление размера самого файла"
+          "en": "A Leaf can hold other Leaves; a Composite cannot hold anything",
+          "ru": "Лист может содержать другие Листья; Контейнер не может содержать ничего"
         },
         {
-          "en": "It requires every leaf to also be a container",
-          "ru": "Он требует, чтобы каждый лист также был контейнером"
+          "en": "A Leaf implements a different interface than the Composite does",
+          "ru": "Лист реализует другой интерфейс, отличный от интерфейса Контейнера"
         },
         {
-          "en": "It prevents any recursion from happening at all",
-          "ru": "Он полностью исключает возможность рекурсии"
+          "en": "A Leaf is only used by the Client, never by a Composite",
+          "ru": "Лист используется только Клиентом, но никогда - Контейнером"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Forcing leaves and containers to share one interface can leave leaves with methods that make no sense for them, like managing children.",
-        "ru": "Принуждение листьев и контейнеров к общему интерфейсу может оставить у листьев методы, которые для них бессмысленны, например управление потомками."
+        "en": "A Leaf is a terminal node with no children of its own that answers a Component call directly, while a Composite keeps a collection of child Components and answers by combining the results of calling it on each child.",
+        "ru": "Лист - это конечный узел без собственных потомков, который отвечает на вызов Компонента напрямую, тогда как Контейнер хранит коллекцию дочерних Компонентов и отвечает, объединяя результаты вызова на каждом потомке."
       }
     },
     {
       "question": {
-        "en": "What can happen with very deep or very large trees under Composite?",
-        "ru": "Что может произойти с очень глубокими или очень большими деревьями при использовании Компоновщика?"
+        "en": "According to the Client's role description, how does it interact with the tree?",
+        "ru": "Согласно описанию роли Клиента, как он взаимодействует с деревом?"
       },
       "hint": {
-        "en": "One call to getSize() on the root can trigger how many recursive calls total?",
-        "ru": "К скольким рекурсивным вызовам в итоге может привести один вызов getSize() на корне дерева?"
+        "en": "Does the Client ever ask whether the object in its hand is a single element or a whole subtree?",
+        "ru": "Проверяет ли Клиент когда-либо, держит ли он отдельный элемент или целое поддерево?"
       },
       "options": [
         {
-          "en": "Simple operations can get expensive as they fan out recursively",
-          "ru": "Простые операции могут стать затратными из-за рекурсии"
+          "en": "It calls Component operations without checking what it's holding",
+          "ru": "Он вызывает операции Компонента, не проверяя, что держит"
         },
         {
-          "en": "The Component interface stops working entirely",
-          "ru": "Интерфейс Component полностью перестаёт работать"
+          "en": "It maintains its own separate copy of the entire tree",
+          "ru": "Он хранит собственную отдельную копию всего дерева"
         },
         {
-          "en": "Leaves automatically turn into containers",
-          "ru": "Листья автоматически превращаются в контейнеры"
+          "en": "It calls a different method depending on tree depth",
+          "ru": "Он вызывает разный метод в зависимости от глубины дерева"
         },
         {
-          "en": "getSize() can no longer be called on a single file",
-          "ru": "getSize() больше нельзя вызвать на отдельном файле"
+          "en": "It can only operate on Leaf objects, never on a Composite",
+          "ru": "Он может работать только с объектами-Листьями, но не с Контейнером"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Very deep or very large trees can make simple aggregate operations expensive, since a single call may fan out recursively across the whole structure.",
-        "ru": "Очень глубокие или очень большие деревья могут сделать простые агрегирующие операции затратными, поскольку один вызов может рекурсивно развернуться по всей структуре."
+        "en": "The Client calls Component operations on whatever object it's given, never checking whether it's holding a single element or an entire subtree.",
+        "ru": "Клиент вызывает операции Компонента на переданном ему объекте, никогда не проверяя, держит ли он отдельный элемент или целое поддерево."
+      }
+    },
+    {
+      "question": {
+        "en": "In the JavaScript implementation, how does `Directory` store its children?",
+        "ru": "Как в реализации на JavaScript `Directory` хранит своих потомков?"
+      },
+      "hint": {
+        "en": "Look at the field declared right at the top of the Directory class body.",
+        "ru": "Посмотрите на поле, объявленное в самом начале тела класса Directory."
+      },
+      "options": [
+        {
+          "en": "In a private #children array holding any mix of File or Directory",
+          "ru": "В приватном массиве #children, хранящем любую смесь File или Directory"
+        },
+        {
+          "en": "In a Map keyed by each child's file extension",
+          "ru": "В Map с ключом по расширению файла каждого потомка"
+        },
+        {
+          "en": "In a fixed-size array that must be preallocated on construction",
+          "ru": "В массиве фиксированного размера, выделяемом заранее при создании"
+        },
+        {
+          "en": "In a separate global registry shared across all directories",
+          "ru": "В отдельном глобальном реестре, общем для всех директорий"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The private `#children` array holds any mix of `File` or `Directory` items, and `add()`/`remove()` manage that collection - a directory can contain other directories.",
+        "ru": "Приватный массив `#children` хранит любую комбинацию `File` или `Directory` - `add()`/`remove()` управляют этой коллекцией, поэтому директория может содержать другие директории."
+      }
+    },
+    {
+      "question": {
+        "en": "In the walkthrough, what does `Directory.print()` do after logging its own line?",
+        "ru": "Что делает `Directory.print()` в разборе кода после вывода своей собственной строки?"
+      },
+      "hint": {
+        "en": "Recall how printing must reach every nested file, not just the top-level directory name.",
+        "ru": "Вспомните, как вывод должен дойти до каждого вложенного файла, а не только до имени директории верхнего уровня."
+      },
+      "options": [
+        {
+          "en": "It calls print() on every child with deeper indentation",
+          "ru": "Вызывает print() у каждого потомка с большим отступом"
+        },
+        {
+          "en": "It stops, leaving children to print themselves independently later",
+          "ru": "Останавливается, оставляя потомкам вывод себя позже независимо"
+        },
+        {
+          "en": "It sorts children alphabetically before returning the size",
+          "ru": "Сортирует потомков по алфавиту перед возвратом размера"
+        },
+        {
+          "en": "It calls getSize() on itself to validate the total first",
+          "ru": "Вызывает у себя getSize() для проверки итоговой суммы"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "After logging its own line, `Directory.print()` calls `c.print(indent + '  ')` on every child - each child prints itself, and its own children if any, with deeper indentation.",
+        "ru": "После вывода своей строки `Directory.print()` вызывает `c.print(indent + '  ')` у каждого потомка - каждый потомок выводит себя (и своих потомков, если есть) с большим отступом."
+      }
+    },
+    {
+      "question": {
+        "en": "Why is `add`/`remove` on the shared Component interface flagged as a risk in the cons?",
+        "ru": "Почему размещение `add`/`remove` в общем интерфейсе Компонента отмечено как риск в недостатках?"
+      },
+      "hint": {
+        "en": "Think about what a Leaf, which has no children at all, would have to do to satisfy that method.",
+        "ru": "Подумайте, что придётся сделать Листу, у которого вовсе нет потомков, чтобы реализовать этот метод."
+      },
+      "options": [
+        {
+          "en": "It forces leaves to implement no-ops or throw for those methods",
+          "ru": "Он заставляет листья реализовывать заглушки или бросать исключения"
+        },
+        {
+          "en": "It makes the Composite class impossible to instantiate",
+          "ru": "Он делает невозможным создание экземпляра класса Composite"
+        },
+        {
+          "en": "It breaks the recursive traversal used by getSize()",
+          "ru": "Он ломает рекурсивный обход, используемый в getSize()"
+        },
+        {
+          "en": "It requires the Client to import a separate management interface",
+          "ru": "Он требует, чтобы Клиент импортировал отдельный интерфейс управления"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "It's tempting to put container-only operations like add/remove on the shared interface, which then forces leaves to implement no-ops or throw, since they have no children to manage.",
+        "ru": "Возникает соблазн разместить операции, свойственные только контейнерам (add/remove), в общем интерфейсе, из-за чего листьям приходится реализовывать пустые заглушки или бросать исключения, ведь управлять им нечем."
+      }
+    },
+    {
+      "question": {
+        "en": "In the DOM tree real-world example, what makes uniform traversal like `querySelectorAll` possible?",
+        "ru": "Что в примере с деревом DOM делает возможным единообразный обход вроде `querySelectorAll`?"
+      },
+      "hint": {
+        "en": "Text nodes and element nodes look very different, but what do they both implement?",
+        "ru": "Текстовые узлы и узлы-элементы выглядят совсем по-разному, но что они оба реализуют?"
+      },
+      "options": [
+        {
+          "en": "A text node and an element node both implement the same Node interface",
+          "ru": "Текстовый узел и узел-элемент оба реализуют один интерфейс Node"
+        },
+        {
+          "en": "The browser caches every possible query result in advance",
+          "ru": "Браузер заранее кэширует все возможные результаты запросов"
+        },
+        {
+          "en": "Element nodes are converted into text nodes before traversal",
+          "ru": "Узлы-элементы преобразуются в текстовые узлы перед обходом"
+        },
+        {
+          "en": "Only element nodes are visited; text nodes are skipped entirely",
+          "ru": "Обходятся только узлы-элементы; текстовые узлы полностью пропускаются"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A text node and an element node both implement the same Node interface, so traversal code like querySelectorAll works uniformly at any depth.",
+        "ru": "Текстовый узел и узел-элемент оба реализуют один интерфейс Node, поэтому обходящий код вроде querySelectorAll работает единообразно на любой глубине."
       }
     }
   ],

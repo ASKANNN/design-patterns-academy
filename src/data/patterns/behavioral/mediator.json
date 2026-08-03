@@ -309,8 +309,8 @@
     },
     {
       "question": {
-        "en": "What goes wrong in a group chat where every user object calls every other user directly?",
-        "ru": "Что идёт не так в групповом чате, где каждый пользователь напрямую вызывает всех остальных?"
+        "en": "In the group-chat example, what happens as soon as a fourth user joins a chat built on direct references?",
+        "ru": "В примере с групповым чатом - что происходит, как только к чату, построенному на прямых ссылках, присоединяется четвёртый пользователь?"
       },
       "hint": {
         "en": "Picture the number of direct connections between users as the group grows - what has to change when one more person joins?",
@@ -318,32 +318,32 @@
       },
       "options": [
         {
-          "en": "Adding a new person means updating every existing user",
-          "ru": "Добавление нового участника требует обновить всех существующих"
+          "en": "Every existing user has to be rewired to know about the new one",
+          "ru": "Всех существующих пользователей приходится перепроводить, чтобы они узнали о новом"
         },
         {
-          "en": "Messages can no longer be delivered to anyone",
-          "ru": "Сообщения вообще перестают доставляться кому-либо"
+          "en": "Messages stop being delivered to anyone in the room",
+          "ru": "Сообщения вообще перестают доставляться кому-либо в комнате"
         },
         {
-          "en": "The chat works fine no matter how many users join",
-          "ru": "Чат отлично работает независимо от числа участников"
+          "en": "The chat keeps working with no changes needed anywhere",
+          "ru": "Чат продолжает работать без каких-либо изменений"
         },
         {
-          "en": "Users automatically lose the ability to send messages",
-          "ru": "Пользователи автоматически теряют возможность отправлять сообщения"
+          "en": "The three original users automatically lose send access",
+          "ru": "Три первоначальных пользователя автоматически теряют доступ к отправке"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "It works with three people, but dropping in a fourth requires rewiring every existing user to know about them, and removing someone reverses that rewiring.",
-        "ru": "С тремя участниками это работает, но добавление четвёртого требует перепроводки всех существующих пользователей, чтобы они знали о нём, а удаление - той же перепроводки в обратную сторону."
+        "en": "It works with three people, but drop in a fourth and you have to rewire every existing user to know about them - the web of direct references becomes a tangle that's hard to change.",
+        "ru": "С тремя участниками это работает, но добавь четвёртого - и придётся перепроводить всех существующих пользователей, чтобы они знали о нём. Сеть прямых ссылок превращается в клубок, который трудно менять."
       }
     },
     {
       "question": {
-        "en": "In the solution, how does a user send a message?",
-        "ru": "В решении - как пользователь отправляет сообщение?"
+        "en": "Once Mediator is applied, how does a user actually send a message to the group?",
+        "ru": "После применения Посредника - как пользователь на самом деле отправляет сообщение в группу?"
       },
       "hint": {
         "en": "Who now knows the full list of participants - the individual user, or the chat room itself?",
@@ -351,26 +351,158 @@
       },
       "options": [
         {
-          "en": "It sends the message through one method, and the chat room delivers it",
-          "ru": "Он отправляет сообщение через единственный метод чата"
+          "en": "It tells the chat room through one method and forgets about who's listening",
+          "ru": "Сообщает об этом чату через единственный метод и забывает, кто его слушает"
         },
         {
-          "en": "It calls every other user's receiveMessage method directly, one by one",
-          "ru": "Он напрямую вызывает метод receiveMessage у каждого пользователя по очереди"
+          "en": "It calls every other user's receive method directly, one by one",
+          "ru": "Напрямую вызывает метод получения сообщения у каждого пользователя по очереди"
         },
         {
-          "en": "It broadcasts the message over a shared network socket without any coordinator",
-          "ru": "Он рассылает сообщение через общий сетевой сокет без какого-либо координатора"
+          "en": "It broadcasts over a shared network socket with no coordinator involved",
+          "ru": "Рассылает сообщение через общий сетевой сокет без какого-либо координатора"
         },
         {
-          "en": "It stores the message in the mediator without ever delivering it",
-          "ru": "Он сохраняет сообщение в посреднике, ни разу его не доставляя"
+          "en": "It stores the message locally until another user asks for it",
+          "ru": "Сохраняет сообщение локально, пока другой пользователь сам не запросит его"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Each user sends its message to the chat room through a single method, and the chat room looks up everyone currently registered and delivers the message to them.",
-        "ru": "Каждый пользователь отправляет своё сообщение в чат через единственный метод, а чат находит всех текущих зарегистрированных участников и доставляет им сообщение."
+        "en": "A user that wants to say something now just tells the chat room and forgets about who's listening - the chat room is the only place that knows the full list of participants.",
+        "ru": "Пользователь, который хочет что-то сказать, теперь просто говорит об этом чату и забывает, кто его слушает. Только чат знает полный список участников."
+      }
+    },
+    {
+      "question": {
+        "en": "In the structure, what does a Component (Colleague) know about, and what does it not know about?",
+        "ru": "В структуре паттерна - о чём знает Компонент (Коллега), а о чём не знает?"
+      },
+      "hint": {
+        "en": "Compare what Alice knows in the diagram to what Chat Room knows.",
+        "ru": "Сравните, что знает Алиса на схеме, и что знает Чат."
+      },
+      "options": [
+        {
+          "en": "It only knows about the mediator, never about sibling components",
+          "ru": "Знает только о посреднике, но никогда - о соседних компонентах"
+        },
+        {
+          "en": "It knows about every sibling component but not the mediator",
+          "ru": "Знает о каждом соседнем компоненте, но не о посреднике"
+        },
+        {
+          "en": "It knows about both the mediator and every sibling component",
+          "ru": "Знает и о посреднике, и о каждом соседнем компоненте"
+        },
+        {
+          "en": "It knows about the mediator only after registering twice",
+          "ru": "Узнаёт о посреднике только после двойной регистрации"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "A Component only knows about the mediator, never about sibling components - it reports its own state changes and reacts only to calls the mediator makes on it.",
+        "ru": "Компонент знает только о посреднике, но никогда - о соседних компонентах. Он сообщает о собственных изменениях состояния и реагирует лишь на вызовы, которые делает посредник."
+      }
+    },
+    {
+      "question": {
+        "en": "In the JavaScript ChatRoom implementation, what does sendMessage do with the sender argument?",
+        "ru": "В реализации ChatRoom на JavaScript - что sendMessage делает с аргументом sender?"
+      },
+      "hint": {
+        "en": "Look at the condition inside the loop over #users before receive is called.",
+        "ru": "Посмотрите на условие внутри цикла по #users перед вызовом receive."
+      },
+      "options": [
+        {
+          "en": "It skips calling receive on the sender while notifying everyone else",
+          "ru": "Пропускает вызов receive у самого отправителя, оповещая всех остальных"
+        },
+        {
+          "en": "It removes the sender from the users list permanently",
+          "ru": "Навсегда удаляет отправителя из списка пользователей"
+        },
+        {
+          "en": "It ignores the sender argument and messages nobody",
+          "ru": "Игнорирует аргумент sender и никому не отправляет сообщение"
+        },
+        {
+          "en": "It calls receive on the sender twice to confirm delivery",
+          "ru": "Дважды вызывает receive у отправителя, чтобы подтвердить доставку"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "sendMessage loops over #users and calls user.receive(...) on everyone except sender - users never call each other directly, and the sender doesn't receive its own message back.",
+        "ru": "sendMessage проходит по #users и вызывает user.receive(...) у всех, кроме sender - пользователи никогда не вызывают друг друга напрямую, и отправитель не получает собственное сообщение обратно."
+      }
+    },
+    {
+      "question": {
+        "en": "How does a User join the chat room in the implementation?",
+        "ru": "Как пользователь присоединяется к чату в реализации?"
+      },
+      "hint": {
+        "en": "Look at what happens inside the User constructor, right after the mediator reference is stored.",
+        "ru": "Посмотрите, что происходит внутри конструктора User сразу после сохранения ссылки на посредника."
+      },
+      "options": [
+        {
+          "en": "Its constructor calls mediator.register(this) to add itself to the room",
+          "ru": "Его конструктор вызывает mediator.register(this), чтобы добавить себя в чат"
+        },
+        {
+          "en": "It waits for the chat room to discover it automatically",
+          "ru": "Он ждёт, пока чат сам его не обнаружит"
+        },
+        {
+          "en": "It calls every other user's constructor to announce itself",
+          "ru": "Он вызывает конструктор каждого другого пользователя, чтобы заявить о себе"
+        },
+        {
+          "en": "It adds its name to a global list shared across all mediators",
+          "ru": "Добавляет своё имя в глобальный список, общий для всех посредников"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The User constructor calls mediator.register(this) to join the room - each new User passes the same mediator instance and registers itself immediately.",
+        "ru": "Конструктор User вызывает mediator.register(this), чтобы присоединиться к комнате - каждый новый пользователь передаёт один и тот же экземпляр посредника и сразу регистрируется в нём."
+      }
+    },
+    {
+      "question": {
+        "en": "Which of these is listed as a genuine benefit of Mediator?",
+        "ru": "Что из перечисленного указано как настоящее преимущество Посредника?"
+      },
+      "hint": {
+        "en": "Think about where the reaction logic used to be scattered, and where it lives now.",
+        "ru": "Подумайте, где раньше была разбросана логика реакций и где она находится теперь."
+      },
+      "options": [
+        {
+          "en": "Cross-component logic lives in one class instead of being smeared across every participant",
+          "ru": "Логика взаимодействия компонентов сосредоточена в одном классе, а не размазана по каждому участнику"
+        },
+        {
+          "en": "It guarantees the mediator never needs to change once written",
+          "ru": "Гарантирует, что посредника никогда не придётся менять после написания"
+        },
+        {
+          "en": "It removes the need for components to have any state at all",
+          "ru": "Устраняет необходимость компонентам иметь какое-либо состояние"
+        },
+        {
+          "en": "It makes every component aware of every other component by design",
+          "ru": "По замыслу делает каждый компонент осведомлённым обо всех остальных"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Cross-component logic lives in one class instead of being smeared across every participant, so you can read the whole reaction chain in one place.",
+        "ru": "Логика взаимодействия компонентов сосредоточена в одном классе, а не размазана по каждому участнику, поэтому всю цепочку реакций можно прочитать в одном месте."
       }
     },
     {
@@ -408,35 +540,68 @@
     },
     {
       "question": {
-        "en": "What is a stated benefit of Mediator for testing components?",
-        "ru": "Какое преимущество Посредника указано для тестирования компонентов?"
+        "en": "Why is debugging harder in a system built around Mediator?",
+        "ru": "Почему отладка сложнее в системе, построенной вокруг Посредника?"
       },
       "hint": {
-        "en": "If a component holds no references to its peers, what does that mean for setting it up in isolation for a test?",
-        "ru": "Если компонент не хранит ссылок на своих соседей, что это значит для его изолированной настройки в тесте?"
+        "en": "Compare following a direct method call between two objects to following a call that first passes through a middleman.",
+        "ru": "Сравните отслеживание прямого вызова метода между двумя объектами с отслеживанием вызова, который сначала проходит через посредника."
       },
       "options": [
         {
-          "en": "Components can be tested and reused independently",
-          "ru": "Компоненты можно тестировать и переиспользовать независимо"
+          "en": "It means tracing calls through an extra indirection layer",
+          "ru": "Приходится прослеживать вызовы через дополнительный слой косвенности"
         },
         {
-          "en": "Testing components requires running the entire mediator network at once",
-          "ru": "Тестирование компонентов требует запуска всей сети посредника целиком"
+          "en": "Debuggers cannot attach to any class that implements a mediator interface",
+          "ru": "Отладчики не могут подключиться ни к одному классу, реализующему интерфейс посредника"
         },
         {
-          "en": "Components can no longer be tested once a mediator is introduced",
-          "ru": "Компоненты больше нельзя тестировать после введения посредника"
+          "en": "Every bug becomes permanent once the mediator is introduced",
+          "ru": "Любая ошибка становится неисправимой после введения посредника"
         },
         {
-          "en": "Only the mediator itself can be tested, never the components",
-          "ru": "Тестировать можно только сам посредник, но не компоненты"
+          "en": "Components stop emitting any log output once wired to a mediator",
+          "ru": "Компоненты перестают выводить какие-либо логи после подключения к посреднику"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Components can be swapped, tested, or reused independently, since none of them hold references to the others.",
-        "ru": "Компоненты можно заменять, тестировать и переиспользовать независимо, поскольку ни один из них не хранит ссылок на другие."
+        "en": "Debugging means tracing calls through an extra indirection layer instead of following a direct method call between two objects.",
+        "ru": "Отладка требует прослеживать вызовы через дополнительный слой косвенности, а не следовать за прямым вызовом метода между двумя объектами."
+      }
+    },
+    {
+      "question": {
+        "en": "When can introducing a Mediator feel like unnecessary ceremony?",
+        "ru": "Когда введение Посредника может ощущаться как лишняя церемония?"
+      },
+      "hint": {
+        "en": "Think about a case where the set of interactions is small and isn't going to grow.",
+        "ru": "Подумайте о случае, когда набор взаимодействий небольшой и не собирается расти."
+      },
+      "options": [
+        {
+          "en": "For a small, stable set of interactions compared to a couple of direct calls",
+          "ru": "Для небольшого и стабильного набора взаимодействий по сравнению с парой прямых вызовов"
+        },
+        {
+          "en": "Whenever there are more than two components in the system",
+          "ru": "Всякий раз, когда в системе больше двух компонентов"
+        },
+        {
+          "en": "Only when the mediator interface has more than one method",
+          "ru": "Только когда интерфейс посредника содержит больше одного метода"
+        },
+        {
+          "en": "Whenever components are expected to be reused elsewhere",
+          "ru": "Всякий раз, когда компоненты предполагается переиспользовать в другом месте"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "For a small, stable set of interactions the mediator can feel like unnecessary ceremony compared to a couple of direct calls.",
+        "ru": "Для небольшого и стабильного набора взаимодействий посредник может выглядеть как лишняя церемония по сравнению с парой прямых вызовов."
       }
     }
   ],

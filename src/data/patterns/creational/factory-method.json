@@ -302,8 +302,8 @@
   "quiz": [
     {
       "question": {
-        "en": "What does Factory Method delegate to a subclass-overridable method?",
-        "ru": "Что Фабричный метод передаёт методу, переопределяемому подклассами?"
+        "en": "What does Factory Method's intent say the pattern delegates to an overridable method?",
+        "ru": "Что, согласно определению паттерна, Фабричный метод передаёт переопределяемому методу?"
       },
       "hint": {
         "en": "The pattern's name is a strong clue - what kind of work does a \"factory\" normally do?",
@@ -311,8 +311,8 @@
       },
       "options": [
         {
-          "en": "Object creation, delegated to a subclass method",
-          "ru": "Создание объекта, делегированное методу подкласса"
+          "en": "Object creation, so a base class doesn't need to know the exact product type",
+          "ru": "Создание объекта, чтобы базовому классу не нужно было знать точный тип продукта"
         },
         {
           "en": "The entire business logic of the class",
@@ -329,14 +329,47 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "The base class only knows the factory method returns something implementing the Transport interface, not a concrete class.",
-        "ru": "Базовый класс знает лишь, что фабричный метод возвращает нечто, реализующее интерфейс Transport, а не конкретный класс."
+        "en": "The base class only knows the factory method returns something implementing the Transport interface, not which concrete class it is.",
+        "ru": "Базовый класс знает лишь, что фабричный метод возвращает нечто, реализующее интерфейс Transport, а не какой это конкретный класс."
       }
     },
     {
       "question": {
-        "en": "What goes wrong when Logistics.planDelivery() constructs a Truck directly and sea shipping is later added?",
-        "ru": "Что идёт не так, если Logistics.planDelivery() создаёт Truck напрямую, а затем добавляется морская доставка?"
+        "en": "In the logistics example, what forces a Truck object to be built directly inside planDelivery()?",
+        "ru": "Что в примере с логистикой заставляет создавать объект Truck прямо внутри planDelivery()?"
+      },
+      "hint": {
+        "en": "Think about how the module looked before sea shipping was ever a consideration.",
+        "ru": "Подумайте, как выглядел модуль до того, как вообще зашла речь о морской доставке."
+      },
+      "options": [
+        {
+          "en": "The module originally supported only road delivery",
+          "ru": "Изначально модуль поддерживал только доставку по земле"
+        },
+        {
+          "en": "JavaScript classes cannot return interfaces from methods",
+          "ru": "Классы JavaScript не могут возвращать интерфейсы из методов"
+        },
+        {
+          "en": "The Transport interface did not exist yet",
+          "ru": "Интерфейс Transport тогда ещё не существовал"
+        },
+        {
+          "en": "Ship objects require a different planning algorithm entirely",
+          "ru": "Объектам Ship требуется совершенно другой алгоритм планирования"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The logistics module started out delivering only by road, so planDelivery() built a Truck right inside its own method body - a design that broke down once sea shipping was added.",
+        "ru": "Модуль логистики начинался с доставки только по земле, поэтому planDelivery() создавал Truck прямо внутри своего метода - решение, которое перестало работать с появлением морской доставки."
+      }
+    },
+    {
+      "question": {
+        "en": "What goes wrong once sea shipping is added, if every call site still constructs a Truck directly?",
+        "ru": "Что идёт не так после добавления морской доставки, если каждое место вызова по-прежнему создаёт Truck напрямую?"
       },
       "hint": {
         "en": "If the concrete class is hardcoded in one place, what has to happen at every call site once a second transport mode exists?",
@@ -344,8 +377,8 @@
       },
       "options": [
         {
-          "en": "Every place needs its own branching logic for delivery mode",
-          "ru": "Каждое место нуждается в своей логике выбора доставки"
+          "en": "Branching logic for delivery mode gets copy-pasted everywhere",
+          "ru": "Логику выбора вида доставки приходится копировать повсюду"
         },
         {
           "en": "The Truck class stops working entirely",
@@ -362,8 +395,8 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "The class doing the useful work is welded to one specific concrete class, so extending it to a new transport mode means editing code that conceptually has nothing to do with that mode.",
-        "ru": "Класс, выполняющий полезную работу, намертво привязан к одному конкретному классу, поэтому расширение под новый вид транспорта требует правки кода, концептуально не связанного с этим видом транспорта."
+        "en": "Every place that constructed a Truck directly now needs an if/else on delivery mode, and that branching logic tends to get copy-pasted into every method that needs a transport.",
+        "ru": "В каждом месте, где раньше напрямую создавался Truck, теперь нужен if/else по способу доставки, и такую ветвящуюся логику приходится копировать в каждый метод, которому нужен транспорт."
       }
     },
     {
@@ -377,12 +410,12 @@
       },
       "options": [
         {
-          "en": "They override only the factory method: one returns a Truck, the other a Ship",
-          "ru": "Они переопределяют только фабричный метод: Truck или Ship"
+          "en": "They override only the factory method, one returning a Truck, the other a Ship",
+          "ru": "Они переопределяют только фабричный метод: один возвращает Truck, другой - Ship"
         },
         {
-          "en": "They each reimplement planDelivery() from scratch with duplicated logic",
-          "ru": "Каждый заново реализует planDelivery() с дублированием логики"
+          "en": "They each reimplement planDelivery() from scratch",
+          "ru": "Каждый заново реализует planDelivery() с нуля"
         },
         {
           "en": "SeaLogistics does not extend the Logistics base class",
@@ -395,8 +428,74 @@
       ],
       "correct": 0,
       "explanation": {
-        "en": "Each delivery mode becomes a subclass overriding just the factory method; all shared logic (planning, tracking, logging) stays untouched in the base class.",
-        "ru": "Каждый способ доставки становится подклассом, переопределяющим только фабричный метод; вся общая логика (планирование, отслеживание, логирование) остаётся нетронутой в базовом классе."
+        "en": "Each delivery mode becomes a subclass overriding just the factory method; all shared logic - planning, tracking, logging - stays untouched in the base class.",
+        "ru": "Каждый способ доставки становится подклассом, переопределяющим только фабричный метод; вся общая логика - планирование, отслеживание, логирование - остаётся нетронутой в базовом классе."
+      }
+    },
+    {
+      "question": {
+        "en": "In the class diagram, what does the Creator participant do?",
+        "ru": "Что делает участник Creator на диаграмме классов?"
+      },
+      "hint": {
+        "en": "Look at what stays the same across every ConcreteCreator, rather than what each one overrides.",
+        "ru": "Обратите внимание на то, что остаётся неизменным во всех ConcreteCreator, а не на то, что каждый из них переопределяет."
+      },
+      "options": [
+        {
+          "en": "Hosts the shared workflow and calls its own factory method for a product",
+          "ru": "Содержит общий рабочий процесс и вызывает собственный фабричный метод за продуктом"
+        },
+        {
+          "en": "Implements a specific ConcreteProduct like Truck directly",
+          "ru": "Напрямую реализует конкретный продукт вроде Truck"
+        },
+        {
+          "en": "Restricts the class to a single shared instance",
+          "ru": "Ограничивает класс единственным общим экземпляром"
+        },
+        {
+          "en": "Deep-copies whatever product it last created",
+          "ru": "Глубоко копирует последний созданный им продукт"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The Creator contains the workflow that needs a product and calls its own factory method to obtain one, without knowing which concrete class that method returns.",
+        "ru": "Создатель содержит рабочий процесс, которому нужен продукт, и вызывает собственный фабричный метод, чтобы его получить, не зная, какой конкретный класс этот метод вернёт."
+      }
+    },
+    {
+      "question": {
+        "en": "Why does planDelivery() work correctly for both RoadLogistics and SeaLogistics without any change to its own code?",
+        "ru": "Почему planDelivery() корректно работает и для RoadLogistics, и для SeaLogistics без единого изменения в своём коде?"
+      },
+      "hint": {
+        "en": "Check what type planDelivery() actually references when it calls createTransport().",
+        "ru": "Проверьте, на какой тип на самом деле ссылается planDelivery(), вызывая createTransport()."
+      },
+      "options": [
+        {
+          "en": "It only relies on the Transport interface, not a concrete class",
+          "ru": "Он полагается только на интерфейс Transport, а не на конкретный класс"
+        },
+        {
+          "en": "Both subclasses secretly call the same constructor",
+          "ru": "Оба подкласса тайно вызывают один и тот же конструктор"
+        },
+        {
+          "en": "JavaScript merges identical method bodies at runtime",
+          "ru": "JavaScript объединяет одинаковые тела методов во время выполнения"
+        },
+        {
+          "en": "Truck and Ship happen to have identical field names",
+          "ru": "У Truck и Ship случайно совпадают имена полей"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The Product interface lets the Creator's workflow stay identical regardless of which concrete product is actually in play, since planDelivery() only calls deliver() through that shared interface.",
+        "ru": "Интерфейс Product позволяет рабочему процессу Создателя оставаться неизменным независимо от того, какой конкретный продукт используется, поскольку planDelivery() вызывает deliver() только через этот общий интерфейс."
       }
     },
     {
@@ -410,8 +509,8 @@
       },
       "options": [
         {
-          "en": "It's purely additive - one new Creator/Product pair",
-          "ru": "Это чисто аддитивно - одна новая пара Creator/Product"
+          "en": "It's purely additive - one new ConcreteCreator/ConcreteProduct pair",
+          "ru": "Это чисто аддитивная операция - одна новая пара ConcreteCreator/ConcreteProduct"
         },
         {
           "en": "It requires rewriting the base class entirely",
@@ -434,8 +533,8 @@
     },
     {
       "question": {
-        "en": "What is a stated drawback of Factory Method?",
-        "ru": "Какой недостаток Фабричного метода указан явно?"
+        "en": "According to the pattern's drawbacks, what happens as a product family grows to many variants?",
+        "ru": "Согласно недостаткам паттерна, что происходит по мере роста числа вариантов продукта?"
       },
       "hint": {
         "en": "Every new variant so far has meant one more subclass - what happens as the number of variants keeps growing?",
@@ -443,26 +542,92 @@
       },
       "options": [
         {
-          "en": "Each new variant means a new subclass, so variants can pile up",
-          "ru": "Каждый новый вариант - новый подкласс, их может стать много"
+          "en": "It can produce a sizeable parallel class hierarchy",
+          "ru": "Это может породить заметную параллельную иерархию классов"
         },
         {
           "en": "It makes it impossible to add new transport types",
-          "ru": "Он делает невозможным добавление новых типов транспорта"
+          "ru": "Это делает невозможным добавление новых типов транспорта"
         },
         {
           "en": "It requires a global synchronization lock",
-          "ru": "Он требует глобальной блокировки синхронизации"
+          "ru": "Это требует глобальной блокировки синхронизации"
         },
         {
           "en": "It prevents the base class from having any shared logic",
-          "ru": "Он не позволяет базовому классу содержать общую логику"
+          "ru": "Это не позволяет базовому классу содержать общую логику"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "For a class that only ever needs to build one type of object, or a family with many variants, Factory Method's subclass-per-variant approach can become overhead or a sizeable parallel hierarchy.",
-        "ru": "Для класса, которому нужен только один тип объекта, либо для семейства с большим числом вариантов, подход «подкласс на вариант» Фабричного метода превращается в накладные расходы или заметную параллельную иерархию."
+        "en": "Each new product variant typically means a new subclass, so a family with many variants can produce a sizeable parallel class hierarchy.",
+        "ru": "Каждый новый вариант продукта обычно означает новый подкласс, поэтому семейство с большим числом вариантов может породить заметную параллельную иерархию классов."
+      }
+    },
+    {
+      "question": {
+        "en": "When does Factory Method's own drawbacks say the pattern is pure overhead?",
+        "ru": "Когда, согласно недостаткам паттерна, Фабричный метод оказывается чистыми накладными расходами?"
+      },
+      "hint": {
+        "en": "Consider a class that will never need more than the one product type it already builds.",
+        "ru": "Подумайте о классе, которому никогда не понадобится больше одного уже существующего типа продукта."
+      },
+      "options": [
+        {
+          "en": "When a class only ever needs to build one type of object",
+          "ru": "Когда классу нужно создавать объекты только одного типа"
+        },
+        {
+          "en": "When the codebase has more than two ConcreteCreators",
+          "ru": "Когда в кодовой базе больше двух ConcreteCreator"
+        },
+        {
+          "en": "When the Product interface has more than one method",
+          "ru": "Когда интерфейс Product содержит больше одного метода"
+        },
+        {
+          "en": "When the base class is declared abstract",
+          "ru": "Когда базовый класс объявлен абстрактным"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "For a class that only ever needs to build one type of object, introducing a factory method is pure overhead with no payoff.",
+        "ru": "Для класса, которому нужно создавать объекты только одного типа, введение фабричного метода - чистые накладные расходы без какой-либо выгоды."
+      }
+    },
+    {
+      "question": {
+        "en": "Which listed real-world example matches Factory Method's shape?",
+        "ru": "Какой из перечисленных реальных примеров соответствует форме Фабричного метода?"
+      },
+      "hint": {
+        "en": "Look for an example where the tag argument decides which concrete class comes back, behind one shared interface.",
+        "ru": "Найдите пример, где аргумент-тег определяет, какой конкретный класс вернётся, за одним общим интерфейсом."
+      },
+      "options": [
+        {
+          "en": "document.createElement(tag) returning different element classes behind one Element interface",
+          "ru": "document.createElement(tag), возвращающий разные классы элементов за одним интерфейсом Element"
+        },
+        {
+          "en": "A Redux store shared by every component in an app",
+          "ru": "Store Redux, общий для всех компонентов приложения"
+        },
+        {
+          "en": "structuredClone() deep-copying an arbitrary object",
+          "ru": "structuredClone(), глубоко копирующий произвольный объект"
+        },
+        {
+          "en": "A fluent query builder chaining .where().limit() calls",
+          "ru": "Цепочка вызовов .where().limit() в построителе запросов"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "document.createElement(tag) returns different concrete element classes (HTMLButtonElement, HTMLInputElement) behind the same Element interface, chosen by the tag argument - the same shape as a factory method.",
+        "ru": "document.createElement(tag) возвращает разные конкретные классы элементов (HTMLButtonElement, HTMLInputElement) за одним интерфейсом Element, выбирая их по аргументу tag - та же форма, что и у фабричного метода."
       }
     }
   ],

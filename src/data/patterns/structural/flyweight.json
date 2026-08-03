@@ -374,6 +374,39 @@
     },
     {
       "question": {
+        "en": "In the Structure section, what does the Context object do?",
+        "ru": "Что делает объект Контекста в разделе о структуре?"
+      },
+      "hint": {
+        "en": "It's the object that stands between the client's unique data and the shared flyweight itself.",
+        "ru": "Это объект, который стоит между уникальными данными клиента и самим разделяемым легковесом."
+      },
+      "options": [
+        {
+          "en": "Pairs a reference to a flyweight with the extrinsic data unique to that usage",
+          "ru": "Связывает ссылку на легковес с внешними данными, уникальными для конкретного случая"
+        },
+        {
+          "en": "Owns the pool of flyweight instances and builds them on demand",
+          "ru": "Владеет пулом экземпляров легковесов и создаёт их по требованию"
+        },
+        {
+          "en": "Holds only data identical across a whole class of objects",
+          "ru": "Хранит только данные, одинаковые для целого класса объектов"
+        },
+        {
+          "en": "Requests flyweights directly by instantiating them with `new`",
+          "ru": "Запрашивает легковесы, создавая их напрямую через `new`"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The Context pairs a reference to some flyweight with the extrinsic data unique to that particular usage - it's what the Tree class does by holding x/y plus a shared type reference.",
+        "ru": "Контекст связывает ссылку на легковес с внешними данными, уникальными для конкретного случая использования - именно это делает класс Tree, храня x/y вместе со ссылкой на общий тип."
+      }
+    },
+    {
+      "question": {
         "en": "What role does the factory play in Flyweight?",
         "ru": "Какую роль играет фабрика в Легковесе?"
       },
@@ -407,35 +440,167 @@
     },
     {
       "question": {
-        "en": "What is a stated risk of mutating a flyweight?",
-        "ru": "Какой риск указан для изменения легковеса?"
+        "en": "In the walkthrough, how does `TreeTypeFactory.getTreeType()` decide whether to build a new `TreeType`?",
+        "ru": "Как `TreeTypeFactory.getTreeType()` в разборе кода решает, создавать ли новый `TreeType`?"
       },
       "hint": {
-        "en": "Remember how many different contexts can be pointing at the very same flyweight instance.",
-        "ru": "Вспомните, сколько разных контекстов могут указывать на один и тот же экземпляр легковеса."
+        "en": "Look at what the method builds from `name`, `color`, and `texture` before it touches the cache.",
+        "ru": "Посмотрите, что метод строит из `name`, `color` и `texture` перед обращением к кэшу."
       },
       "options": [
         {
-          "en": "Mutating one shared flyweight affects every context using it",
-          "ru": "Изменение одного легковеса затронет все ссылающиеся на него контексты"
+          "en": "It builds a key from name_color_texture and checks the map for it",
+          "ru": "Строит ключ из name_color_texture и проверяет его наличие в карте"
         },
         {
-          "en": "Mutating a flyweight has no effect on any other object",
-          "ru": "Изменение легковеса никак не влияет на другие объекты"
+          "en": "It always constructs a new instance and overwrites the old one",
+          "ru": "Всегда создаёт новый экземпляр и перезаписывает старый"
         },
         {
-          "en": "It automatically triggers a factory rebuild of all flyweights",
-          "ru": "Оно автоматически запускает пересборку всех легковесов фабрикой"
+          "en": "It compares the new tree's coordinates against every tree already planted",
+          "ru": "Сравнивает координаты нового дерева со всеми уже посаженными деревьями"
         },
         {
-          "en": "It converts the flyweight's extrinsic state into intrinsic state",
-          "ru": "Оно превращает внешнее состояние легковеса во внутреннее"
+          "en": "It asks the Tree instance whether its type has already been drawn",
+          "ru": "Спрашивает у объекта Tree, был ли его тип уже отрисован"
         }
       ],
       "correct": 0,
       "explanation": {
-        "en": "Since flyweights are shared, mutating one accidentally affects every context referencing it - intrinsic state has to stay strictly read-only.",
-        "ru": "Поскольку легковесы разделяются между объектами, случайное изменение одного из них затронет все контексты, на него ссылающиеся, - внутреннее состояние обязано оставаться строго неизменяемым."
+        "en": "`getTreeType()` builds a key from `name_color_texture` and only calls `new TreeType(...)` if that key isn't already in the cache map, otherwise it returns the existing shared instance.",
+        "ru": "`getTreeType()` строит ключ из `name_color_texture` и вызывает `new TreeType(...)` только если такого ключа ещё нет в карте кэша, иначе возвращает уже существующий общий экземпляр."
+      }
+    },
+    {
+      "question": {
+        "en": "In the walkthrough's planting sequence, why does `TreeTypeFactory.getCount()` report 2 after four trees are planted?",
+        "ru": "Почему `TreeTypeFactory.getCount()` в разборе кода показывает 2 после посадки четырёх деревьев?"
+      },
+      "hint": {
+        "en": "Look at which species and colors were passed to `plantTree()` and how many distinct combinations that produces.",
+        "ru": "Посмотрите, какие виды и цвета передавались в `plantTree()` и сколько различных комбинаций из этого получается."
+      },
+      "options": [
+        {
+          "en": "The four calls form only two distinct intrinsic-data combinations",
+          "ru": "Четыре вызова образуют только две различные комбинации внутренних данных"
+        },
+        {
+          "en": "The factory has a hard-coded limit of two cached types",
+          "ru": "У фабрики жёстко задан лимит в два закэшированных типа"
+        },
+        {
+          "en": "Two of the four `plantTree()` calls silently failed",
+          "ru": "Два из четырёх вызовов `plantTree()` завершились с тихой ошибкой"
+        },
+        {
+          "en": "`getCount()` only counts trees planted at even-numbered coordinates",
+          "ru": "`getCount()` считает только деревья, посаженные в точках с чётными координатами"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Two trees are planted as Oak/green/rough and two as Pine/dark-green/smooth, so the matching pairs reuse the same cached TreeType and only two distinct instances ever get created.",
+        "ru": "Два дерева высажены как Oak/green/rough, а два - как Pine/dark-green/smooth, поэтому совпадающие пары переиспользуют один и тот же закэшированный TreeType, и создаются лишь два различных экземпляра."
+      }
+    },
+    {
+      "question": {
+        "en": "Why can shared intrinsic state be read from multiple threads without extra synchronization, according to the pros?",
+        "ru": "Почему, согласно перечисленным преимуществам, общее внутреннее состояние можно читать из нескольких потоков без дополнительной синхронизации?"
+      },
+      "hint": {
+        "en": "Think about what property intrinsic state is required to have so mutation never becomes an issue.",
+        "ru": "Подумайте, каким свойством обязано обладать внутреннее состояние, чтобы изменения никогда не становились проблемой."
+      },
+      "options": [
+        {
+          "en": "Keeping it immutable and shared makes concurrent reads inherently safe",
+          "ru": "Его неизменность и разделяемость делают параллельное чтение безопасным по своей природе"
+        },
+        {
+          "en": "Each thread automatically receives its own private copy of it",
+          "ru": "Каждый поток автоматически получает собственную приватную копию"
+        },
+        {
+          "en": "The factory locks the entire pool during every read operation",
+          "ru": "Фабрика блокирует весь пул на время каждой операции чтения"
+        },
+        {
+          "en": "Extrinsic state is what actually gets shared between threads",
+          "ru": "На самом деле между потоками разделяется именно внешнее состояние"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Keeping intrinsic state immutable and shared makes it inherently safe to read from multiple threads without extra synchronization, since nothing about it ever changes after creation.",
+        "ru": "Хранение внутреннего состояния неизменяемым и общим делает его по своей природе безопасным для чтения из нескольких потоков без дополнительной синхронизации, так как оно никогда не меняется после создания."
+      }
+    },
+    {
+      "question": {
+        "en": "According to the cons, what tradeoff does Flyweight make to save memory?",
+        "ru": "Согласно недостаткам, какой компромисс делает Легковес ради экономии памяти?"
+      },
+      "hint": {
+        "en": "Extrinsic state has to be recomputed or re-passed on every call - what does that cost?",
+        "ru": "Внешнее состояние приходится пересчитывать или передавать заново при каждом вызове - чего это стоит?"
+      },
+      "options": [
+        {
+          "en": "It spends CPU time recomputing or passing extrinsic state on every call",
+          "ru": "Тратит процессорное время на повторное вычисление или передачу внешнего состояния при каждом вызове"
+        },
+        {
+          "en": "It increases the number of network round-trips per request",
+          "ru": "Увеличивает количество сетевых обращений на каждый запрос"
+        },
+        {
+          "en": "It requires every flyweight to be serialized to disk",
+          "ru": "Требует сериализации каждого легковеса на диск"
+        },
+        {
+          "en": "It forces all extrinsic state to become immutable as well",
+          "ru": "Заставляет всё внешнее состояние также стать неизменяемым"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "You're spending CPU time to save memory - recomputing or re-passing extrinsic state on every call can outweigh the savings if objects aren't numerous enough.",
+        "ru": "Экономия памяти достигается за счёт затрат процессорного времени - повторное вычисление или передача внешнего состояния при каждом вызове может перевесить выигрыш, если объектов не так уж много."
+      }
+    },
+    {
+      "question": {
+        "en": "How does Java's `Integer.valueOf()` cache illustrate Flyweight, per the real-world examples?",
+        "ru": "Как кэш `Integer.valueOf()` в Java иллюстрирует Легковес, согласно примерам из реальной практики?"
+      },
+      "hint": {
+        "en": "Only a narrow range of integer values gets this treatment - think about why that specific range was chosen.",
+        "ru": "Такому обращению подвергается лишь узкий диапазон целых чисел - подумайте, почему выбран именно он."
+      },
+      "options": [
+        {
+          "en": "Small boxed integers are pooled and reused since the same values recur constantly",
+          "ru": "Небольшие упакованные целые берутся из пула и переиспользуются, так как одни и те же значения постоянно повторяются"
+        },
+        {
+          "en": "Every integer value ever used in the program gets cached forever",
+          "ru": "Каждое использованное в программе целочисленное значение кэшируется навсегда"
+        },
+        {
+          "en": "It compiles integer arithmetic into native machine code at runtime",
+          "ru": "Оно компилирует целочисленную арифметику в машинный код во время выполнения"
+        },
+        {
+          "en": "It stores each integer's binary representation on a remote server",
+          "ru": "Оно хранит двоичное представление каждого числа на удалённом сервере"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Small boxed integers (-128 to 127) are pooled and reused rather than allocated fresh, since the same handful of values recur constantly in typical programs - a textbook flyweight pool.",
+        "ru": "Небольшие упакованные целые числа (от -128 до 127) берутся из пула и переиспользуются вместо создания заново, поскольку одни и те же значения постоянно повторяются в типичных программах - классический пул легковесов."
       }
     }
   ],

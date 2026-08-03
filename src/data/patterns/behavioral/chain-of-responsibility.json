@@ -312,8 +312,8 @@
   "quiz": [
     {
       "question": {
-        "en": "What does Chain of Responsibility do with a request?",
-        "ru": "Что Цепочка обязанностей делает с запросом?"
+        "en": "What does Chain of Responsibility do with an incoming request?",
+        "ru": "Что Цепочка обязанностей делает с входящим запросом?"
       },
       "hint": {
         "en": "Think about how many objects get a chance to look at the same request, one after another.",
@@ -321,23 +321,23 @@
       },
       "options": [
         {
-          "en": "Wraps it into a self-contained command object that can be stored, queued, and replayed later",
-          "ru": "Упаковывает его в самостоятельный объект-команду, который можно сохранить, поставить в очередь и повторить позже"
+          "en": "Routes it through a chain of handlers, each free to process it or pass it on",
+          "ru": "Пропускает его по цепочке обработчиков, каждый из которых сам решает обработать его или передать дальше"
         },
         {
-          "en": "Routes it through a chain of handlers, each free to process it or pass it to the next",
-          "ru": "Пропускает его по цепочке обработчиков, каждый из которых сам решает обработать его или передать дальше"
+          "en": "Wraps it into a command object that can be stored and replayed later",
+          "ru": "Упаковывает его в объект-команду, который можно сохранить и повторить позже"
         },
         {
           "en": "Splits it across two parallel, independent class hierarchies",
           "ru": "Разделяет его между двумя параллельными независимыми иерархиями классов"
         },
         {
-          "en": "Broadcasts it to every registered subscriber at the same time",
+          "en": "Broadcasts it to every registered subscriber at once",
           "ru": "Рассылает его всем зарегистрированным подписчикам одновременно"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
         "en": "Chain of Responsibility routes a request through a series of independent handlers, each free to process it itself or hand it off to the next one in line.",
         "ru": "Цепочка обязанностей пропускает запрос через последовательность независимых обработчиков, каждый из которых сам решает - обработать запрос или передать его дальше по цепочке."
@@ -345,32 +345,32 @@
     },
     {
       "question": {
-        "en": "What goes wrong with a single dispatcher function full of nested conditionals for support-ticket routing?",
-        "ru": "Что идёт не так с единой функцией-диспетчером, полной вложенных условий, для маршрутизации тикетов поддержки?"
+        "en": "In the support-desk example, why does a single dispatcher function full of nested conditionals become a problem?",
+        "ru": "В примере со службой поддержки - почему единая функция-диспетчер с вложенными условиями становится проблемой?"
       },
       "hint": {
-        "en": "Imagine you need to insert a brand-new tier between two existing ones - where would that logic have to go?",
+        "en": "Imagine inserting a brand-new tier between two existing ones - where would that logic have to go?",
         "ru": "Представьте, что нужно вставить новый уровень между двумя существующими - куда придётся лезть с этой логикой?"
       },
       "options": [
         {
-          "en": "The bot loses the ability to answer any FAQ-style questions it previously handled",
-          "ru": "Бот теряет способность отвечать на любые типовые вопросы из FAQ, которые раньше обрабатывал"
-        },
-        {
-          "en": "Adding a tier means touching that fragile function and re-checking every branch",
+          "en": "Adding a tier means editing that fragile function and re-checking every branch",
           "ru": "Добавление уровня требует правки той же хрупкой функции и повторной проверки веток"
         },
         {
-          "en": "Tickets can no longer reach an engineer no matter how complex the case is",
-          "ru": "Тикеты больше не могут дойти до инженера, какой бы сложной ни была проблема"
+          "en": "The bot loses its ability to answer FAQ-style questions",
+          "ru": "Бот теряет способность отвечать на типовые вопросы из FAQ"
         },
         {
-          "en": "The dispatcher ends up entirely decoupled from every tier it routes work to",
-          "ru": "Диспетчер в итоге становится полностью независимым от всех уровней, которым он передаёт работу"
+          "en": "Tickets can no longer reach an engineer, however complex",
+          "ru": "Тикеты больше не могут дойти до инженера, какими бы сложными ни были"
+        },
+        {
+          "en": "The dispatcher becomes fully decoupled from every tier it routes to",
+          "ru": "Диспетчер становится полностью независимым от всех уровней, которым он передаёт работу"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
         "en": "Adding a new tier means touching the same fragile dispatcher function and re-verifying every existing branch, and the dispatcher ends up permanently coupled to every tier.",
         "ru": "Добавление нового уровня требует правки той же хрупкой функции и повторной проверки всех веток, а диспетчер оказывается намертво привязан ко всем уровням."
@@ -378,8 +378,8 @@
     },
     {
       "question": {
-        "en": "How does a handler decide what to do with a request it receives?",
-        "ru": "Как обработчик решает, что делать с полученным запросом?"
+        "en": "What does a single handler do when a request arrives at it?",
+        "ru": "Что делает отдельный обработчик, получив запрос?"
       },
       "hint": {
         "en": "Each handler only knows about itself and its immediate successor - what does that limit it to doing?",
@@ -387,23 +387,23 @@
       },
       "options": [
         {
-          "en": "It always forwards the request to every other handler in the chain simultaneously",
-          "ru": "Он всегда пересылает запрос сразу всем остальным обработчикам цепи одновременно"
+          "en": "Inspects it, then handles it or forwards it unchanged to the next handler",
+          "ru": "Проверяет запрос и либо решает его сам, либо без изменений передаёт следующему обработчику"
         },
         {
-          "en": "It checks the request, then either handles it or forwards it to its successor",
-          "ru": "Он проверяет запрос и либо решает его сам, либо передаёт преемнику"
+          "en": "Forwards it to every other handler in the chain simultaneously",
+          "ru": "Пересылает его сразу всем остальным обработчикам цепи одновременно"
         },
         {
-          "en": "It rewrites the request into a brand-new type before passing it further down the chain",
-          "ru": "Он переписывает запрос в совершенно новый тип, прежде чем передать его дальше по цепи"
+          "en": "Rewrites it into a new request type before passing it along",
+          "ru": "Переписывает его в новый тип запроса, прежде чем передать дальше"
         },
         {
-          "en": "It requires the caller to specify in advance exactly which handler should process it",
-          "ru": "Он требует, чтобы вызывающий код заранее указал, какой именно обработчик должен обработать запрос"
+          "en": "Waits for the client to name the exact handler that should process it",
+          "ru": "Ждёт, пока клиент явно не укажет, какой обработчик должен его обработать"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
         "en": "When a request arrives at a handler, it inspects the request and either deals with it on the spot or forwards it unchanged to its successor.",
         "ru": "Получив запрос, обработчик проверяет его и либо решает задачу сам, либо без изменений передаёт запрос преемнику."
@@ -411,32 +411,164 @@
     },
     {
       "question": {
-        "en": "What is a stated benefit of Chain of Responsibility regarding chain assembly?",
-        "ru": "Какое преимущество Цепочки обязанностей указано в отношении сборки цепочки?"
+        "en": "Why doesn't the client need to know which concrete handler ends up processing a request?",
+        "ru": "Почему клиенту не нужно знать, какой конкретный обработчик в итоге обработает запрос?"
       },
       "hint": {
-        "en": "The chain is just a list of links connected at runtime - what does that buy you compared to a hardcoded sequence?",
-        "ru": "Цепочка - это просто список звеньев, связанных во время выполнения. Что это даёт по сравнению с жёстко заданной последовательностью?"
+        "en": "All handlers expose the same method to the outside world - what does that make possible for the caller?",
+        "ru": "Все обработчики предоставляют внешнему миру один и тот же метод - что это даёт вызывающему коду?"
       },
       "options": [
         {
-          "en": "The chain's order is fixed forever once the first handler class is written",
-          "ru": "Порядок цепочки навсегда фиксируется, как только написан первый класс обработчика"
+          "en": "Every handler implements the same interface, so the client just calls the first link",
+          "ru": "Все обработчики реализуют один и тот же интерфейс, поэтому клиент просто обращается к первому звену"
         },
         {
-          "en": "Chains can be assembled per scenario, or rebuilt on the fly, without editing handlers",
-          "ru": "Цепочки можно собирать под сценарий или перестраивать на лету, не трогая обработчики"
+          "en": "The client maintains a lookup table mapping requests to handlers",
+          "ru": "Клиент хранит таблицу соответствий запросов и обработчиков"
         },
         {
-          "en": "Every chain must contain exactly three handlers, no more and no fewer",
-          "ru": "Каждая цепочка обязана содержать ровно три обработчика, не больше и не меньше"
+          "en": "Handlers register themselves with a central request broker",
+          "ru": "Обработчики регистрируются в центральном брокере запросов"
         },
         {
-          "en": "Handlers must know about every other handler in the chain by name in advance",
-          "ru": "Обработчики обязаны заранее знать по имени обо всех остальных обработчиках в цепи"
+          "en": "The chain always has exactly one handler, so there's nothing to choose",
+          "ru": "В цепочке всегда ровно один обработчик, поэтому выбирать не из чего"
         }
       ],
-      "correct": 1,
+      "correct": 0,
+      "explanation": {
+        "en": "Because every handler implements the same interface, the caller never needs to know which concrete handler will end up processing the request - it just hands the request to the first link and lets the chain sort itself out.",
+        "ru": "Поскольку все обработчики реализуют один и тот же интерфейс, вызывающему коду не нужно знать, какой именно обработчик в итоге справится с запросом - он просто отдаёт запрос первому звену."
+      }
+    },
+    {
+      "question": {
+        "en": "In the expense-approval structure, what role does the optional BaseHandler class play?",
+        "ru": "Какую роль в структуре согласования расходов играет необязательный класс BaseHandler?"
+      },
+      "hint": {
+        "en": "Look at what concrete handlers like Team Lead or Manager would otherwise have to repeat themselves.",
+        "ru": "Подумайте, что конкретным обработчикам вроде Тимлида или Менеджера пришлось бы иначе дублировать самим."
+      },
+      "options": [
+        {
+          "en": "Keeps the successor reference and default forwarding logic in one place",
+          "ru": "Хранит ссылку на преемника и логику пересылки по умолчанию в одном месте"
+        },
+        {
+          "en": "Decides which concrete handler gets created at runtime",
+          "ru": "Решает, какой конкретный обработчик создать во время выполнения"
+        },
+        {
+          "en": "Stores the entire history of requests the chain has processed",
+          "ru": "Хранит всю историю запросов, обработанных цепочкой"
+        },
+        {
+          "en": "Validates that the client has permission to submit a request",
+          "ru": "Проверяет, есть ли у клиента право отправить запрос"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "An optional base class factors out the bookkeeping - storing the successor reference and forwarding by default - so concrete handlers only need to write the logic specific to what they check.",
+        "ru": "Необязательный базовый класс берёт на себя рутину - хранение ссылки на преемника и пересылку по умолчанию, - так что конкретным обработчикам остаётся написать только логику своей проверки."
+      }
+    },
+    {
+      "question": {
+        "en": "In the JavaScript implementation, why does setNext return the handler it was given rather than this?",
+        "ru": "В реализации на JavaScript почему setNext возвращает переданный ему обработчик, а не this?"
+      },
+      "hint": {
+        "en": "Look at how the chain gets built: lead.setNext(manager).setNext(director) - each call needs to attach to the one just linked in.",
+        "ru": "Посмотрите, как строится цепочка: lead.setNext(manager).setNext(director) - каждый вызов должен присоединиться к только что подключённому звену."
+      },
+      "options": [
+        {
+          "en": "So calls can be chained fluently, each acting on the handler just linked in",
+          "ru": "Чтобы вызовы можно было объединять цепочкой, действуя на только что подключённом обработчике"
+        },
+        {
+          "en": "Because returning this would create a circular reference",
+          "ru": "Потому что возврат this создал бы циклическую ссылку"
+        },
+        {
+          "en": "It's required so the handler can later remove itself from the chain",
+          "ru": "Это нужно, чтобы обработчик мог позже удалить себя из цепочки"
+        },
+        {
+          "en": "It lets the approve method skip straight to the CEO",
+          "ru": "Это позволяет методу approve сразу переходить к CEO"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "setNext(handler) stores handler in this.next and returns that same handler, not this - that's what lets calls be chained fluently like a.setNext(b).setNext(c).",
+        "ru": "setNext(handler) сохраняет handler в this.next и возвращает именно этот handler, а не this - именно это позволяет писать цепочку вызовов подряд, например a.setNext(b).setNext(c)."
+      }
+    },
+    {
+      "question": {
+        "en": "In the diagram walkthrough for a $50,000 expense, why does Director handle the request instead of the CEO?",
+        "ru": "В примере со схемой для расхода в $50 000 - почему запрос обрабатывает Директор, а не гендиректор?"
+      },
+      "hint": {
+        "en": "The chain stops moving forward as soon as some condition is met - what is that condition tied to?",
+        "ru": "Цепочка перестаёт двигаться вперёд, как только выполняется определённое условие - с чем оно связано?"
+      },
+      "options": [
+        {
+          "en": "The request moves forward only until a handler whose limit covers it accepts it",
+          "ru": "Запрос движется вперёд лишь до обработчика, чей лимит его покрывает"
+        },
+        {
+          "en": "The CEO handler was never linked into this particular chain",
+          "ru": "Обработчик CEO вообще не был подключён к этой цепочке"
+        },
+        {
+          "en": "Directors always get priority over the CEO for large amounts",
+          "ru": "Директора всегда имеют приоритет перед гендиректором для крупных сумм"
+        },
+        {
+          "en": "The chain processes requests in reverse, starting from the CEO",
+          "ru": "Цепочка обрабатывает запросы в обратном порядке, начиная с гендиректора"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The request moves forward until one handler accepts it, then it stops - Director's limit covers $50,000, so the journey ends there and the CEO is never reached.",
+        "ru": "Запрос движется вперёд, пока один обработчик не примет его - и на этом останавливается; лимит Директора покрывает $50 000, поэтому путь заканчивается там, а гендиректор так и не задействован."
+      }
+    },
+    {
+      "question": {
+        "en": "Which of these is listed as a genuine benefit of Chain of Responsibility?",
+        "ru": "Что из перечисленного указано как настоящее преимущество Цепочки обязанностей?"
+      },
+      "hint": {
+        "en": "Since a chain is just an ordered list of links wired together, what does that make easy compared to a hardcoded sequence?",
+        "ru": "Раз цепочка - это просто упорядоченный список связанных звеньев, что это упрощает по сравнению с жёстко заданной последовательностью?"
+      },
+      "options": [
+        {
+          "en": "Chains can be assembled differently per scenario, or rebuilt on the fly",
+          "ru": "Цепочки можно собирать по-разному под сценарий или перестраивать на лету"
+        },
+        {
+          "en": "Every handler must know every other handler in the chain by name",
+          "ru": "Каждый обработчик обязан знать по имени все остальные обработчики цепи"
+        },
+        {
+          "en": "The chain's length is fixed once the first handler class is written",
+          "ru": "Длина цепочки фиксируется, как только написан первый класс обработчика"
+        },
+        {
+          "en": "A request is guaranteed to be handled by exactly one specific handler",
+          "ru": "Запрос гарантированно обрабатывается ровно одним заранее известным обработчиком"
+        }
+      ],
+      "correct": 0,
       "explanation": {
         "en": "Chains can be assembled differently for different scenarios, or rebuilt on the fly, without touching the handler classes themselves.",
         "ru": "Для разных сценариев цепочки можно собирать по-разному или перестраивать на лету, не трогая сами классы обработчиков."
@@ -444,35 +576,68 @@
     },
     {
       "question": {
-        "en": "What is a stated risk of Chain of Responsibility?",
-        "ru": "Какой риск указан для Цепочки обязанностей?"
+        "en": "What is a stated risk if no handler in the chain accepts a request?",
+        "ru": "Какой риск указан, если ни один обработчик в цепочке не принимает запрос?"
       },
       "hint": {
-        "en": "What happens if the request reaches the last handler and even that one declines it?",
-        "ru": "Что произойдёт, если запрос дойдёт до последнего обработчика, а тот тоже откажется его обрабатывать?"
+        "en": "What happens once a request passes the very last link and still gets declined?",
+        "ru": "Что произойдёт, когда запрос пройдёт через самое последнее звено и всё равно получит отказ?"
       },
       "options": [
         {
-          "en": "Handlers automatically process every incoming request at least twice each",
-          "ru": "Обработчики автоматически обрабатывают каждый входящий запрос минимум дважды"
+          "en": "It can silently fall off the chain unhandled",
+          "ru": "Он может незаметно выпасть из цепочки необработанным"
         },
         {
-          "en": "A request can silently go unhandled if no handler catches it",
-          "ru": "Запрос может незаметно остаться необработанным, если его никто не поймает"
+          "en": "The entire chain throws an unrecoverable exception",
+          "ru": "Вся цепочка бросает неустранимое исключение"
         },
         {
-          "en": "Adding any new handler always breaks every handler already in the chain",
-          "ru": "Добавление любого нового обработчика всегда ломает все уже существующие в цепи"
+          "en": "The request automatically loops back to the first handler",
+          "ru": "Запрос автоматически возвращается к первому обработчику"
         },
         {
-          "en": "The chain can never legally contain more than two handlers total",
-          "ru": "Цепочка в принципе не может содержать больше двух обработчиков"
+          "en": "Every handler in the chain is immediately destroyed",
+          "ru": "Все обработчики цепочки немедленно уничтожаются"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
         "en": "If every handler declines and nobody remembered to add a catch-all at the end, a request can silently fall off the chain unhandled.",
         "ru": "Если все обработчики отказываются, а завершающий обработчик «по умолчанию» никто не добавил, запрос может незаметно выпасть из цепочки необработанным."
+      }
+    },
+    {
+      "question": {
+        "en": "Why does tracing which handler processed a request get harder as the chain grows?",
+        "ru": "Почему проследить, какой обработчик обработал запрос, становится сложнее по мере роста цепочки?"
+      },
+      "hint": {
+        "en": "To find the answer, you need to check the outcome at every earlier link, not just the one that finally acted.",
+        "ru": "Чтобы найти ответ, нужно проверить исход на каждом более раннем звене, а не только на том, что в итоге сработал."
+      },
+      "options": [
+        {
+          "en": "Understanding the outcome means stepping through every link that came before",
+          "ru": "Чтобы понять исход, приходится проходить по всем предыдущим звеньям"
+        },
+        {
+          "en": "Handlers overwrite each other's results as the request passes through",
+          "ru": "Обработчики перезаписывают результаты друг друга по мере прохождения запроса"
+        },
+        {
+          "en": "Each handler logs its decision to a different, unrelated file",
+          "ru": "Каждый обработчик записывает решение в свой не связанный с остальными файл"
+        },
+        {
+          "en": "The chain reorders itself randomly on every request",
+          "ru": "Цепочка случайным образом перестраивается при каждом запросе"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Tracing why a particular handler ended up processing (or not processing) a request means stepping through every link that came before it.",
+        "ru": "Чтобы понять, почему конкретный обработчик в итоге обработал (или не обработал) запрос, приходится проходить по всем предыдущим звеньям."
       }
     }
   ],

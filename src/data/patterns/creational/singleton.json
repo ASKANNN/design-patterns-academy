@@ -235,12 +235,12 @@
       },
       "options": [
         {
-          "en": "That the class can never be subclassed",
-          "ru": "Что класс никогда нельзя будет унаследовать"
+          "en": "That exactly one instance exists, reachable the same way everywhere",
+          "ru": "Что существует ровно один экземпляр, доступный одинаковым способом отовсюду"
         },
         {
-          "en": "That exactly one instance exists, reachable globally",
-          "ru": "Что существует ровно один экземпляр, доступный глобально"
+          "en": "That the class can never be subclassed",
+          "ru": "Что класс никогда нельзя будет унаследовать"
         },
         {
           "en": "That the class's methods all run on separate threads",
@@ -251,10 +251,43 @@
           "ru": "Что класс не может хранить состояние"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
-        "en": "The constructor is hidden and a static access method is the only way to obtain the instance, so only one instance ever exists.",
-        "ru": "Конструктор скрыт, и единственный способ получить экземпляр - статический метод доступа, поэтому существует только один экземпляр."
+        "en": "Take the Logger: however many places call the access method, they all get back the same instance writing to the same file handle - no two competing Loggers can silently clobber each other's writes.",
+        "ru": "Возьмём Logger: сколько бы мест ни вызывало метод доступа, все они получают один и тот же экземпляр, пишущий в один файловый дескриптор, - два конкурирующих Logger'а не смогут незаметно затереть записи друг друга."
+      }
+    },
+    {
+      "question": {
+        "en": "In the logging example, what goes wrong if any part of the codebase can freely call `new Logger()`?",
+        "ru": "В примере с логированием, что идёт не так, если любая часть кодовой базы может свободно вызывать `new Logger()`?"
+      },
+      "hint": {
+        "en": "Think about two independent file handles pointed at the very same file on disk.",
+        "ru": "Подумайте о двух независимых файловых дескрипторах, указывающих на один и тот же файл на диске."
+      },
+      "options": [
+        {
+          "en": "Writes from different Logger instances can clobber or interleave",
+          "ru": "Записи от разных экземпляров Logger могут затирать или перемешивать друг друга"
+        },
+        {
+          "en": "The log file becomes impossible to delete",
+          "ru": "Лог-файл становится невозможно удалить"
+        },
+        {
+          "en": "The Logger class stops compiling",
+          "ru": "Класс Logger перестаёт компилироваться"
+        },
+        {
+          "en": "Every Logger instance automatically shares one instance anyway",
+          "ru": "Все экземпляры Logger автоматически становятся одним и тем же"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Nothing stops two different modules from opening independent file handles to the same log file - one write can silently clobber another, and buffered output can end up interleaved or lost.",
+        "ru": "Ничто не помешает двум разным модулям открыть независимые файловые дескрипторы на один и тот же лог-файл - одна запись может незаметно затереть другую, а буферизованный вывод может перемешаться или потеряться."
       }
     },
     {
@@ -268,12 +301,12 @@
       },
       "options": [
         {
-          "en": "To improve runtime performance",
-          "ru": "Чтобы повысить производительность во время выполнения"
-        },
-        {
           "en": "To stop outside code from creating instances with `new`",
           "ru": "Чтобы код снаружи не мог создавать экземпляры через `new`"
+        },
+        {
+          "en": "To improve runtime performance",
+          "ru": "Чтобы повысить производительность во время выполнения"
         },
         {
           "en": "To allow the class to be serialized",
@@ -284,43 +317,10 @@
           "ru": "Потому что статическим методам требуется приватный конструктор"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
         "en": "If the constructor stayed public, any caller could bypass the access method and create a second instance, breaking the single-instance guarantee.",
         "ru": "Если бы конструктор остался публичным, любой вызывающий код мог бы обойти метод доступа и создать второй экземпляр, нарушив гарантию единственности."
-      }
-    },
-    {
-      "question": {
-        "en": "What is a common drawback of using Singleton?",
-        "ru": "В чём типичный недостаток использования Одиночки?"
-      },
-      "hint": {
-        "en": "Consider what happens when you try to unit-test code that depends on it.",
-        "ru": "Подумайте, что происходит, когда вы пытаетесь юнит-тестировать код, зависящий от него."
-      },
-      "options": [
-        {
-          "en": "It makes object creation slower in every case",
-          "ru": "Он всегда замедляет создание объектов"
-        },
-        {
-          "en": "It introduces hidden coupling and complicates testing",
-          "ru": "Он вносит скрытую связанность и усложняет тестирование"
-        },
-        {
-          "en": "It requires every class in the codebase to be static",
-          "ru": "Он требует, чтобы все классы в кодовой базе были статическими"
-        },
-        {
-          "en": "It prevents the class from having any methods",
-          "ru": "Он не позволяет классу иметь методы"
-        }
-      ],
-      "correct": 1,
-      "explanation": {
-        "en": "Code that reaches for the singleton directly hides that dependency from its signature, and swapping in a mock for tests is awkward as a result.",
-        "ru": "Код, напрямую обращающийся к одиночке, скрывает эту зависимость от своей сигнатуры, из-за чего подмена мок-объектом для тестов оказывается затруднена."
       }
     },
     {
@@ -334,12 +334,12 @@
       },
       "options": [
         {
-          "en": "As soon as the program starts, before anything else runs",
-          "ru": "Как только запускается программа, до выполнения всего остального"
-        },
-        {
           "en": "The first time the static access method is called",
           "ru": "При первом вызове статического метода доступа"
+        },
+        {
+          "en": "As soon as the program starts, before anything else runs",
+          "ru": "Как только запускается программа, до выполнения всего остального"
         },
         {
           "en": "Every time the static access method is called",
@@ -350,10 +350,76 @@
           "ru": "Только когда программа вот-вот завершится"
         }
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": {
         "en": "The access method checks the static field, builds the instance only on the first call, and simply returns the cached reference on every call after that.",
         "ru": "Метод доступа проверяет статическое поле, создаёт экземпляр только при первом вызове, а при всех последующих просто возвращает закэшированную ссылку."
+      }
+    },
+    {
+      "question": {
+        "en": "In the Singleton participant's role, what three responsibilities does the class combine?",
+        "ru": "Какие три обязанности объединяет класс в роли участника Singleton?"
+      },
+      "hint": {
+        "en": "Look at the structure description for what the one class owns besides the instance field itself.",
+        "ru": "Посмотрите в описании структуры, чем ещё владеет этот единственный класс, помимо самого поля экземпляра."
+      },
+      "options": [
+        {
+          "en": "State, creation, and access control",
+          "ru": "Состояние, создание и контроль доступа"
+        },
+        {
+          "en": "Networking, rendering, and persistence",
+          "ru": "Работу с сетью, отрисовку и сохранение данных"
+        },
+        {
+          "en": "Logging, testing, and deployment",
+          "ru": "Логирование, тестирование и развёртывание"
+        },
+        {
+          "en": "Inheritance, polymorphism, and encapsulation",
+          "ru": "Наследование, полиморфизм и инкапсуляцию"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The Singleton owns the private constructor, the static instance field, and the public static access method - combining state, creation, and access control in one class.",
+        "ru": "Одиночка владеет приватным конструктором, статическим полем экземпляра и публичным статическим методом доступа, объединяя состояние, создание и контроль доступа в одном классе."
+      }
+    },
+    {
+      "question": {
+        "en": "What is a common drawback of using Singleton?",
+        "ru": "В чём типичный недостаток использования Одиночки?"
+      },
+      "hint": {
+        "en": "Consider what happens when you try to unit-test code that depends on it.",
+        "ru": "Подумайте, что происходит, когда вы пытаетесь юнит-тестировать код, зависящий от него."
+      },
+      "options": [
+        {
+          "en": "It introduces hidden coupling and complicates testing",
+          "ru": "Он вносит скрытую связанность и усложняет тестирование"
+        },
+        {
+          "en": "It makes object creation slower in every case",
+          "ru": "Он всегда замедляет создание объектов"
+        },
+        {
+          "en": "It requires every class in the codebase to be static",
+          "ru": "Он требует, чтобы все классы в кодовой базе были статическими"
+        },
+        {
+          "en": "It prevents the class from having any methods",
+          "ru": "Он не позволяет классу иметь методы"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Anything using the singleton becomes implicitly coupled to it - that dependency doesn't show up in constructor or function signatures, and swapping in a mock for tests is awkward as a result.",
+        "ru": "Всё, что использует одиночку, оказывается неявно связано с ним - эта зависимость не отражается в сигнатурах конструктора или функции, из-за чего подмена мок-объектом для тестов оказывается затруднена."
       }
     },
     {
@@ -375,7 +441,7 @@
           "ru": "Потокам запрещено вызывать статические методы"
         },
         {
-          "en": "The class keyword `static` only works on a single thread",
+          "en": "The keyword `static` only works on a single thread",
           "ru": "Ключевое слово `static` работает только в одном потоке"
         },
         {
@@ -387,6 +453,105 @@
       "explanation": {
         "en": "Without synchronization, two threads can race through the same null-check before either one finishes creating the instance, so the single-instance guarantee breaks unless the creation path is explicitly synchronized.",
         "ru": "Без синхронизации два потока могут одновременно пройти одну и ту же проверку на null, прежде чем кто-то из них завершит создание экземпляра, - и гарантия единственности нарушается, если путь создания явно не синхронизирован."
+      }
+    },
+    {
+      "question": {
+        "en": "According to Singleton's pros, what happens to setup cost if the singleton's part of the program never runs?",
+        "ru": "Согласно преимуществам Одиночки, что происходит с затратами на настройку, если эта часть программы вообще не выполняется?"
+      },
+      "hint": {
+        "en": "Recall that the instance is built only on first actual use - what follows if that first use never happens?",
+        "ru": "Вспомните, что экземпляр создаётся только при первом реальном обращении - что следует из этого, если такого обращения не происходит?"
+      },
+      "options": [
+        {
+          "en": "The setup cost isn't paid at all",
+          "ru": "Затраты на настройку вообще не возникают"
+        },
+        {
+          "en": "The setup cost is paid twice instead of once",
+          "ru": "Затраты на настройку возникают дважды вместо одного раза"
+        },
+        {
+          "en": "The program crashes on startup",
+          "ru": "Программа аварийно завершается при запуске"
+        },
+        {
+          "en": "The static field is deleted automatically",
+          "ru": "Статическое поле автоматически удаляется"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "The instance is built only on first actual use, so its setup cost isn't paid at all if that part of the program never runs.",
+        "ru": "Экземпляр создаётся только при первом реальном обращении, поэтому затраты на его настройку вообще не возникают, если эта часть программы не выполняется."
+      }
+    },
+    {
+      "question": {
+        "en": "According to when_to_use, what kind of resource is Singleton actually meant for?",
+        "ru": "Согласно рекомендациям по применению, для какого рода ресурса на самом деле предназначена Одиночка?"
+      },
+      "hint": {
+        "en": "Compare a resource where two instances just seems redundant against one where two instances would actively conflict.",
+        "ru": "Сравните ресурс, где два экземпляра выглядят просто избыточными, с ресурсом, где два экземпляра реально конфликтовали бы."
+      },
+      "options": [
+        {
+          "en": "A resource that's inherently singular, where duplicates cause real conflicts",
+          "ru": "Ресурс, по своей природе единственный, где дублирование вызывает реальные конфликты"
+        },
+        {
+          "en": "Any class that happens to have no constructor arguments",
+          "ru": "Любой класс, у которого просто нет аргументов конструктора"
+        },
+        {
+          "en": "A class that needs to be copied frequently at runtime",
+          "ru": "Класс, который часто нужно копировать во время выполнения"
+        },
+        {
+          "en": "A class whose instances must all differ from each other",
+          "ru": "Класс, чьи экземпляры обязательно должны отличаться друг от друга"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Reach for Singleton when a resource is inherently singular - a hardware handle, a single log file, a connection pool - and more than one instance would cause real conflicts, not just redundancy.",
+        "ru": "Применяйте Одиночку, когда ресурс по своей природе единственен - доступ к оборудованию, один лог-файл, пул соединений - и появление более одного экземпляра вызовет реальные конфликты, а не просто избыточность."
+      }
+    },
+    {
+      "question": {
+        "en": "What broader risk does global mutable state introduced by a Singleton create?",
+        "ru": "Какой более широкий риск создаёт глобальное изменяемое состояние, вносимое Одиночкой?"
+      },
+      "hint": {
+        "en": "Think about whether calling the same code twice in a different order could produce different results.",
+        "ru": "Подумайте, может ли вызов одного и того же кода дважды в разном порядке давать разные результаты."
+      },
+      "options": [
+        {
+          "en": "Execution order can start mattering in hard-to-reason-about ways",
+          "ru": "Порядок выполнения начинает влиять на результат непредсказуемым образом"
+        },
+        {
+          "en": "The class immediately loses all its methods",
+          "ru": "Класс сразу теряет все свои методы"
+        },
+        {
+          "en": "Every other class in the program becomes a singleton too",
+          "ru": "Все остальные классы программы тоже становятся одиночками"
+        },
+        {
+          "en": "The static access method stops being callable",
+          "ru": "Статический метод доступа перестаёт быть вызываемым"
+        }
+      ],
+      "correct": 0,
+      "explanation": {
+        "en": "Global mutable state introduced by a singleton can make execution order matter in ways that are hard to reason about as the codebase grows.",
+        "ru": "Глобальное изменяемое состояние, вносимое одиночкой, может сделать результат работы программы зависимым от порядка выполнения - и разобраться в этой зависимости становится всё труднее по мере роста кодовой базы."
       }
     }
   ],
