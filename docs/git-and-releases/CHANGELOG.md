@@ -6,6 +6,48 @@ All notable changes to Design Patterns Academy are documented in this file.
 
 ### Added
 
+- Migrated from hash routing to History API routing (`/patterns/adapter`, no
+  `#`): per-route dynamic `<title>`/meta description/canonical/OG/Twitter
+  tags, Playwright-based prerendering (`scripts/prerender.mjs`, built on
+  GitHub Actions since Vercel's own build containers lack the shared
+  libraries Playwright's Chromium needs) so crawlers see real HTML instead
+  of an empty shell, JSON-LD structured data per pattern, updated
+  `sitemap.xml`/`robots.txt`, and Google Search Console verification —
+  hash routing previously collapsed every page into one URL with identical
+  metadata, blocking real SEO regardless of content quality
+- Quizzes — reusable `Quiz` component (`src/components/ui/Quiz.js`), 10
+  bilingual questions per pattern drawn only from facts already stated
+  elsewhere in that pattern's own JSON, Fisher–Yates-shuffled question and
+  option order every render, tiered pass/warn/fail results screen — shipped
+  for all 23 patterns
+- Interactive code walkthroughs — step-by-step line highlighting layered
+  over `CodeBlock` (`src/components/ui/Walkthrough.js`), JavaScript +
+  Python, side-by-side sticky layout that collapses to a stacked column
+  under 860px — shipped for all 23 patterns
+- Pattern playgrounds — sandboxed `iframe` + `Function()` execution for
+  JavaScript/TypeScript (`src/components/ui/Playground.js`, editor +
+  console panes, Run/Reset/Clear), TypeScript stripped via a small
+  regex-based `strip-types.js`; Java/C#/Python stay read-only — shipped
+  for all 23 patterns
+- Advanced search — matches pattern aliases via `also_known_as` (e.g.
+  "Wrapper" now finds Adapter/Decorator), filter logic deduped into a
+  single `src/utils/search.js` shared by the search page and live-typing
+- Favorites — localStorage-backed star toggle on every `PatternCard`, new
+  `/favorites` page
+- Progress tracking — localStorage-backed, manual "Mark as completed"
+  toggle on the pattern detail page, checkmark badge on cards everywhere
+  they're reused, completion counter/bar on `/roadmap`
+- Learning Roadmap — new `/roadmap` page, one fixed recommended path
+  across all 23 patterns ordered by category → complexity → popularity
+- Sound effects — synthesized Web Audio tones for navigation clicks and
+  quiz correct/incorrect answers, toggle inside the existing accessibility
+  widget (`soundEffects`, default on, no external audio assets)
+- Dockable accessibility-widget trigger — slides mostly off-screen after
+  page load, peeks back on hover/tap, undocks on real keyboard focus or
+  while its own panel is open
+- Screen-reader live region + `announce()` helper confirming
+  favorite/progress toggles out loud
+- Dark theme as the default (was light)
 - Previous/next pattern navigation on the pattern detail page, rendered below
   Related Patterns; computed from list order in `src/data/patterns/index.json`,
   hides gracefully at the first/last pattern, full ru/en i18n
@@ -31,6 +73,32 @@ All notable changes to Design Patterns Academy are documented in this file.
 
 ### Fixed
 
+- Stabilized the GitHub Actions → Vercel deploy pipeline: build+prerender
+  now run on GitHub Actions, fixed prerender navigation timeouts/hangs with
+  a watchdog, pinned the Node engine to match Vercel's project settings,
+  launched Chromium with `--no-sandbox` for CI containers, replaced a flaky
+  stdout text-match with HTTP polling for server readiness, corrected
+  `VERCEL_TOKEN` scope, and regenerated `package-lock.json` to fix `npm ci`
+  mismatches
+- Safari/touch tab bar: fixed horizontal overflow (missing `min-width: 0`
+  on the tab list), restricted touch-panning gestures to the tab bar, and
+  moved `touch-action` onto the tab buttons themselves (not just the list)
+- Mobile: strengthened diagram glow on WebKit, stacked the pattern-group
+  list, aligned filter chips
+- Accessibility widget: fixed a WebKit double-tap bug and restored touch
+  docking; kept the trigger reachable on touch devices
+- The global inline `code {}` rule (border/padding/radius meant for
+  `` `inline code` ``) was leaking onto `.code-block__code`, shrinking the
+  highlighted walkthrough line and showing a stray box on mobile
+- Pattern detail: separated the "in the diagram" note from participant
+  role text; stopped the progress badge dot from misaligning language tabs
+- Mobile nav burger menu now closes on link click; router gates the app's
+  first paint on the first route render instead of flashing unstyled
+  content
+- Previous/next pattern navigation now follows Learning Roadmap order when
+  arriving from that page
+- Canonical/OG/sitemap/robots repointed at the live Vercel URL after a
+  domain change
 - Fixed `diagram.css`'s always-on ambient glow on the emphasis/dispatch card
   (`.diagram__card--emphasis`, `.diagram__dispatch`, `core-breathe` keyframes)
   being nearly invisible on phones: `drop-shadow` blur on SVG children scales
@@ -77,6 +145,11 @@ All notable changes to Design Patterns Academy are documented in this file.
 
 ### Changed
 
+- Split the `ui.js` "god module" into focused modules under
+  `src/scripts/interactions/`; converted CSS to mobile-first
+- Replaced the accordion's CSS `max-height` toggle with a JS-driven
+  animated collapse
+- Lazy-render off-screen code panels on tab switch (performance)
 - Stripped narrative/redundant comments across `src/` in favor of
   self-documenting code
 - Stripped all code comments from every pattern's `implementation` code
@@ -86,6 +159,7 @@ All notable changes to Design Patterns Academy are documented in this file.
 
 ### Removed
 
+- Dead toggle CSS left over after closing Phase 13
 - 17 unused UI-kit primitives from Phase 4 that were never wired into any
   page: `Card`, `Checkbox`, `Chip`, `CopyButton`, `Divider`, `Input`,
   `Modal`, `Pagination`, `ProgressBar`, `Radio`, `Select`, `Skeleton`,
