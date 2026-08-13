@@ -173,7 +173,7 @@ during this sprint, bug fixing only.
 
 - [x] Custom domain — **decided against (2026-08-13):** not worth the
       ongoing cost. Discovery/navigation into this project is handled by
-      an external hub site ("Академия HB") that links into this app.
+      an external hub site ("Askan Academy") that links into this app.
 - [x] Advanced search (alias matching)
 - [x] Favorites
 - [x] Progress tracking
@@ -191,6 +191,6 @@ during this sprint, bug fixing only.
 **Out of scope for this repository (2026-08-13, owner decision).** The
 multi-module vision (parent portal, module navigation, additional academies
 beyond GoF patterns) is realized one level up, on an external hub site
-("Академия HB") that provides the parent portal / cross-module navigation
+("Askan Academy") that provides the parent portal / cross-module navigation
 and links into this app as one module. This repository stays scoped to the
 Design Patterns module.
