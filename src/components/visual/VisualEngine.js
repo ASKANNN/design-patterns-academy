@@ -14,7 +14,7 @@ export function createVisualEngine(root, options = {}) {
   const svgNS = 'http://www.w3.org/2000/svg';
   let overlay = null;
   let _pendingArrivals = [];
-  let _lastPacketDot = null;
+  let _onPacketCreated = null;
 
   const node = (id) => svg.querySelector(`[data-node-id="${cssEscape(id)}"]`);
   const focalNodes = () =>
@@ -108,7 +108,7 @@ export function createVisualEngine(root, options = {}) {
     getOverlay().appendChild(dot);
     if (!spec.loop) {
       dot.addEventListener('animationend', () => dot.remove(), { once: true });
-      _lastPacketDot = dot;
+      if (_onPacketCreated) _onPacketCreated(dot);
     }
     return api;
   }
@@ -203,11 +203,15 @@ export function createVisualEngine(root, options = {}) {
     });
 
     const arrivalIds = new Set();
+    const arrivalOrder = [];
     if (hasPacket) {
       actions.forEach((a) => {
         if (!a.do || !a.node) return;
         const p = getPrimitive(a.do);
-        if (p && (p.kind === 'node' || p.kind === 'state')) arrivalIds.add(a.node);
+        if (p && (p.kind === 'node' || p.kind === 'state') && !arrivalIds.has(a.node)) {
+          arrivalIds.add(a.node);
+          arrivalOrder.push(a.node);
+        }
       });
     }
 
@@ -217,41 +221,69 @@ export function createVisualEngine(root, options = {}) {
     }
 
     const immediate = [];
-    const deferred  = [];
+    const deferredByTarget = new Map(arrivalOrder.map((id) => [id, []]));
     actions.forEach((a) => {
-      if (_isArrivalTarget(a, arrivalIds)) deferred.push(a);
+      const targetId = _arrivalTargetId(a, arrivalIds);
+      if (targetId) deferredByTarget.get(targetId).push(a);
       else immediate.push(a);
     });
 
-    _lastPacketDot = null;
+    const packetDots = [];
+    _onPacketCreated = (dot) => packetDots.push(dot);
     immediate.forEach((a) => _applyAction(a, true));
+    _onPacketCreated = null;
 
-    const applyDeferred = () => deferred.forEach((a) => _applyAction(a, true));
-
-    const dot = _lastPacketDot;
     const delay = _arrivalDelay();
+
+    // One packet per arrival target (the common case, incl. fan-out to several
+    // branches in the same step): each card waits for its OWN branch's dot,
+    // not for whichever dot happened to be created last.
+    if (packetDots.length === arrivalOrder.length) {
+      arrivalOrder.forEach((id, i) => {
+        _scheduleArrival(packetDots[i], delay, () => {
+          deferredByTarget.get(id).forEach((a) => _applyAction(a, true));
+        });
+      });
+      return;
+    }
+
+    // Ambiguous pairing (packet count != target count) - fall back to waiting
+    // for every dot to finish before lighting up any deferred card.
+    const applyAllDeferred = () => arrivalOrder.forEach((id) =>
+      deferredByTarget.get(id).forEach((a) => _applyAction(a, true)));
+    if (packetDots.length === 0) {
+      const tid = setTimeout(applyAllDeferred, delay);
+      _pendingArrivals.push(tid);
+      return;
+    }
+    let remaining = packetDots.length;
+    const onOneDone = () => { remaining -= 1; if (remaining <= 0) applyAllDeferred(); };
+    packetDots.forEach((dot) => _scheduleArrival(dot, delay, onOneDone));
+  }
+
+  function _scheduleArrival(dot, delay, applyFn) {
     if (dot) {
       let fired = false;
       const fire = () => {
         if (fired) return;
         fired = true;
-        applyDeferred();
+        applyFn();
       };
       dot.addEventListener('animationend', fire, { once: true });
       const tid = setTimeout(fire, delay * 1.5);
       _pendingArrivals.push(tid);
     } else {
-      const tid = setTimeout(applyDeferred, delay);
+      const tid = setTimeout(applyFn, delay);
       _pendingArrivals.push(tid);
     }
   }
 
-  function _isArrivalTarget(action, ids) {
-    if (action.set && ids.has(action.set.id) && action.set.state !== 'dim') return true;
-    if (action.glow && ids.has(action.glow)) return true;
-    if (action.highlight && ids.has(action.highlight)) return true;
-    if (action.do  && action.node && ids.has(action.node)) return true;
-    return false;
+  function _arrivalTargetId(action, ids) {
+    if (action.set && ids.has(action.set.id) && action.set.state !== 'dim') return action.set.id;
+    if (action.glow && ids.has(action.glow)) return action.glow;
+    if (action.highlight && ids.has(action.highlight)) return action.highlight;
+    if (action.do  && action.node && ids.has(action.node)) return action.node;
+    return null;
   }
 
   function _arrivalDelay() {

@@ -196,6 +196,19 @@
   stroke: transparent;
 }
 
+@media (max-width: 640px) {
+  .diagram__card--emphasis {
+    filter:
+      drop-shadow(0 10px 20px rgba(17, 24, 39, 0.16))
+      drop-shadow(0 30px 120px color-mix(in srgb, var(--diagram-accent) 65%, transparent));
+  }
+  [data-theme="dark"] .diagram__card--emphasis {
+    filter:
+      drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 30px 130px color-mix(in srgb, var(--diagram-accent) 80%, transparent));
+  }
+}
+
 .diagram__card-chip {
   fill: var(--color-accent-subtle);
   stroke: none;
@@ -505,6 +518,16 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .diagram--nested .diagram__card--emphasis { animation: none; }
+}
+@media (max-width: 640px) {
+  @keyframes core-breathe {
+    0%, 100% { filter:
+      drop-shadow(0 10px 20px rgba(17, 24, 39, 0.22))
+      drop-shadow(0 0 65px color-mix(in srgb, var(--diagram-accent) 60%, transparent)); }
+    50%      { filter:
+      drop-shadow(0 10px 20px rgba(17, 24, 39, 0.22))
+      drop-shadow(0 0 105px color-mix(in srgb, var(--diagram-accent) 88%, transparent)); }
+  }
 }
 
 .diagram__rail-base {
@@ -1551,6 +1574,18 @@
   filter:
     drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5))
     drop-shadow(0 20px 46px color-mix(in srgb, var(--diagram-accent) 55%, transparent));
+}
+@media (max-width: 640px) {
+  .diagram__dispatch {
+    filter:
+      drop-shadow(0 10px 20px rgba(17, 24, 39, 0.16))
+      drop-shadow(0 30px 120px color-mix(in srgb, var(--diagram-accent) 65%, transparent));
+  }
+  [data-theme="dark"] .diagram__dispatch {
+    filter:
+      drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 30px 130px color-mix(in srgb, var(--diagram-accent) 80%, transparent));
+  }
 }
 .diagram__dispatch-bg {
   stroke: transparent;

@@ -31,6 +31,20 @@ All notable changes to Design Patterns Academy are documented in this file.
 
 ### Fixed
 
+- Fixed `diagram.css`'s always-on ambient glow on the emphasis/dispatch card
+  (`.diagram__card--emphasis`, `.diagram__dispatch`, `core-breathe` keyframes)
+  being nearly invisible on phones: `drop-shadow` blur on SVG children scales
+  with the viewBox, not real screen pixels, so the same px values that read
+  fine on desktop shrank to a third of their size at phone viewBox scale;
+  added a `max-width: 640px` override with blur increased to compensate,
+  for both light and dark themes
+- Fixed arrival-gated glow in `VisualEngine` relying on a single
+  last-created packet dot: in timeline steps that fan out several impulses
+  at once (Observer's broadcast to subscribers, Mediator's route to
+  connected colleagues), every target card now waits for its *own*
+  branch's packet to actually arrive instead of being gated by whichever
+  dot happened to be created last; falls back to waiting for all packets
+  in the step when packet/target counts don't line up 1:1
 - Rewrote English pattern content in original wording
 - Fixed Russian-language calques (literal English-to-Russian translations)
   across all 23 pattern JSON files
