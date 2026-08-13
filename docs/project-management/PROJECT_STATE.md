@@ -1,6 +1,6 @@
 # Project State
 
-Last Updated: 2026-07-31
+Last Updated: 2026-08-13
 
 ---
 
@@ -486,10 +486,12 @@ Version: **v1.1.0**
 
 Status: In active development
 
-Current focus: Phase 14 — Platform Improvements is nearly complete (advanced
+Current focus: Phase 14 — Platform Improvements is complete (advanced
 search, favorites, progress tracking, learning roadmap, and UX improvements
-shipped; only "Custom domain" remains, deliberately deferred — no budget yet).
-Phase 15 has not started. Phase 9 (live production deployment) and Phase 13
+shipped; custom domain decided against — not worth the ongoing cost,
+discovery is handled by an external hub site instead). Phase 15
+(multi-module platform) is out of scope for this repository — realized on
+that external hub. Phase 9 (live production deployment) and Phase 13
 (interactive learning) are both closed; practical exercises remain deferred
 pending scope discussion.
 

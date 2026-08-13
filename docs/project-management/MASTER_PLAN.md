@@ -90,15 +90,20 @@ Factory Method       BESPOKE (`override`) — committed (Client ->
                      term in Participants now appears verbatim
                      somewhere in the diagram; concrete names
                      (RoadLogistics, Truck) kept as secondary/flavor
-                     text. Note: this same example-name-vs-generic-role
-                     divergence still exists, unaddressed, in the
-                     already-shipped Visitor (Circle/Rectangle/
+                     text. Note: the same example-name-vs-generic-role
+                     divergence exists in Visitor (Circle/Rectangle/
                      XMLExporter vs Visitor/ConcreteVisitor/Element/
                      ConcreteElement) and Template Method
                      (ReportGenerator/HtmlReport/MarkdownReport vs
-                     AbstractClass/ConcreteClass) diagrams — flagged
-                     here as a possible future cross-pattern
-                     consistency pass, not yet scheduled or agreed)
+                     AbstractClass/ConcreteClass), but via a different
+                     mechanism than Factory Method's kicker: both
+                     patterns' `structure.participants[].role` text
+                     already carries an explicit bold "In the diagram: X"
+                     callout for every ConcreteX row, bridging the
+                     generic name to the concrete diagram label from the
+                     Participants side instead of the diagram side.
+                     Re-verified live in the browser 2026-08-13 — reads
+                     clearly, no fix needed.)
 Abstract Factory     BESPOKE (`family`) — committed and pushed
                      (Client -> Abstract
                      Factory card branching down into a dashed "same

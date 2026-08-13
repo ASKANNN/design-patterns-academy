@@ -123,9 +123,8 @@ of content quality.
       (ownership verified via `public/google27f15fcbbc0bee4a.html`)
 
 **Known gap:** indexing is a waiting game (days to a few weeks) and the
-domain has no backlink authority yet — see Phase 14 for the custom-domain
-follow-up, which will need a redirect from the `vercel.app` address and
-re-verification in Search Console once it lands.
+domain has no backlink authority yet. No custom-domain migration is
+planned (see Phase 14) — the `vercel.app` address stays permanent.
 
 ---
 
@@ -312,14 +311,14 @@ No new features are implemented during this sprint — only bug fixing and stabi
 
 ---
 
-## Phase 14 — Platform Improvements
+## Phase 14 — Platform Improvements ✅
 
-- [ ] Custom domain (buy + connect in Vercel, update `SITE_URL` in
-      `src/config/site.js` and every place that references the domain,
-      301-redirect the old `vercel.app` address, re-verify in Google Search
-      Console and resubmit `sitemap.xml` under the new domain). **Deferred
-      to the end of Phase 14 (2026-08-01, owner decision)** — no domain
-      purchased yet; the other Phase 14 items don't depend on it.
+- [x] Custom domain — **decided against (2026-08-13, owner decision):** not
+      worth the ongoing cost. Discovery/navigation into this project is
+      handled by an external hub site ("Академия HB"), which links into
+      this app rather than this app owning its own top-level domain. Stays
+      on the `vercel.app` address; no `SITE_URL`/redirect/Search Console
+      work needed.
 - [x] Advanced search — search previously matched only `name`/`category`/
       `summary`/`tags` from `index.json`, so alias queries like "Wrapper"
       (Adapter, Decorator) or "Kit" (Abstract Factory) returned nothing.
@@ -486,10 +485,9 @@ tap-to-activate) — zero console errors.
 
 ## Phase 15 — Software Engineering Platform
 
-- [ ] Parent portal
-- [ ] Multi-module navigation
-- [ ] Algorithms Academy
-- [ ] Data Structures Academy
-- [ ] Backend Academy
-- [ ] DevOps Academy
-- [ ] AI Academy
+**Out of scope for this repository (2026-08-13, owner decision).** The
+multi-module vision (parent portal, module navigation, additional academies
+beyond GoF patterns) is realized one level up, on an external hub site
+("Академия HB") that provides the parent portal / cross-module navigation
+and links into this app as one module. This repository stays scoped to the
+Design Patterns module.
