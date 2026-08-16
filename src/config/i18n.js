@@ -7,12 +7,8 @@ let _lang         = DEFAULT_LANG;
 let _translations = {};
 
 export async function initI18n() {
-  const saved   = localStorage.getItem(STORAGE_KEY);
-  const browser = navigator.language.split('-')[0];
-
-  const lang = SUPPORTED_LANGS.includes(saved)   ? saved
-             : SUPPORTED_LANGS.includes(browser)  ? browser
-             : DEFAULT_LANG;
+  const saved = localStorage.getItem(STORAGE_KEY);
+  const lang  = SUPPORTED_LANGS.includes(saved) ? saved : DEFAULT_LANG;
 
   await _load(lang);
 }
