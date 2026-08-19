@@ -267,16 +267,16 @@
   ],
   "when_to_use": [
     {
-      "en": "Reach for it when a class can't know in advance the exact type of object it will need to create - that decision belongs to a subclass or is resolved at runtime.",
-      "ru": "Применяйте паттерн, когда класс заранее не может знать точный тип объекта, который ему нужно создать, - это решение принадлежит подклассу или разрешается во время выполнения."
+      "en": "Reach for Factory Method when a class can't know in advance the exact type of object it will need to create - that decision belongs to a subclass or is resolved at runtime.",
+      "ru": "Применяйте Фабричный метод, когда класс заранее не может знать точный тип объекта, который ему нужно создать, - это решение принадлежит подклассу или разрешается во время выполнения."
     },
     {
-      "en": "Reach for it when you're building a library or framework and want callers to be able to plug in their own product types without modifying your internal code.",
-      "ru": "Применяйте паттерн, когда вы создаёте библиотеку или фреймворк и хотите, чтобы пользователи могли подключать собственные типы продуктов, не изменяя ваш внутренний код."
+      "en": "It's a natural fit when you're building a library or framework and want callers to be able to plug in their own product types without modifying your internal code.",
+      "ru": "Паттерн уместен, когда вы создаёте библиотеку или фреймворк и хотите, чтобы пользователи могли подключать собственные типы продуктов, не изменяя ваш внутренний код."
     },
     {
-      "en": "Reach for it when several classes share almost identical logic and differ only in which kind of object they instantiate at one specific point.",
-      "ru": "Применяйте паттерн, когда несколько классов имеют почти идентичную логику и различаются только тем, объект какого типа они создают в одной конкретной точке."
+      "en": "Use it when several classes share almost identical logic and differ only in which kind of object they instantiate at one specific point.",
+      "ru": "Используйте его, когда несколько классов имеют почти идентичную логику и различаются только тем, объект какого типа они создают в одной конкретной точке."
     }
   ],
   "real_world_examples": [

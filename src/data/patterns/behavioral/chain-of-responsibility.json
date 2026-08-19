@@ -277,8 +277,8 @@
   ],
   "when_to_use": [
     {
-      "en": "Reach for this pattern when a request might need one of several different treatments and you can't pin down in advance which handler, or how many, will actually run.",
-      "ru": "Применяйте паттерн, когда запрос может потребовать одну из нескольких разных обработок, и заранее нельзя определить, какой обработчик и сколько их сработает."
+      "en": "Reach for Chain of Responsibility when a request might need one of several different treatments and you can't pin down in advance which handler, or how many, will actually run.",
+      "ru": "Применяйте Цепочку обязанностей, когда запрос может потребовать одну из нескольких разных обработок, и заранее нельзя определить, какой обработчик и сколько их сработает."
     },
     {
       "en": "Use it when several independent steps must run against the same request in a specific, well-defined order.",

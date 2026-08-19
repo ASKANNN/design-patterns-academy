@@ -268,16 +268,16 @@
   ],
   "when_to_use": [
     {
-      "en": "Reach for it when code holds objects only through a common interface and has to duplicate them without ever knowing their concrete class.",
-      "ru": "Применяйте паттерн, когда код держит объекты только через общий интерфейс и должен их дублировать, не зная их конкретного класса."
+      "en": "Reach for Prototype when code holds objects only through a common interface and has to duplicate them without ever knowing their concrete class.",
+      "ru": "Применяйте Прототип, когда код держит объекты только через общий интерфейс и должен их дублировать, не зная их конкретного класса."
     },
     {
-      "en": "Reach for it when building a new instance from scratch is measurably more expensive than copying an already-configured one.",
-      "ru": "Применяйте паттерн, когда построение нового экземпляра с нуля заметно дороже, чем копирование уже настроенного."
+      "en": "It pays off when building a new instance from scratch is measurably more expensive than copying an already-configured one.",
+      "ru": "Паттерн окупается, когда построение нового экземпляра с нуля заметно дороже, чем копирование уже настроенного."
     },
     {
-      "en": "Reach for it when you're maintaining a growing set of subclasses that differ only in preset field values - a library of cloneable prototypes replaces that hierarchy.",
-      "ru": "Применяйте паттерн, когда вы поддерживаете растущий набор подклассов, отличающихся только преднастроенными значениями полей, - библиотека клонируемых прототипов заменяет эту иерархию."
+      "en": "Use it when you're maintaining a growing set of subclasses that differ only in preset field values - a library of cloneable prototypes replaces that hierarchy.",
+      "ru": "Используйте его, когда вы поддерживаете растущий набор подклассов, отличающихся только преднастроенными значениями полей, - библиотека клонируемых прототипов заменяет эту иерархию."
     }
   ],
   "real_world_examples": [

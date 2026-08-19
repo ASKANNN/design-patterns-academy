@@ -311,16 +311,16 @@
   ],
   "when_to_use": [
     {
-      "en": "Reach for it when a system must stay agnostic to which concrete family of products it works with, and that family is chosen at runtime or configuration time.",
-      "ru": "Применяйте паттерн, когда система должна оставаться независимой от конкретного семейства продуктов, а само семейство выбирается во время выполнения или через конфигурацию."
+      "en": "Reach for Abstract Factory when a system must stay agnostic to which concrete family of products it works with, and that family is chosen at runtime or configuration time.",
+      "ru": "Применяйте Абстрактную фабрику, когда система должна оставаться независимой от конкретного семейства продуктов, а само семейство выбирается во время выполнения или через конфигурацию."
     },
     {
-      "en": "Reach for it when several related product types must always be used together as a matching set, and accidentally mixing variants would be a real bug.",
-      "ru": "Применяйте паттерн, когда несколько связанных типов продуктов всегда должны использоваться вместе как согласованный набор, а случайное смешение вариантов было бы реальной ошибкой."
+      "en": "It fits well when several related product types must always be used together as a matching set, and accidentally mixing variants would be a real bug.",
+      "ru": "Паттерн подходит, когда несколько связанных типов продуктов всегда должны использоваться вместе как согласованный набор, а случайное смешение вариантов было бы реальной ошибкой."
     },
     {
-      "en": "Reach for it when you already have a Factory Method for one product and realize a second, third, and fourth related product need the same variant-based creation logic.",
-      "ru": "Применяйте паттерн, когда у вас уже есть Фабричный метод для одного продукта, и вы понимаете, что второму, третьему и четвёртому связанным продуктам нужна та же логика создания на основе варианта."
+      "en": "Consider it when you already have a Factory Method for one product and realize a second, third, and fourth related product need the same variant-based creation logic.",
+      "ru": "Стоит применить его, когда у вас уже есть Фабричный метод для одного продукта, и вы понимаете, что второму, третьему и четвёртому связанным продуктам нужна та же логика создания на основе варианта."
     }
   ],
   "real_world_examples": [

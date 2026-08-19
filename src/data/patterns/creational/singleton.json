@@ -195,12 +195,12 @@
   ],
   "when_to_use": [
     {
-      "en": "Reach for it when a resource is inherently singular - a hardware handle, a single log file, a connection pool - and more than one instance would cause real conflicts, not just redundancy.",
-      "ru": "Применяйте паттерн, когда ресурс по своей природе единственен - доступ к оборудованию, один лог-файл, пул соединений - и появление более одного экземпляра вызовет реальные конфликты, а не просто избыточность."
+      "en": "Reach for Singleton when a resource is inherently singular - a hardware handle, a single log file, a connection pool - and more than one instance would cause real conflicts, not just redundancy.",
+      "ru": "Применяйте Одиночку, когда ресурс по своей природе единственен - доступ к оборудованию, один лог-файл, пул соединений - и появление более одного экземпляра вызовет реальные конфликты, а не просто избыточность."
     },
     {
-      "en": "Reach for it when many unrelated parts of the codebase need the same shared object and threading it through every layer as an explicit parameter would be impractical.",
-      "ru": "Применяйте паттерн, когда множеству не связанных друг с другом частей кодовой базы нужен один и тот же общий объект, а протаскивать его через каждый слой как явный параметр непрактично."
+      "en": "It fits well when many unrelated parts of the codebase need the same shared object and threading it through every layer as an explicit parameter would be impractical.",
+      "ru": "Паттерн подходит, когда множеству не связанных друг с другом частей кодовой базы нужен один и тот же общий объект, а протаскивать его через каждый слой как явный параметр непрактично."
     }
   ],
   "real_world_examples": [

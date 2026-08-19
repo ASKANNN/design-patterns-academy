@@ -295,16 +295,16 @@
   ],
   "when_to_use": [
     {
-      "en": "Reach for it when a constructor would need many optional parameters and most calls would only set a handful of them.",
-      "ru": "Применяйте паттерн, когда конструктору потребовалось бы много необязательных параметров, а большинство вызовов задавало бы лишь часть из них."
+      "en": "Reach for Builder when a constructor would need many optional parameters and most calls would only set a handful of them.",
+      "ru": "Применяйте Строителя, когда конструктору потребовалось бы много необязательных параметров, а большинство вызовов задавало бы лишь часть из них."
     },
     {
-      "en": "Reach for it when the same underlying construction process needs to yield visibly different end results depending on which builder or steps are used.",
-      "ru": "Применяйте паттерн, когда один и тот же процесс конструирования должен давать заметно разные конечные результаты в зависимости от используемого строителя или набора шагов."
+      "en": "It's a good fit when the same underlying construction process needs to yield visibly different end results depending on which builder or steps are used.",
+      "ru": "Паттерн полезен, когда один и тот же процесс конструирования должен давать заметно разные конечные результаты в зависимости от используемого строителя или набора шагов."
     },
     {
-      "en": "Reach for it when assembling an object involves ordering constraints or nested sub-objects that are easier to express as discrete steps than as one call.",
-      "ru": "Применяйте паттерн, когда сборка объекта подразумевает ограничения на порядок операций или вложенные подобъекты, которые проще выразить отдельными шагами, чем одним вызовом."
+      "en": "Use it when assembling an object involves ordering constraints or nested sub-objects that are easier to express as discrete steps than as one call.",
+      "ru": "Используйте его, когда сборка объекта подразумевает ограничения на порядок операций или вложенные подобъекты, которые проще выразить отдельными шагами, чем одним вызовом."
     }
   ],
   "real_world_examples": [

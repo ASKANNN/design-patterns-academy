@@ -72,7 +72,7 @@ export async function PatternDetailPage({ category, slug } = {}) {
           <h1 class="pattern-detail__title">${PatternIcon({ pattern: slug, category, size: 'lg' })}<span class="pattern-detail__title-text">${pattern.name}</span></h1>
 
           <p class="pattern-detail__intent">
-            ${localise(pattern.intent, lang)}
+            ${_mdInline(localise(pattern.intent, lang))}
           </p>
 
           <div class="pattern-detail__stats">
@@ -136,7 +136,7 @@ function _intentPanel(p, lang) {
           <h3 class="detail-section__title">${t('patterns.sections.when_to_use')}</h3>
           <ul class="detail-list">
             ${p.when_to_use.map(item =>
-              `<li class="detail-list__item">${localise(item, lang)}</li>`
+              `<li class="detail-list__item">${_mdInline(localise(item, lang))}</li>`
             ).join('')}
           </ul>
         </div>
@@ -147,7 +147,7 @@ function _intentPanel(p, lang) {
           <h3 class="detail-section__title">${t('patterns.sections.real_world')}</h3>
           <ul class="detail-list">
             ${p.real_world_examples.map(ex =>
-              `<li class="detail-list__item">${localise(ex, lang)}</li>`
+              `<li class="detail-list__item">${_mdInline(localise(ex, lang))}</li>`
             ).join('')}
           </ul>
         </div>
@@ -163,7 +163,7 @@ function _structurePanel(p, lang) {
       ${struct.description ? `
         <div>
           <h3 class="detail-section__title">${t('patterns.sections.structure')}</h3>
-          <p>${localise(struct.description, lang)}</p>
+          <p>${_mdInline(localise(struct.description, lang))}</p>
         </div>
       ` : ''}
 
@@ -174,7 +174,7 @@ function _structurePanel(p, lang) {
           <h3 class="detail-section__title">${t('patterns.sections.participants')}</h3>
           <div class="participants-list" role="list">
             ${struct.participants.map(part => {
-              const { role, diagramNote } = _splitDiagramNote(localise(part.role, lang));
+              const { role, diagramNote } = _splitDiagramNote(_mdInline(localise(part.role, lang)));
               return `
               <div class="participant" role="listitem">
                 <span class="participant__name">${part.name}</span>
@@ -479,14 +479,19 @@ function _progressToggle(slug) {
   `;
 }
 
+function _mdInline(text = '') {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>');
+}
+
 function _mdToHtml(text = '') {
   return text
     .split('\n\n')
     .map(para => {
       const trimmed = para.trim();
       if (!trimmed) return '';
-      const formatted = trimmed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      return `<p>${formatted}</p>`;
+      return `<p>${_mdInline(trimmed)}</p>`;
     })
     .join('');
 }
