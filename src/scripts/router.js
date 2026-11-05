@@ -60,7 +60,7 @@ export async function initRouter(outletEl) {
     _markActiveLinks(path);
     setPageMeta(path, params);
     refreshAnimations(_outlet);
-    document.getElementById('main-content')?.focus();
+    document.getElementById('main-content')?.focus({ preventScroll: true });
     window.dispatchEvent(new CustomEvent('app:navigated'));
   };
 
